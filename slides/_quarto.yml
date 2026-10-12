@@ -1,0 +1,26 @@
+project:
+  type: default
+
+title: "Teaching Machines to Read DNA"
+format:
+  revealjs:
+    width: 1600
+    height: 900
+    code-overflow: scroll
+    code-line-wrapping: true
+    title-slide-attributes:
+      data-state: "hide-menubar"
+    slide-number: true
+    preview-links: auto
+    css: style.css
+    logo: assets/logo.png
+    footer: 'AI Days 2026 - Teaching Machines to Read DNA  '
+    toc: false
+    simplemenu:
+      flat: true
+      barhtml:
+          header: "<div class='menubar'><ul class='menu'></ul></div>"
+      scale: 0.42
+
+revealjs-plugins:
+  - simplemenu

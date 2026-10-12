@@ -1,0 +1,88 @@
+[time] load_and_encode: 2.07 s
+seed 0 ep 01 auc 0.7930 (1.9s)
+seed 0 ep 02 auc 0.8401 (1.4s)
+seed 0 ep 03 auc 0.8531 (1.0s)
+seed 0 ep 04 auc 0.8566 (1.1s)
+seed 0 ep 05 auc 0.8565 (1.4s)
+seed 0 ep 06 auc 0.8586 (1.6s)
+seed 0 ep 07 auc 0.8616 (1.4s)
+seed 0 ep 08 auc 0.8637 (1.4s)
+seed 0 ep 09 auc 0.8652 (1.4s)
+seed 0 ep 10 auc 0.8667 (1.4s)
+seed 0 ep 11 auc 0.8672 (1.6s)
+seed 0 ep 12 auc 0.8689 (1.4s)
+seed 0 ep 13 auc 0.8676 (1.4s)
+seed 0 ep 14 auc 0.8692 (1.4s)
+seed 0 ep 15 auc 0.8677 (1.4s)
+seed 0 ep 16 auc 0.8684 (1.6s)
+seed 0 ep 17 auc 0.8680 (1.4s)
+seed 0 ep 18 auc 0.8694 (1.4s)
+seed 0 ep 19 auc 0.8694 (1.3s)
+seed 0 ep 20 auc 0.8698 (1.4s)
+seed 1 ep 01 auc 0.7819 (1.6s)
+seed 1 ep 02 auc 0.8069 (1.4s)
+seed 1 ep 03 auc 0.8325 (1.4s)
+seed 1 ep 04 auc 0.8432 (1.4s)
+seed 1 ep 05 auc 0.8509 (1.4s)
+seed 1 ep 06 auc 0.8540 (1.6s)
+seed 1 ep 07 auc 0.8593 (1.4s)
+seed 1 ep 08 auc 0.8619 (1.5s)
+seed 1 ep 09 auc 0.8638 (1.5s)
+seed 1 ep 10 auc 0.8669 (1.8s)
+seed 1 ep 11 auc 0.8681 (1.6s)
+seed 1 ep 12 auc 0.8702 (1.6s)
+seed 1 ep 13 auc 0.8706 (1.6s)
+seed 1 ep 14 auc 0.8739 (1.6s)
+seed 1 ep 15 auc 0.8734 (1.6s)
+seed 1 ep 16 auc 0.8714 (1.5s)
+seed 1 ep 17 auc 0.8738 (1.5s)
+seed 1 ep 18 auc 0.8751 (1.4s)
+seed 1 ep 19 auc 0.8749 (1.6s)
+seed 1 ep 20 auc 0.8759 (1.7s)
+seed 2 ep 01 auc 0.7914 (1.4s)
+seed 2 ep 02 auc 0.8269 (1.4s)
+seed 2 ep 03 auc 0.8419 (1.5s)
+seed 2 ep 04 auc 0.8507 (1.6s)
+seed 2 ep 05 auc 0.8537 (1.7s)
+seed 2 ep 06 auc 0.8585 (1.4s)
+seed 2 ep 07 auc 0.8606 (1.4s)
+seed 2 ep 08 auc 0.8628 (1.4s)
+seed 2 ep 09 auc 0.8660 (1.4s)
+seed 2 ep 10 auc 0.8678 (1.6s)
+seed 2 ep 11 auc 0.8662 (1.4s)
+seed 2 ep 12 auc 0.8679 (1.4s)
+seed 2 ep 13 auc 0.8671 (1.4s)
+seed 2 ep 14 auc 0.8683 (1.4s)
+seed 2 ep 15 auc 0.8695 (1.6s)
+seed 2 ep 16 auc 0.8710 (1.5s)
+seed 2 ep 17 auc 0.8705 (1.5s)
+seed 2 ep 18 auc 0.8697 (1.4s)
+seed 2 ep 19 auc 0.8718 (1.4s)
+seed 2 ep 20 auc 0.8724 (1.5s)
+{'filter': 0, 'consensus_pos': 'UAUAAUGUAU', 'n_pos': 189118, 'consensus_neg': 'GAUGAUGCUU', 'n_neg': 199593, 'mean_max_act_pos': 1.8475877046585083, 'mean_max_act_neg': 1.8428188562393188}
+{'filter': 1, 'consensus_pos': 'AAAGAUAGAG', 'n_pos': 121315, 'consensus_neg': 'GGAGAUAGAG', 'n_neg': 132968, 'mean_max_act_pos': 1.671087384223938, 'mean_max_act_neg': 1.711466670036316}
+{'filter': 2, 'consensus_pos': 'AAACAAAUUA', 'n_pos': 52127, 'consensus_neg': 'AAACAAAUUA', 'n_neg': 45285, 'mean_max_act_pos': 1.442922592163086, 'mean_max_act_neg': 1.397762656211853}
+{'filter': 3, 'consensus_pos': 'GGGCCCCGCC', 'n_pos': 12958, 'consensus_neg': 'GGGCCCCGCC', 'n_neg': 22029, 'mean_max_act_pos': 1.0019375085830688, 'mean_max_act_neg': 1.10706627368927}
+{'filter': 4, 'consensus_pos': 'UGGCGGGCUG', 'n_pos': 24252, 'consensus_neg': 'UGGCGGGCCG', 'n_neg': 46546, 'mean_max_act_pos': 1.170516848564148, 'mean_max_act_neg': 1.2430943250656128}
+{'filter': 5, 'consensus_pos': 'UUUUUAUACU', 'n_pos': 19942, 'consensus_neg': 'UUUUUGUACU', 'n_neg': 14899, 'mean_max_act_pos': 0.8003698587417603, 'mean_max_act_neg': 0.7559542059898376}
+{'filter': 6, 'consensus_pos': 'AAGGGGCGGG', 'n_pos': 53992, 'consensus_neg': 'CAGGGGCGGG', 'n_neg': 71107, 'mean_max_act_pos': 1.6678211688995361, 'mean_max_act_neg': 1.7312854528427124}
+{'filter': 7, 'consensus_pos': 'ACUGUAAGUU', 'n_pos': 36425, 'consensus_neg': 'UCUGUACGUU', 'n_neg': 30981, 'mean_max_act_pos': 1.1276943683624268, 'mean_max_act_neg': 1.1125860214233398}
+{'filter': 8, 'consensus_pos': 'CUCCGUCACC', 'n_pos': 26246, 'consensus_neg': 'CUCCGUCCCC', 'n_neg': 29232, 'mean_max_act_pos': 1.2406392097473145, 'mean_max_act_neg': 1.2931894063949585}
+{'filter': 9, 'consensus_pos': 'GCCAGGCGCA', 'n_pos': 17689, 'consensus_neg': 'GCCAGGCGCA', 'n_neg': 28427, 'mean_max_act_pos': 1.1587131023406982, 'mean_max_act_neg': 1.2519701719284058}
+random miR-19 {1: {'site': 0.4330368638038635, 'shuffled': 0.42631110548973083}, 3: {'site': 0.46202385425567627, 'shuffled': 0.44878941774368286}, 6: {'site': 0.5609195828437805, 'shuffled': 0.4893586337566376}}
+random miR-15/16 {1: {'site': 0.451924592256546, 'shuffled': 0.4310905933380127}, 3: {'site': 0.5236704349517822, 'shuffled': 0.45444250106811523}, 6: {'site': 0.6839720606803894, 'shuffled': 0.5330025553703308}}
+random miR-30 {1: {'site': 0.4320090115070343, 'shuffled': 0.41953757405281067}, 3: {'site': 0.47356554865837097, 'shuffled': 0.412509948015213}, 6: {'site': 0.5471808314323425, 'shuffled': 0.4909253716468811}}
+random let-7 {1: {'site': 0.42005518078804016, 'shuffled': 0.4170164167881012}, 3: {'site': 0.42305776476860046, 'shuffled': 0.4234255850315094}, 6: {'site': 0.4917263984680176, 'shuffled': 0.4729412794113159}}
+random polyA-signal {1: {'site': 0.40113064646720886, 'shuffled': 0.40140265226364136}, 3: {'site': 0.36591655015945435, 'shuffled': 0.3636583983898163}, 6: {'site': 0.42591965198516846, 'shuffled': 0.3957471251487732}}
+random U-run {1: {'site': 0.42151176929473877, 'shuffled': 0.42151176929473877}, 3: {'site': 0.4337162971496582, 'shuffled': 0.4337162971496582}, 6: {'site': 0.4995186924934387, 'shuffled': 0.4995186924934387}}
+random GC-run {1: {'site': 0.4017012119293213, 'shuffled': 0.4311975836753845}, 3: {'site': 0.3580338954925537, 'shuffled': 0.452374666929245}, 6: {'site': 0.23844924569129944, 'shuffled': 0.4688792824745178}}
+negatives miR-19 {1: {'site': 0.26882708072662354, 'shuffled': 0.2561080753803253}, 3: {'site': 0.29800423979759216, 'shuffled': 0.25494444370269775}, 6: {'site': 0.39617809653282166, 'shuffled': 0.23979781568050385}}
+negatives miR-15/16 {1: {'site': 0.28458112478256226, 'shuffled': 0.2650785446166992}, 3: {'site': 0.3534865975379944, 'shuffled': 0.28245189785957336}, 6: {'site': 0.5325353741645813, 'shuffled': 0.316343754529953}}
+negatives miR-30 {1: {'site': 0.2696169316768646, 'shuffled': 0.251689076423645}, 3: {'site': 0.3095517158508301, 'shuffled': 0.23748165369033813}, 6: {'site': 0.3855077028274536, 'shuffled': 0.18210600316524506}}
+negatives let-7 {1: {'site': 0.25983482599258423, 'shuffled': 0.25640422105789185}, 3: {'site': 0.2671349346637726, 'shuffled': 0.255814790725708}, 6: {'site': 0.33214491605758667, 'shuffled': 0.33238255977630615}}
+negatives polyA-signal {1: {'site': 0.2449595034122467, 'shuffled': 0.2449595034122467}, 3: {'site': 0.225901797413826, 'shuffled': 0.225901797413826}, 6: {'site': 0.26304543018341064, 'shuffled': 0.26304543018341064}}
+negatives U-run {1: {'site': 0.2607245445251465, 'shuffled': 0.2607245445251465}, 3: {'site': 0.27873149514198303, 'shuffled': 0.27873149514198303}, 6: {'site': 0.3261367380619049, 'shuffled': 0.3261367380619049}}
+negatives GC-run {1: {'site': 0.24727176129817963, 'shuffled': 0.25122758746147156}, 3: {'site': 0.22409678995609283, 'shuffled': 0.23030875623226166}, 6: {'site': 0.15380339324474335, 'shuffled': 0.1657828986644745}}
+[time] dinuc_shuffle: 0.04 s
+{'auc_real': 0.869788, 'auc_shuffled_pos_vs_neg': 0.674832}
+wrote /data/home/hoory/ai-days-2026/spike/s2_cnn.json

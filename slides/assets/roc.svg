@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 460 340" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <polygon points="70,300 80.8,209 98.8,149.2 124,105 178,71.2 250,53 430,40 430,300" fill="#16a34a" fill-opacity="0.12"/>
+  <line x1="70" y1="300" x2="430" y2="40" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <line x1="70" y1="300" x2="440" y2="300" stroke="#334155" stroke-width="1.5"/>
+  <line x1="70" y1="300" x2="70" y2="34" stroke="#334155" stroke-width="1.5"/>
+  <polyline points="70,300 80.8,209 98.8,149.2 124,105 178,71.2 250,53 430,40" fill="none" stroke="#16a34a" stroke-width="3"/>
+  <text x="235" y="252" text-anchor="middle" font-size="17" font-weight="700" fill="#15803d">AUC</text>
+  <text x="300" y="176" text-anchor="middle" font-size="12" fill="#64748b" transform="rotate(-35.8 300 176)">chance = 0.5</text>
+  <text x="118" y="58" font-size="12" fill="#334155">&#8598; perfect</text>
+  <g font-size="12" fill="#334155">
+    <text x="64" y="304" text-anchor="end">0</text>
+    <text x="64" y="44" text-anchor="end">1</text>
+    <text x="430" y="317" text-anchor="middle">1</text>
+    <text x="70" y="317" text-anchor="middle">0</text>
+  </g>
+  <text x="250" y="333" text-anchor="middle" font-size="13" fill="#334155">FPR = 1 &#8722; specificity</text>
+  <text x="26" y="170" text-anchor="middle" font-size="13" fill="#334155" transform="rotate(-90 26 170)">TPR = sensitivity</text>
+</svg>

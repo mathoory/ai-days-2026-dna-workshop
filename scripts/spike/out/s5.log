@@ -1,0 +1,66 @@
+[time] build_matched: 0.43 s
+{'train': 60988, 'test': 6776, 'pos_kept_frac': 0.7044807152510656}
+original {'gc_u': 0.6393595356670291, 'k5_core': 0.8266225039048494, 'k5_full': 0.7760904804697232}
+matched {'gc_u': 0.5096619134146376, 'k5_core': 0.8076317104100219, 'k5_full': 0.7486059558511949}
+cnn original {'auc': 0.8632440613649272, 'train_s': 13.8}
+cnn matched {'auc': 0.8487674822455593, 'train_s': 9.2}
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/74 [00:00<?, ?it/s]Loading weights: 100%|██████████| 74/74 [00:00<00:00, 2325.58it/s]
+[transformers] [1mMixtralModel LOAD REPORT[0m from: RaphaelMourad/Mistral-DNA-v1-17M-hg38
+Key            | Status     |  | 
+---------------+------------+--+-
+lm_head.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+mistral17m full original {'auc': 0.7950682711774884, 'embed_s': 5.8, 'n_train': 12000}
+mistral17m full matched {'auc': 0.7508655564853104, 'embed_s': 5.3, 'n_train': 12000}
+mistral17m core original {'auc': 0.780441766861202, 'embed_s': 4.0, 'n_train': 12000}
+mistral17m core matched {'auc': 0.7601329122510934, 'embed_s': 4.1, 'n_train': 12000}
+Loading weights:   0%|          | 0/390 [00:00<?, ?it/s]Loading weights: 100%|██████████| 390/390 [00:00<00:00, 17735.48it/s]
+[transformers] [1mEsmModel LOAD REPORT[0m from: InstaDeepAI/nucleotide-transformer-500m-human-ref
+Key                       | Status     | 
+--------------------------+------------+-
+lm_head.bias              | UNEXPECTED | 
+lm_head.layer_norm.weight | UNEXPECTED | 
+lm_head.layer_norm.bias   | UNEXPECTED | 
+lm_head.dense.weight      | UNEXPECTED | 
+lm_head.dense.bias        | UNEXPECTED | 
+lm_head.decoder.weight    | UNEXPECTED | 
+pooler.dense.bias         | MISSING    | 
+pooler.dense.weight       | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+nt500m full original {'auc': 0.8002426062170147, 'embed_s': 32.3, 'n_train': 12000}
+nt500m full matched {'auc': 0.7745515631863423, 'embed_s': 32.3, 'n_train': 12000}
+nt500m core original {'auc': 0.7436468693083866, 'embed_s': 8.7, 'n_train': 12000}
+nt500m core matched {'auc': 0.7233133117982234, 'embed_s': 8.7, 'n_train': 12000}
+Loading weights:   0%|          | 0/74 [00:00<?, ?it/s]Loading weights: 100%|██████████| 74/74 [00:00<00:00, 1399.34it/s]
+[transformers] [1mMixtralForSequenceClassification LOAD REPORT[0m from: RaphaelMourad/Mistral-DNA-v1-17M-hg38
+Key            | Status     | 
+---------------+------------+-
+lm_head.weight | UNEXPECTED | 
+score.weight   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+lora original {'epoch': 1, 'auc': 0.8146320623853047, 'min': 0.87}
+lora original {'epoch': 2, 'auc': 0.8350112555267175, 'min': 1.73}
+lora original {'epoch': 3, 'auc': 0.8375160133124492, 'min': 2.47}
+Loading weights:   0%|          | 0/74 [00:00<?, ?it/s]Loading weights: 100%|██████████| 74/74 [00:00<00:00, 1205.86it/s]
+[transformers] [1mMixtralForSequenceClassification LOAD REPORT[0m from: RaphaelMourad/Mistral-DNA-v1-17M-hg38
+Key            | Status     | 
+---------------+------------+-
+lm_head.weight | UNEXPECTED | 
+score.weight   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+lora matched {'epoch': 1, 'auc': 0.7615902398567185, 'min': 0.7}
+lora matched {'epoch': 2, 'auc': 0.8004902431069393, 'min': 1.39}
+lora matched {'epoch': 3, 'auc': 0.8045792911433746, 'min': 2.08}
+wrote /data/home/hoory/ai-days-2026/spike/s5_fix_build_baselines_cnn_probe_lora.json

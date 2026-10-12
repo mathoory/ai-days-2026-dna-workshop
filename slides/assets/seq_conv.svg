@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 860 270" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <defs>
+    <marker id="arrow43" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <text x="252" y="40" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">one-hot input&#160;&#160;(1 &#215; 4 &#215; L)</text>
+
+  <rect x="98"  y="62"  width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="124" y="88"  width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="150" y="114" width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="176" y="140" width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="202" y="62"  width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="228" y="114" width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="254" y="88"  width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="280" y="140" width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="306" y="114" width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="332" y="62"  width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="358" y="88"  width="22" height="22" rx="2" fill="#2563eb"/>
+  <rect x="384" y="140" width="22" height="22" rx="2" fill="#2563eb"/>
+
+  <g stroke="#94a3b8" stroke-width="1">
+    <line x1="96"  y1="60" x2="96"  y2="164"/><line x1="122" y1="60" x2="122" y2="164"/>
+    <line x1="148" y1="60" x2="148" y2="164"/><line x1="174" y1="60" x2="174" y2="164"/>
+    <line x1="200" y1="60" x2="200" y2="164"/><line x1="226" y1="60" x2="226" y2="164"/>
+    <line x1="252" y1="60" x2="252" y2="164"/><line x1="278" y1="60" x2="278" y2="164"/>
+    <line x1="304" y1="60" x2="304" y2="164"/><line x1="330" y1="60" x2="330" y2="164"/>
+    <line x1="356" y1="60" x2="356" y2="164"/><line x1="382" y1="60" x2="382" y2="164"/>
+    <line x1="408" y1="60" x2="408" y2="164"/>
+    <line x1="96" y1="60"  x2="408" y2="60"/><line x1="96" y1="86"  x2="408" y2="86"/>
+    <line x1="96" y1="112" x2="408" y2="112"/><line x1="96" y1="138" x2="408" y2="138"/>
+    <line x1="96" y1="164" x2="408" y2="164"/>
+  </g>
+
+  <g font-size="15" fill="#0f172a" text-anchor="end">
+    <text x="88" y="78">A</text><text x="88" y="104">C</text>
+    <text x="88" y="130">G</text><text x="88" y="156">U</text>
+  </g>
+
+  <rect x="96" y="60" width="260" height="104" fill="#dc2626" fill-opacity="0.10" stroke="#dc2626" stroke-width="3" rx="3"/>
+  <text x="226" y="182" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626">4 &#215; 10 filter</text>
+
+  <text x="426" y="118" font-size="22" fill="#475569">&#8230;</text>
+  <text x="252" y="204" text-anchor="middle" font-size="14" fill="#475569">width = L positions</text>
+
+  <text x="505" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Conv2d, 4 &#215; 10</text>
+  <line x1="452" y1="112" x2="558" y2="112" stroke="#334155" stroke-width="2" marker-end="url(#arrow43)"/>
+  <text x="505" y="132" text-anchor="middle" font-size="13" fill="#dc2626">height 4 &#8594; 1</text>
+
+  <text x="690" y="80" text-anchor="middle" font-size="17" font-weight="700" fill="#0f172a">feature map&#160;&#160;(C&#8338; &#215; 1 &#215; L&#8722;9)</text>
+  <rect x="614" y="101" width="22" height="22" rx="2" fill="#16a34a" fill-opacity="0.85"/>
+  <rect x="640" y="101" width="22" height="22" rx="2" fill="#16a34a" fill-opacity="0.50"/>
+  <rect x="666" y="101" width="22" height="22" rx="2" fill="#16a34a" fill-opacity="0.70"/>
+  <rect x="692" y="101" width="22" height="22" rx="2" fill="#16a34a" fill-opacity="0.35"/>
+  <rect x="718" y="101" width="22" height="22" rx="2" fill="#16a34a" fill-opacity="0.60"/>
+  <rect x="744" y="101" width="22" height="22" rx="2" fill="#16a34a" fill-opacity="0.45"/>
+  <g stroke="#94a3b8" stroke-width="1">
+    <line x1="612" y1="99" x2="612" y2="125"/><line x1="638" y1="99" x2="638" y2="125"/>
+    <line x1="664" y1="99" x2="664" y2="125"/><line x1="690" y1="99" x2="690" y2="125"/>
+    <line x1="716" y1="99" x2="716" y2="125"/><line x1="742" y1="99" x2="742" y2="125"/>
+    <line x1="768" y1="99" x2="768" y2="125"/>
+    <line x1="612" y1="99" x2="768" y2="99"/><line x1="612" y1="125" x2="768" y2="125"/>
+  </g>
+  <text x="778" y="120" font-size="22" fill="#475569">&#8230;</text>
+  <text x="690" y="150" text-anchor="middle" font-size="14" fill="#475569">height = 1</text>
+
+  <text x="430" y="244" text-anchor="middle" font-size="14" fill="#334155">Each output value summarizes one 4 &#215; 10 window; the A/C/G/U height axis is collapsed to 1.</text>
+</svg>

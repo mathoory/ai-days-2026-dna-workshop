@@ -1,0 +1,112 @@
+{
+ "Mistral-DNA-17M (hg38)": {
+  "repo": "RaphaelMourad/Mistral-DNA-v1-17M-hg38",
+  "load_s": 7.5,
+  "params_M": 15.7,
+  "embed_s": 18.5,
+  "ls": 0.782272,
+  "shuffle": 0.7649720000000001,
+  "matched": 0.7697684294782714,
+  "n100": 0.6797283706314179,
+  "n500": 0.7331209955049601
+ },
+ "DNABERT-2-117M (multi-species)": {
+  "repo": "zhihan1996/DNABERT-2-117M",
+  "load_s": 3.4,
+  "params_M": 117.1,
+  "embed_s": 17.0,
+  "ls": 0.8208280000000001,
+  "shuffle": 0.7818160000000001,
+  "matched": 0.794083890117953,
+  "n100": 0.7237248427847754,
+  "n500": 0.7513232760058255
+ },
+ "HyenaDNA-small-32k (hg38)": {
+  "repo": "LongSafari/hyenadna-small-32k-seqlen-hf",
+  "load_s": 4.5,
+  "params_M": 3.3,
+  "embed_s": 17.2,
+  "ls": 0.8051920000000001,
+  "shuffle": 0.7547,
+  "matched": 0.7794648197351891,
+  "n100": 0.6646687641049015,
+  "n500": 0.7299163618710928
+ },
+ "HyenaDNA-medium-160k (hg38)": {
+  "repo": "LongSafari/hyenadna-medium-160k-seqlen-hf",
+  "load_s": 5.4,
+  "params_M": 6.6,
+  "embed_s": 21.7,
+  "ls": 0.7926040000000001,
+  "shuffle": 0.7589240000000002,
+  "matched": 0.7558292848328534,
+  "n100": 0.6431355589895239,
+  "n500": 0.6999476752157657
+ },
+ "NT-v2-50M (multi-species)": {
+  "repo": "InstaDeepAI/nucleotide-transformer-v2-50m-multi-species",
+  "load_s": 7.4,
+  "params_M": 55.9,
+  "embed_s": 16.4,
+  "ls": 0.769984,
+  "shuffle": 0.673936,
+  "matched": 0.7449175662305032,
+  "n100": 0.6069530448058758,
+  "n500": 0.686329075459602
+ },
+ "NT-v2-100M (multi-species)": {
+  "repo": "InstaDeepAI/nucleotide-transformer-v2-100m-multi-species",
+  "load_s": 32.2,
+  "params_M": 97.9,
+  "embed_s": 22.9,
+  "ls": 0.76106,
+  "shuffle": 0.673452,
+  "matched": 0.7194841636001823,
+  "n100": 0.6203289939337343,
+  "n500": 0.6645727859241884
+ },
+ "NT-v2-250M (multi-species)": {
+  "repo": "InstaDeepAI/nucleotide-transformer-v2-250m-multi-species",
+  "load_s": 5.2,
+  "params_M": 235.1,
+  "embed_s": 32.6,
+  "ls": 0.7768440000000001,
+  "shuffle": 0.688236,
+  "matched": 0.7442265233293681,
+  "n100": 0.6030217933467481,
+  "n500": 0.6733335556766091
+ },
+ "NT-v2-500M (multi-species)": {
+  "repo": "InstaDeepAI/nucleotide-transformer-v2-500m-multi-species",
+  "load_s": 27.7,
+  "params_M": 498.3,
+  "embed_s": 54.2,
+  "ls": 0.773344,
+  "shuffle": 0.69338,
+  "matched": 0.7327207034941247,
+  "n100": 0.6272744790682334,
+  "n500": 0.6786167283669257
+ },
+ "NT-500M (human ref)": {
+  "repo": "InstaDeepAI/nucleotide-transformer-500m-human-ref",
+  "load_s": 3.7,
+  "params_M": 485.7,
+  "embed_s": 40.0,
+  "ls": 0.7883040000000001,
+  "shuffle": 0.7541479999999999,
+  "matched": 0.7705742015097108,
+  "n100": 0.6958363257032533,
+  "n500": 0.7390820928431405
+ },
+ "NT-2.5B (multi-species)": {
+  "repo": "InstaDeepAI/nucleotide-transformer-2.5b-multi-species",
+  "load_s": 9.5,
+  "params_M": 2547.8,
+  "embed_s": 141.0,
+  "ls": 0.821344,
+  "shuffle": 0.74652,
+  "matched": 0.7922282131382641,
+  "n100": 0.7250683890859096,
+  "n500": 0.7628188680503829
+ }
+}

@@ -1,0 +1,59 @@
+{
+ "HyenaDNA-small-32k (hg38)": {
+  "n20000": {
+   "auc": 0.723011862013763,
+   "epochs_run": 2,
+   "minutes": 0.92,
+   "trainable_frac": 0.0848,
+   "per_epoch_auc": [
+    0.7075069760202777,
+    0.723011862013763
+   ]
+  },
+  "n500": {
+   "auc": 0.6209727518315528,
+   "epochs_run": 8,
+   "minutes": 0.11,
+   "trainable_frac": 0.0848,
+   "per_epoch_auc": []
+  }
+ },
+ "DNABERT-2-117M (multi-species)": {
+  "n20000": {
+   "auc": 0.8735104668097075,
+   "epochs_run": 2,
+   "minutes": 1.57,
+   "trainable_frac": 0.0248,
+   "per_epoch_auc": [
+    0.8559280052473013,
+    0.8735104668097075
+   ]
+  },
+  "n500": {
+   "auc": 0.8012435659414571,
+   "epochs_run": 13,
+   "minutes": 0.27,
+   "trainable_frac": 0.0248,
+   "per_epoch_auc": []
+  }
+ },
+ "NT-2.5B (multi-species)": {
+  "n20000": {
+   "auc": 0.7308185567697969,
+   "epochs_run": 2,
+   "minutes": 10.98,
+   "trainable_frac": 0.0092,
+   "per_epoch_auc": [
+    0.6088823915242744,
+    0.7308185567697969
+   ]
+  },
+  "n500": {
+   "auc": 0.7973374392724928,
+   "epochs_run": 11,
+   "minutes": 1.63,
+   "trainable_frac": 0.0092,
+   "per_epoch_auc": []
+  }
+ }
+}

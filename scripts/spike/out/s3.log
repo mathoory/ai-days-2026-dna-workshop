@@ -1,0 +1,74 @@
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 12 files:   8%|▊         | 1/12 [00:00<00:04,  2.30it/s]Fetching 12 files:  25%|██▌       | 3/12 [00:00<00:01,  5.56it/s]Fetching 12 files:  58%|█████▊    | 7/12 [00:00<00:00,  8.47it/s]Fetching 12 files:  67%|██████▋   | 8/12 [00:01<00:00,  7.66it/s]Fetching 12 files:  83%|████████▎ | 10/12 [00:05<00:01,  1.09it/s]Fetching 12 files:  92%|█████████▏| 11/12 [00:07<00:01,  1.15s/it]Fetching 12 files: 100%|██████████| 12/12 [00:08<00:00,  1.13s/it]Fetching 12 files: 100%|██████████| 12/12 [00:08<00:00,  1.34it/s]
+[time] download_fresh: 9.46 s
+MaskedLM load failed, trying AutoModel: ImportError("cannot import name 'find_pruneable_heads_and_indices' from 'transformers.pytorch_utils' (/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/pytorch_utils.py)")
+ule_spec.loader.exec_module(module)
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/tmp/hf_fresh_nt50m/modules/transformers_modules/InstaDeepAI/nucleotide_hyphen_transformer_hyphen_v2_hyphen_50m_hyphen_multi_hyphen_species/81b29e5786726d891dbf929404ef20adca5b36f1/modeling_esm.py", line 37, in <module>
+    from transformers.pytorch_utils import find_pruneable_heads_and_indices, prune_linear_layer
+ImportError: cannot import name 'find_pruneable_heads_and_indices' from 'transformers.pytorch_utils' (/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/pytorch_utils.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/data/home/hoory/ai-days-2026/spike/s3_fm.py", line 108, in <module>
+    tok, m = load(name, repo)
+             ^^^^^^^^^^^^^^^^
+  File "/data/home/hoory/ai-days-2026/spike/s3_fm.py", line 60, in load
+    m = AutoModel.from_pretrained(repo, **kw)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py", line 411, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/modeling_utils.py", line 4291, in from_pretrained
+    model = cls(config, *model_args, **model_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/models/esm/modeling_esm.py", line 632, in __init__
+    self.rotary_embeddings = EsmRotaryEmbedding(config=config)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/models/esm/modeling_esm.py", line 117, in __init__
+    curr_inv_freq, curr_attention_scaling = self.compute_default_rope_parameters(self.config)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/models/esm/modeling_esm.py", line 133, in compute_default_rope_parameters
+    base = config.rope_theta
+           ^^^^^^^^^^^^^^^^^
+  File "/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/configuration_utils.py", line 525, in __getattribute__
+    return super().__getattribute__(key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/integrations/heterogeneity/configuration_utils.py", line 312, in __getattribute__
+    return super().__getattribute__(key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EsmConfig' object has no attribute 'rope_theta'
+
+wrote /data/home/hoory/ai-days-2026/spike/s3_fm_nt50m_mistral17m_nt500m.json
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:   9%|▉         | 1/11 [00:00<00:05,  1.93it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:00<00:00,  7.03it/s]Fetching 11 files:  55%|█████▍    | 6/11 [00:01<00:00,  6.44it/s]Fetching 11 files:  73%|███████▎  | 8/11 [00:01<00:00,  4.20it/s]Fetching 11 files: 100%|██████████| 11/11 [00:09<00:00,  1.32s/it]Fetching 11 files: 100%|██████████| 11/11 [00:09<00:00,  1.14it/s]
+[time] download_fresh: 10.04 s
+MaskedLM load failed, trying AutoModel: ValueError("Unrecognized configuration class <class 'transformers.models.mixtral.configuration_mixtral.MixtralConfig'> for this kind of AutoModel: AutoModelForMaskedLM.\nModel type should be one of AlbertConfig, BartConfig, BertConfig, BigBirdConfig, CamembertConfig, ConvBertConfig, Data2VecTextConf
+Loading weights:   0%|          | 0/74 [00:00<?, ?it/s]Loading weights: 100%|██████████| 74/74 [00:00<00:00, 1745.59it/s]
+[transformers] [1mMixtralModel LOAD REPORT[0m from: RaphaelMourad/Mistral-DNA-v1-17M-hg38
+Key            | Status     |  | 
+---------------+------------+--+-
+lm_head.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+[time] load_to_gpu: 2.23 s
+mistral17m tokens for one seq: 71 ['[CLS]', 'TGTG', 'GGAA', 'GGGC', 'TATA', 'CCACTG', 'CCTCA', 'TACTT']
+[time] embed_1k: 0.87 s
+[time] embed_all: 4.18 s
+mistral17m pretrained {'auc_heldout': 0.7970557970557971, 'auc_ls': 0.7826760000000001, 'auc_shuffledpos_vs_neg': 0.765064, 'probe_fit_s': 2.48}
+[time] random_init_embed: 5.43 s
+mistral17m random init {'auc_heldout': 0.5532800532800533, 'auc_ls': 0.57382, 'auc_shuffledpos_vs_neg': 0.5693199999999999, 'probe_fit_s': 2.73}
+wrote /data/home/hoory/ai-days-2026/spike/s3_fm_nt50m_mistral17m_nt500m.json
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Fetching 10 files:  10%|█         | 1/10 [00:00<00:04,  2.10it/s]Fetching 10 files:  40%|████      | 4/10 [00:00<00:00,  8.18it/s]Fetching 10 files:  60%|██████    | 6/10 [00:00<00:00,  8.98it/s]Fetching 10 files:  70%|███████   | 7/10 [00:13<00:00,  8.98it/s]Fetching 10 files:  80%|████████  | 8/10 [00:49<00:18,  9.40s/it]Fetching 10 files:  90%|█████████ | 9/10 [00:54<00:08,  8.37s/it]Fetching 10 files: 100%|██████████| 10/10 [00:55<00:00,  6.63s/it]Fetching 10 files: 100%|██████████| 10/10 [00:55<00:00,  5.50s/it]
+[time] download_fresh: 55.4 s
+Loading weights:   0%|          | 0/396 [00:00<?, ?it/s]Loading weights: 100%|██████████| 396/396 [00:00<00:00, 16835.72it/s]
+[time] load_to_gpu: 2.39 s
+nt500m tokens for one seq: 61 ['<cls>', 'TGTGGG', 'AAGGGC', 'TATACC', 'ACTGCC', 'TCATAC', 'TTTCTT', 'CTACAT']
+[time] embed_1k: 1.51 s
+[time] embed_all: 18.27 s
+nt500m pretrained {'auc_heldout': 0.7963437963437964, 'auc_ls': 0.7844720000000001, 'auc_shuffledpos_vs_neg': 0.741584, 'probe_fit_s': 5.38}
+[time] random_init_embed: 23.32 s
+nt500m random init {'auc_heldout': 0.6377136377136376, 'auc_ls': 0.608464, 'auc_shuffledpos_vs_neg': 0.633324, 'probe_fit_s': 3.16}
+wrote /data/home/hoory/ai-days-2026/spike/s3_fm_nt50m_mistral17m_nt500m.json

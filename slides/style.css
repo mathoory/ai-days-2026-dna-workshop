@@ -1,0 +1,5 @@
+.reveal .slide-logo {
+    max-height: 1.8em !important;
+ }
+/* Center all slide images (fig-align is unreliable in reveal.js) */
+.reveal section img:not(.slide-logo) { display: block; margin-left: auto; margin-right: auto; }

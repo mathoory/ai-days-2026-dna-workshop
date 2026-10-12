@@ -1,0 +1,64 @@
+{
+ "HyenaDNA-small-32k (hg38)": {
+  "n20000": {
+   "error": "ata/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/peft/tuners/lora/model.py\", line 350, in _create_new_module\n    raise ValueError(\nValueError: Target module HyenaBlock(\n  (mixer): HyenaOperator(\n    (dropout): Dropout(p=0.0, inplace=False)\n    (in_proj): Linear(in_features=256, out_features=768, bias=True)\n    (out_proj): Linear(in_features=256, out_features=256, bias=True)\n    (short_filter): Conv1d(768, 768, kernel_size=(3,), stride=(1,), padding=(2,), groups=768)\n    (filter_fn): HyenaFilter(\n      (dropout): Dropout(p=0.0, inplace=False)\n      (pos_emb): HyenaPositionalEmbedding()\n      (implicit_filter): Sequential(\n        (0): Linear(in_features=5, out_features=64, bias=True)\n        (1): HyenaSin()\n        (2): Linear(in_features=64, out_features=64, bias=True)\n        (3): HyenaSin()\n        (4): Linear(in_features=64, out_features=64, bias=True)\n        (5): HyenaSin()\n        (6): Linear(in_features=64, out_features=256, bias=False)\n      )\n      (modulation): HyenaExponentialModulation()\n    )\n  )\n  (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)\n  (mlp): HyenaMlp(\n    (fc1): Linear(in_features=256, out_features=1024, bias=True)\n    (fc2): Linear(in_features=1024, out_features=256, bias=True)\n  )\n  (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)\n) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv2d`, `transformers.pytorch_utils.Conv1D`.\n"
+  },
+  "n500": {
+   "error": "ata/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/peft/tuners/lora/model.py\", line 350, in _create_new_module\n    raise ValueError(\nValueError: Target module HyenaBlock(\n  (mixer): HyenaOperator(\n    (dropout): Dropout(p=0.0, inplace=False)\n    (in_proj): Linear(in_features=256, out_features=768, bias=True)\n    (out_proj): Linear(in_features=256, out_features=256, bias=True)\n    (short_filter): Conv1d(768, 768, kernel_size=(3,), stride=(1,), padding=(2,), groups=768)\n    (filter_fn): HyenaFilter(\n      (dropout): Dropout(p=0.0, inplace=False)\n      (pos_emb): HyenaPositionalEmbedding()\n      (implicit_filter): Sequential(\n        (0): Linear(in_features=5, out_features=64, bias=True)\n        (1): HyenaSin()\n        (2): Linear(in_features=64, out_features=64, bias=True)\n        (3): HyenaSin()\n        (4): Linear(in_features=64, out_features=64, bias=True)\n        (5): HyenaSin()\n        (6): Linear(in_features=64, out_features=256, bias=False)\n      )\n      (modulation): HyenaExponentialModulation()\n    )\n  )\n  (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)\n  (mlp): HyenaMlp(\n    (fc1): Linear(in_features=256, out_features=1024, bias=True)\n    (fc2): Linear(in_features=1024, out_features=256, bias=True)\n  )\n  (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)\n) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv2d`, `transformers.pytorch_utils.Conv1D`.\n"
+  }
+ },
+ "Mistral-DNA-17M (hg38)": {
+  "n20000": {
+   "auc": 0.7873733477115319,
+   "epochs_run": 2,
+   "minutes": 4.13,
+   "trainable_frac": 0.1061,
+   "per_epoch_auc": [
+    0.7768827472735156,
+    0.7873733477115319
+   ]
+  },
+  "n500": {
+   "auc": 0.6663283343153494,
+   "epochs_run": 10,
+   "minutes": 0.52,
+   "trainable_frac": 0.1061,
+   "per_epoch_auc": []
+  }
+ },
+ "NT-500M (human ref)": {
+  "n20000": {
+   "auc": 0.8715264977598915,
+   "epochs_run": 2,
+   "minutes": 3.47,
+   "trainable_frac": 0.018,
+   "per_epoch_auc": [
+    0.8287254171715711,
+    0.8715264977598915
+   ]
+  },
+  "n500": {
+   "auc": 0.7442518704628076,
+   "epochs_run": 6,
+   "minutes": 0.34,
+   "trainable_frac": 0.018,
+   "per_epoch_auc": []
+  }
+ },
+ "NT-2.5B (multi-species)": {
+  "n20000": {
+   "error": "^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/peft/tuners/lora/layer.py\", line 584, in forward\n    result = result + lora_B(lora_A(dropout(x))) * scaling\n                             ^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1775, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1786, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/linear.py\", line 134, in forward\n    return F.linear(input, self.weight, self.bias)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 23.60 GiB of which 9.31 MiB is free. Including non-PyTorch memory, this process has 23.58 GiB memory in use. Of the allocated memory 22.84 GiB is allocated by PyTorch, and 471.56 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+  },
+  "n500": {
+   "error": " 1371, in to\n    return self._apply(convert)\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 930, in _apply\n    module._apply(fn)\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 930, in _apply\n    module._apply(fn)\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 930, in _apply\n    module._apply(fn)\n  [Previous line repeated 3 more times]\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 957, in _apply\n    param_applied = fn(param)\n                    ^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1357, in convert\n    return t.to(\n           ^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 100.00 MiB. GPU 0 has a total capacity of 23.60 GiB of which 89.31 MiB is free. Including non-PyTorch memory, this process has 23.50 GiB memory in use. Of the allocated memory 22.67 GiB is allocated by PyTorch, and 561.28 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+  }
+ },
+ "DNABERT-2-117M (multi-species)": {
+  "n20000": {
+   "error": "e 1371, in to\n    return self._apply(convert)\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 930, in _apply\n    module._apply(fn)\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 930, in _apply\n    module._apply(fn)\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 930, in _apply\n    module._apply(fn)\n  [Previous line repeated 2 more times]\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 957, in _apply\n    param_applied = fn(param)\n                    ^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1357, in convert\n    return t.to(\n           ^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 18.00 MiB. GPU 0 has a total capacity of 23.60 GiB of which 13.31 MiB is free. Including non-PyTorch memory, this process has 23.58 GiB memory in use. Of the allocated memory 22.83 GiB is allocated by PyTorch, and 474.10 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+  },
+  "n500": {
+   "error": "e 1371, in to\n    return self._apply(convert)\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 930, in _apply\n    module._apply(fn)\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 930, in _apply\n    module._apply(fn)\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 930, in _apply\n    module._apply(fn)\n  [Previous line repeated 2 more times]\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 957, in _apply\n    param_applied = fn(param)\n                    ^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/gw-unified/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1357, in convert\n    return t.to(\n           ^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 18.00 MiB. GPU 0 has a total capacity of 23.60 GiB of which 13.31 MiB is free. Including non-PyTorch memory, this process has 23.58 GiB memory in use. Of the allocated memory 22.83 GiB is allocated by PyTorch, and 474.58 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+  }
+ }
+}

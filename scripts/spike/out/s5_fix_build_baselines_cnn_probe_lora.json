@@ -1,0 +1,122 @@
+{
+  "matched_sizes": {
+    "train": 60988,
+    "test": 6776,
+    "pos_kept_frac": 0.7044807152510656
+  },
+  "baselines": {
+    "original": {
+      "gc_u": 0.6393595356670291,
+      "k5_core": 0.8266225039048494,
+      "k5_full": 0.7760904804697232
+    },
+    "matched": {
+      "gc_u": 0.5096619134146376,
+      "k5_core": 0.8076317104100219,
+      "k5_full": 0.7486059558511949
+    }
+  },
+  "cnn": {
+    "original": {
+      "auc": 0.8632440613649272,
+      "train_s": 13.8
+    },
+    "matched": {
+      "auc": 0.8487674822455593,
+      "train_s": 9.2
+    }
+  },
+  "probe": {
+    "mistral17m": {
+      "full:original": {
+        "auc": 0.7950682711774884,
+        "embed_s": 5.8,
+        "n_train": 12000
+      },
+      "full:matched": {
+        "auc": 0.7508655564853104,
+        "embed_s": 5.3,
+        "n_train": 12000
+      },
+      "core:original": {
+        "auc": 0.780441766861202,
+        "embed_s": 4.0,
+        "n_train": 12000
+      },
+      "core:matched": {
+        "auc": 0.7601329122510934,
+        "embed_s": 4.1,
+        "n_train": 12000
+      }
+    },
+    "nt500m": {
+      "full:original": {
+        "auc": 0.8002426062170147,
+        "embed_s": 32.3,
+        "n_train": 12000
+      },
+      "full:matched": {
+        "auc": 0.7745515631863423,
+        "embed_s": 32.3,
+        "n_train": 12000
+      },
+      "core:original": {
+        "auc": 0.7436468693083866,
+        "embed_s": 8.7,
+        "n_train": 12000
+      },
+      "core:matched": {
+        "auc": 0.7233133117982234,
+        "embed_s": 8.7,
+        "n_train": 12000
+      }
+    }
+  },
+  "lora_mistral17m": {
+    "original": {
+      "trainable_params": 262400,
+      "n_train": 20000,
+      "history": [
+        {
+          "epoch": 1,
+          "auc": 0.8146320623853047,
+          "min": 0.87
+        },
+        {
+          "epoch": 2,
+          "auc": 0.8350112555267175,
+          "min": 1.73
+        },
+        {
+          "epoch": 3,
+          "auc": 0.8375160133124492,
+          "min": 2.47
+        }
+      ]
+    },
+    "matched": {
+      "trainable_params": 262400,
+      "n_train": 20000,
+      "history": [
+        {
+          "epoch": 1,
+          "auc": 0.7615902398567185,
+          "min": 0.7
+        },
+        {
+          "epoch": 2,
+          "auc": 0.8004902431069393,
+          "min": 1.39
+        },
+        {
+          "epoch": 3,
+          "auc": 0.8045792911433746,
+          "min": 2.08
+        }
+      ]
+    }
+  },
+  "timings": {
+    "build_matched": 0.43
+  }
+}

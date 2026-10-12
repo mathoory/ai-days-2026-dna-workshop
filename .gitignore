@@ -1,0 +1,7 @@
+*_solution*
+data/
+*.pt
+*.npz
+__pycache__/
+.ipynb_checkpoints/
+*_files/

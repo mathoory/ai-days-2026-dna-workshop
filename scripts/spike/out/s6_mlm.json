@@ -1,0 +1,51 @@
+{
+  "nt500m_load_cached_s": 27.59,
+  "mlm_demo": {
+    "tokens": [
+      "<cls>",
+      "TGTGGG",
+      "AAGGGC",
+      "TATACC",
+      "ACTGCC",
+      "TCATAC",
+      "TTTCTT",
+      "CTACAT",
+      "TTGCAC",
+      "A",
+      "A",
+      "A",
+      "G",
+      "G"
+    ],
+    "masked_pos": 6,
+    "true": "TTTCTT",
+    "top5": [
+      [
+        "CGGCGT",
+        0.039841748774051666
+      ],
+      [
+        "GCGGCG",
+        0.032838284969329834
+      ],
+      [
+        "GGCGTT",
+        0.03156307712197304
+      ],
+      [
+        "GCCGCA",
+        0.031443770974874496
+      ],
+      [
+        "AGCGTT",
+        0.030544552952051163
+      ]
+    ],
+    "infer_s": 0.246
+  },
+  "nt50m_patch": {
+    "ok": false,
+    "err": "^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py\", line 386, in from_pretrained\n    model_class = get_class_from_dynamic_module(\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/dynamic_module_utils.py\", line 622, in get_class_from_dynamic_module\n    return get_class_in_module(class_name, final_module, force_reload=force_download)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/dynamic_module_utils.py\", line 309, in get_class_in_module\n    module_spec.loader.exec_module(module)\n  File \"<frozen importlib._bootstrap_external>\", line 940, in exec_module\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\n  File \"/data/home/hoory/.cache/huggingface/modules/transformers_modules/InstaDeepAI/nucleotide_hyphen_transformer_hyphen_v2_hyphen_50m_hyphen_multi_hyphen_species/81b29e5786726d891dbf929404ef20adca5b36f1/modeling_esm.py\", line 37, in <module>\n    from transformers.pytorch_utils import find_pruneable_heads_and_indices, prune_linear_layer\nImportError: cannot import name 'find_pruneable_heads_and_indices' from 'transformers.pytorch_utils' (/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/pytorch_utils.py)\n"
+  },
+  "transformers": "5.19.0"
+}

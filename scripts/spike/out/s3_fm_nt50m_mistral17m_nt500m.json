@@ -1,0 +1,64 @@
+{
+  "nt50m": {
+    "repo": "InstaDeepAI/nucleotide-transformer-v2-50m-multi-species",
+    "download_MB": 2000.6,
+    "error": "ule_spec.loader.exec_module(module)\n  File \"<frozen importlib._bootstrap_external>\", line 940, in exec_module\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\n  File \"/tmp/hf_fresh_nt50m/modules/transformers_modules/InstaDeepAI/nucleotide_hyphen_transformer_hyphen_v2_hyphen_50m_hyphen_multi_hyphen_species/81b29e5786726d891dbf929404ef20adca5b36f1/modeling_esm.py\", line 37, in <module>\n    from transformers.pytorch_utils import find_pruneable_heads_and_indices, prune_linear_layer\nImportError: cannot import name 'find_pruneable_heads_and_indices' from 'transformers.pytorch_utils' (/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/pytorch_utils.py)\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/data/home/hoory/ai-days-2026/spike/s3_fm.py\", line 108, in <module>\n    tok, m = load(name, repo)\n             ^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/ai-days-2026/spike/s3_fm.py\", line 60, in load\n    m = AutoModel.from_pretrained(repo, **kw)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py\", line 411, in from_pretrained\n    return model_class.from_pretrained(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/modeling_utils.py\", line 4291, in from_pretrained\n    model = cls(config, *model_args, **model_kwargs)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/models/esm/modeling_esm.py\", line 632, in __init__\n    self.rotary_embeddings = EsmRotaryEmbedding(config=config)\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/models/esm/modeling_esm.py\", line 117, in __init__\n    curr_inv_freq, curr_attention_scaling = self.compute_default_rope_parameters(self.config)\n                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/models/esm/modeling_esm.py\", line 133, in compute_default_rope_parameters\n    base = config.rope_theta\n           ^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/configuration_utils.py\", line 525, in __getattribute__\n    return super().__getattribute__(key)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data/home/hoory/miniconda3/envs/aidays-2026/lib/python3.11/site-packages/transformers/integrations/heterogeneity/configuration_utils.py\", line 312, in __getattribute__\n    return super().__getattribute__(key)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'EsmConfig' object has no attribute 'rope_theta'\n",
+    "timings": {
+      "download_fresh": 9.46
+    }
+  },
+  "mistral17m": {
+    "repo": "RaphaelMourad/Mistral-DNA-v1-17M-hg38",
+    "download_MB": 0.0,
+    "n_params_M": 15.7,
+    "n_tokens_example": 71,
+    "peak_gpu_GB": 0.34,
+    "n_embedded": 13500,
+    "probe_pretrained": {
+      "auc_heldout": 0.7970557970557971,
+      "auc_ls": 0.7826760000000001,
+      "auc_shuffledpos_vs_neg": 0.765064,
+      "probe_fit_s": 2.48
+    },
+    "probe_random_init": {
+      "auc_heldout": 0.5532800532800533,
+      "auc_ls": 0.57382,
+      "auc_shuffledpos_vs_neg": 0.5693199999999999,
+      "probe_fit_s": 2.73
+    },
+    "timings": {
+      "download_fresh": 10.04,
+      "load_to_gpu": 2.23,
+      "embed_1k": 0.87,
+      "embed_all": 4.18,
+      "random_init_embed": 5.43
+    }
+  },
+  "nt500m": {
+    "repo": "InstaDeepAI/nucleotide-transformer-500m-human-ref",
+    "download_MB": 0.0,
+    "n_params_M": 485.7,
+    "n_tokens_example": 61,
+    "peak_gpu_GB": 4.31,
+    "n_embedded": 13500,
+    "probe_pretrained": {
+      "auc_heldout": 0.7963437963437964,
+      "auc_ls": 0.7844720000000001,
+      "auc_shuffledpos_vs_neg": 0.741584,
+      "probe_fit_s": 5.38
+    },
+    "probe_random_init": {
+      "auc_heldout": 0.6377136377136376,
+      "auc_ls": 0.608464,
+      "auc_shuffledpos_vs_neg": 0.633324,
+      "probe_fit_s": 3.16
+    },
+    "timings": {
+      "download_fresh": 55.4,
+      "load_to_gpu": 2.39,
+      "embed_1k": 1.51,
+      "embed_all": 18.27,
+      "random_init_embed": 23.32
+    }
+  }
+}
