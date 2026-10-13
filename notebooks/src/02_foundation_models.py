@@ -243,7 +243,7 @@ results["Nucleotide Transformer (486M), pretrained"] = auc_nt
 print(f"NT-500M + probe: {auc_nt:.3f}   vs   Mistral-DNA (16M): {auc_fm:.3f}")
 
 # %% [markdown]
-# ## 3. Pretraining from scratch, live (about 7 min, 5 of them computing)
+# ## 3. Pretraining from scratch, live (about 6 min, 4 of them computing)
 #
 # Real pretraining takes days of GPU time. Here we run the first 3 minutes of it, following the Galaxy
 # Training Network tutorial (Mourad & Batut, CC-BY). The new model has the same design as Mistral-DNA
@@ -251,9 +251,9 @@ print(f"NT-500M + probe: {auc_nt:.3f}   vs   Mistral-DNA (16M): {auc_fm:.3f}")
 # Mistral). It starts from random weights and is trained to predict the next token on 200-letter pieces
 # of the human genome. We probe it on AGO2 before and after.
 #
-# Start the cell (about 5 minutes on a T4), then read **What to take away** below the Summary cell
-# while the loss goes down. A T4 runs fewer steps in 3 minutes than our A30 test GPU did (about 1,800
-# steps, probe 0.73 after), so expect a smaller gain.
+# Start the cell (about 4 minutes on a T4), then read **What to take away** below the Summary cell
+# while the loss goes down. A T4 runs about 1,200 steps in the 3 minutes, against about 1,800 on our A30
+# test GPU; in our Colab test the probe still went from 0.57 to 0.72.
 
 # %%
 #@title Pretrain from scratch for a few minutes - run this cell { display-mode: "form" }

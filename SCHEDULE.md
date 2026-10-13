@@ -20,16 +20,17 @@ the "about N min" section headings (reading, typing and T4 compute). Both are es
 | Part | Budget | Talk | Notebook | Debrief | Projected | Over |
 |---|---|---|---|---|---|---|
 | 1. Machine learning and CNNs | 40 | 32 (task and biology 12, learning and testing 8, CNN 9, look inside 3) | 46 (+5 optional) | 8 | 86 | +46 |
-| 2. DNA foundation models | 40 | 20 (overview, tokenization, embedding, transformer, heads) | 33 | 5 | 58 | +18 |
-| 3. Shortcuts, controls and fine-tuning | 40 | 10 (shortcuts, control, fine-tuning) | 53 (+2 optional) | 8 | 71 | +31 |
+| 2. DNA foundation models | 40 | 20 (overview, tokenization, embedding, transformer, heads) | 32 | 5 | 57 | +17 |
+| 3. Shortcuts, controls and fine-tuning | 40 | 10 (shortcuts, control, fine-tuning) | 49 (+2 optional) | 8 | 67 | +27 |
 | Wrap-up | 10 | 10 | | | 10 | 0 |
-| **Total** | **130** | | | | **225** | **+95 (+65 after the buffer)** |
+| **Total** | **130** | | | | **220** | **+90 (+60 after the buffer)** |
 
-Compute alone is small: on an A30 the notebooks take 0.5, 5 and 4.3 min (README); the minutes above are
-reading and typing. The Colab test (`notebooks/colab_timing_test.ipynb`) measures the T4 compute.
+Measured on a Colab T4 (13.10, no errors): compute is 1.8, 4.1 and 4.7 min for the three notebooks
+(excluding the "Stuck?" cells). The longest waits are live pretraining (3.7 min) and LoRA training (3.2 min);
+everything else in the minutes above is reading and typing.
 
-Largest items: part 1 notebook sections 7 and 8 (logos 9, insertion 8); part 3 LoRA (11, of which 6–8 training)
-and `shortcut_scores` (8); part 2 TODO-1 embeddings (9) and live pretraining (7).
+Largest items: part 1 notebook sections 7 and 8 (logos 9, insertion 8); part 3 LoRA (7, of which 3 training)
+and `shortcut_scores` (8); part 2 TODO-1 embeddings (9) and live pretraining (6, of which 4 computing).
 
 Notebooks for students: https://github.com/mathoory/ai-days-2026-dna-workshop (Open in Colab links in the README).
 Data: https://huggingface.co/datasets/yup8/ai-days-2026-ago2

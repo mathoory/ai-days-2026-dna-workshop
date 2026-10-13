@@ -432,7 +432,7 @@ for name in BENCH:
     print(f"CNN, {name:8s}: {scores[name]['CNN (part 1 architecture)']:.3f}  ({time.time() - t0:.0f}s)")
 
 # %% [markdown]
-# ## 6. Fine-tuning with LoRA (TODO-5, about 11 min)
+# ## 6. Fine-tuning with LoRA (TODO-5, about 7 min)
 #
 # So far the language model was **frozen**: we only trained a linear probe on top. **Fine-tuning**
 # also updates the model's own weights for the AGO2 task. A 16M-parameter model like Mistral-DNA could
@@ -442,7 +442,7 @@ for name in BENCH:
 # are about 1.6% of the parameters.
 #
 # We train on the **matched** benchmark, 2 epochs over 20,000 labelled sequences (the frozen probe used
-# 12,000), and test on the matched test set. This takes **about 6 to 8 minutes on a T4**. Start the
+# 12,000), and test on the matched test set. This takes **about 3 minutes on a T4**. Start the
 # TODO-5 cell as soon as you have written it, and read on while it trains.
 #
 # The setup cell defines what TODO-5 needs: `make_lora()`, which returns a fresh model with LoRA

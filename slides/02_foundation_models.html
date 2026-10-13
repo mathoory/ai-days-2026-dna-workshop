@@ -692,13 +692,13 @@
 <td style="text-align: left;">live</td>
 <td style="text-align: left;">pretrain a 105M model for 3 minutes</td>
 <td style="text-align: left;">probe before and after</td>
-<td style="text-align: left;">7 min</td>
+<td style="text-align: left;">6 min</td>
 </tr>
 </tbody>
 </table>
 <aside class="notes">
 <ul>
-<li>Given cells (setup, loading Mistral-DNA, 2-D map, NT-500M vectors, take-aways): about 12 min. Projected hands-on total: about 33 min (the times in the notebook headings).</li>
+<li>Given cells (setup, loading Mistral-DNA, 2-D map, NT-500M vectors, take-aways): about 12 min. Projected hands-on total: about 32 min (the times in the notebook headings).</li>
 <li>Signatures: <code>embed(tok, model, seqs)</code> returns an <code>(N, 256)</code> array; <code>probe_auc(...)</code> returns <code>(auc, probe)</code>.</li>
 <li>TODO-1 check: the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
 <li>TODO-2: the probe trains on 12,000 sequences (the <code>C=0.1</code> setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set.</li>
@@ -791,7 +791,7 @@
 <li>The figure: the next-token loss every 100 steps of one 3-minute run (logged from step 100 to 1,000). Dashed: uniform guessing, ln 4096 ≈ 8.3. Dotted: a model that knows only how frequent each token is, with no context (about 7.1).</li>
 <li>The loss falls from about 7.0 after 100 steps to about 6.4. Most of the early drop is learning token frequencies; going below the dotted line requires using context.</li>
 <li>Probed on AGO2 before and after: 0.55 to 0.73 in our latest run (1,834 steps; earlier runs gave 0.72 and 0.75). That is only a little above the two composition numbers of part 1, slide 2.4 (0.66), so it should not be read as learned binding biology.</li>
-<li>A T4 completes fewer steps in 3 minutes than our A30 test GPU, so expect a smaller gain. The released Mistral-DNA, a different model trained far longer, reaches 0.78.</li>
+<li>A T4 completes about 1,200 steps in 3 minutes against 1,834 on our A30 test GPU; in our Colab test the probe still went from 0.57 to 0.72. The released Mistral-DNA, a different model trained far longer, reaches 0.78.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {

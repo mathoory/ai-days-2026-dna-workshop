@@ -48,8 +48,11 @@ quarto render slides/01_cnn.qmd          # one deck
 | `02_foundation_models` | 5 min (fresh download, NT-500M recomputed) | live pretraining: 3.4 min |
 | `03_shortcuts_and_controls` | 4.3 min | LoRA, 2 epochs × 20,000 sequences: 1.5 min (3 min with float16 forced); `shortcut_scores()`: 43 s |
 
-With float16 forced (the T4 path, no bfloat16), all three notebooks run without errors. A T4 is roughly
-2 to 3 times slower than an A30.
+Colab, Tesla T4 (13.10, all three notebooks in one session, no errors): `01_cnn` 1.8 min (training 69 s),
+`02_foundation_models` 4.1 min (live pretraining 3.7 min, 1,178 steps), `03_shortcuts_and_controls` 4.7 min
+without the "Stuck?" cells (LoRA 3.2 min, `shortcut_scores()` 32 s). Peak GPU memory 2.2 GB; the 18 MB data
+file downloads in 1.5 s. Torch reports bfloat16 support on the T4, so the float16 + GradScaler branch was
+not used there; it runs without errors when forced (tested on the A30).
 
 ## Reference results (held-out AUROC)
 - **Part 1:** CNN 0.861 (0.789 after epoch 1). Inserted miR-15/16 site 0.53 against 0.30 for shuffled copies.
