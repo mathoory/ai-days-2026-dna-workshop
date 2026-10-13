@@ -222,48 +222,17 @@
 <section id="pretrain-once-reuse-many-times" class="slide level2">
 <h2>1.1 Pretrain once, reuse many times</h2>
 <ul>
-<li>A <strong>foundation model</strong> is pretrained on unlabelled sequence, then adapted to many tasks. A DNA <strong>language model</strong> is one pretrained to predict tokens of genome sequence from the other tokens</li>
-<li>Today’s example: <strong>Mistral-DNA</strong>, 16M parameters, pretrained on the human genome</li>
-</ul>
-<table class="caption-top">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Stage</th>
-<th style="text-align: left;">Data</th>
-<th style="text-align: left;">Labels</th>
-<th style="text-align: left;">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><strong>Pretraining</strong></td>
-<td style="text-align: left;">billions of letters of genome sequence</td>
-<td style="text-align: left;">none</td>
-<td style="text-align: left;">Mistral-DNA: the human genome</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Adaptation</strong></td>
-<td style="text-align: left;">one task’s data set</td>
-<td style="text-align: left;">thousands</td>
-<td style="text-align: left;">AGO2: 92,346 labelled sequences</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li><strong>Claim</strong>: what a model learns in pretraining transfers, so each task needs fewer labels. Parts 2 and 3 test it on AGO2</li>
+<li><strong>Pretraining</strong>: billions of letters of genome sequence, no labels</li>
+<li><strong>Adaptation</strong>: one task, thousands of labels (AGO2: 92,346)</li>
+<li>Today’s model: <strong>Mistral-DNA</strong>, 16M parameters, pretrained on the human genome</li>
 </ul>
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
+<li>A foundation model is pretrained on unlabelled sequence, then adapted to many tasks. A DNA language model is one pretrained to predict tokens of genome sequence from the other tokens.</li>
 <li>Most models so far, like our CNN, are trained from random weights for one task with that task’s labels.</li>
-<li>Each task adds a small output layer (a head) and may adjust the model.</li>
-<li>Heads differ by task: a number (expression level), a label per position (splice sites), or one probability per sequence, as today.</li>
+<li>Each task adds a small output layer (a head) and may adjust the model. Heads differ by task: a number (expression level), a label per position (splice sites), or one probability per sequence, as today.</li>
+<li>The claim to test in parts 2 and 3: what a model learns in pretraining transfers, so each task needs fewer labels.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -288,36 +257,37 @@
 <thead>
 <tr class="header">
 <th style="text-align: left;">Stage</th>
-<th style="text-align: left;">The CNN (part 1)</th>
-<th style="text-align: left;">A DNA language model</th>
+<th style="text-align: left;">CNN (part 1)</th>
+<th style="text-align: left;">DNA language model</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;"><strong>Tokenization</strong></td>
 <td style="text-align: left;">single letters</td>
-<td style="text-align: left;">k-mers or learned BPE tokens</td>
+<td style="text-align: left;">k-mers or BPE tokens</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><strong>Embedding</strong></td>
-<td style="text-align: left;">a one-hot column of 4 numbers</td>
-<td style="text-align: left;">a learned vector per token (256 numbers in Mistral-DNA)</td>
+<td style="text-align: left;">one-hot, 4 numbers</td>
+<td style="text-align: left;">learned, 256 numbers</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><strong>Body</strong></td>
-<td style="text-align: left;">two convolution layers</td>
-<td style="text-align: left;">a transformer (8 layers in Mistral-DNA)</td>
+<td style="text-align: left;">2 convolution layers</td>
+<td style="text-align: left;">transformer, 8 layers</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><strong>Prediction head</strong></td>
-<td style="text-align: left;">a linear layer → one logit</td>
-<td style="text-align: left;">pretraining: a probability for every token; our task: a linear layer → one logit</td>
+<td style="text-align: left;">linear → 1 logit</td>
+<td style="text-align: left;">linear → token probabilities, or 1 logit</td>
 </tr>
 </tbody>
 </table>
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
+<li>One row per stage; the language-model column gives Mistral-DNA’s numbers.</li>
 <li>These four stages describe most sequence models in use today. This part goes through them in order; the transformer stays a black box.</li>
 <li>The CNN’s stages were fixed by us (one-hot) or trained on 92,346 labels. A language model learns its embedding and body from unlabelled genome sequence first.</li>
 </ul>
@@ -341,13 +311,18 @@
 <section id="single-letters" class="slide level2">
 <h2>2.1 Single letters</h2>
 <ul>
-<li>The CNN read one token per letter, each a one-hot column (part 1)</li>
-<li>A vocabulary of 4, and a 330-letter sequence is 330 tokens</li>
-<li>Every position is kept, but the model has to learn from scratch which letters belong together</li>
+<li>A vocabulary of 4: each letter is a token, as in the CNN</li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/tokens_letters.png" class="quarto-figure quarto-figure-center" height="300"></p>
+</figure>
+</div>
 <aside class="notes">
 <ul>
 <li>Projected: 1 min.</li>
+<li>The figure and the next two: the same 30 letters of a real bound sequence around a miR-19 site (underlined), one box per token, with the token count on the right.</li>
+<li>A 330-letter sequence is 330 tokens. Every position is kept, but the model has to learn from scratch which letters belong together.</li>
 <li>Some genome models (HyenaDNA, Evo) also read single letters, which needs a model that can handle long inputs: a 1,000-letter sequence is 1,000 tokens.</li>
 </ul>
 <style type="text/css">
@@ -365,16 +340,19 @@
 <section id="k-mers" class="slide level2">
 <h2>2.2 k-mers</h2>
 <ul>
-<li>A <strong>k-mer</strong> is a fixed word of k letters. Nucleotide Transformer cuts DNA into consecutive 6-mers, a vocabulary of <span class="math inline">\(4^6 = 4{,}096\)</span></li>
-<li><code>AAACTG CAGAAT TTTGCA CAGTTA CCTGCA ...</code></li>
-<li>Shift the sequence by one letter and every token changes: <code>AACTGC AGAATT TTGCAC AGTTAC ...</code></li>
+<li>Fixed words of 6 letters, a vocabulary of <span class="math inline">\(4^6 = 4{,}096\)</span> (Nucleotide Transformer)</li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/tokens_kmer.png" class="quarto-figure quarto-figure-center" height="445"></p>
+</figure>
+</div>
 <aside class="notes">
 <ul>
 <li>Projected: 1 min.</li>
-<li>The models read DNA letters, so U becomes T. This is the start of a real bound sequence from our data.</li>
+<li>The models read DNA letters, so U becomes T. This is the same stretch of a real bound sequence from our data. Top row: Nucleotide Transformer’s 6-mer tokens; bottom row: the same sequence shifted by one letter.</li>
+<li>Shift the sequence by one letter and every token changes. The letters left over at the end become single-letter tokens.</li>
 <li>A sequence of n letters becomes about n / 6 tokens, so the model can read six times more sequence for the same cost.</li>
-<li>The letters left over at the end become single-letter tokens.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -391,19 +369,19 @@
 <section id="byte-pair-encoding-bpe" class="slide level2">
 <h2>2.3 Byte-pair encoding (BPE)</h2>
 <ul>
-<li>Start from the 4 letters. Count every pair of neighbouring tokens in the genome, merge the most frequent pair into one new token, and repeat until the vocabulary has 4,096 tokens</li>
-<li>Frequent stretches become one token and rare ones stay short, so token lengths vary. Mistral-DNA and DNABERT-2 share one BPE vocabulary</li>
+<li>Merge the most frequent neighbouring pair into a new token; repeat until 4,096 tokens</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/tokens.png" class="quarto-figure quarto-figure-center" height="492"></p>
+<p><img data-src="assets/custom/tokens_bpe.png" class="quarto-figure quarto-figure-center" height="302"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
-<li>Real tokenizers on the same bound sequence, one row per method.</li>
-<li>Single letters (row 2) are what the CNN read. The 6-mer rows are the previous slide.</li>
+<li>Mistral-DNA’s BPE tokenizer on the same bound sequence. Single letters (slide 2.1) are what the CNN read; the 6-mer rows are the previous slide.</li>
+<li>Start from the 4 letters and count every pair of neighbouring tokens in the genome.</li>
+<li>Frequent stretches become one token and rare ones stay short, so token lengths vary. Mistral-DNA and DNABERT-2 share one BPE vocabulary.</li>
 <li>The underlined miR-19 site is split differently by each tokenizer. No model sees it as one unit.</li>
 </ul>
 <style type="text/css">
@@ -426,15 +404,20 @@
 <section id="token-embeddings" class="slide level2">
 <h2>3.1 Token embeddings</h2>
 <ul>
-<li>Each token in the vocabulary has a row in a learned table <span class="math inline">\(E\)</span> (4,096 tokens × 256 numbers in Mistral-DNA)</li>
-<li>Token number <span class="math inline">\(i\)</span> becomes the vector <span class="math inline">\(e_i\)</span>, row <span class="math inline">\(i\)</span> of <span class="math inline">\(E\)</span>. With a one-hot vector <span class="math inline">\(x_i\)</span>: <span class="math inline">\(\;e_i = x_i^\top E\)</span></li>
-<li>The CNN’s one-hot encoding is the same lookup with a fixed 4 × 4 identity table: 4 tokens, 4 numbers each, nothing learned</li>
-<li>The table is learned during pretraining, so tokens that occur in similar contexts end up with similar vectors</li>
+<li>Token <span class="math inline">\(i\)</span> becomes row <span class="math inline">\(i\)</span> of a learned table <span class="math inline">\(E\)</span>: <span class="math inline">\(\;e_i = x_i^\top E\)</span></li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/emb_lookup.png" class="quarto-figure quarto-figure-center" height="508"></p>
+</figure>
+</div>
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
-<li>Multiplying a one-hot vector by <span class="math inline">\(E\)</span> selects one row of <span class="math inline">\(E\)</span>, so an embedding layer is implemented as a table lookup.</li>
+<li>Left: the real rows of Mistral-DNA’s table for the first four tokens of our example sequence; blue positive, grey negative. The table has 4,096 rows of 256 numbers. Right: the CNN’s table.</li>
+<li><span class="math inline">\(x_i\)</span> is the one-hot vector of token <span class="math inline">\(i\)</span>. Multiplying a one-hot vector by <span class="math inline">\(E\)</span> selects one row of <span class="math inline">\(E\)</span>, so an embedding layer is implemented as a table lookup.</li>
+<li>The CNN’s one-hot encoding is the same lookup with a fixed 4 × 4 identity table: nothing learned.</li>
+<li>The table is learned during pretraining, so tokens that occur in similar contexts end up with similar vectors.</li>
 <li>These are the input vectors, one per token. Section 4 follows them through the transformer and back out as one vector per sequence.</li>
 </ul>
 <style type="text/css">
@@ -457,16 +440,22 @@
 <section id="the-transformer-as-a-black-box" class="slide level2">
 <h2>4.1 The transformer, as a black box</h2>
 <ul>
-<li><strong>In</strong>: one vector per token. <strong>Out</strong>: one vector per token, the same size</li>
-<li>Each output vector depends on all the tokens in the sequence (attention), not only on its own token</li>
-<li>Mistral-DNA: 8 layers, 256 numbers per token, up to 512 tokens, 16M parameters</li>
+<li>Each output vector depends on every input token (attention)</li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/blackbox.png" class="quarto-figure quarto-figure-center" height="642"></p>
+</figure>
+</div>
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
+<li>The strips are real: the first 64 of the 256 numbers for each token, at the input (bottom) and after the last layer (top). The blue lines connect every input token to one output vector.</li>
+<li>In: one vector per token. Out: one vector per token, the same size (256 numbers).</li>
+<li>Mistral-DNA: 8 layers, 256 numbers per token, up to 512 tokens, 16M parameters.</li>
 <li>Inside each layer, attention mixes information between positions (8 attention heads per layer in Mistral-DNA) and a small feed-forward network transforms each position. Mistral-DNA’s feed-forward part is a mixture of 8 experts. We do not open these today.</li>
-<li>For the exercise we need only its last layer’s output: the token-by-256 matrix on the next slide, averaged into one vector.</li>
 <li>The CNN’s convolutions see a 10-letter window and then a few pooled neighbours; a transformer layer can relate any two tokens in the input.</li>
+<li>For the exercise we need only its last layer’s output: the token-by-256 matrix on the next slide, averaged into one vector.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -492,7 +481,9 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Mistral-DNA on the first 60 letters of one real sequence: each token is mapped to an integer, the model outputs one 256-number vector per token in its last layer, and we average those vectors.</li>
+<li>Mistral-DNA on the first 60 letters of one real sequence. Top: the last layer, one row of 256 numbers per token; blue positive, grey negative. Bottom: their average, the sequence embedding.</li>
+<li>Each token is mapped to an integer, the model outputs one 256-number vector per token in its last layer, and we average those vectors.</li>
+<li><code>[CLS]</code> and <code>[SEP]</code> are special tokens the tokenizer adds at the start and end; they are not DNA.</li>
 <li>In a batch, shorter sequences are padded. The attention mask (1 for real tokens, 0 for padding) keeps padding out of the average.</li>
 <li>A few dimensions are large for almost every token (the vertical stripes). That is common in transformer models and does not depend on the sequence.</li>
 </ul>
@@ -524,37 +515,38 @@
 <thead>
 <tr class="header">
 <th style="text-align: left;">Use</th>
-<th style="text-align: left;">Head on top of the transformer</th>
+<th style="text-align: left;">Head</th>
 <th style="text-align: left;">Output</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Pretraining, next token</td>
-<td style="text-align: left;">linear layer 256 → 4,096, softmax</td>
-<td style="text-align: left;">a probability for every possible next token</td>
+<td style="text-align: left;">Next token</td>
+<td style="text-align: left;">256 → 4,096, softmax</td>
+<td style="text-align: left;">probability of each token</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Pretraining, masked tokens</td>
-<td style="text-align: left;">linear layer → vocabulary, softmax</td>
-<td style="text-align: left;">a probability for every possible hidden token</td>
+<td style="text-align: left;">Masked tokens</td>
+<td style="text-align: left;">256 → vocabulary, softmax</td>
+<td style="text-align: left;">probability of each hidden token</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Our task</td>
-<td style="text-align: left;">average over tokens, then linear layer 256 → 1, sigmoid</td>
-<td style="text-align: left;">P(bound), as the CNN’s last layer</td>
+<td style="text-align: left;">average, 256 → 1, sigmoid</td>
+<td style="text-align: left;">P(bound)</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li><strong>Softmax</strong>: turns one score per token of the vocabulary into probabilities that sum to 1</li>
-<li><strong>Linear probe</strong>: the task head trained on the frozen model’s sequence embeddings, which is logistic regression</li>
+<li><strong>Linear probe</strong>: our task’s head on a frozen model, which is logistic regression</li>
 </ul>
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
+<li>The first two rows are the vocabulary heads used in pretraining (next slide); the third is ours.</li>
+<li>Softmax turns one score per vocabulary token into probabilities that sum to 1.</li>
+<li>Our task’s head first averages the last layer over the tokens (the sequence embedding), then applies one linear layer. Before the logistic regression each of the 256 dimensions is standardised.</li>
 <li>After pretraining the vocabulary head is discarded and a new task head is attached. The body (and the embedding table) transfers to the new task.</li>
-<li>Before the logistic regression each of the 256 dimensions is standardised.</li>
 <li>Frozen body, new linear head: a linear probe (this part’s notebook). Body adapted too: fine-tuning (part 3, LoRA).</li>
 </ul>
 <style type="text/css">
@@ -582,8 +574,8 @@
 </div>
 <aside class="notes">
 <ul>
-<li>These are the losses the vocabulary heads of slide 5.1 are trained with.</li>
-<li>The figure: Mistral-DNA, given the first tokens of a real sequence, assigns a probability to each of its 4,096 possible next tokens. Its top choice gets about 10%; the true token is shown at the bottom with its much lower probability.</li>
+<li>These are the losses the vocabulary heads of slide 5.1 are trained with. <span class="math inline">\(x_t\)</span> is the token at position <span class="math inline">\(t\)</span>; <span class="math inline">\(x_{&lt;t}\)</span> the tokens before it; <span class="math inline">\(x_{\setminus t}\)</span> all tokens except the hidden ones.</li>
+<li>The figure: Mistral-DNA, given the first tokens of a real sequence (the end of that context is printed at the top), assigns a probability to each of its 4,096 possible next tokens. Its top choice gets about 10%; the true token is shown at the bottom with its much lower probability.</li>
 <li>Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.</li>
 <li>Masked models hide about 15% of the tokens and predict them from the tokens on both sides.</li>
 <li>In both cases the genome supplies its own targets, so no experimental labels are needed.</li>
@@ -609,8 +601,8 @@
 </div>
 <aside class="notes">
 <ul>
+<li>x: year of publication; y: parameters, log scale. Filled points are masked models, open points next-token models. The vertical line joins the Nucleotide Transformer sizes.</li>
 <li>DNABERT (110M parameters), Nucleotide Transformer (50M to 2.5B), DNABERT-2 and HyenaDNA, then Evo (7B) and Evo 2 (40B).</li>
-<li>Filled points are masked models, open points next-token models.</li>
 <li>Not shown: Enformer, Borzoi and AlphaGenome, trained with labels from thousands of experiments, and the reference models for predicting gene regulation from sequence.</li>
 <li>The wrap-up shows ten models from these families tested on AGO2.</li>
 </ul>
@@ -651,7 +643,7 @@
 <li>The download goes to the Colab machine. Mistral-DNA is about 60 MB, roughly 10 seconds.</li>
 <li>Mistral-DNA has 16M parameters; the “17M” in its name includes an output layer we do not use.</li>
 <li>The tokenizer returns more keys than the model accepts, so pass only <code>input_ids</code> and <code>attention_mask</code>.</li>
-<li>The last three lines are TODO-1: average the last layer over the real tokens only.</li>
+<li>The last three lines are TODO-1: average the last layer over the real tokens only. <code>unsqueeze(-1)</code> gives the mask shape (1, tokens, 1), so it multiplies all 256 numbers of each token.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -686,13 +678,13 @@
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">TODO-1</td>
-<td style="text-align: left;"><code>embed</code>: one 256-number vector per sequence</td>
-<td style="text-align: left;">shape <code>(N, 256)</code>; same alone or in a batch</td>
+<td style="text-align: left;"><code>embed</code>: one vector per sequence</td>
+<td style="text-align: left;">shape <code>(N, 256)</code></td>
 <td style="text-align: left;">9 min</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">TODO-2</td>
-<td style="text-align: left;"><code>probe_auc</code>: standardise, logistic regression, test AUROC</td>
+<td style="text-align: left;"><code>probe_auc</code>: logistic regression</td>
 <td style="text-align: left;">about 0.78</td>
 <td style="text-align: left;">5 min</td>
 </tr>
@@ -704,17 +696,15 @@
 </tr>
 </tbody>
 </table>
-<ul>
-<li>Given cells (setup, loading Mistral-DNA, 2-D map, NT-500M vectors, take-aways): about 12 min. Total about 33 min</li>
-</ul>
 <aside class="notes">
 <ul>
-<li>Signatures: <code>embed(tok, model, seqs)</code> returns an <code>(N, 256)</code> array; <code>probe_auc(...)</code> returns <code>(auc, probe)</code>. NT-500M scores about 0.79 from precomputed vectors.</li>
-<li>Projected hands-on total: about 33 min (the times in the notebook headings).</li>
-<li>TODO-1’s built-in check: if the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
+<li>Given cells (setup, loading Mistral-DNA, 2-D map, NT-500M vectors, take-aways): about 12 min. Projected hands-on total: about 33 min (the times in the notebook headings).</li>
+<li>Signatures: <code>embed(tok, model, seqs)</code> returns an <code>(N, 256)</code> array; <code>probe_auc(...)</code> returns <code>(auc, probe)</code>.</li>
+<li>TODO-1 check: the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
 <li>TODO-2: the probe trains on 12,000 sequences (the <code>C=0.1</code> setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set.</li>
+<li>NT-500M (human reference) is a 2 GB download, so its vectors are provided. It scores about 0.79 from these precomputed vectors.</li>
+<li>The live row is section 3 of the notebook (slide 7.3): start the cell and read the take-aways while it trains.</li>
 <li>Each TODO has a “Stuck?” cell that loads our version.</li>
-<li>NT-500M (human reference) is a 2 GB download, so its vectors are provided.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -745,9 +735,9 @@
 </div>
 <aside class="notes">
 <ul>
-<li>12,000 Mistral-DNA embeddings, the same map the notebook draws.</li>
+<li>12,000 Mistral-DNA embeddings, one point per sequence, the same map the notebook draws.</li>
 <li>Left, coloured by G+C fraction: it changes smoothly across the map, mostly along direction 2 (correlation r = 0.81; with direction 1, r = 0.52).</li>
-<li>Right, coloured by label: bound sequences concentrate at the low-G+C end, unbound ones spread along both arms.</li>
+<li>Right, coloured by label (blue bound, grey unbound): bound sequences concentrate at the low-G+C end, unbound ones spread along both arms.</li>
 <li>Composition is one of the main axes of these vectors, and the two classes differ in composition. Part 3 tests how much of the probe’s score that explains.</li>
 </ul>
 <style type="text/css">
@@ -771,10 +761,10 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Held-out AUROC on the same 1,000 sequences.</li>
+<li>Held-out AUROC on the same 1,000 sequences; bars start at 0.5 (chance). Grey: probes on frozen models (light grey: random weights); black: the CNN.</li>
 <li>Mistral-DNA with a probe: 0.78. NT-500M, 30 times larger: 0.79. The difference is within the ±0.025 noise from part 1, so there is no evidence that size helps here.</li>
 <li>Both are below the part 1 CNN at 0.86, but the CNN was trained on about 92,000 labels and the probes on 12,000. At equal label counts the gap is smaller (part 3: CNN 0.82 vs probe 0.77 at 12,000 labels).</li>
-<li>The 105M model with random weights gives 0.55; after 3 minutes of pretraining, about 0.73 (next slide).</li>
+<li>The 105M model with random weights gives 0.55; after 3 minutes of pretraining, 0.72 in the run on this figure and 0.73 in our latest run (next slide).</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -798,7 +788,8 @@
 <aside class="notes">
 <ul>
 <li>The live cell: a 105M-parameter model of the same design as Mistral-DNA but larger, with random weights, trained to predict the next token on 200-letter pieces of the human genome for about 3 minutes (recipe from the Galaxy Training Network, Mourad and Batut, CC-BY).</li>
-<li>The loss falls from about 7.0 after 100 steps to about 6.4. Uniform guessing is ln 4096 ≈ 8.3; a model that knows only how frequent each token is, with no context, sits at the dotted line. Most of the early drop is learning token frequencies; going below the dotted line requires using context.</li>
+<li>The figure: the next-token loss every 100 steps of one 3-minute run (logged from step 100 to 1,000). Dashed: uniform guessing, ln 4096 ≈ 8.3. Dotted: a model that knows only how frequent each token is, with no context (about 7.1).</li>
+<li>The loss falls from about 7.0 after 100 steps to about 6.4. Most of the early drop is learning token frequencies; going below the dotted line requires using context.</li>
 <li>Probed on AGO2 before and after: 0.55 to 0.73 in our latest run (1,834 steps; earlier runs gave 0.72 and 0.75). That is only a little above the two composition numbers of part 1, slide 2.4 (0.66), so it should not be read as learned binding biology.</li>
 <li>A T4 completes fewer steps in 3 minutes than our A30 test GPU, so expect a smaller gain. The released Mistral-DNA, a different model trained far longer, reaches 0.78.</li>
 </ul>
