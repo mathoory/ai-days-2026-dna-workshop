@@ -1,0 +1,87 @@
+---
+subtitle: "Slot 5: A pretrained DNA model. Probe it, and watch pretraining start<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
+---
+
+::: {.center}
+# 1 Load a model {data-name="Load"}
+:::
+
+## 1.1 From a sequence to an embedding with Hugging Face
+
+```python
+from transformers import AutoTokenizer, AutoModel
+name  = "RaphaelMourad/Mistral-DNA-v1-17M-hg38"
+tok   = AutoTokenizer.from_pretrained(name)          # the token vocabulary
+model = AutoModel.from_pretrained(name)              # the weights
+
+seq = "UGAUUUAUCAAG...".replace("U", "T")            # the model reads DNA letters
+ids = tok([seq], return_tensors="pt", padding=True)
+h   = model(**ids, output_hidden_states=True).hidden_states[-1]   # (1, tokens, 256)
+m   = ids["attention_mask"].unsqueeze(-1)            # 1 = real token, 0 = padding
+vec = (h * m).sum(1) / m.sum(1)                      # (1, 256): the embedding
+```
+
+::: {.notes}
+- The same calls load any model on the Hugging Face Hub. Each model has a page with a model card: what it was trained on, how, and its known limits.
+- The download goes to the Colab machine. Mistral-DNA is about 60 MB, roughly 10 seconds.
+- Mistral-DNA (16M) has 16M parameters; the "17M" in its name includes an output layer we do not use.
+- The last three lines are TODO-1: average the last layer over the real tokens only.
+:::
+
+## 1.2 Your turn
+
+Open **`05_pretrained_model.ipynb`**.
+
+| Step | Task | Check | Time |
+|:--|:--|:--|:--|
+| TODO-1 | `embed(tok, model, seqs)` → one 256-number vector per sequence | shape `(N, 256)`; same vector alone or in a batch | 7 min |
+| given | 2-D map of the vectors | | 1 min |
+| TODO-2 | `probe_auc(...)` → `(auc, probe)`: standardise, logistic regression, AUROC on the test set | about 0.78 | 5 min |
+| given | NT-500M vectors, precomputed | about 0.79 | 1 min |
+| live | pretrain a 105M model from random weights for 3 minutes | probe before and after | 4 min |
+
+::: {.notes}
+- TODO-1's built-in check: if the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.
+- TODO-2: the probe trains on 12,000 sequences (the `C=0.1` setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set.
+- Each TODO has a "Stuck?" cell that loads our version.
+- NT-500M (human reference) is a 2 GB download, so its vectors are provided.
+:::
+
+::: {.center}
+# 2 Results {data-name="Results"}
+:::
+
+## 2.1 What the embeddings vary with
+
+- **PCA**: project the 256-dimensional embeddings onto the two directions of largest variance
+
+![](assets/custom/emb_pca.png){fig-align="center" height="596px"}
+
+::: {.notes}
+- 12,000 Mistral-DNA embeddings, the same map the notebook draws.
+- Left, coloured by G+C fraction: it changes smoothly across the map, mostly along direction 2 (correlation r = 0.81; with direction 1, r = 0.52).
+- Right, coloured by label: bound sequences concentrate at the low-G+C end, unbound ones spread along both arms.
+- Composition is one of the main axes of these vectors, and the two classes differ in composition. Slot 6 tests how much of the probe's score that explains.
+:::
+
+## 2.2 Frozen pretrained models against the CNN
+
+![](assets/custom/results_05.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- Held-out AUROC on the same 1,000 sequences.
+- Mistral-DNA with a probe: 0.78. NT-500M, 30 times larger: 0.79. The difference is within the ±0.025 noise from Slot 1, so there is no evidence that size helps here.
+- Both are below the Slot 2 CNN at 0.86, but the CNN was trained on about 92,000 labels and the probes on 12,000. At equal label counts the gap is smaller (Slot 7: CNN 0.82 vs probe 0.77 at 12,000 labels).
+- The 105M model with random weights gives 0.55; after 3 minutes of pretraining, 0.72 (next slide).
+:::
+
+## 2.3 Pretraining from random weights
+
+![](assets/custom/pretrain_loss.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- The live cell: a 105M-parameter model of the same design as Mistral-DNA but larger, with random weights, trained to predict the next token on 200-letter pieces of the human genome for about 3 minutes (recipe from the Galaxy Training Network, Mourad and Batut, CC-BY).
+- The loss falls from about 7.0 after 100 steps to about 6.4. Uniform guessing is ln 4096 ≈ 8.3; a model that knows only how frequent each token is, with no context, sits at the dotted line. Most of the early drop is learning token frequencies; going below the dotted line requires using context.
+- Probed on AGO2 before and after: 0.55 to 0.72 in this run (another run gave 0.75). That is only a little above the two composition numbers of Slot 6 (0.66), so it should not be read as learned binding biology.
+- A T4 completes fewer steps in 3 minutes than our A30, so expect a smaller gain. The released Mistral-DNA, a different model trained far longer, reaches 0.78.
+:::

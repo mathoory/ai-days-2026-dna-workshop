@@ -57,7 +57,7 @@ def auroc_ci(model, tr, ty, ls, ly):
         d = np.load(DATA / f)
         clf = make_pipeline(StandardScaler(), LogisticRegression(max_iter=3000, C=0.1)).fit(d["train"], ty[idx])
         rows.append((name, clf.predict_proba(d["test"])[:, 1], c))
-    rows.append(("CNN from Slot 2", cnn_scores(model, ls), BLUE))
+    rows.append(("CNN from part 1", cnn_scores(model, ls), BLUE))
     fig = plt.figure(figsize=(16, 9), dpi=120)
     ax = fig.add_axes([0.36, 0.2, 0.6, 0.6])
     for i, (n, s, c) in enumerate(rows):
@@ -86,7 +86,7 @@ def splits():
                  (141, "1,000 held-out (ls)")):
         label(ax, x, 40, t, fs=17, color=GREY)
     label(ax, 80, 24, "today: the 1,000 held-out sequences are the test set in every slot", fs=22, color=NAVY)
-    label(ax, 80, 15, "Slot 2 also watches them every epoch, so small gains on them are not evidence", fs=19, color=GREY)
+    label(ax, 80, 15, "The training loop also watches them every epoch, so small gains on them are not evidence", fs=19, color=GREY)
     save(fig, "splits")
 
 

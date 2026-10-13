@@ -1,0 +1,100 @@
+---
+subtitle: "Slot 3: Look inside. What did the CNN learn?<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
+---
+
+::: {.center}
+# 1 Look {data-name="Look"}
+:::
+
+## 1.1 From a filter to a sequence logo
+
+- `cutoff_for` → `windows_above` → `pwm_of` → logo: collect the windows with the highest output, count letters per position
+- Logo height = information content: 2 bits = always the same letter, 0 = all four equally often
+
+![](assets/custom/filter_logo.png){fig-align="center" height="492px"}
+
+::: {.notes}
+- Left: filter 0's 40 weights. Right: its logo, built from the roughly 25,000 windows in bound sequences whose output is above the cutoff (half-way between the filter's mean and maximum output). The notebook's count differs slightly because it scans a different subset.
+- Information content at a position is 2 minus the entropy of the letter frequencies, in bits. Each letter's height is its frequency times that value.
+- A logo shows which windows activate a filter. It leaves out the letters the filter penalises (its negative weights).
+- TODO-1 builds a logo for every filter with these helpers, then `consensus_of` reads off the most frequent letter at each position.
+:::
+
+## 1.2 All ten filters
+
+![](assets/custom/logo_grid.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- Mostly U-rich logos; several have one dominant G or C at a single position; few look like sharp motifs.
+- After TODO-1: choose the clearest logo, read its consensus and enter it as `MY_MOTIF`, with its filter number as `MY_FILTER`. That is the hypothesis for the next experiment.
+:::
+
+## 1.3 The same filter on unbound sequences
+
+![](assets/custom/logo_bound_unbound.png){fig-align="center" height="628px"}
+
+::: {.notes}
+- A control for reading logos: filter 0 gives almost the same logo on unbound sequences.
+- The windows it responds to look the same in both classes. Whether they occur more often in bound sequences needs a count or a test, which is what the next section does.
+- If a student's chosen filter looks the same in both classes, the notebook suggests choosing another one.
+:::
+
+::: {.center}
+# 2 Test {data-name="Test"}
+:::
+
+## 2.1 Your turn
+
+Open **`03_look_inside.ipynb`**. First cell: `USE_MY_CNN = True` to upload your `my_cnn.pt`, or `False` to use ours.
+
+| Step | Task | Names | Time |
+|:--|:--|:--|:--|
+| TODO-1 | a logo for every filter | `acts[:, f, :]`, `cutoff_for`, `windows_above`, `pwm_of` | 8 min |
+| step | choose one filter and its consensus | `MY_FILTER`, `MY_MOTIF` | 2 min |
+| TODO-2 | insert it 1 to 7 times, against a shuffled copy | `plant(seqs, motif, copies)` | 7 min |
+| given | position scan, microRNA sites | | 3 min |
+
+::: {.notes}
+- The shuffle here reorders the motif's own letters. Slot 6 uses a stricter shuffle that keeps letter-pair counts.
+- Expect a jump in the score once a copy lands near letter 175 (the fourth copy). The next two slides explain why.
+:::
+
+## 2.2 Insert the motif (TODO-2)
+
+![](assets/custom/dose_response.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- 1,000 random RNA sequences. The dotted line is their mean score with nothing inserted.
+- Insert the motif 1 to 7 times (black), the most that fit in a 330-letter sequence, and the same letters in shuffled order (grey). Compare the two curves rather than each curve with the baseline: the shuffled copy has the same letters, so it also changes the score.
+- `plant()` writes copy n starting at letter 40 + 45(n − 1). The score jumps when copy 4 (letter 175) lands in the region the CNN weighs and falls again with more copies, as they replace more of the background.
+:::
+
+## 2.3 Position matters
+
+![](assets/custom/position_scan.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- One copy of the motif at every position, averaged over 400 random sequences (a given cell in the notebook). The numbers 1 to 7 mark where `plant()` puts each copy in the previous test.
+- The motif changes the score only between about letters 140 and 190, where almost every sequence in the data has its measured site (shaded).
+- The shuffled copy gets much of the same increase there, so a good part of the effect is the letters' composition in that region rather than their order.
+- This is the last-layer pattern from Slot 2: the CNN weighs positions. It reflects how the data were cut, and it means the answer to "does this motif matter?" depends on where it is placed.
+:::
+
+::: {.center}
+# 3 Seed sites {data-name="Seed sites"}
+:::
+
+## 3.1 Does the CNN respond to seed sites?
+
+![](assets/custom/planting_bars.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- The hypothesis from Slot 1: a model that learned AGO2 targeting should respond to seed sites. This is the bonus cell.
+- 6 copies of each site inserted into real unbound sequences, against the same letters shuffled (grey: mean and standard deviation over 10 shuffles).
+- miR-15/16 (UGCUGCU): 0.53 against 0.31 ± 0.09, a clear effect. miR-19, miR-30 and let-7 lie within the spread of their shuffles.
+- The CNN was not given seed sites and responds to one of the four tested. The logos did not reveal this site; the insertion test did.
+- Inside the 40-letter measured site, these seed sites are 3 to 6 times enriched in bound sequences but occur in only about 1 to 2% of them, so the signal is weak.
+- The notebook's shuffle numbers differ slightly from these because the shuffles are random.
+
+Next (Roee): models pretrained on the whole genome.
+:::

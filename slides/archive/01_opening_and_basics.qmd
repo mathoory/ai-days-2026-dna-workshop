@@ -1,0 +1,222 @@
+---
+subtitle: "Slot 1: Opening, the biology, and how to read a result<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Prof. Roee Amit and Mattan Hoory"
+format:
+  revealjs:
+    toc: false
+---
+
+::: {.center}
+# 1 Welcome {data-name="Welcome"}
+:::
+
+## 1.1 Teaching machines to read DNA
+
+- 28 letters of one RNA sequence bound by the protein AGO2, and the same letters as numbers
+- A CNN trained on such sequences gives the full 330-letter sequence a score of **0.81**. What in the sequence produced that number?
+
+![](assets/custom/hero.png){fig-align="center" height="399px"}
+
+::: {.notes}
+Presenter: Mattan.
+
+- The CNN the participants train in an hour reads the whole sequence and returns 0.81.
+- The question for every model today: what in the sequence produced the score?
+- The data are RNA (letters A, C, G, U). The DNA models later in the day read the same sequences with T in place of U.
+:::
+
+## 1.2 About us
+
+::: columns
+::: {.column width="34%"}
+![](assets/mattan.jpg){height="560px"}
+:::
+::: {.column width="66%"}
+- **Prof. Roee Amit**: Faculty of Biotechnology and Food Engineering, Technion
+- **Mattan Hoory**: M.Sc. student in the Amit lab; TA of 00660121 Medical Diagnostics
+
+![](assets/hero_triplex.png){width="42%"}
+:::
+:::
+
+::: {.notes}
+- Mattan: B.Sc. in CS (bioinformatics track), now an M.Sc. in Roee's lab. Today is a compressed version of the Medical Diagnostics course's ML part.
+- Mattan's research: Triplexis, predicting where an RNA strand binds DNA as a triple helix. Sequence in, "does it bind?" out, the same kind of problem as today.
+- Roee introduces himself in his own words.
+:::
+
+## 1.3 Goals
+
+::: columns
+::: {.column width="50%"}
+**We will**
+
+- see what happens inside a model that reads sequence: encoding, filters, embeddings, fine-tuning
+- read a result: what a number means and when a difference is real
+- test whether a model uses the biology or a shortcut
+:::
+::: {.column width="50%"}
+**We will not**
+
+- write models from scratch
+- cover PyTorch or Hugging Face in depth
+- open up transformer internals
+:::
+:::
+
+::: {.notes}
+- Every hands-on slot ends with a result to interpret.
+- Most code is given. The TODOs are short and each one says what to write and what number to expect. An AI assistant can help with a TODO; check its answer against that number.
+- Sit next to someone with a different background: a programmer next to a biologist. Quick show of hands: who has trained a model? Who has used a pipette this year?
+:::
+
+## 1.4 What you need
+
+::: columns
+::: {.column width="58%"}
+- A laptop and a Google account
+- Colab with a GPU: *Runtime → Change runtime type → T4 GPU*
+- The notebooks: **[github.com/mathoory/ai-days-2026-dna-workshop]{.nowrap}**
+- Nothing to install; the data download by themselves
+- Stuck? Raise a hand, or load our files and continue
+:::
+::: {.column width="42%"}
+![](assets/custom/qr_repo.png){width="80%"}
+:::
+:::
+
+::: {.notes}
+- Every notebook runs on its own. At the end of each one participants can download their results and upload them in the next; otherwise the notebook loads ours.
+- Helpers will walk around the room.
+:::
+
+## 1.5 Today
+
+| Time | Slot | Format |
+|:--|:--|:--|
+| 10:00 | 1. Opening, biology, how to read a result | talk |
+| 10:30 | 2. Build a CNN | hands-on |
+| 11:00 | 3. Look inside it | hands-on |
+| 11:30 | 4. Foundation models for DNA | talk |
+| 12:00 | Break | |
+| 12:15 | 5. A pretrained DNA model | hands-on |
+| 12:45 | 6. Break it | hands-on |
+| 13:15 | 7. Fix it | hands-on |
+| 13:40 | 8. What we saw | talk |
+
+::: {.notes}
+- Talks: Roee (slots 1, 4, 8; Mattan opens slot 1). Hands-on slots: Mattan.
+- One data set all day: about 92,000 RNA sequences where AGO2 did or did not bind.
+- We build a CNN, inspect it, compare it with models pretrained on the genome, test both for shortcuts, and then change the data.
+
+Hand over to Roee.
+:::
+
+::: {.center}
+# 2 The biology {data-name="Biology"}
+:::
+
+## 2.1 The seed rule
+
+- AGO2 carries a microRNA. Its **seed** (letters 2 to 7) pairs with the target mRNA; this site also pairs letter 8
+
+![](assets/custom/seed_pairing.png){fig-align="center" height="432px"}
+
+::: {.notes}
+Presenter: Roee.
+
+- DNA is transcribed to messenger RNA, which is translated to protein. AGO2 acts on the messenger RNA.
+- AGO2 carries a microRNA of about 22 letters. The seed pairs with the mRNA (A with U, G with C, antiparallel). Where AGO2 binds, the mRNA is degraded or not translated.
+- The top row is a real bound sequence from our data. It contains the miR-16 site UGCUGCU, which pairs with microRNA letters 2 to 8.
+- More than 60% of human protein-coding genes carry conserved microRNA sites (Friedman et al., Genome Res 2009). A single-letter variant in a site can create or remove regulation, for example the let-7 site in KRAS (Chin et al., Cancer Res 2008). siRNA drugs such as patisiran work through AGO2.
+- An experiment covers one cell type and one condition. A model can score transcripts, variants and designed sequences nobody measured, provided it learned the rule.
+- Hypothesis for the day: a model that learned AGO2 targeting should respond to seed sites like this one. Slot 3 tests it.
+:::
+
+## 2.2 The data
+
+- **Bound**: about 48,000 sites where CLIP-seq found AGO2. **Unbound**: about 44,000 random positions in the same genes
+
+![](assets/custom/labels_raster.png){fig-align="center" height="596px"}
+
+::: {.notes}
+- CLIP-seq: UV light crosslinks proteins to the RNA they touch, an antibody pulls down AGO2, and the attached RNA fragments are sequenced.
+- The data set is the GraphProt CLIP benchmark (Maticzka et al. 2014), used by Pan and Shen (2018). Each sequence is about 330 letters, with the measured 40-letter site in the middle (letters 150 to 190 in almost every sequence) and context on both sides.
+- Each row is one sequence, each pixel one letter: dark for G or C, light for A or U. 150 of each class, sorted by G+C. The white stripes on the right are sequence ends (sequences differ in length).
+- The bound block is slightly richer in A and U: mean G+C 0.42 vs 0.46 in this sample, 0.41 vs 0.45 over all 92,000. AGO2 sites are often in AU-rich 3′ UTRs, so part of this may be biology, and part may come from how the unbound positions were drawn. Slot 7 tests that.
+:::
+
+::: {.center}
+# 3 Learning and testing {data-name="Learning"}
+:::
+
+## 3.1 What training does
+
+- Model: $\;\hat p = \sigma(w^\top x + b)$, with $x$ = (G+C fraction, U fraction)
+- Training: compute the gradient of the loss, move $w, b$ against it, repeat
+
+![](assets/custom/lr_training.png){fig-align="center" height="584px"}
+
+::: {.notes}
+- The smallest possible model on our data: two features per sequence and three parameters. The line is where the predicted probability equals 0.5.
+- The Slot 2 CNN has 2,491 parameters. The genome models have millions to billions.
+- The loss is binary cross-entropy; a coin flip gives 0.69. Here it falls from 0.77 at a deliberately bad start to 0.67. The two numbers carry some information; Slot 6 measures how much.
+- The sigmoid $\sigma$ maps any score to a probability between 0 and 1. Every model today ends with one.
+:::
+
+## 3.2 Train, validate, test
+
+- **Train**: fit the parameters
+- **Validation**: choose settings such as the number of epochs
+- **Test**: report once; never used for choices
+- Slots 2 to 6 use the same **1,000 held-out sequences** as the test set; Slot 7 builds new test sets
+
+::: {.notes}
+- Never grade a model on the data it was trained on.
+- Slot 2 prints the held-out AUROC after every epoch, so we do look at the test set during training. That is acceptable for a workshop as long as nobody picks the best epoch by it; in a real project that is the validation set's job.
+- The split is random by sequence. We checked for near-duplicates: 47% of held-out bound sequences have a training sequence within 150 letters on the genome (13% of unbound). On the 698 held-out sequences without one, the CNN scores 0.85 instead of 0.86, so the effect on our results is small. Real projects split by gene or chromosome.
+:::
+
+::: {.center}
+# 4 Reading a result {data-name="Results"}
+:::
+
+## 4.1 AUROC
+
+- **AUROC** = the probability that a random bound sequence scores higher than a random unbound one. 0.5 is chance, 1.0 is perfect.
+
+![](assets/custom/auroc.png){fig-align="center" height="596px"}
+
+::: {.notes}
+- Left: the CNN's scores on the 1,000 held-out sequences, bound in blue and unbound in grey.
+- Each threshold on the left gives one true positive rate and one false positive rate, one point on the right. The area under the curve is the AUROC.
+- It does not depend on a threshold, so it compares models fairly. It says nothing about why a model scores well.
+- For the Medical Diagnostics students: this is the ROC of a diagnostic test, sensitivity against 1 minus specificity.
+:::
+
+## 4.2 Noise in a held-out AUROC
+
+- On 1,000 test sequences, 95% of resampled AUROCs fall within about **±0.025**
+
+![](assets/custom/auroc_ci.png){fig-align="center" height="642px"}
+
+::: {.notes}
+- Resample the 1,000 test sequences with replacement 2,000 times; the bar covers 95% of the resulting AUROCs.
+- Three models from today: the CNN (0.86), logistic regression on 5-letter word counts (0.74), and on the two composition numbers of 3.1 (0.66). The bars do not overlap: these are real differences.
+- The bars describe one model at a time. Two models scored on the same sequences make correlated errors, so their difference varies less than the bars suggest; a paired bootstrap measures it. Overlapping bars mean no evidence of a difference, not proof that the models are equal.
+- Rule of thumb: on 1,000 test sequences ignore differences below about 0.03; on 3,000 (Slot 7), below about 0.015.
+:::
+
+## 4.3 Fit vs held-out
+
+- Report the held-out score; a large gap to the training score means the model memorised its training data
+
+![](assets/custom/probe_trap.png){fig-align="center" height="596px"}
+
+::: {.notes}
+- The same model, logistic regression on 5-letter word counts, scored two ways.
+- Left: 12,000 training sequences with regularisation. 0.82 on its own training data, 0.74 held out. A small gap is normal.
+- Right: 600 sequences and almost no regularisation. 1.00 on its training data, 0.67 held out.
+- This is the first thing to check in any evaluation code, including code an AI assistant wrote: which data was the score computed on?
+
+Next: Slot 2, build the CNN.
+:::

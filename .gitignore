@@ -5,3 +5,4 @@ data/
 __pycache__/
 .ipynb_checkpoints/
 *_files/
+notebooks/colab_timing_test.ipynb

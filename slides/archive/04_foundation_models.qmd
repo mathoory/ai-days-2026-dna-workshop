@@ -1,0 +1,109 @@
+---
+subtitle: "Slot 4: Foundation models for DNA<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Prof. Roee Amit"
+---
+
+::: {.center}
+# 1 Pretraining {data-name="Pretraining"}
+:::
+
+## 1.1 Pretrain once, reuse many times
+
+| Stage | Data | Labels | Example |
+|:--|:--|:--|:--|
+| **Pretraining** | billions of letters of genome sequence | none | Mistral-DNA: the human genome |
+| **Adaptation** | one task's data set | thousands | AGO2: 92,000 labelled sequences |
+
+- **Claim**: what a model learns in pretraining transfers, so each task needs fewer labels
+- Slots 5 to 7 test that claim on AGO2
+
+::: {.notes}
+Presenter: Roee.
+
+- Most models so far, like our CNN, are trained from random weights for one task with that task's labels.
+- A foundation model is first trained on genome sequence alone. Each task then adds a small output layer (a head) and may adjust the model.
+- Heads differ by task: a number (expression level), a label per position (splice sites), or one probability per sequence, as today.
+:::
+
+## 1.2 Each model cuts DNA into different tokens
+
+![](assets/custom/tokens.png){fig-align="center" height="659px"}
+
+::: {.notes}
+- Real tokenizers on a real bound sequence, in DNA letters (the models were trained on DNA, so U becomes T).
+- Mistral-DNA and DNABERT-2 use the same learned vocabulary, built by byte-pair encoding (BPE): frequent substrings become single tokens, so token lengths vary.
+- Nucleotide Transformer uses fixed 6-letter tokens. Shifting the sequence by one letter changes every token (bottom row); the remainder becomes single letters.
+- The underlined miR-19 site is split differently by each tokenizer. No model sees it as one unit.
+:::
+
+## 1.3 From tokens to an embedding
+
+- **Embedding**: the last layer's output, averaged over all non-padding tokens (including the special tokens `[CLS]` and `[SEP]`)
+- **Linear probe**: a logistic regression trained on embeddings, with the model frozen
+
+![](assets/custom/pipeline_real.png){fig-align="center" height="538px"}
+
+::: {.notes}
+- Mistral-DNA on the first 60 letters of one real sequence: each token is mapped to an integer, the model outputs one 256-number vector per token in its last layer, and we average those vectors.
+- In a batch, shorter sequences are padded. The attention mask (1 for real tokens, 0 for padding) keeps padding out of the average.
+- A few dimensions are large for almost every token (the vertical stripes). That is common in transformer models and does not depend on the sequence.
+- Before the logistic regression each of the 256 dimensions is standardised.
+- We do not open the model's internals (attention) today. For our purposes it is a function from tokens to vectors.
+:::
+
+## 1.4 Two pretraining objectives
+
+- **Next token** (Mistral-DNA, HyenaDNA, Evo): $\;\mathcal{L} = -\log p_\theta(x_t \mid x_{<t})$
+- **Masked tokens** (Nucleotide Transformer, DNABERT-2): $\;\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$, hidden tokens predicted from both sides
+
+![](assets/custom/next_token.png){fig-align="center" height="492px"}
+
+::: {.notes}
+- The figure: Mistral-DNA, given the first tokens of a real sequence, assigns a probability to each of its 4,096 possible next tokens. Its top choice gets about 10%; the true token is shown at the bottom with its much lower probability.
+- Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.
+- Masked models hide about 15% of the tokens and predict them from the tokens on both sides.
+- In both cases the genome supplies its own targets, so no experimental labels are needed.
+:::
+
+## 1.5 The landscape, 2021 to 2025
+
+![](assets/custom/landscape.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- DNABERT (110M parameters), Nucleotide Transformer (50M to 2.5B), DNABERT-2 and HyenaDNA, then Evo (7B) and Evo 2 (40B).
+- Filled points are masked models, open points next-token models.
+- Not shown: Enformer, Borzoi and AlphaGenome, trained with labels from thousands of experiments; currently the strongest models for gene regulation.
+- Slot 8 shows ten models from these families tested on AGO2.
+:::
+
+::: {.center}
+# 2 Adapting {data-name="Adapting"}
+:::
+
+## 2.1 Four ways to adapt a pretrained model
+
+| Method | Trained | Cost |
+|:--|:--|:--|
+| Linear probe | a new output layer only (after one pass to compute embeddings) | seconds to minutes |
+| Partial fine-tuning | the output layer and the top layers | minutes |
+| Full fine-tuning | all weights | hours |
+| LoRA | small low-rank matrices added to each layer | minutes |
+
+::: {.notes}
+- "Fine-tuning" usually refers to the last three; the first is called probing. Slot 5 uses a probe, Slot 7 uses LoRA.
+- Full fine-tuning with few labels overfits easily.
+:::
+
+## 2.2 LoRA
+
+$$W x \;\rightarrow\; (W + BA)\,x, \qquad B \in \mathbb{R}^{256 \times r},\; A \in \mathbb{R}^{r \times 256},\; r = 16$$
+
+![](assets/custom/lora.png){fig-align="center" height="605px"}
+
+::: {.notes}
+- LoRA keeps each large weight matrix W fixed and learns a low-rank correction BA. Here W is one real 256 × 256 matrix from Mistral-DNA: 65,536 frozen weights against 8,192 trained ones.
+- B starts at zero, so training begins exactly from the pretrained model.
+- Across the models in our tests, LoRA trained between about 1% and 9% of the parameters.
+- A 16M-parameter model could be fully fine-tuned on a laptop GPU; LoRA is how 500M-parameter models are adapted on modest hardware. Slot 7 uses it on Mistral-DNA so the students practise the method.
+
+Next: Slot 5, where the students load a pretrained model and probe it.
+:::

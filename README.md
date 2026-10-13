@@ -1,75 +1,64 @@
-# Teaching Machines to Read DNA — AI Days 2026 workshop
+# Teaching Machines to Read DNA: AI Days 2026 workshop
 
-Technion AI Days, Thu 15.10.2026, 10:00–14:00. Mattan's hands-on slots: 2, 3, 5, 6 and 7.
-Roee Amit's theory slots are 1, 4 and 8. All the hands-on slots use the AGO2 CLIP-seq data
-from the 00660121 final project (Task 1).
+Technion AI Days, Thu 15.10.2026. Prof. Roee Amit opens at 10:00; the three hands-on parts run from 11:00
+to 13:30. All parts use the AGO2 CLIP-seq data of the GraphProt benchmark (Maticzka et al. 2014).
 
-| slot | notebook | deck | students write |
+| part | notebook | deck | you write |
 |---|---|---|---|
-| 2 Build | `notebooks/02_build_cnn.ipynb` | `slides/02_build_cnn.qmd` | one-hot check, CNN layers, held-out AUROC |
-| 3 Look inside | `notebooks/03_look_inside.ipynb` | `slides/03_look_inside.qmd` | motif readout, planting + shuffled control |
-| 5 Pretrained model | `notebooks/05_pretrained_model.ipynb` | `slides/05_pretrained_model.qmd` | `embed()`, `probe_auc()` |
-| 6 Break it | `notebooks/06_break_it.ipynb` | `slides/06_break_it.qmd` | GC/U baseline, 5-mer baseline, shuffle test |
-| 7 Fix it | `notebooks/07_fix_it.ipynb` | `slides/07_fix_it.qmd` | shortcut scores on both benchmarks, LoRA training step |
+| 1 Machine learning and CNNs (11:00) | `notebooks/01_cnn.ipynb` | `slides/01_cnn.qmd` | one-hot encoding, the CNN layers, held-out AUROC, a logo for every filter, motif insertion against a shuffled copy |
+| 2 DNA foundation models (11:50) | `notebooks/02_foundation_models.ipynb` | `slides/02_foundation_models.qmd` | `embed()`, `probe_auc()` |
+| 3 Shortcuts, controls and fine-tuning (12:40) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks, the LoRA training step |
+
+Open a notebook in Colab, choose *Runtime → Change runtime type → T4 GPU*, and run from the top. Every
+notebook runs on its own: the data and our reference files download from
+[Hugging Face](https://huggingface.co/datasets/yup8/ai-days-2026-ago2).
 
 ## Layout
 ```
 notebooks/src/NN_*.py      single source of truth (percent format, `# %include h_*.py` for shared helpers)
 notebooks/NN_*.ipynb       student versions          (generated)
 notebooks/NN_*_solution.ipynb  filled-in versions     (generated, gitignored)
-notebooks/executed/        solution notebooks executed on gold-srv2, with outputs and timings
-slides/                    reveal.js decks in the course style (quarto render NN_*.qmd)
+slides/                    reveal.js decks (quarto render NN_*.qmd)
 scripts/build.py           src -> solution + student notebooks
-scripts/run_hpc.sh         execute all solution notebooks on gold-srv2 (GPU1), producing the rejoin files
+scripts/build_colab_test.py  the three solution notebooks in one, timed cell by cell, for a Colab test run
+scripts/run_hpc.sh         execute all solution notebooks on gold-srv2 (GPU1)
 scripts/spike/             the feasibility spike (REPORT.md) behind the workshop design
 data/                      files to host (gitignored): the 4 AGO2 FASTAs, cnn.pt, emb_mistral17m.npz, emb_nt500m.npz
 ```
 
 ## Student work markers
-Same convention as the course: `# TODO-N:` comments, then the student's code between
-`# === Your code here ===` and `# === End of your code ===`. `build.py` replaces exactly those
-regions with `...`; nothing else differs between the student and solution versions.
-Given cells start with `#@title … run this cell, nothing to change` (Colab collapses them).
-Each TODO names the functions to use, the gotchas, and the number to expect; a "Stuck?" cell after it
-loads our version so nobody falls behind.
+`# TODO-N:` comments, then the student's code between `# === Your code here ===` and
+`# === End of your code ===`. `build.py` replaces exactly those regions with `...`; nothing else differs
+between the student and solution versions. Given cells start with `#@title … run this cell, nothing to change`
+(Colab collapses them). Each TODO names the functions to use, the gotchas and the number to expect; a
+"Stuck?" cell after it loads our version.
 
 ## Rebuild
 ```
-python scripts/build.py                      # all notebooks
-quarto render slides/02_build_cnn.qmd        # one deck
+python scripts/build.py                  # all notebooks
+python scripts/build_colab_test.py       # the Colab timing test
+quarto render slides/01_cnn.qmd          # one deck
 ```
 
-## Measured run times (gold-srv2, NVIDIA A30, fresh Hugging Face cache, 12.10.2026)
+## Measured run times (gold-srv2, NVIDIA A30, 13.10.2026)
 
-| slot | whole notebook | the slow cells |
+| notebook | whole notebook | the slow cells |
 |---|---|---|
-| 2 | 23 s | 10-epoch CNN training: 15 s |
-| 3 | 10 s | — |
-| 5 | 4.2–5 min | NT-500M download + embedding: 40–48 s (students load precomputed by default); live pretraining: 3 min + probes ≈ 3.8 min |
-| 6 | 17 s | — |
-| 7 | 2.5 min | two CNN trainings: 17 s; LoRA 2 epochs × 20k: 85 s; label-count curve (4 sizes): 21 s |
+| `01_cnn` | 32 s | 10-epoch CNN training: 19 s |
+| `02_foundation_models` | 5 min (fresh download, NT-500M recomputed) | live pretraining: 3.4 min |
+| `03_shortcuts_and_controls` | 4.3 min | LoRA, 2 epochs × 20,000 sequences: 1.5 min (3 min with float16 forced); `shortcut_scores()`: 43 s |
 
-A T4 is roughly 2–3× slower than an A30. Still to be measured on Colab: slot 5's pretraining cell
-and slot 7's LoRA, which take the fp16 + GradScaler branch on a T4 (no bf16).
+With float16 forced (the T4 path, no bfloat16), all three notebooks run without errors. A T4 is roughly
+2 to 3 times slower than an A30.
 
-Reference results (held-out AUROC), reproducible across reruns to three decimals:
-- **Slot 2:** CNN 0.861.
-- **Slot 5:** probe 0.782; NT-500M 0.788; our model 0.554 before and 0.746 after 3 minutes of
-  pretraining.
-- **Slot 6:** GC/U 0.660; 5-mers 0.738. Shuffle test: CNN 0.861 → 0.661, probe 0.782 → 0.765.
-- **Slot 7:** on two equal-size benchmarks, original → matched.
-  - GC/U: 0.637 → 0.510
-  - 5-mers: 0.762 → 0.725
+## Reference results (held-out AUROC)
+- **Part 1:** CNN 0.861 (0.789 after epoch 1). Inserted miR-15/16 site 0.53 against 0.30 for shuffled copies.
+- **Part 2:** Mistral-DNA probe 0.782; NT-500M probe 0.788; a 105M model 0.554 before and 0.726 after
+  3 minutes of pretraining (1,834 steps on the A30).
+- **Part 3:** G+C/U 0.660; 5-letter words 0.738. Shuffle test: CNN 0.861 → 0.662, probe 0.782 → 0.765.
+  On two 3,000-sequence benchmarks, original → matched:
+  - G+C/U: 0.637 → 0.510
+  - 5-letter words: 0.762 → 0.725
   - frozen probe: 0.806 → 0.770
-  - CNN: 0.843 → 0.838
-  - LoRA, matched only: 0.809
-- **Slot 7 label-count curve** (matched data), at 100 / 500 / 2,500 / 12,000 labels:
-  - CNN: 0.53 / 0.64 / 0.68 / 0.82
-  - pretrained probe: 0.67 / 0.72 / 0.74 / 0.77
-  - random-weight probe: 0.50 / 0.50 / 0.51 / 0.54
-  - the full 3-draw curve is in `scripts/spike/REPORT.md` §6
-
-## Hosting (open)
-The notebooks read their files through `fetch(name)`, which downloads from `DATA_URL` when it is
-set and otherwise expects `./data/`. Once the rejoin files in `data/` are hosted, set `DATA_URL`
-in `notebooks/src/h_setup.py` and rebuild.
+  - CNN: 0.844 → 0.838
+  - Mistral-DNA fine-tuned with LoRA, matched only: 0.809

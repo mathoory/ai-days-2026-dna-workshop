@@ -1,5 +1,82 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap");
+
+:root {
+  --ink: #202124;
+  --muted: #5F6368;
+  --hair: #DADCE0;
+  --accent: #1A73E8;
+}
+
+.reveal {
+  font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+}
+.reveal h1, .reveal h2, .reveal h3 {
+  font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.reveal h2 { font-size: 1.5em; }
+.reveal strong { font-weight: 500; color: var(--ink); }
+.reveal a { color: var(--accent); }
+.reveal code, .reveal pre code { font-family: "Roboto Mono", Consolas, monospace; }
+.reveal ul li, .reveal ol li { margin-bottom: 0.35em; }
+.reveal .muted { color: var(--muted); }
+
+.reveal table { border-collapse: collapse; font-size: 0.8em; margin: 0.4em 0; }
+.reveal table th, .reveal table td { padding: 0.28em 1.1em 0.28em 0; }
+.reveal table th { font-weight: 500; border-bottom: 1.5px solid var(--ink); }
+.reveal table td { border-bottom: 1px solid var(--hair); }
+
 .reveal .slide-logo {
     max-height: 1.8em !important;
  }
 /* Center all slide images (fig-align is unreliable in reveal.js) */
 .reveal section img:not(.slide-logo) { display: block; margin-left: auto; margin-right: auto; }
+
+/* ---------- chrome, after the Triplexis seminar: thin bar on top, logo and number at the bottom ---------- */
+.reveal .footer, .reveal .progress { display: none !important; }
+.reveal .slides section { text-align: left; }
+.reveal .menubar {
+  position: fixed; top: 0; left: 0; width: 100%; height: 40px; margin: 0; padding: 0;
+  background: #FFFFFF; border-bottom: 1px solid var(--hair); z-index: 40;
+  display: flex; align-items: center; justify-content: center;
+}
+.reveal .menubar ul.menu {
+  list-style: none; display: flex; gap: 1.6em; margin: 0; padding: 0 18px; align-items: center;
+}
+.reveal .menubar ul.menu li {
+  font-size: 14.5px; color: #80868B; font-weight: 500; letter-spacing: .01em; cursor: pointer;
+  line-height: 38px; white-space: nowrap; border-bottom: 2px solid transparent;
+}
+.reveal .menubar ul.menu li.active { color: var(--ink); border-bottom-color: var(--accent); }
+.reveal .slides { margin-top: 26px; }
+.reveal .slide-logo {
+  max-height: 56px !important; height: auto !important; width: auto !important;
+  top: auto !important; bottom: 20px !important; left: 32px !important; right: auto !important; opacity: .9;
+}
+.reveal .slide-number {
+  color: var(--muted) !important; font-size: 20px !important; font-weight: 500;
+  background: none !important; top: auto !important; bottom: 22px !important; right: 34px !important;
+}
+.reveal .slide-number a { color: var(--muted); }
+
+/* section dividers: type only */
+.reveal section.center h1 { font-weight: 500; font-size: 2.4em; letter-spacing: -.02em; color: var(--ink); }
+
+/* figures: sizes come from scripts/fit_figures.py; do not let reveal shrink them (it clamps to 95%) */
+.reveal img { max-width: none !important; max-height: none !important; }
+.reveal .slides section img:not(.slide-logo) { object-fit: contain; }
+
+/* code blocks readable from the back of the room */
+.reveal div.sourceCode pre code, .reveal pre code { font-size: 28px !important; line-height: 1.45; }
+.reveal div.sourceCode { border: none; background: #F8F9FA; }
+
+/* ---------- fixes after the deck audit ---------- */
+.reveal .slide-number, .reveal .slide-number a { color: #5F6368 !important; opacity: 1 !important; }
+.reveal .menubar ul.menu li { display: flex; align-items: center; height: 38px; line-height: 1; margin: 0; padding: 0; }
+.reveal p code, .reveal li code, .reveal td code, .reveal th code {
+  color: var(--ink); background: #F1F3F4; padding: 0.05em 0.25em; border-radius: 3px; }
+.reveal .nowrap { white-space: nowrap; }
+.reveal .slide-menu-button { display: none !important; }

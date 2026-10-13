@@ -1,6 +1,6 @@
-#@title The CNN from Slot 2 - run this cell, nothing to change { display-mode: "form" }
+#@title The CNN from part 1 - run this cell, nothing to change { display-mode: "form" }
 class GlobalCNN(nn.Module):
-    """The Slot 2 network: one-hot (N,1,4,501) -> one binding score (logit) per sequence."""
+    """The part 1 network: one-hot (N,1,4,501) -> one binding score (logit) per sequence."""
 
     def __init__(self):
         super().__init__()
@@ -29,15 +29,15 @@ def score_sequences(model, seqs, batch=1024):
 
 
 def load_cnn(mine="my_cnn.pt", ours="cnn.pt"):
-    """Your CNN from Slot 2 if you uploaded it and it loads; otherwise ours."""
+    """Your CNN from part 1 if you uploaded it and it loads; otherwise ours."""
     model = GlobalCNN().to(DEVICE)
     if (DATA_DIR / mine).exists():
         try:
             model.load_state_dict(torch.load(DATA_DIR / mine, map_location=DEVICE))
-            print("loaded YOUR CNN from Slot 2")
+            print("loaded YOUR CNN from part 1")
             return model.eval()
         except Exception as e:
-            print(f"your {mine} doesn't match the Slot 2 architecture ({type(e).__name__}) - using ours")
+            print(f"your {mine} doesn't match the part 1 architecture ({type(e).__name__}) - using ours")
     model.load_state_dict(torch.load(fetch(ours), map_location=DEVICE))
     print("loaded the reference CNN")
     return model.eval()

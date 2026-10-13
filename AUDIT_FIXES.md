@@ -108,3 +108,30 @@ Status: ☐ open · ◐ partly done · ☑ done · ✗ won't do (reason given)
 - ☑ A3-10 07: CNN line in model_scan = all ~64k matched sequences (noted); CNN-at-500 0.58 vs 0.66 explained (draw-to-draw spread 0.51–0.68); "no labels" bullet toned down; dumbbell 0.51 label off the line; notebook takeaway rewritten (fine-tuned NT-500M 0.87 vs 0.84 / 0.75 vs 0.66, offline).
 - ☑ A3-11 08: recap adds planting and head-to-head panels; idea 5 shortened (no longer clipped).
 - ☐ A3-12 Survey QR + form link (needs the form; Mattan)
+
+## Round 4: three independent audits of 13.10.2026 (all applied 13.10)
+Reports: `audits/notebooks_audit_2026-10-13.md`, `audits/decks_audit_2026-10-13.md`, `audits/merged_audit_2026-10-13.md`,
+ranked summary `audits/CONSOLIDATED_2026-10-13.md`.
+
+New facts established while fixing:
+- **Negatives** (from Pan & Shen 2018, data from the GraphProt benchmark, Maticzka et al. 2014): unbound sequences are the
+  bound sites moved to random positions in the same gene. Stated in nb02, deck 01 §2.2, deck 06, nb06/07, credits.
+- **Split leakage check** (`scripts/spike/s11_leakage.py`): 47% of held-out bound vs 13% of unbound sequences have a
+  training window within 150 nt; the CNN scores 0.85 on the 698 without one vs 0.86 on all 1,000. Small; stated in
+  nb02 and deck 01 §3.2. No exact duplicates and no ID overlap between train and held-out files; T/U letters balanced.
+- **PCA**: G+C correlates r = 0.81 with direction 2 and 0.52 with direction 1 (deck 05, nb05).
+- The probe's spike of unbound sequences near 0 is not explained by G+C, length or repetitiveness (deck 06 notes).
+
+Applied:
+- ☑ Notebooks: every item in the notebook audit and the notebook side of the merged audit (rescue cells in all five,
+  T4 fp16 GradScaler + `AIDAYS_FORCE_FP16` test switch, `make_lora()`, precomputed label curve, pinned peft/logomaker,
+  `val_*` → `test_*`, shuffle-floor logic, matching described as a subset of both classes, takeaways restated with
+  numbers, palette, wording).
+- ☑ Decks: every slide finding in the deck audit, rewritten deck by deck: overclaims removed (take-home 5, "fine-tuning
+  wins"), masked objective on 04, shuffle floor, composition levels, one-run frozen probe, both CNN-at-500 values
+  explained on one figure, Slot 7 test sets named, label counts on 05, "Your turn" slides with names/checks, no probes
+  before Slot 4 (deck 01 uses CNN / word counts / G+C models), strict colour rule (blue = bound or fine-tuned only),
+  one-item TOCs gone, chrome fixes, deck 08 rebuilt (results table, model scan, take-home with numbers, when to use,
+  from a question to a model), notes for Roee rewritten, credits corrected.
+- ☑ Slot 7 time: LoRA slide moved to deck 04, model scan and "when to use" to deck 08, label curve precomputed in nb07.
+- ◐ T4 test: forced-fp16 runs of nb05 and nb07 on the A30 (see run log); a real Colab T4 run is still Mattan's.

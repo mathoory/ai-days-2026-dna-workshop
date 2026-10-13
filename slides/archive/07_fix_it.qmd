@@ -1,0 +1,79 @@
+---
+subtitle: "Slot 7: Fix it. Change the data, then test again<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
+---
+
+::: {.center}
+# 1 A control {data-name="Control"}
+:::
+
+## 1.1 Composition-matched data
+
+- Bin every sequence by G+C, U and length; in each bin keep **as many unbound as bound**
+- Bound and unbound then have the same single-letter composition and length; letter pairs and longer words can still differ
+
+![](assets/custom/matched_hist.png){fig-align="center" height="538px"}
+
+::: {.notes}
+- 67,764 of the 92,346 sequences remain, from both classes. About 30% of the bound sequences are dropped because no unbound sequence matches them; the bound sequences that remain are the ones that look most like the negatives. No new experiment is needed.
+- In the matched set, G+C, U and length carry no information about the label. Letter pairs and five-letter words still can.
+- From the same file we build two test sets of 3,000 sequences each: one with the original negatives and one matched. A difference between them comes from how the sequences were selected.
+:::
+
+## 1.2 Your turn
+
+Open **`07_fix_it.ipynb`**. LoRA was introduced in Slot 4.
+
+| Step | Task | Check | Time |
+|:--|:--|:--|:--|
+| TODO-1 | `shortcut_scores()`: three AUROCs on both test sets | G+C/U 0.64 → 0.51, words 0.76 → 0.73, probe 0.81 → 0.77 | 8 min |
+| given | retrain the CNN on both | about 0.84 on both | 1.5 min |
+| TODO-2 | the LoRA training step (`batch_logits`, `crit`, `opt`, `scaler`) | about 0.80 after 2 passes | 2 min + 6–8 min training |
+| given | how many labels does each model need? (precomputed) | | 2 min |
+
+::: {.notes}
+- TODO-1: one function, run on both test sets. `probe_auc` returns `(auc, probe)`; keep the AUROC.
+- TODO-2 is the same four training lines as Slot 2, with `batch_logits` in place of `model` and the backward pass and optimiser step going through `scaler` (needed for float16 on a T4; it does nothing on GPUs with bfloat16). Start the cell as soon as it is written and read on while it trains (6 to 8 minutes on a T4). The "Stuck?" cell below it starts a fresh model.
+- The label-count cell shows our precomputed results; setting `RUN_LIVE = True` reruns it.
+:::
+
+::: {.center}
+# 2 Results {data-name="Results"}
+:::
+
+## 2.1 Before and after matching
+
+![](assets/custom/dumbbell.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- These are Slot 7's new 3,000-sequence test sets, not the 1,000 held-out sequences of Slots 2 to 6, so the "original" values differ slightly from earlier slots (CNN 0.84 here, 0.86 before). On 3,000 sequences, 95% of resampled AUROCs fall within about ±0.015.
+- Two numbers: 0.64 to 0.51, chance level. Single-letter composition carried that score.
+- Five-letter word counts and the frozen probe each lose about 0.04 and keep most of their score: they rely on letter-pair and short-word composition, which matching does not remove.
+- The CNN: 0.84 to 0.84 (notebook run). It uses more than single-letter composition.
+:::
+
+## 2.2 Fine-tuning against the CNN
+
+![](assets/custom/headtohead.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- Run offline on our A30 server with NT-500M (human reference), on matched data: the same labelled sequences and the same test set for every model.
+- 20,000 labels: CNN 0.84, frozen probe 0.78, fine-tuned 0.87.
+- 500 labels: CNN 0.66, frozen 0.73, fine-tuned 0.75.
+- CNN and LoRA have three seeds each (dots); the frozen probe has one run. The CNN and LoRA seeds do not overlap at either label count.
+- The students fine-tuned the smaller Mistral-DNA (about 0.81), which improved on its frozen probe but stayed below the CNN (0.84). The 500M model needs more GPU memory than free Colab offers.
+- These fine-tuned models have not been put through the shuffle test yet.
+:::
+
+## 2.3 How many labels does each model need?
+
+![](assets/custom/label_curve2.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- Each model trained on 100 to 30,000 labelled matched sequences, three random draws per size (lines, with one standard deviation shaded).
+- Frozen Mistral-DNA beats the CNN up to about 2,500 labels; above about 5,000 the CNN is better. At 12,000 labels: CNN 0.82, frozen probe 0.77.
+- The same Mistral-DNA architecture with random weights stays between 0.50 and 0.57, so the advantage at low label counts comes from pretraining.
+- Five-letter word counts also beat the CNN below about 1,000 labels.
+- Squares: the CNN in the head-to-head experiment of the previous slide, diamonds: NT-500M fine-tuned. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, which sequences you have matters as much as the model.
+
+Hand over to Roee.
+:::

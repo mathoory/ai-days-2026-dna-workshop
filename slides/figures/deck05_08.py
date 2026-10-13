@@ -28,7 +28,7 @@ def gc_u(S):
     return np.array([((s.count("G") + s.count("C")) / len(s), s.count("U") / len(s)) for s in S])
 
 
-def matched_indices(S, y, seed=0):  # identical to the Slot 7 notebook
+def matched_indices(S, y, seed=0):  # identical to the part 3 notebook
     rng = np.random.default_rng(seed)
     C = gc_u(S)
     L = np.array([len(s) for s in S])
@@ -88,7 +88,7 @@ def results_05():
     ax = fig.add_axes([0.36, 0.12, 0.6, 0.76])
     rows = [("our model, random weights", 0.554, "#bdbdbd"), ("our model, 3 min of pretraining", 0.717, "#b39ddb"),
             ("Mistral-DNA (16M), pretrained", 0.782, PURPLE), ("Nucleotide Transformer (486M)", 0.788, PURPLE),
-            ("your CNN from Slot 2", 0.861, BLUE)]
+            ("your CNN from part 1", 0.861, BLUE)]
     for i, (n, v, c) in enumerate(rows):
         ax.barh(i, v, color=c, height=0.66)
         ax.text(v + 0.005, i, f"{v:.2f}", va="center", fontsize=24, color=NAVY, fontweight="bold")
@@ -158,7 +158,7 @@ def scoreboard_06():
     ax.axhline(0.660, ls="--", color=RED, lw=2.5); ax.text(1.42, 0.668, "2 numbers: 0.66", fontsize=20, color=RED, ha="left")
     ax.axhline(0.738, ls=":", color=GREY, lw=2.5); ax.text(1.42, 0.746, "word counts: 0.74", fontsize=20, color=GREY, ha="left")
     ax.set_xlim(-0.5, 1.95)
-    ax.set_xticks(x); ax.set_xticklabels(["CNN (Slot 2)", "Mistral-DNA + probe (Slot 5)"], fontsize=24)
+    ax.set_xticks(x); ax.set_xticklabels(["CNN (part 1)", "Mistral-DNA + probe (part 2)"], fontsize=24)
     ax.set_ylim(0.5, 0.92); ax.set_ylabel("held-out AUROC", fontsize=22); ax.tick_params(labelsize=20)
     ax.legend(fontsize=20, frameon=False, loc="upper center")
     save(fig, "scoreboard_06")

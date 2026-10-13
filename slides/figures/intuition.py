@@ -280,7 +280,7 @@ def shuffle_scores(model, all_seqs, all_y, ls_seqs, ls_y):
     from sklearn.metrics import roc_auc_score
     fig, axes = plt.subplots(1, 2, figsize=(16, 9), dpi=120, sharey=False)
     cols = {"bound": GREEN, "bound, shuffled": "#ef6c00", "unbound": "#9e9e9e"}
-    for ax, sc, t in ((axes[0], cs, "CNN (Slot 2)"), (axes[1], ps, "Mistral-DNA + probe (Slot 5)")):
+    for ax, sc, t in ((axes[0], cs, "CNN (part 1)"), (axes[1], ps, "Mistral-DNA + probe (part 2)")):
         bins = np.linspace(0, 1, 40)
         for k in ("unbound", "bound", "bound, shuffled"):
             ax.hist(sc[k], bins, color=cols[k], alpha=.5 if k != "bound, shuffled" else .65, label=k, density=True,

@@ -1,7 +1,8 @@
-#@title Embedding + probe helpers (written in Slot 5) - run this cell, nothing to change { display-mode: "form" }
+#@title Embedding helper (written in part 2) - run this cell, nothing to change { display-mode: "form" }
 @torch.no_grad()
 def embed(tok, model, seqs, batch=128):
-    """List of DNA strings -> (N, hidden) numpy array: the mean of the last layer over real tokens."""
+    """List of DNA strings -> (N, hidden) numpy array: the mean of the last layer over all
+    non-padding tokens ([CLS] and [SEP] included). float16 autocast only makes it faster."""
     model.eval()
     out = []
     for i in range(0, len(seqs), batch):
@@ -12,10 +13,3 @@ def embed(tok, model, seqs, batch=128):
         m = mask.unsqueeze(-1).float()
         out.append(((h * m).sum(1) / m.sum(1)).cpu().numpy())
     return np.concatenate(out)
-
-
-def probe_auc(E_train, y_train, E_test, y_test, C=0.1):
-    """Fit a linear probe (logistic regression) on the training vectors; AUROC on the test vectors."""
-    probe = make_pipeline(StandardScaler(), LogisticRegression(max_iter=3000, C=C))
-    probe.fit(E_train, y_train)
-    return roc_auc_score(y_test, probe.predict_proba(E_test)[:, 1]), probe

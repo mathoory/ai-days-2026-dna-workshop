@@ -17,7 +17,7 @@ from deckstyle import *  # noqa: F401,F403
 from intuition import (ALPH, DATA, DEV, acts, cnn_scores, dinuc_shuffle, load_cnn, onehot, split)
 
 MIR16 = "UAGCAGCACGUAAAUAUUGGCG"          # hsa-miR-16-5p
-FP = FontProperties(family="DejaVu Sans", weight="bold")
+FP = FontProperties(family="Roboto", weight="bold")
 
 
 def draw_letter(ax, ch, x, y, w, h, color):
@@ -262,7 +262,7 @@ def position_scan(model, pos, f=0):
     ax.axhline(0, color=NAVY, lw=1)
     for x in (40, 85, 130, 175, 220, 265, 310):
         ax.axvline(x, color=RED, lw=1.5, alpha=.5, ls=":")
-    ax.text(42, ax.get_ylim()[1] * 0.92, "where Slot 3's plant() writes copies", color=RED, fontsize=16)
+    ax.text(42, ax.get_ylim()[1] * 0.92, "where plant() writes copies", color=RED, fontsize=16)
     ax.set_xlabel("position where the motif is planted", fontsize=21)
     ax.set_ylabel("change in mean score", fontsize=21); ax.tick_params(labelsize=17)
     ax.legend(fontsize=18, frameon=False, loc="lower right")

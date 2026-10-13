@@ -22,7 +22,7 @@ def read_fasta(path, label):
 
 
 def read_split(split):
-    """'train' or 'ls' (the held-out validation set) -> (sequences, labels as a numpy array)."""
+    """'train' or 'ls' (the held-out test set) -> (sequences, labels as a numpy array)."""
     pos, neg = FILES[split]
     p, lp = read_fasta(fetch(pos), 1)
     n, ln = read_fasta(fetch(neg), 0)

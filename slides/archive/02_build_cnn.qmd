@@ -1,0 +1,140 @@
+---
+subtitle: "Slot 2: Build a CNN that reads RNA<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
+---
+
+::: {.center}
+# 1 Build {data-name="Build"}
+:::
+
+## 1.1 One-hot encoding
+
+- Each letter becomes a column with a single 1 in its row (A, C, G, U): a sequence becomes a $4 \times \text{length}$ matrix
+- All sequences are padded to 501 columns with columns of 0.25 (the longest is 375 letters)
+
+![](assets/custom/onehot_big.png){fig-align="center" height="492px"}
+
+::: {.notes}
+- TODO-1 encodes one sequence and checks its first columns against its letters.
+- If asked why not A=1, C=2, G=3, U=4: that would impose an order (G "greater than" C) with no biological meaning. One-hot keeps the four letters equally far apart.
+- A padding column of 0.25 means "unknown letter": each base equally likely. 501 is the input width used by Pan and Shen, whose CNN this one follows.
+:::
+
+## 1.2 A filter computes a dot product
+
+![](assets/custom/filter_dot.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- A real learned filter from the trained CNN, applied to the real window where it responds most strongly.
+- The filter is a 4 × 10 matrix of weights, one per letter and position. Multiplied element by element with the one-hot window, it keeps one weight per position: the weight of the letter that is there. Their sum plus a bias is the filter's output at that position.
+- The same 40 weights are applied at every one of the 492 positions. Sharing the weights across positions is what makes it a convolution.
+- This filter prefers U-rich windows, and its strongest response is only 1.07 times larger on bound than on unbound sequences. It responds to something common in both classes, which we test properly in Slot 6.
+:::
+
+## 1.3 The filter along one sequence
+
+- **ReLU**: $\max(0, z)$, so negative outputs become 0
+
+![](assets/custom/activation_track.png){fig-align="center" height="642px"}
+
+::: {.notes}
+- The same filter's output at every position of one bound sequence, after ReLU.
+- Most positions give 0. Windows that resemble the weights give large values. The highest one is marked and its letters printed.
+:::
+
+## 1.4 The network (TODO-2)
+
+| Layer | Output shape |
+|:--|:--|
+| input | $1 \times 4 \times 501$ |
+| `Conv2d(1, 10, (4, 10))` + ReLU | $10 \times 1 \times 492$ |
+| `MaxPool2d((1, 3))` | $10 \times 1 \times 164$ |
+| `Conv2d(10, 20, (1, 5))` + ReLU | $20 \times 1 \times 160$ |
+| `MaxPool2d((1, 3))` | $20 \times 1 \times 53$ |
+| `Flatten` → `Linear(1060, 1)` | one score (a logit) |
+
+- 2,491 parameters. No sigmoid inside the network: `BCEWithLogitsLoss` applies it.
+
+::: {.notes}
+- 10 first-layer filters, each 4 × 10. Each produces one output row, a channel.
+- Max pooling keeps the largest value in each block of 3 positions.
+- The second convolution combines nearby first-layer outputs: 20 channels, each looking at 5 pooled positions.
+- The final linear layer has one weight per channel and pooled position: 20 × 53 = 1,060 weights. The next slide shows them.
+- A logit is any real number; the sigmoid turns it into a probability between 0 and 1.
+:::
+
+## 1.5 The last layer weighs positions
+
+![](assets/custom/last_layer.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- The trained last-layer weights: one row per channel, one column per pooled position.
+- Pooled column j covers letters of roughly 9j to 9j + 29. The large weights sit in columns 17 to 20, letters about 150 to 210: where the measured site sits in almost every sequence.
+- The columns on the right are padding (no sequence is longer than 375 letters), so their weights barely move from initialisation.
+- The CNN learned where in the sequence to look, as well as which letter patterns to look for. Slot 3 shows what that implies.
+:::
+
+::: {.center}
+# 2 Train {data-name="Train"}
+:::
+
+## 2.1 Training changes the filters
+
+$$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
+
+![](assets/custom/filter_learning.png){fig-align="center" height="605px"}
+
+::: {.notes}
+- One filter at epochs 0, 1, 3 and 10 of a training run, with the held-out AUROC after each epoch.
+- Epoch 0 is the random initialisation (AUROC 0.58). By epoch 10 the filter has a clear preference and the model reaches 0.86.
+- Each step computes the gradient of the loss with respect to every weight and moves each weight against its gradient, scaled by the learning rate $\eta$. We use Adam, a variant that adapts the step size per weight.
+:::
+
+## 2.2 The training step and the evaluation (TODO-3)
+
+```python
+opt.zero_grad()                       # clear the previous step's gradients
+loss = criterion(model(X), y)         # predict a batch, measure the error
+loss.backward()                       # gradient of the loss for every weight
+opt.step()                            # move every weight against its gradient
+
+model.eval()                          # evaluation mode
+with torch.no_grad():                 # no gradients, no learning
+    p = torch.sigmoid(model(X_test.to(DEVICE))).cpu().numpy()
+auc = roc_auc_score(test_y, p)
+```
+
+::: {.notes}
+- The first four lines are given in the notebook. TODO-3 is the evaluation block.
+- `.cpu().numpy()` matters: scikit-learn cannot read a tensor that is still on the GPU, and on Colab that is the most common error in this TODO.
+:::
+
+## 2.3 Your turn
+
+Open **`02_build_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
+
+| Step | Task | Check | Time |
+|:--|:--|:--|:--|
+| TODO-1 | one-hot encode a sequence | first 8 columns match the letters | 3 min |
+| TODO-2 | build the network from the table | the sanity check prints `torch.Size([2])` | 7 min |
+| TODO-3 | held-out AUROC after each epoch | about 0.79 after epoch 1 | 5 min |
+| run | train 10 epochs | about 0.86 | 1 min |
+
+The last cell downloads `my_cnn.pt`, which Slot 3 can load.
+
+::: {.notes}
+- Given cells run as they are. TODO cells: write the code between the markers. Each TODO has a "Stuck?" cell below it that loads our version.
+- About 4 seconds per epoch on a T4.
+- On 1,000 test sequences, 95% of resampled AUROCs fall within about ±0.025, so 0.85 and 0.86 are the same result.
+- Finished early: change `EPOCHS` and retrain.
+:::
+
+## 2.4 Training curve
+
+![](assets/custom/learning_curve.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- Show after they have run it. The workshop run: 0.79 after one epoch, 0.86 after ten. Three other seeds follow the same path and end within 0.01 of each other.
+- Most of the improvement happens in the first two or three epochs.
+
+Next: what did the CNN learn?
+:::

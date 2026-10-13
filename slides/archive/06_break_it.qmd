@@ -1,0 +1,89 @@
+---
+subtitle: "Slot 6: Break it. Biology, or a shortcut?<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
+---
+
+::: {.center}
+# 1 Simpler explanations {data-name="Baselines"}
+:::
+
+## 1.1 The two classes differ in composition
+
+- Before crediting a model with biology, measure what much simpler features achieve
+
+![](assets/custom/gc_hist.png){fig-align="center" height="642px"}
+
+::: {.notes}
+- Bound sequences have less G+C than unbound ones: mean 0.41 against 0.45 over all 92,000 sequences. It was visible in the data raster in Slot 1 and in the embedding map in Slot 5.
+- The unbound sequences are random positions in the same genes as the bound sites. AGO2 sites are often in AU-rich 3′ UTRs, so part of this difference may be real biology and part may come from how the negatives were drawn. Slot 7 tests that.
+- Two simple models and one stress test:
+  - TODO-1: logistic regression on two numbers per sequence, the G+C and U fractions.
+  - TODO-2: logistic regression on the counts of all 1,024 five-letter words, which ignores order and position.
+  - TODO-3: the shuffle test, next slide.
+- A shortcut is a simple property that happens to differ between the classes in this data set. If a simple model scores well, a larger model may be using the same shortcut.
+:::
+
+## 1.2 The dinucleotide shuffle test
+
+- The shuffle keeps every letter and letter-pair count and scrambles everything longer, including where sites sit
+
+![](assets/custom/shuffle_demo.png){fig-align="center" height="596px"}
+
+::: {.notes}
+- A real bound sequence and its dinucleotide shuffle (Altschul and Erickson 1985). All 16 letter-pair counts are identical, so G+C is identical too; the miR-16 site (underlined) is gone.
+- Shuffle the 500 bound test sequences, keep the 500 unbound ones, and ask the trained model, without retraining, to separate them.
+- The shuffled sequences keep their composition, so a model that uses only composition still scores about as well as the composition model (0.66). A model that uses letter order beyond neighbouring pairs drops towards that level.
+- For our CNN the shuffle also moves the site away from letters 150 to 190, so its drop mixes letter order and position.
+:::
+
+## 1.3 Your turn
+
+Open **`06_break_it.ipynb`**. First cell: `USE_MY_FILES = True` to upload your CNN and vectors, or use ours.
+
+| Step | Task | Names | Expect | Time |
+|:--|:--|:--|:--|:--|
+| TODO-1 | AUROC from G+C and U | `gc_u`, `probe_auc` | about 0.66 | 5 min |
+| TODO-2 | AUROC from 5-letter word counts | `kmer_counts(seqs, k=5)`, `probe_auc` | about 0.74 | 5 min |
+| TODO-3 | shuffle test, CNN and probe | `dinuc_shuffle`; reuse the fitted probe | about 0.67 and 0.77 | 10 min |
+
+::: {.notes}
+- TODO-3: score the shuffled sequences with the probe already fitted on real sequences. Fitting a new probe on shuffled data answers a different question.
+- Each TODO has a "Stuck?" cell, so the scoreboard at the end always runs.
+:::
+
+::: {.center}
+# 2 Results {data-name="Results"}
+:::
+
+## 2.1 Scores before and after shuffling
+
+![](assets/custom/shuffle_scores.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- Score distributions on the held-out set: bound (blue), unbound (grey), shuffled bound (black outline).
+- CNN: shuffled bound sequences move towards the unbound distribution, AUROC 0.66. Part of what the CNN uses is letter order or position.
+- Mistral-DNA with a probe: shuffled sequences score almost like the originals, AUROC 0.77. Its embeddings change little when everything beyond letter pairs is scrambled.
+- About a quarter of the unbound sequences get a probe score near 0 (the tall grey bar on the right). They do not differ from the other unbound sequences in G+C, length or repetitiveness; we have not found what they share.
+:::
+
+## 2.2 Shuffling lowers the CNN, barely moves the probe
+
+![](assets/custom/scoreboard_06.png){fig-align="center" height="700px"}
+
+::: {.notes}
+- Two numbers alone reach 0.66, nearly half of the distance from chance (0.5) to the CNN (0.86).
+- Five-letter word counts, with no order or position, reach 0.74. Counted only inside the 40-letter site, word counts reach 0.83, close to the CNN: much of what the CNN adds may be where it looks.
+- CNN: 0.86 on real sequences, 0.66 after shuffling, the same as the composition model. The shuffle removes both letter order and site position.
+- Mistral-DNA probe: 0.78 on real sequences, 0.77 shuffled. Its score survives a shuffle that keeps letter and letter-pair counts, so most of what it uses is composition at that level.
+- The gap between real and shuffled is the part of a score that depends on letter order and position.
+:::
+
+## 2.3 Discussion
+
+1. How much of each score do two composition numbers explain?
+2. Which model barely changed after the shuffle, and what does that say about what it uses?
+3. Could the G+C difference come from how the negatives were chosen? How would you test that?
+
+::: {.notes}
+- Two minutes with your neighbour.
+- Question 3 sets up Slot 7, which keeps the models and changes the negatives.
+:::

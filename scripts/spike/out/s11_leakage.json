@@ -1,0 +1,10 @@
+{
+ "n": 1000,
+ "overlap_bound": 0.47,
+ "overlap_unbound": 0.134,
+ "cnn_all": 0.860916,
+ "cnn_no_nearby_train": 0.8503202753932633,
+ "cnn_no_nearby_train_n": 698,
+ "cnn_nearby_train": 0.8755160368370912,
+ "cnn_nearby_train_n": 302
+}

@@ -10,12 +10,16 @@ format:
     code-line-wrapping: true
     title-slide-attributes:
       data-state: "hide-menubar"
-    slide-number: true
+    theme: white
+    menu: false
+    slide-number: c/t
+    transition: none
+    progress: false
     preview-links: auto
     css: style.css
     logo: assets/logo.png
-    footer: 'AI Days 2026 - Teaching Machines to Read DNA  '
-    toc: false
+    toc: true
+    toc-depth: 1
     simplemenu:
       flat: true
       barhtml:
