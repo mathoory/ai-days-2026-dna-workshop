@@ -690,7 +690,7 @@
 <ul>
 <li>A real learned filter (filter 7) from the trained CNN, applied to the real window where it responds most strongly.</li>
 <li>The filter is a 4 × 10 matrix of weights, one per letter and position. Multiplied element by element with the one-hot window, it keeps one weight per position: the weight of the letter that is there. Their sum plus a bias is the filter’s output at that position.</li>
-<li>The same 40 weights are applied at every one of the 492 positions. Sharing the weights across positions is what makes it a convolution.</li>
+<li>The same 40 weights are applied at every one of the 492 positions. Sharing the weights across positions makes it a convolution.</li>
 <li>This filter prefers U-rich windows, and its strongest response is only 1.07 times larger on bound than on unbound sequences. It responds to something common in both classes. Part 3 tests composition effects of this kind with a shuffle and with matched data.</li>
 </ul>
 <style type="text/css">
@@ -829,13 +829,13 @@
 <span id="cb1-4"><a href=""></a>opt.step()                            <span class="co"># move every weight against its gradient</span></span>
 <span id="cb1-5"><a href=""></a></span>
 <span id="cb1-6"><a href=""></a>model.<span class="bu">eval</span>()                          <span class="co"># evaluation mode</span></span>
-<span id="cb1-7"><a href=""></a><span class="cf">with</span> torch.no_grad():                 <span class="co"># no gradients, no learning</span></span>
+<span id="cb1-7"><a href=""></a><span class="cf">with</span> torch.no_grad():                 <span class="co"># no gradient tracking</span></span>
 <span id="cb1-8"><a href=""></a>    probs <span class="op">=</span> torch.sigmoid(model(X_test.to(DEVICE))).cpu().numpy()</span>
 <span id="cb1-9"><a href=""></a>auc <span class="op">=</span> roc_auc_score(test_y, probs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <aside class="notes">
 <ul>
 <li>The first four lines are given in the notebook. TODO-3 is the evaluation block.</li>
-<li><code>.cpu().numpy()</code> matters: scikit-learn cannot read a tensor that is still on the GPU, a common error in this TODO.</li>
+<li><code>.cpu().numpy()</code> is needed because scikit-learn cannot read a tensor that is still on the GPU. Leaving it out is a common error in this TODO.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1022,7 +1022,7 @@
 <aside class="notes">
 <ul>
 <li>The trained last-layer weights: one row per channel, one column per pooled position. Our run; the notebook does not draw this.</li>
-<li>Pooled column j covers letters of roughly 9j to 9j + 29. The large weights sit in columns 17 to 20, letters about 150 to 210: where the measured site sits in almost every sequence.</li>
+<li>Pooled column j covers letters of roughly 9j to 9j + 29. The large weights are in columns 17 to 20, letters about 150 to 210, where the measured site is in almost every sequence.</li>
 <li>The columns on the right are padding (no sequence is longer than 375 letters), so their weights barely move from initialisation.</li>
 <li>The CNN learned where in the sequence to look, as well as which letter patterns to look for. Slide 5.6 shows what that implies.</li>
 </ul>
@@ -1112,8 +1112,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="position-matters" class="slide level2">
-<h2>5.6 Position matters</h2>
+<section id="the-effect-depends-on-position" class="slide level2">
+<h2>5.6 The effect depends on position</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/position_scan.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -1123,7 +1123,7 @@
 <ul>
 <li>One copy of the motif at every position, averaged over 400 random sequences (a given cell in the notebook). The numbers 1 to 7 mark where <code>plant()</code> puts each copy in the previous test.</li>
 <li>The motif changes the score only between about letters 140 and 190, where almost every sequence in the data has its measured site (shaded).</li>
-<li>The shuffled copy gets much of the same increase there, so a good part of the effect comes from which letters sit in that region, whatever their order.</li>
+<li>The shuffled copy gets much of the same increase there, so a good part of the effect comes from which letters are in that region, whatever their order.</li>
 <li>This is the last-layer pattern from slide 5.2: the CNN weighs positions. It reflects how the data were cut, and it means the answer to “does this motif matter?” depends on where it is placed.</li>
 </ul>
 <style type="text/css">

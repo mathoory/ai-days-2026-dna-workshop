@@ -240,7 +240,7 @@ Next: build the CNN.
 ::: {.notes}
 - A real learned filter (filter 7) from the trained CNN, applied to the real window where it responds most strongly.
 - The filter is a 4 × 10 matrix of weights, one per letter and position. Multiplied element by element with the one-hot window, it keeps one weight per position: the weight of the letter that is there. Their sum plus a bias is the filter's output at that position.
-- The same 40 weights are applied at every one of the 492 positions. Sharing the weights across positions is what makes it a convolution.
+- The same 40 weights are applied at every one of the 492 positions. Sharing the weights across positions makes it a convolution.
 - This filter prefers U-rich windows, and its strongest response is only 1.07 times larger on bound than on unbound sequences. It responds to something common in both classes. Part 3 tests composition effects of this kind with a shuffle and with matched data.
 :::
 
@@ -297,14 +297,14 @@ loss.backward()                       # gradient of the loss for every weight
 opt.step()                            # move every weight against its gradient
 
 model.eval()                          # evaluation mode
-with torch.no_grad():                 # no gradients, no learning
+with torch.no_grad():                 # no gradient tracking
     probs = torch.sigmoid(model(X_test.to(DEVICE))).cpu().numpy()
 auc = roc_auc_score(test_y, probs)
 ```
 
 ::: {.notes}
 - The first four lines are given in the notebook. TODO-3 is the evaluation block.
-- `.cpu().numpy()` matters: scikit-learn cannot read a tensor that is still on the GPU, a common error in this TODO.
+- `.cpu().numpy()` is needed because scikit-learn cannot read a tensor that is still on the GPU. Leaving it out is a common error in this TODO.
 :::
 
 ::: {.center}
@@ -379,7 +379,7 @@ Next: the trained last-layer weights.
 
 ::: {.notes}
 - The trained last-layer weights: one row per channel, one column per pooled position. Our run; the notebook does not draw this.
-- Pooled column j covers letters of roughly 9j to 9j + 29. The large weights sit in columns 17 to 20, letters about 150 to 210: where the measured site sits in almost every sequence.
+- Pooled column j covers letters of roughly 9j to 9j + 29. The large weights are in columns 17 to 20, letters about 150 to 210, where the measured site is in almost every sequence.
 - The columns on the right are padding (no sequence is longer than 375 letters), so their weights barely move from initialisation.
 - The CNN learned where in the sequence to look, as well as which letter patterns to look for. Slide 5.6 shows what that implies.
 :::
@@ -413,14 +413,14 @@ Next: the trained last-layer weights.
 - `plant()` writes copy n starting at letter 40 + 45(n − 1). The score jumps when copy 4 (letter 175) lands in the region the CNN weighs and decreases slightly with more copies (0.72 to 0.68), as they replace more of the background.
 :::
 
-## 5.6 Position matters
+## 5.6 The effect depends on position
 
 ![](assets/custom/position_scan.png){fig-align="center" height="700px"}
 
 ::: {.notes}
 - One copy of the motif at every position, averaged over 400 random sequences (a given cell in the notebook). The numbers 1 to 7 mark where `plant()` puts each copy in the previous test.
 - The motif changes the score only between about letters 140 and 190, where almost every sequence in the data has its measured site (shaded).
-- The shuffled copy gets much of the same increase there, so a good part of the effect comes from which letters sit in that region, whatever their order.
+- The shuffled copy gets much of the same increase there, so a good part of the effect comes from which letters are in that region, whatever their order.
 - This is the last-layer pattern from slide 5.2: the CNN weighs positions. It reflects how the data were cut, and it means the answer to "does this motif matter?" depends on where it is placed.
 :::
 

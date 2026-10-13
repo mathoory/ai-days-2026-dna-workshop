@@ -318,7 +318,7 @@
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
-<li>The same four stages describe every sequence model today. This part goes through them in order; the transformer stays a black box.</li>
+<li>These four stages describe most sequence models in use today. This part goes through them in order; the transformer stays a black box.</li>
 <li>The CNN’s stages were fixed by us (one-hot) or trained on 92,346 labels. A language model learns its embedding and body from unlabelled genome sequence first.</li>
 </ul>
 <style type="text/css">
@@ -553,7 +553,7 @@
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
-<li>After pretraining the vocabulary head is discarded and a new task head is attached. The body (and the embedding table) is what transfers.</li>
+<li>After pretraining the vocabulary head is discarded and a new task head is attached. The body (and the embedding table) transfers to the new task.</li>
 <li>Before the logistic regression each of the 256 dimensions is standardised.</li>
 <li>Frozen body, new linear head: a linear probe (this part’s notebook). Body adapted too: fine-tuning (part 3, LoRA).</li>
 </ul>
@@ -600,8 +600,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-landscape-2021-to-2025" class="slide level2">
-<h2>5.3 The landscape, 2021 to 2025</h2>
+<section id="dna-language-models-2021-to-2025" class="slide level2">
+<h2>5.3 DNA language models, 2021 to 2025</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/landscape.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -611,7 +611,7 @@
 <ul>
 <li>DNABERT (110M parameters), Nucleotide Transformer (50M to 2.5B), DNABERT-2 and HyenaDNA, then Evo (7B) and Evo 2 (40B).</li>
 <li>Filled points are masked models, open points next-token models.</li>
-<li>Not shown: Enformer, Borzoi and AlphaGenome, trained with labels from thousands of experiments; currently the strongest models for gene regulation.</li>
+<li>Not shown: Enformer, Borzoi and AlphaGenome, trained with labels from thousands of experiments, and the reference models for predicting gene regulation from sequence.</li>
 <li>The wrap-up shows ten models from these families tested on AGO2.</li>
 </ul>
 <p>Next: load a pretrained model and probe it.</p>

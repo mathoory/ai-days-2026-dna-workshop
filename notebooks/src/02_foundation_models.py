@@ -1,11 +1,11 @@
 # %% [markdown]
 # # Part 2: DNA foundation models
 #
-# **Borrow a pretrained DNA model**
+# **Use a pretrained DNA model**
 #
 # **Technion AI Days 2026: Teaching Machines to Read DNA**
 #
-# In part 1 you trained a CNN from scratch on our data only. Now we borrow a **foundation model**: a
+# In part 1 you trained a CNN from scratch on our data only. Now we use a **foundation model**: a
 # language model trained on the human genome before it ever sees our task. This general-purpose
 # training is called *pretraining*. The two models in this notebook were pretrained in different ways:
 #
@@ -269,7 +269,7 @@ for name, sub in (("pretrain_config.json", "models/Mixtral-8x7B-v0.1/config.json
 
 cfg = AutoConfig.from_pretrained(DATA_DIR / "pretrain_config.json")
 torch.manual_seed(SEED)
-# the config asks for bfloat16 weights; keep them in float32 and let autocast do the half-precision maths
+# the config specifies bfloat16 weights; keep them in float32 and let autocast do the half-precision maths
 # (a GradScaler cannot unscale bfloat16 gradients, which breaks the float16 path on a T4)
 scratch = AutoModelForCausalLM.from_config(cfg, attn_implementation="sdpa").float().to(DEVICE)
 print(f"fresh model: {sum(p.numel() for p in scratch.parameters()) / 1e6:.0f}M parameters, random weights")
@@ -339,7 +339,7 @@ _ = (DATA_DIR / "my_part2_results.json").write_text(json.dumps(results, indent=1
 # %% [markdown]
 # ### What to take away (about 2 min)
 #
-# **Reading the loss.** The loss measures how surprised the model is by the true next token. A
+# **Reading the loss.** The loss is minus the log of the probability the model gave the true next token. A
 # uniform guess among 4,096 tokens gives ln 4096 ≈ 8.3 (the dashed line). A model that knows only how
 # often each token occurs, with no context, gets about 7.1. Most of the early drop is learning those
 # frequencies; a loss below about 7.1 means the model uses the tokens before it to predict the next one.

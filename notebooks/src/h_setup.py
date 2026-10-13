@@ -49,7 +49,7 @@ plt.rcParams.update({
     "image.cmap": "ws_seq",
 })
 
-# Where the workshop files live. Either one direct-download link per file (FILE_URLS, e.g. SharePoint
+# Where the workshop files are stored. Either one direct-download link per file (FILE_URLS, e.g. SharePoint
 # "anyone with the link" + download=1), or one folder URL (DATA_URL, e.g. a Hugging Face dataset repo).
 FILE_URLS = {}
 DATA_URL = os.environ.get("AIDAYS_DATA_URL", "https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main")

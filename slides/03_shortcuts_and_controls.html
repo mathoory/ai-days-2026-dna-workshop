@@ -142,7 +142,7 @@
 <li><a href="#/a-control" id="/toc-a-control">2 A control</a></li>
 <li><a href="#/fine-tuning" id="/toc-fine-tuning">3 Fine-tuning</a></li>
 <li><a href="#/hands-on" id="/toc-hands-on">4 Hands-on</a></li>
-<li><a href="#/what-broke-what-survived" id="/toc-what-broke-what-survived">5 What broke, what survived</a></li>
+<li><a href="#/results-of-the-controls" id="/toc-results-of-the-controls">5 Results of the controls</a></li>
 <li><a href="#/wrap-up" id="/toc-wrap-up">6 Wrap-up</a></li>
 </ul>
 </nav>
@@ -417,8 +417,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="what-broke-what-survived" class="title-slide slide level1 center" data-name="Results">
-<h1>5 What broke, what survived</h1>
+<section id="results-of-the-controls" class="title-slide slide level1 center" data-name="Results">
+<h1>5 Results of the controls</h1>
 
 </section>
 
@@ -449,8 +449,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="shuffling-lowers-the-cnn-barely-moves-the-probe" class="slide level2">
-<h2>5.2 Shuffling lowers the CNN, barely moves the probe</h2>
+<section id="shuffling-lowers-the-cnns-score-and-barely-changes-the-probes" class="slide level2">
+<h2>5.2 Shuffling lowers the CNN’s score and barely changes the probe’s</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/shuffle_scoreboard.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -461,7 +461,7 @@
 <li>Two numbers alone reach 0.66, nearly half of the distance from chance (0.5) to the CNN (0.86).</li>
 <li>Five-letter word counts, with no order or position, reach 0.74. Counted only inside the 40-letter site, word counts reach 0.83, close to the CNN, which suggests that much of what the CNN adds is where it looks.</li>
 <li>CNN: 0.86 on real sequences, 0.66 after shuffling, the same as the composition model. The shuffle removes both letter order and site position.</li>
-<li>Mistral-DNA probe: 0.78 on real sequences, 0.77 shuffled. Its score survives a shuffle that keeps letter and letter-pair counts, so most of what it uses is composition at that level.</li>
+<li>Mistral-DNA probe: 0.78 on real sequences, 0.77 shuffled. Its score barely changes under a shuffle that keeps letter and letter-pair counts, so most of what it uses is composition at that level.</li>
 <li>The gap between real and shuffled is the part of a score that depends on letter order and position.</li>
 </ul>
 <style type="text/css">
@@ -510,9 +510,9 @@
 <aside class="notes">
 <ul>
 <li>These are new 3,000-sequence test sets, not the 1,000 held-out sequences used until now, so the “original” values differ slightly from earlier results (CNN 0.84 here, 0.86 before). On 3,000 sequences, 95% of resampled AUROCs fall within about ±0.015.</li>
-<li>Two numbers: 0.64 to 0.51, chance level. Single-letter composition carried that score.</li>
+<li>Two numbers: 0.64 to 0.51, chance level. That score came from single-letter composition.</li>
 <li>Five-letter word counts and the frozen probe each lose about 0.04 and keep most of their score: they rely on letter-pair and short-word composition, which matching does not remove.</li>
-<li>The CNN: 0.84 to 0.84 (notebook run). It uses more than single-letter composition.</li>
+<li>The CNN: 0.84 to 0.84 (notebook run), so it uses more than single-letter composition.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -565,10 +565,10 @@
 <ul>
 <li>The notebook plots three of these lines, up to 12,000 labels.</li>
 <li>Each model trained on 100 to 30,000 labelled matched sequences, three random draws per size (lines, with one standard deviation shaded).</li>
-<li>Frozen Mistral-DNA beats the CNN up to about 2,500 labels; above about 5,000 the CNN is better. At 12,000 labels: CNN 0.82, frozen probe 0.77.</li>
+<li>Frozen Mistral-DNA scores higher than the CNN up to about 2,500 labels; above about 5,000 the CNN is better. At 12,000 labels: CNN 0.82, frozen probe 0.77.</li>
 <li>The same Mistral-DNA architecture with random weights stays between 0.50 and 0.57, so the advantage at low label counts comes from pretraining.</li>
-<li>Five-letter word counts also beat the CNN below about 1,000 labels.</li>
-<li>Squares: the CNN in the head-to-head experiment of the previous slide, diamonds: NT-500M fine-tuned. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, which sequences you have matters as much as the model.</li>
+<li>Five-letter word counts also score higher than the CNN below about 1,000 labels.</li>
+<li>Squares: the CNN in the head-to-head experiment of the previous slide, diamonds: NT-500M fine-tuned. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, the draw of training sequences changes the CNN’s score by about as much as the differences between models.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -654,7 +654,7 @@
 <ul>
 <li>Each row is a measured number from today; the slides of each part have the figure behind it.</li>
 <li>The miR-15/16 row is the only seed site with an effect clearly beyond its shuffled controls; miR-19, miR-30 and let-7 were within the spread.</li>
-<li>The position row comes from inserting one copy at every position: the score changes only where the measured site sits in almost every sequence.</li>
+<li>The position row comes from inserting one copy at every position: the score changes only where the measured site is in almost every sequence.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -709,8 +709,8 @@
 <section id="when-to-use-a-pretrained-model" class="slide level2">
 <h2>6.4 When to use a pretrained model</h2>
 <ul>
-<li><strong>Below about 2,500 labels</strong>: a frozen pretrained model with a probe beat the CNN on this task</li>
-<li><strong>With 20,000 labels</strong>: fine-tuned NT-500M (0.87) beat the CNN (0.84) in one offline benchmark (3,000 matched test sequences, 3 runs each); keep a small task model as the baseline</li>
+<li><strong>Below about 2,500 labels</strong>: a frozen pretrained model with a probe scored higher than the CNN on this task</li>
+<li><strong>With 20,000 labels</strong>: fine-tuned NT-500M (0.87) scored higher than the CNN (0.84) in one offline benchmark (3,000 matched test sequences, 3 runs each); keep a small task model as the baseline</li>
 <li><strong>Not tested today</strong>: scoring mutations (variants) without labels by how unexpected the model finds them (published results are mixed)</li>
 </ul>
 <aside class="notes">

@@ -293,7 +293,7 @@ plt.title("Learning curve"); plt.tight_layout(); plt.show()
 # **Reading your result.** The curve should climb quickly and level off at about **0.86** (0.86 to
 # 0.87). In our tests, three seeds finished within 0.01 of each other. The test set has only 1,000
 # sequences, so any AUROC on it has a sampling uncertainty of about ±0.025 (95% range, part 1 talk).
-# A 0.85 and a 0.86 are the same result; a 0.80 and a 0.86 are not.
+# A difference of 0.01 (0.85 against 0.86) is within this noise; a difference of 0.06 (0.80 against 0.86) is not.
 
 # %% [markdown]
 # ## 5. Take your model with you (about 1 min)
@@ -560,7 +560,7 @@ plt.title("Score vs number of copies"); plt.tight_layout(); plt.show()
 
 # %% [markdown]
 # **Reading your result.** Compare the two curves with each other. The shuffled copy can move the
-# score too, because it contains the same letters. If the curve jumps at one particular copy number,
+# score too, because it contains the same letters. If the curve jumps at one copy number,
 # suspect **position**: `plant()` writes copy 1 at letter 40, copy 2 at 85, copy 3 at 130, copy 4 at
 # 175, and so on. The next cell checks this.
 
@@ -590,18 +590,18 @@ plt.tight_layout(); plt.show()
 #
 # * The logo suggests a pattern. Inserting the motif, next to a shuffled control, tests whether the
 #   model's output responds to it.
-# * A strongly activated filter can still push the score down. Its effect reaches the output
+# * A strongly activated filter can still lower the score. Its effect on the output passes
 #   through every layer above it, so your curve can go down.
 # * If the logo looks the same on bound and unbound RNA, that filter picks up a property of RNA in
 #   general (for example, how U-rich it is) and tells you little about AGO2.
 # * The CNN's last layer has one weight per (filter, **position**). Almost every sequence in this data
 #   set, bound or unbound, was cut so that the measured ~40-letter site sits at letters 150–190, with
 #   context on both sides (the sequences are 137 to 375 letters long), and the CNN learned to weight
-#   that region. In our runs the shuffled copy gets much of the same boost there, so part of the effect
-#   comes from which letters sit in letters 150–190, whatever their order. How much a motif matters
+#   that region. In our runs the shuffled copy gets much of the same increase there, so part of the effect
+#   comes from which letters occupy positions 150–190, whatever their order. A motif's effect on the score
 #   depends on where it is placed.
 #
-# **Discuss with your neighbour:** did your motif beat its shuffled control? Did theirs?
+# **Discuss with your neighbour:** did your motif score higher than its shuffled control? Did theirs?
 
 # %% [markdown]
 # ## 9. Bonus (optional): known microRNA target sites (about 2 min)

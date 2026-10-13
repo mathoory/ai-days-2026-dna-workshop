@@ -84,7 +84,7 @@ for k, v in table.items():
     print(f"{k:32s} test AUROC {v:.3f}")
 
 # %% [markdown]
-# # Break it. Look for shortcuts (sections 1 to 3)
+# # Look for shortcuts (sections 1 to 3)
 #
 # A score does not tell you what a model uses. A **shortcut** is a simple property of the sequences
 # that differs between bound and unbound ones in this data set, so that a model can score well by
@@ -94,7 +94,7 @@ for k, v in table.items():
 # 1. **Composition:** the fractions of G+C and of U letters in a sequence (2 numbers).
 # 2. **Word counts:** how often each 5-letter word appears, ignoring order and position.
 # 3. **The shuffle test:** shuffle each bound sequence so that it keeps its letters and letter pairs,
-#    and see how much of each model's score survives.
+#    and see how much of each model's score remains.
 
 # %% [markdown]
 # ## 1. Composition (about 3 min)
@@ -569,7 +569,7 @@ _ = (DATA_DIR / "my_part3_matched_results.json").write_text(json.dumps(scores, i
 #
 # The table above compares models trained on different numbers of labels. At equal numbers the CNN
 # still scores higher. With 12,000 labels on matched data it reaches about 0.82, against 0.77 for the
-# frozen probe. A lab studying a new question rarely has that many labels.
+# frozen probe. A lab studying a new question often has fewer labels than that.
 #
 # The next cell compares both approaches trained on 100 to 12,000 labelled sequences (matched
 # benchmark, matched test set). The light grey dashed line is the same language model with **random

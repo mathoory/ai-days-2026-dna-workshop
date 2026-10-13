@@ -968,10 +968,10 @@ def label_curve():
 
 # ============================================================================ deck 08
 def recap():
-    tiles = [("seed_pairing", "The seed rule"), ("filter_dot", "A filter is a dot product"),
-             ("planting_bars", "The CNN responds to miR-16"), ("position_scan", "It learned where"),
-             ("emb_pca", "Embeddings track G+C"), ("shuffle_scores", "The shuffle test"),
-             ("dumbbell", "Matched negatives"), ("headtohead", "Fine-tuning wins")]
+    tiles = [("seed_pairing", "The seed rule"), ("filter_dot", "A filter computes a dot product"),
+             ("planting_bars", "The CNN responds to miR-16"), ("position_scan", "The CNN weighs position"),
+             ("emb_pca", "Embeddings vary with G+C"), ("shuffle_scores", "The shuffle test"),
+             ("dumbbell", "Matched negatives"), ("headtohead", "Fine-tuning against the CNN")]
     fig, axes = plt.subplots(2, 4, figsize=(16, 9), dpi=120)
     for ax, (n, t) in zip(axes.flat, tiles):
         ax.imshow(mpimg.imread(OUT / f"{n}.png")); ax.axis("off"); ax.set_title(t, fontsize=17)

@@ -36,7 +36,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 ::: {.notes}
 - Projected: 2 min.
-- The same four stages describe every sequence model today. This part goes through them in order; the transformer stays a black box.
+- These four stages describe most sequence models in use today. This part goes through them in order; the transformer stays a black box.
 - The CNN's stages were fixed by us (one-hot) or trained on 92,346 labels. A language model learns its embedding and body from unlabelled genome sequence first.
 :::
 
@@ -145,7 +145,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 ::: {.notes}
 - Projected: 2 min.
-- After pretraining the vocabulary head is discarded and a new task head is attached. The body (and the embedding table) is what transfers.
+- After pretraining the vocabulary head is discarded and a new task head is attached. The body (and the embedding table) transfers to the new task.
 - Before the logistic regression each of the 256 dimensions is standardised.
 - Frozen body, new linear head: a linear probe (this part's notebook). Body adapted too: fine-tuning (part 3, LoRA).
 :::
@@ -165,14 +165,14 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - In both cases the genome supplies its own targets, so no experimental labels are needed.
 :::
 
-## 5.3 The landscape, 2021 to 2025
+## 5.3 DNA language models, 2021 to 2025
 
 ![](assets/custom/landscape.png){fig-align="center" height="700px"}
 
 ::: {.notes}
 - DNABERT (110M parameters), Nucleotide Transformer (50M to 2.5B), DNABERT-2 and HyenaDNA, then Evo (7B) and Evo 2 (40B).
 - Filled points are masked models, open points next-token models.
-- Not shown: Enformer, Borzoi and AlphaGenome, trained with labels from thousands of experiments; currently the strongest models for gene regulation.
+- Not shown: Enformer, Borzoi and AlphaGenome, trained with labels from thousands of experiments, and the reference models for predicting gene regulation from sequence.
 - The wrap-up shows ten models from these families tested on AGO2.
 
 Next: load a pretrained model and probe it.
