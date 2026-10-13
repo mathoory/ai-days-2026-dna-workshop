@@ -2,16 +2,14 @@
 
 Hands-on notebooks for the AI Days 2026 workshop at the Technion (15.10.2026), Prof. Roee Amit and Mattan Hoory.
 
-Open a notebook in Colab, then *Runtime → Change runtime type → T4 GPU*. The data downloads automatically.
+Open a notebook in Colab, then *Runtime → Change runtime type → T4 GPU*, and run from the top. The data downloads automatically.
 
-| Slot | Notebook | |
+| Time | Part | |
 |---|---|---|
-| 2 | Build a CNN | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/02_build_cnn.ipynb) |
-| 3 | Look inside it | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/03_look_inside.ipynb) |
-| 5 | A pretrained DNA model | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/05_pretrained_model.ipynb) |
-| 6 | Break it | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/06_break_it.ipynb) |
-| 7 | Fix it | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/07_fix_it.ipynb) |
+| 11:00 | 1. Machine learning and CNNs | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/01_cnn.ipynb) |
+| 11:50 | 2. DNA foundation models | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/02_foundation_models.ipynb) |
+| 12:40 | 3. Shortcuts, controls and fine-tuning | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/03_shortcuts_and_controls.ipynb) |
 
-Data: [huggingface.co/datasets/yup8/ai-days-2026-ago2](https://huggingface.co/datasets/yup8/ai-days-2026-ago2) (AGO2 CLIP-seq, from Pan & Shen 2018, *iDeep*).
+Data: [huggingface.co/datasets/yup8/ai-days-2026-ago2](https://huggingface.co/datasets/yup8/ai-days-2026-ago2) (AGO2 CLIP-seq from the GraphProt benchmark, Maticzka et al. 2014, as used by Pan and Shen 2018, *iDeepE*).
 
 Feedback: [forms.gle/NfE6ZHj98ri3WYmG6](https://forms.gle/NfE6ZHj98ri3WYmG6)
