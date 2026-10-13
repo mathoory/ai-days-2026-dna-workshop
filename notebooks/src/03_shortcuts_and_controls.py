@@ -454,6 +454,8 @@ for name in BENCH:
 # %%
 #@title Set up LoRA - run this cell, nothing to change { display-mode: "form" }
 !pip -q install peft==0.21.2   # tested with peft 0.21.2 and Colab's preinstalled transformers (5.19 in our tests)
+# Colab ships torchao 0.10, which peft 0.21 rejects (it needs > 0.16). This notebook does not use torchao.
+!pip -q uninstall -y torchao
 from peft import LoraConfig, get_peft_model
 from transformers import AutoModelForSequenceClassification
 
