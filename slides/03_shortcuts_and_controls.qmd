@@ -196,15 +196,15 @@ Open **`03_shortcuts_and_controls.ipynb`**. In the rejoin cell at the end of sec
 
 | Part | Finding | Number |
 |:--|:--|:--|
-| 1 | seed-site words are enriched in bound sites | miR-19 site UUUGCAC 6 times enriched, in 1–2% of bound sites |
-| 1 | a CNN trained on 92,346 sequences | held-out AUROC 0.86 |
-| 1 | it responds to one inserted seed site | miR-15/16: 0.53 vs 0.31 shuffled |
+| 1 | seed-site words enriched in bound sites | miR-19 site 6×, in 1–2% of sites |
+| 1 | CNN, 92,346 training sequences | AUROC 0.86 |
+| 1 | responds to one inserted seed site | miR-15/16 0.53 vs 0.31 shuffled |
 | 1 | it weighs position | effect only at letters ~140–190 |
 | 2 | frozen pretrained models + probe | 0.78–0.79 |
 | 3 | two composition numbers alone | 0.66 |
-| 3 | after a dinucleotide shuffle | CNN 0.86 → 0.66, probe 0.78 → 0.77 |
+| 3 | dinucleotide shuffle | CNN 0.86 → 0.66, probe 0.78 → 0.77 |
 | 3 | composition-matched data | G+C/U 0.64 → 0.51, CNN 0.84 → 0.84 |
-| 3 | Mistral-DNA fine-tuned with LoRA (20,000 labels) | 0.81 on matched data, frozen 0.77, CNN 0.84 |
+| 3 | Mistral-DNA + LoRA, 20,000 labels | 0.81 matched (frozen 0.77) |
 
 ::: {.notes}
 - Each row is a measured number from today; the slides of each part have the figure behind it.

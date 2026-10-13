@@ -919,7 +919,7 @@ def model_scan():
             "NT-2.5B (multi-species)": "NT-2.5B (multi-sp.)"}
     fig = newfig()
     ax = fig.add_axes([0.09, 0.13, 0.87, 0.75])
-    ax.axhline(0.838, color=CNN_C, lw=2, ls="--"); ax.text(2e6, 0.843, "CNN, all ~61,000 matched training sequences", color=CNN_C)
+    ax.axhline(0.838, color=CNN_C, lw=2, ls="--"); ax.text(2e6, 0.843, "CNN, whole matched training set", color=CNN_C)
     for n, r in d.items():
         if "matched" not in r:
             continue
