@@ -2,7 +2,7 @@
 @torch.no_grad()
 def embed(tok, model, seqs, batch=128):
     """List of DNA strings -> (N, hidden) numpy array: the mean of the last layer over all
-    non-padding tokens ([CLS] and [SEP] included). float16 autocast only makes it faster."""
+    non-padding tokens ([CLS] and [SEP] included)."""
     model.eval()
     out = []
     for i in range(0, len(seqs), batch):

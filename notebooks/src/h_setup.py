@@ -13,8 +13,6 @@ np.random.seed(SEED)
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("device:", DEVICE, "|", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "no GPU - Runtime > Change runtime type > T4 GPU")
 
-# Half precision for the language models: bfloat16 where the GPU supports it, float16 otherwise (T4).
-# AIDAYS_FORCE_FP16=1 forces the float16 path on a newer GPU, to test what a T4 runs.
 FORCE_FP16 = os.environ.get("AIDAYS_FORCE_FP16") == "1"
 AMP_DTYPE = (torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() and not FORCE_FP16
              else torch.float16)

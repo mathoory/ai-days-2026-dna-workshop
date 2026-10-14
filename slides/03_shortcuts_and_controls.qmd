@@ -1,4 +1,5 @@
 ---
+pagetitle: "Part 3: Shortcuts, controls and fine-tuning"
 subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
 ---
 
@@ -101,21 +102,22 @@ $$W x \;\rightarrow\; (W + BA)\,x, \qquad B \in \mathbb{R}^{256 \times r},\; A \
 - A 16M-parameter model could be fully fine-tuned on a laptop GPU; LoRA is how 500M-parameter models are adapted on modest hardware. Part 3 uses it on Mistral-DNA so you practise the method.
 :::
 
-## 3.3 The LoRA training step (TODO-4)
+## 3.3 The LoRA training step
 
-```python
-loss = crit(batch_logits(seqs), y)    # predict a batch of DNA strings, measure the error
-opt.zero_grad()                       # clear the previous step's gradients
-scaler.scale(loss).backward()         # gradients of the scaled loss
-scaler.step(opt)                      # unscale them, then move the trainable weights
-scaler.update()                       # adjust the scale for the next step
+```
+for each batch (DNA strings, labels):
+    clear the gradients
+    predict: one score per sequence
+    loss: the scores against the labels
+    gradients: only for B, A and the new output layer
+    step: move B, A and the output layer; W stays fixed
 ```
 
 ::: {.notes}
-- The same steps as part 1 slide 4.7. Only the LoRA matrices and the new output layer are trainable; the pretrained weights stay fixed.
-- `batch_logits` tokenizes the DNA strings and returns one raw score per sequence; `crit` is the binary cross-entropy of part 1 slide 2.2.
-- The scaler: in float16, very small gradients round to 0, so the loss is multiplied by a large factor before `backward()` and the gradients are divided by it before the step. On a GPU with bfloat16, Colab's T4 included, the scaler does nothing, and the same code runs.
+- The same steps as part 1 slide 4.7, and the notebook gives this step. Only the LoRA matrices B and A and the new output layer are trainable; the pretrained weights W stay fixed.
+- The loss is the binary cross-entropy of part 1 slide 2.2.
 - Batches of 32 sequences, 2 epochs over 20,000 matched sequences: 625 steps per epoch.
+- In the notebook, TODO-4a counts the numbers LoRA trains from the shapes of W and r, and TODO-4b is a written prediction of the result before training.
 :::
 
 ::: {.center}
@@ -128,18 +130,18 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 
 | Step | Task | Check | Time |
 |:--|:--|:--|:--|
-| TODO-1 | write `gc_u`, then AUROC from G+C and U | the test cell passes; about 0.66 | 6 min |
-| TODO-2 | count words by hand, then AUROC from 5-letter words | the test cell passes; about 0.74 | 4 min |
-| TODO-3 | shuffle one sequence, then the shuffle test on CNN and probe | the test cell passes; 0.66 and 0.77 | 10 min |
-| TODO-4 | the LoRA training step | the test cell passes; about 0.81 | 7 min |
+| TODO-1 | write `gc_u`, then AUROC from G+C and U | the test cell passes | 6 min |
+| TODO-2 | count words by hand, then AUROC from 5-letter words | the test cell passes | 4 min |
+| TODO-3 | shuffle one sequence, then the shuffle test on CNN and probe | the test cell passes | 10 min |
+| TODO-4 | count the numbers LoRA trains, then predict the result | the test cell passes | 7 min |
 
 ::: {.notes}
 - Given cells (setup, `shortcut_scores`, CNN retrain, before and after, take-aways): about 12 min. Projected hands-on total: about 39 min, 41 with the optional section, including LoRA training.
 - The rejoin cell is at the end of section 0; keep `USE_MY_FILES = False` to use our files.
-- Helpers: TODO-1 `probe_auc` (`gc_u` is written by the students); TODO-2 `Counter`, `kmer_counts(seqs, k=5)`; TODO-3 `dinuc_shuffle`; TODO-4 `batch_logits`, `crit`, `opt`, `scaler`.
+- Helpers: TODO-1 `probe_auc` (`gc_u` is written by the students); TODO-2 `Counter`, `kmer_counts(seqs, k=5)`; TODO-3 `dinuc_shuffle`; TODO-4 the shapes of W printed above it.
 - TODO-3: score the shuffled sequences with the probe already fitted on real sequences.
 - `shortcut_scores` is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.
-- TODO-4: write the step, run its test (one batch on a fresh model), then start the training cell and read on while it trains.
+- TODO-4: count LoRA's numbers (4a) and write a prediction (4b), then start the training cell and read on while it trains. Expected after training: about 0.81, between the frozen probe (0.77) and the CNN (0.84).
 - The label curve (optional, 2 min) is precomputed. Each TODO has a test cell and a "Stuck?" cell.
 :::
 

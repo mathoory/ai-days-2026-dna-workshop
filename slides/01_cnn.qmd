@@ -1,4 +1,5 @@
 ---
+pagetitle: "Part 1: Machine learning and CNNs"
 subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
 ---
 
@@ -391,21 +392,22 @@ Next: build the CNN.
 
 ## 4.7 The training step and the evaluation (TODO-3)
 
-```python
-opt.zero_grad()                       # clear the previous step's gradients
-loss = criterion(model(X), y)         # predict a batch, measure the error
-loss.backward()                       # gradient of the loss for every weight
-opt.step()                            # move every weight against its gradient
-
-model.eval()                          # evaluation mode
-with torch.no_grad():                 # no gradient tracking
-    probs = torch.sigmoid(model(X_test.to(DEVICE))).cpu().numpy()
-auc = roc_auc_score(test_y, probs)
+```
+for each epoch:
+    for each batch (X, y):
+        clear the gradients
+        predict: one score per sequence of X
+        loss: the scores against the labels y
+        gradients: of the loss, for every weight
+        step: move every weight against its gradient
+    evaluate on the held-out test set, without learning:
+        probabilities: the sigmoid of the scores
+        AUROC: the probabilities against the true labels
 ```
 
 ::: {.notes}
-- TODO-3a runs the first four lines by hand on one batch: the loss, one gradient's shape, one step, and the loss again on the same batch, now lower. TODO-3b puts the four lines in the loop of `train()`; TODO-3c is the evaluation block. The test cell trains one epoch on 5,000 sequences and checks that the evaluation used probabilities.
-- `.cpu().numpy()` is needed because scikit-learn cannot read a tensor that is still on the GPU. Leaving it out is a common error in this TODO.
+- The training loop in pseudocode, the same as in the notebook. Students write the code with their assistant; the pseudocode is what they need to understand.
+- TODO-3a runs one training step by hand on one batch: the loss, one gradient, one step, and the loss again on the same batch, now lower. TODO-3b is the training step inside the loop of `train()`; TODO-3c is the evaluation. The test cell trains one epoch on 5,000 sequences and checks that the evaluation used probabilities.
 :::
 
 ::: {.center}
@@ -448,14 +450,14 @@ Open **`01_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
 | Step | Task | Check | Time |
 |:--|:--|:--|:--|
 | TODO-1 | write `one_hot` and `encode_batch` | the test cell passes | 3 min |
-| TODO-2 | build the network | the test cell passes; 2,491 parameters | 7 min |
-| TODO-3 | one batch by hand, then the loop in `train()` | the test cell passes; 0.79, then 0.86 | 7 min |
-| TODO-4 | filter 0 step by step, then a logo for every filter | the test cell passes; ten logos | 9 min |
-| TODO-5 | one copy in one sequence, then the motif and a shuffled copy | the test cell passes; two curves | 8 min |
+| TODO-2 | build the network | the test cell passes | 7 min |
+| TODO-3 | one batch by hand, then the loop in `train()` | the test cell passes | 7 min |
+| TODO-4 | filter 0 step by step, then a logo for every filter | the test cell passes | 9 min |
+| TODO-5 | one copy in one sequence, then the motif and a shuffled copy | the test cell passes | 8 min |
 
 ::: {.notes}
 - Given cells (setup, data, motif toolkit, take-aways): about 12 min. Projected hands-on total: about 46 min, 51 with the optional sections.
-- TODO-3 check: about 0.79 after epoch 1 and 0.86 after epoch 10. Encoding and 10 epochs take about a minute on a T4 (2 to 8 seconds per epoch).
+- TODO-3 check: about 0.79 after epoch 1 and 0.86 after epoch 10. Encoding and 10 epochs take about a minute on Colab.
 - Helpers for TODO-4: `acts[:, f, :]`, `cutoff_for`, `windows_above`, `pwm_of`; then set `MY_FILTER` and `MY_MOTIF`. TODO-4 ends with choosing a motif. TODO-5 uses `plant`, first on one sequence (TODO-5a), then on all 1,000 (TODO-5b).
 - Each TODO has a test cell and, below it, a "Stuck?" cell that loads our version.
 - Notebook section 5, right after training, downloads `my_cnn.pt`, which part 3 can load.

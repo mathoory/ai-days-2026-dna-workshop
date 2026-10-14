@@ -87,12 +87,11 @@ print("ALPHABET =", repr(ALPHABET), "| the row of each letter:", {b: ALPHABET.in
 print("MAX_LEN  =", MAX_LEN, "columns per sequence")
 
 # %%
-# TODO-1a: write one_hot(seq): ONE sequence -> a numpy array of shape (4, MAX_LEN).
-#          1. start from an array of shape (4, MAX_LEN) full of 0.25 (np.full, dtype np.float32);
-#             every column you do not touch stays a padding column
-#          2. for each position i and letter b of seq: set column i to 0, then put a 1 in the
-#             row of that letter, ALPHABET.index(b)
-#          A letter that is not in ALPHABET keeps its column of 0.25.
+# TODO-1a: write one_hot(seq), which turns ONE sequence into its one-hot matrix, a numpy array with
+#          4 rows (A, C, G, U, in the order of ALPHABET) and MAX_LEN columns, one column per letter.
+#          - the column of a letter has a 1 in that letter's row and 0 in the other three rows
+#          - every column after the end of the sequence is padding: 0.25 in all four rows
+#          - a letter other than A, C, G or U also gets a column of 0.25
 def one_hot(seq):
     # === Your code here ===
     M = np.full((4, MAX_LEN), 0.25, dtype=np.float32)
@@ -106,18 +105,17 @@ def one_hot(seq):
 
 M = one_hot(train_seqs[0])
 L = len(train_seqs[0])
-print("shape:", M.shape, "(want (4, 501))")
+print("shape:", M.shape, "(rows, columns)")
 print("letters:", "  ".join(train_seqs[0][:8]))
 print(M[:, :8])
 print(f"columns {L - 1} and {L} (the last letter, then the first padding column):")
 print(M[:, L - 1:L + 1])
 
 # %%
-# TODO-1b: write encode_batch(seqs): a list of N sequences -> a float tensor of shape (N, 1, 4, MAX_LEN),
-#          the input the CNN expects (N sequences, 1 channel, 4 rows, MAX_LEN columns).
-#          1. one_hot each sequence and stack the results into one array (np.stack): shape (N, 4, MAX_LEN)
-#          2. add the channel axis: shape (N, 1, 4, MAX_LEN), for example with X[:, None]
-#          3. return it as a tensor: torch.from_numpy(X)
+# TODO-1b: write encode_batch(seqs), which turns a list of N sequences into one input for the CNN:
+#          the one-hot matrices of all N sequences, stacked, as a PyTorch tensor of floats with the shape
+#          (N, 1, 4, MAX_LEN). The CNN reads each matrix like a one-colour image, and the axis of size 1
+#          is that single colour channel.
 def encode_batch(seqs):
     # === Your code here ===
     X = np.stack([one_hot(s) for s in seqs])[:, None]
@@ -126,7 +124,7 @@ def encode_batch(seqs):
 
 
 X3 = encode_batch(train_seqs[:3])
-print("shape:", tuple(X3.shape), "(want (3, 1, 4, 501)) | dtype:", X3.dtype, "(want torch.float32)")
+print("shape:", tuple(X3.shape), "(sequences, channel, rows, columns) | type:", X3.dtype)
 
 # %%
 #@title Test your encoding - run this cell, nothing to change { display-mode: "form" }
@@ -184,21 +182,25 @@ print("the fast encode_batch gives the same matrices as yours on 100 sequences")
 # a short sequence pattern). Each filter produces one row of output, called a **channel**, so 10
 # filters give 10 channels.
 #
-# **ReLU** (`max(0, x)`) sets negative values to 0. Max pooling keeps the largest value in each block
-# of 3 positions. A second convolution combines the first-layer channels, and a final linear layer
-# maps them to one number per sequence, the **logit**. A logit can be any real number: large and
-# positive means "bound", large and negative means "unbound". Section 4 turns it into a probability.
+# **ReLU** (`max(0, x)`) sets negative values to 0. **Max pooling** keeps the largest value in each block
+# of 3 positions. A second convolution combines the first-layer channels. **Flatten** lays all remaining
+# numbers out in one row, and a final **linear** layer (a weighted sum plus a bias) maps them to one
+# number per sequence, the **logit**. A logit can be any real number: large and positive means
+# "bound", large and negative means "unbound". Section 4 turns it into a probability.
 #
-# Shapes, for one sequence of width 501:
+# The network, layer by layer, for one sequence of width 501 (each step is its own layer):
 #
-# | layer | output shape |
-# |---|---|
-# | input | `1 × 4 × 501` |
-# | `Conv2d(1, 10, (4, 10))` + ReLU | `10 × 1 × 492` |
-# | `MaxPool2d((1, 3))` | `10 × 1 × 164` |
-# | `Conv2d(10, 20, (1, 5))` + ReLU | `20 × 1 × 160` |
-# | `MaxPool2d((1, 3))` | `20 × 1 × 53` |
-# | `Flatten` → `Linear(20*53, 1)` | `1` |
+# | layer | what it does | output shape |
+# |---|---|---|
+# | input | the one-hot matrix, one channel | `1 × 4 × 501` |
+# | convolution | 10 filters, each 4 letters × 10 positions | `10 × 1 × 492` |
+# | ReLU | negative values become 0 | `10 × 1 × 492` |
+# | max pooling | the largest of every 3 positions | `10 × 1 × 164` |
+# | convolution | 20 filters, each covering 5 positions of all 10 channels | `20 × 1 × 160` |
+# | ReLU | negative values become 0 | `20 × 1 × 160` |
+# | max pooling | the largest of every 3 positions | `20 × 1 × 53` |
+# | flatten | all 20 × 53 numbers in one row | `1060` |
+# | linear | a weighted sum of the 1,060 numbers plus a bias | `1` |
 
 # %%
 class GlobalCNN(nn.Module):
@@ -207,8 +209,7 @@ class GlobalCNN(nn.Module):
     def __init__(self):
         super().__init__()
         self.net = nn.Sequential(
-            # TODO-2: build the network from the table above, in order, separated by commas.
-            #         The last layer is nn.Linear(20 * 53, 1).
+            # TODO-2: the layers of the table above, in order.
             # === Your code here ===
             nn.Conv2d(1, 10, (4, 10)), nn.ReLU(),
             nn.MaxPool2d((1, 3)),
@@ -223,16 +224,16 @@ class GlobalCNN(nn.Module):
         return self.net(x).squeeze(1)
 
 
-# sanity check: two sequences in, two scores out
-print(GlobalCNN()(encode_batch(train_seqs[:2])).shape, "<- should be torch.Size([2])")
+# two sequences in, one score per sequence out
+print("output shape for 2 sequences:", tuple(GlobalCNN()(encode_batch(train_seqs[:2])).shape))
 
 # %%
 #@title Test TODO-2 - run this cell, nothing to change { display-mode: "form" }
 def test_network():
     model = GlobalCNN()
     X = encode_batch(train_seqs[:5])
-    rows = ["Conv2d(1, 10, (4, 10))", "MaxPool2d((1, 3))", "Conv2d(10, 20, (1, 5))", "MaxPool2d((1, 3))",
-            "Flatten", "Linear(20 * 53, 1)"]
+    rows = ["the first convolution", "the first max pooling", "the second convolution", "the second max pooling",
+            "flatten", "the linear layer"]
     want = [(10, 1, 492), (10, 1, 164), (20, 1, 160), (20, 1, 53), (1060,), (1,)]
     # run the batch through self.net one layer at a time and keep the shape after each layer
     # (a ReLU keeps the shape, so a shape is recorded only when it changes)
@@ -252,8 +253,8 @@ def test_network():
     for i, k in enumerate(kinds):
         if k == "Conv2d":
             assert kinds[i + 1:i + 2] == ["ReLU"], \
-                f"layer {i} is a Conv2d, and the table puts a ReLU right after it; layer {i + 1} is {kinds[i + 1:i + 2]}"
-    assert kinds.count("ReLU") == 2, f"self.net has {kinds.count('ReLU')} ReLU layers, want 2 (one after each Conv2d)"
+                f"layer {i} is a convolution, and the table puts a ReLU right after it; layer {i + 1} is {kinds[i + 1:i + 2]}"
+    assert kinds.count("ReLU") == 2, f"the network has {kinds.count('ReLU')} ReLU layers, want 2 (one after each convolution)"
     n = sum(p.numel() for p in model.parameters() if p.requires_grad)
     assert n == 2491, f"{n:,} trainable parameters, want 2,491 (410 + 1,020 + 1,061)"
     out = model(X)
@@ -294,12 +295,11 @@ test_network()
 # gradient of the loss on one batch of 256 sequences and moves every weight a small amount against
 # its gradient. Our loss is binary cross-entropy, the negative log of the probability the model
 # assigns to the correct label, averaged over the batch. The model outputs a logit $z$; the sigmoid
-# $\sigma(z) = 1 / (1 + e^{-z})$ (`torch.sigmoid`) turns it into a probability between 0 and 1.
+# $\sigma(z) = 1 / (1 + e^{-z})$ turns it into a probability between 0 and 1.
 #
 # After every pass over the training data (an *epoch*) we evaluate the model on the held-out test
-# set: the 1,000 `ls` sequences it never trains on. `model.eval()` puts the model in evaluation mode
-# and `torch.no_grad()` turns off gradient tracking, so scoring these sequences does not change the
-# weights. The number we report is **AUROC**: the probability that a randomly chosen bound sequence
+# set: the 1,000 `ls` sequences it never trains on. During evaluation the model only scores: no
+# gradients are computed and the weights do not change. The number we report is **AUROC**: the probability that a randomly chosen bound sequence
 # gets a higher score than a randomly chosen unbound one. 0.5 is a coin flip, 1.0 is perfect.
 #
 # The whole training loop, in pseudocode:
@@ -318,20 +318,18 @@ test_network()
 #         AUROC of the probabilities against the true labels
 # ```
 #
-# Each line of pseudocode is one line of PyTorch:
+# What each step means:
 #
-# | pseudocode | PyTorch |
+# | step | what it means |
 # |---|---|
-# | for each epoch | `for ep in range(1, epochs + 1):` |
-# | for each batch | `for X, y in train_loader:` |
-# | clear the gradients | `opt.zero_grad()` |
-# | predict | `logits = model(X)` |
-# | loss | `loss = criterion(logits, y)` |
-# | gradients | `loss.backward()` |
-# | step | `opt.step()` |
-# | evaluate, no gradients | `model.eval()`, then `with torch.no_grad():` |
-# | probabilities | `probs = torch.sigmoid(model(X_test.to(DEVICE))).cpu().numpy()` |
-# | AUROC | `auc = roc_auc_score(test_y, probs)` |
+# | clear the gradients | forget the gradients of the previous batch |
+# | predict | the model gives one score (logit) per sequence in the batch |
+# | loss | one number for the batch: how far the scores are from the labels |
+# | gradients | for every weight, how much the loss changes when that weight changes |
+# | step | the optimizer (`opt`) moves every weight a little in the direction that lowers the loss |
+# | evaluate | score the held-out test set without learning: no gradients, the weights stay as they are |
+# | probabilities | the sigmoid turns each score into a probability between 0 and 1 |
+# | AUROC | how well the probabilities separate the bound from the unbound test sequences |
 #
 # First you run one step by hand on one batch (TODO-3a). Then you write the loop inside `train()`:
 # the training step (TODO-3b) and the evaluation (TODO-3c).
@@ -356,9 +354,9 @@ opt = optim.Adam(model.parameters(), lr=1e-3)
 criterion = nn.BCEWithLogitsLoss()
 print("X:", tuple(X.shape), "| y:", tuple(y.shape), "| the first 8 labels:", y[:8].tolist())
 
-# TODO-3a: one training step on this one batch, by hand.
-#          1. logits = the model's output on X: one score per sequence, shape (256,)
-#          2. loss = criterion(logits, y): one number for the whole batch
+# TODO-3a: one training step on this one batch, by hand (the pseudocode above, for one batch).
+#          First the prediction and the loss: `logits`, the model's scores for X (one per sequence),
+#          and `loss`, the loss of these scores against the labels y (`criterion` is the loss function).
 # === Your code here ===
 logits = model(X)
 loss = criterion(logits, y)
@@ -367,9 +365,8 @@ print("\nlogits of the first 4 sequences:", [round(v, 3) for v in logits[:4].tol
 print("their labels                   :", y[:4].tolist())
 print(f"loss before the step: {loss.item():.4f}")
 
-#          3. clear the gradients with opt.zero_grad(), then compute them with loss.backward()
-#          4. move the weights with opt.step()
-#          5. loss_after = the loss on the same batch X, y, computed again with the moved weights
+# TODO-3a, continued: clear the gradients, compute the gradients of `loss`, take one optimizer step, and
+#          compute the loss on the same batch again with the updated weights (`loss_after`).
 # === Your code here ===
 opt.zero_grad()
 loss.backward()
@@ -393,8 +390,7 @@ def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
         model.train()
         for X, y in train_loader:
             X, y = X.to(DEVICE), y.to(DEVICE)
-            # TODO-3b: one training step on the batch X, y: the lines of TODO-3a, in the order of
-            #          the table (clear the gradients, loss, backward, step)
+            # TODO-3b: one training step on the batch X, y (the steps of the pseudocode)
             # === Your code here ===
             opt.zero_grad()
             loss = criterion(model(X), y)
@@ -402,13 +398,9 @@ def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
             opt.step()
             # === End of your code ===
 
-        # TODO-3c: measure the model on the held-out test set.
-        #          1. call model.eval(), then do steps 2 and 3 inside a `with torch.no_grad():` block
-        #          2. probs = the sigmoid of the model's output on X_test. Move X_test to DEVICE first,
-        #             and bring the result back with .cpu().numpy() (roc_auc_score needs a numpy array)
-        #          3. auc = roc_auc_score(true labels, probs)
-        #          Expected (the training cell below prints it): about 0.79 after epoch 1, about
-        #          0.86 after epoch 10.
+        # TODO-3c: evaluate on the held-out test set (X_test, labels test_y), without learning: the
+        #          probability of "bound" for every test sequence, and `auc`, the AUROC of these
+        #          probabilities against the true labels.
         # === Your code here ===
         model.eval()
         with torch.no_grad():
@@ -441,17 +433,17 @@ def test_train():
     finally:
         roc_auc_score = real_roc_auc_score
     assert any(not torch.equal(b, p.detach().cpu()) for b, p in zip(before, m.parameters())), \
-        "the weights did not change during training: TODO-3b needs loss.backward() and opt.step()"
+        "the weights did not change during training: the training step must compute the gradients and move the weights"
     assert len(seen) == 1, f"roc_auc_score was called {len(seen)} times in 1 epoch, want once per epoch (TODO-3c)"
     p = seen[0]
     assert isinstance(p, np.ndarray), \
-        f"roc_auc_score received a {type(p).__name__}, want a numpy array: end the line with .cpu().numpy()"
+        f"roc_auc_score received a {type(p).__name__}, want a numpy array of probabilities"
     assert p.shape == (len(test_seqs),), \
         f"roc_auc_score received scores of shape {p.shape}, want ({len(test_seqs)},): one per held-out test sequence (X_test)"
     assert np.isfinite(p).all(), "the probabilities contain NaN or infinite values"
     assert p.min() >= 0 and p.max() <= 1, \
         (f"the evaluated scores range from {p.min():.2f} to {p.max():.2f}, so they are logits. "
-         "Apply torch.sigmoid to get probabilities between 0 and 1")
+         "Turn them into probabilities between 0 and 1 with the sigmoid")
     assert isinstance(hist, list) and len(hist) == 1, f"train() returned {hist!r}, want a list with one AUROC per epoch"
     assert 0.5 < hist[0] <= 1, f"the AUROC after 1 epoch on 5,000 sequences is {hist[0]:.3f}, want between 0.5 and 1"
     print(f"TODO-3 passed: 1 epoch on 5,000 sequences, held-out test AUROC {hist[0]:.3f}, "
@@ -657,12 +649,13 @@ n_filters = acts.shape[1]
 print("activations:", acts.shape, "-> (sequences, filters, positions) for", len(pos_seqs), "bound sequences")
 
 # %%
-# TODO-4a: filter 0, step by step, with the toolkit functions of section 6.
-#          1. acts_0 = the activations of filter 0: acts[:, 0, :], shape (sequences, positions)
-#          2. cut_0 = its threshold: cutoff_for(acts_0)
-#          3. windows_0 = the 10-letter windows above the threshold: windows_above(acts_0, pos_seqs, cut_0)
-#          4. pwm_0 = the letter frequency table of these windows: pwm_of(windows_0), shape (10, 4)
-#          5. consensus_0 = the most frequent letter at each position: consensus_of(pwm_0)
+# TODO-4a: filter 0, step by step, with the toolkit of section 6. `acts` holds the activations of
+#          every filter on the bound sequences `pos_seqs` (sequences, filters, positions). Produce:
+#          acts_0       the activations of filter 0 only (one row per sequence, one column per position)
+#          cut_0        filter 0's threshold
+#          windows_0    the 10-letter windows of pos_seqs where filter 0 is above its threshold
+#          pwm_0        the letter frequency table of these windows
+#          consensus_0  the most frequent letter at each position
 # === Your code here ===
 acts_0 = acts[:, 0, :]
 cut_0 = cutoff_for(acts_0)
@@ -681,11 +674,8 @@ plt.show()
 # %%
 motifs, pwms, n_hits = {}, {}, {}
 for f in range(n_filters):
-    # TODO-4b: the steps of TODO-4a for filter f: take its activations with  acts_f = acts[:, f, :],
-    #          then cutoff_for -> windows_above (the sequences are pos_seqs) -> pwm_of -> consensus_of,
-    #          and fill motifs[f] (consensus string), pwms[f] (the table) and n_hits[f] (number of windows).
-    #          Expected: 10 lines, one per filter, each with its window count and a 10-letter
-    #          consensus; pwms[f] is a numpy array of shape (10, 4) whose rows sum to 1.
+    # TODO-4b: the steps of TODO-4a for filter f, stored as motifs[f] (the consensus),
+    #          pwms[f] (the letter frequency table) and n_hits[f] (the number of windows).
     # === Your code here ===
     acts_f = acts[:, f, :]
     windows = windows_above(acts_f, pos_seqs, cutoff_for(acts_f))
@@ -789,10 +779,8 @@ plt.tight_layout(); plt.show()
 # *(This shuffle only reorders the motif's 10 letters. Part 3 uses a stricter shuffle that keeps
 # every letter pair of a whole sequence.)*
 #
-# **Hint for TODO-5 (and for your AI assistant):** `plant(seqs, motif, copies)` takes a list of
-# strings and returns new strings; `score_sequences(model, seqs)` returns one probability per string.
-# You first insert one copy into one sequence (TODO-5a). Then you need the **mean** score for each
-# number of copies, as two lists of 7 numbers (TODO-5b).
+# You first insert one copy into one sequence (TODO-5a). Then you compute the **mean** score over all
+# random sequences for each number of copies, for the motif and for its shuffled copy (TODO-5b).
 
 # %%
 #@title The random sequences and the shuffled motif - run this cell, nothing to change { display-mode: "form" }
@@ -805,12 +793,9 @@ print(f"{len(canvas):,} random sequences of {len(canvas[0])} letters | mean scor
 print(f"motif {MY_MOTIF} | shuffled control {shuffled}")
 
 # %%
-# TODO-5a: one copy of MY_MOTIF in one sequence.
-#          1. one = canvas[0], the first random sequence
-#          2. one_planted = the same sequence with one copy of MY_MOTIF inserted:
-#             plant([one], MY_MOTIF, 1)[0]  (plant takes a list and returns a list)
-#          3. score_before, score_after = the model's score of one and of one_planted:
-#             score_sequences(model, [one])[0], and the same for one_planted
+# TODO-5a: one copy of MY_MOTIF in one sequence. `one` is the first random sequence of `canvas`;
+#          `one_planted` is the same sequence with one copy of MY_MOTIF inserted (toolkit, section 6);
+#          `score_before` and `score_after` are the model's scores of the two.
 # === Your code here ===
 one = canvas[0]
 one_planted = plant([one], MY_MOTIF, 1)[0]
@@ -824,10 +809,9 @@ print("after :", one_planted[20:40] + one_planted[40:40 + k].lower() + one_plant
 print(f"score before {score_before:.3f} | after {score_after:.3f}")
 
 # %%
-# TODO-5b: fill real_scores and control_scores with the MEAN model score over all of canvas after
-#          inserting c copies (for every c in `copies`) of MY_MOTIF and of `shuffled`, respectively.
-#          Expected: two lists of 7 numbers between 0 and 1. The motif's score usually jumps
-#          at copy 4 (letter 175); the plot below compares the two lists.
+# TODO-5b: for every number of copies in `copies`, the mean score over all sequences of `canvas`
+#          with that many copies of MY_MOTIF inserted (`real_scores`), and the same with the
+#          shuffled motif `shuffled` (`control_scores`): two lists, one number per number of copies.
 # === Your code here ===
 real_scores = [score_sequences(model, plant(canvas, MY_MOTIF, c)).mean() for c in copies]
 control_scores = [score_sequences(model, plant(canvas, shuffled, c)).mean() for c in copies]
@@ -849,8 +833,8 @@ def test_insertion():
             g = float(g)
             assert 0 <= g <= 1, f"{name}, {n_copies}: {g:.3f} is not a probability between 0 and 1"
             assert abs(g - w) < 1e-6, \
-                (f"{name}, {n_copies}: {g:.4f}, want {w:.4f}, the mean score of canvas with {n_copies} of "
-                 f"{motif} inserted: plant(canvas, {motif!r}, {c})")
+                (f"{name}, {n_copies}: {g:.4f}, want {w:.4f}, the mean score over canvas with {n_copies} of "
+                 f"{motif} inserted")
     print(f"TODO-5 passed: both lists have {len(copies)} mean scores between 0 and 1, equal to the reference")
 
 

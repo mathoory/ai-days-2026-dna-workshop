@@ -8,6 +8,7 @@ Source format
 # %% [markdown]          markdown cell; each line starts with "# " (or is "#")
 # %%                     code cell
 # %include h_data.py     replaced by the contents of notebooks/src/h_data.py
+# %include-body h_x.py   the same, without the file's first line when that line is a #@title
 
 Student version: in every code cell, the lines strictly between
     # === Your code here ===
@@ -27,8 +28,11 @@ BEGIN, END = "# === Your code here ===", "# === End of your code ==="
 
 def expand(text):
     def inc(m):
-        return (SRC / m.group(1)).read_text(encoding="utf-8").rstrip("\n")
-    return re.sub(r"^# %include (\S+)$", inc, text, flags=re.M)
+        body = (SRC / m.group(2)).read_text(encoding="utf-8").replace("\r\n", "\n").rstrip("\n")
+        if m.group(1) == "-body" and body.startswith("#@title"):
+            body = body.split("\n", 1)[1] if "\n" in body else ""
+        return body
+    return re.sub(r"^# %include(-body)? (\S+)$", inc, text, flags=re.M)
 
 
 def parse(text):

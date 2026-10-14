@@ -30,8 +30,8 @@
 #
 #
 # Use an AI assistant (Gemini in Colab, or any chat assistant) as much as you like. Each TODO states
-# what to build, the variable names to use, the gotchas to tell your assistant, and the number to
-# expect. A test cell after each TODO checks your code. Run it before you move on.
+# what to build, the rules it must follow and the names later cells use. A test cell after each TODO
+# checks your code. Run it before you move on.
 #
 # | cell | what you do |
 # |---|---|
@@ -92,33 +92,26 @@ print("as tokens        :", " | ".join(tok.convert_ids_to_tokens(ids)))
 # %% [markdown]
 # ### TODO-1: Turn sequences into vectors
 #
-# **Build** `embed(tok, model, seqs, batch=128)`: a list of DNA strings in, a numpy array of shape
-# `(len(seqs), 256)` out, one vector per sequence. You build it in four steps, first on one sequence:
+# **Build** `embed(tok, model, seqs, batch=128)`: a list of DNA strings in, a numpy array out, with one
+# row of 256 numbers per sequence, its **embedding**. You build it in four steps, first on one sequence:
 #
-# 1. **TODO-1a** tokenize one sequence: the token numbers (`input_ids`) and the `attention_mask`;
-# 2. **TODO-1b** run the model on it and take the **last** layer, `outputs.hidden_states[-1]`: one
-#    vector of 256 numbers per token, shape (1, tokens, 256);
-# 3. **TODO-1c** average these vectors over the real tokens only, with the mask: one vector of 256
-#    (`[CLS]` and `[SEP]` count as real tokens);
+# 1. **TODO-1a** tokenize one sequence: its token numbers and its attention mask;
+# 2. **TODO-1b** run the model on it and keep the **last** layer: one vector of 256 numbers per token;
+# 3. **TODO-1c** average these vectors over the real tokens only (`[CLS]` and `[SEP]` count as real);
 # 4. **TODO-1d** `embed()`: the same for a list of sequences, a batch at a time.
 #
-# **Gotchas to tell your assistant:**
-# - sequences in a batch have different lengths, so the tokenizer **pads** the short ones; the
-#   `attention_mask` is 1 for real tokens and 0 for padding. Average with the mask, not with `.mean(1)`.
-# - move `input_ids` and `attention_mask` to `DEVICE`, and the result back with `.cpu().numpy()`.
-# - the tokenizer returns more keys than the model accepts; pass only `input_ids` and `attention_mask`.
-# - optional: our version runs the model under `torch.autocast(..., dtype=torch.float16)`, which only
-#   makes it faster.
+# **Padding and the mask.** Sequences in a batch have different lengths, so the short ones are filled
+# up with padding tokens until all have the same length. The **attention mask** marks which tokens are
+# real (1) and which are padding (0). The average of step 3 must use only the real tokens, so that a
+# sequence gets the same embedding whether it is alone or in a batch with longer ones.
 #
-# **Test** (the cell after TODO-1d): `masked_mean` ignores padding, `embed` gives shape `(3, 256)`, and
-# the same sequence gives the **same** vector whether it is embedded alone or next to a longer one.
+# The test after TODO-1d checks exactly that.
 
 # %%
-s = S_train[0][:60]      # the first 60 letters of one sequence, so the printout stays short
+s = S_train[0][:60]      # the first 60 letters of one sequence, so the printout is short
 
-# TODO-1a: tokenize s.
-#          enc = tok([s], return_tensors="pt"): a dictionary of tensors for a batch of one sequence.
-#          enc["input_ids"] holds the token numbers; enc["attention_mask"] is 1 for every real token.
+# TODO-1a: tokenize s with the tokenizer `tok`, as a batch of one sequence, into `enc`.
+#          enc["input_ids"] holds the token numbers and enc["attention_mask"] the mask.
 # === Your code here ===
 enc = tok([s], return_tensors="pt")
 # === End of your code ===
@@ -129,12 +122,10 @@ print("attention_mask:", enc["attention_mask"].tolist())
 print("all keys      :", list(enc.keys()))
 
 # %%
-# TODO-1b: run the model on this one sequence and keep its last layer.
-#          1. ids, mask = enc["input_ids"] and enc["attention_mask"], both moved to DEVICE
-#          2. inside `with torch.no_grad():`
-#             out = fm(input_ids=ids, attention_mask=mask, output_hidden_states=True)
-#          3. h = out.hidden_states[-1].float(), the last layer as 32-bit numbers: shape (1, tokens, 256)
-#             (.float(): the model may compute in 16-bit numbers)
+# TODO-1b: run the language model `fm` on this one sequence, without learning. Keep:
+#          `mask`  its attention mask, on the model's device
+#          `out`   the model's output, with every layer's vectors (hidden states)
+#          `h`     the last layer: one vector of 256 numbers per token
 # === Your code here ===
 ids, mask = enc["input_ids"].to(DEVICE), enc["attention_mask"].to(DEVICE)
 with torch.no_grad():
@@ -148,13 +139,10 @@ for t, row in zip(tok.convert_ids_to_tokens(enc["input_ids"][0]), h[0, :, :4].to
     print(f"  {t:>12s}", [round(v, 2) for v in row])
 
 # %%
-# TODO-1c: write masked_mean(h, mask): for each sequence, the average of its token vectors over its
-#          real tokens only.  h: (batch, tokens, 256) numbers; mask: (batch, tokens), 1 = real, 0 = padding.
-#          1. m = mask.unsqueeze(-1).float(): shape (batch, tokens, 1), so it multiplies all 256
-#             numbers of a token by that token's 1 or 0
-#          2. the sum over the tokens (dimension 1) of h * m: shape (batch, 256); padding adds 0
-#          3. divide by the number of real tokens of each sequence, m.sum(1): shape (batch, 1)
-#          Return the result, shape (batch, 256).
+# TODO-1c: write masked_mean(h, mask): for each sequence in h, the average of its token vectors over
+#          its real tokens only (mask 1); padding tokens (mask 0) must not count.
+#          h holds one vector of 256 numbers per token of each sequence; the result holds one vector
+#          of 256 numbers per sequence.
 def masked_mean(h, mask):
     # === Your code here ===
     m = mask.unsqueeze(-1).float()
@@ -178,13 +166,9 @@ print(f"  .mean(1)   : {(h2.mean(1)[0] - v[0]).abs().max().item():.4f}   (paddin
 
 # %%
 # TODO-1d: write embed(tok, model, seqs, batch=128): TODO-1a to TODO-1c for a list of DNA strings,
-#          `batch` sequences at a time. For each batch seqs[i:i + batch]:
-#          1. tokenize it with padding=True, truncation=True, max_length=512, return_tensors="pt"
-#          2. run `model` as in TODO-1b and take the last layer
-#          3. masked_mean -> (batch, 256); bring it back with .cpu().numpy() and append it to a list
-#          Return np.concatenate of the list: shape (len(seqs), 256).
-#          Optional: run the model inside  with torch.autocast(DEVICE.type, dtype=torch.float16):
-#          it only makes it faster; convert the last layer with .float() before masked_mean.
+#          `batch` sequences at a time. Within a batch the short sequences are padded; sequences
+#          longer than 512 tokens are cut to 512. Return a numpy array with one row of 256 numbers
+#          per sequence, in the order of `seqs`.
 @torch.no_grad()
 def embed(tok, model, seqs, batch=128):
     # === Your code here ===
@@ -201,7 +185,7 @@ def embed(tok, model, seqs, batch=128):
 
 
 E = embed(tok, fm, S_train[:3])
-print("3 sequences ->", E.shape, "(want (3, 256))")
+print("3 sequences ->", E.shape)
 
 # %%
 #@title Test TODO-1 - run this cell, nothing to change { display-mode: "form" }
@@ -216,21 +200,20 @@ def test_embed():
     assert torch.allclose(got[0], want[0]), \
         f"masked_mean, a sequence with 4 real tokens: {got[0].tolist()}, want {want[0].tolist()}, the mean of its 4 vectors"
     assert torch.allclose(got[1], want[1]), \
-        (f"masked_mean, a sequence with 2 real tokens and 2 padding tokens: {got[1].tolist()}, want {want[1].tolist()}. "
-         "Multiply h by the mask, sum over the tokens and divide by the number of real tokens, m.sum(1)")
+        (f"masked_mean, a sequence with 2 real tokens and 2 padding tokens: {got[1].tolist()}, want {want[1].tolist()}, "
+         "the mean of its 2 real token vectors only")
     E = embed(tok, fm, S_train[:3])
-    assert isinstance(E, np.ndarray), f"embed returned a {type(E).__name__}, want a numpy array: use .cpu().numpy()"
+    assert isinstance(E, np.ndarray), f"embed returned a {type(E).__name__}, want a numpy array"
     assert E.shape == (3, 256), f"embed of 3 sequences has shape {E.shape}, want (3, 256)"
     assert np.isfinite(E).all(), "the vectors contain NaN or infinite values"
     short, long_ = min(S_train[:50], key=len), max(S_train[:50], key=len)
     alone, padded = embed(tok, fm, [short]), embed(tok, fm, [short, long_])[:1]
     assert np.allclose(alone, padded, atol=2e-2), \
         (f"a sequence gives a different vector alone and next to a longer one (largest difference "
-         f"{np.abs(alone - padded).max():.3f}), so the padding changes the average: average with masked_mean")
+         f"{np.abs(alone - padded).max():.3f}), so the padding changes the average: average over the real tokens only")
     E5, E5_in_2s = embed(tok, fm, S_train[:5]), embed(tok, fm, S_train[:5], batch=2)
     assert E5_in_2s.shape == (5, 256), \
         f"embed of 5 sequences with batch=2 has shape {E5_in_2s.shape}, want (5, 256): keep the vectors of every batch"
-    # (16-bit arithmetic changes the last digits with the batch, so the tolerance is 0.05 on numbers of size up to 10)
     assert np.allclose(E5, E5_in_2s, atol=5e-2), \
         f"embed gives different vectors with batch=2 and with batch=128 (largest difference {np.abs(E5 - E5_in_2s).max():.3f})"
     print("TODO-1 passed: masked_mean leaves out padding; embed gives shape (3, 256), the same vector alone "
@@ -241,7 +224,7 @@ test_embed()
 
 # %%
 #@title Stuck? Run this only if the test failed: it defines our masked_mean() and embed() { display-mode: "form" }
-# %include h_fm_embed.py
+# %include-body h_fm_embed.py
 
 
 def masked_mean(h, mask):
@@ -286,42 +269,38 @@ for j in (0, 1):
 # %% [markdown]
 # **Reading the map.** If one colouring changes smoothly across the cloud, that property accounts for
 # much of the variation between the vectors. Here it is the G+C fraction. It changes mostly along PCA
-# direction 2, the vertical axis (correlation about 0.81), and less along direction 1 (about 0.52);
-# the signs can flip between runs. Bound sequences concentrate at the low-G+C end of the map. Part 3
-# tests whether the probe uses this.
+# direction 2, the vertical axis (correlation about 0.81), and less along direction 1 (about 0.52).
+# Bound sequences concentrate at the low-G+C end of the map. Part 3 tests whether the probe uses this.
 #
 # ### TODO-2: A linear probe
 #
-# **Build** `probe_auc(E_train, y_train, E_test, y_test)`. It must **return a tuple `(auc, probe)`**:
-# the AUROC on the **test** set, and the fitted model. Inside:
+# **Build** `probe_auc(E_train, y_train, E_test, y_test)`: train a linear probe on the training
+# embeddings and measure it on the test embeddings. It returns two values, `(auc, probe)`: the AUROC on
+# the **test** set and the fitted probe. The probe has two steps:
 #
-# 1. standardise the features (`StandardScaler`: each of the 256 numbers is shifted and scaled to
-#    mean 0 and standard deviation 1 on the training set);
-# 2. fit `LogisticRegression(max_iter=3000, C=0.1)` on the **training** vectors. `C` sets the
-#    regularisation: a smaller `C` keeps the weights smaller (stronger regularisation), which guards
-#    against fitting noise in 12,000 sequences with 256 numbers each;
-# 3. `probe.predict_proba(E_test)[:, 1]` = probability of "bound" → `roc_auc_score(y_test, ...)`.
+# 1. **standardise** every one of the 256 numbers: shift and scale it to mean 0 and standard deviation 1,
+#    with the mean and standard deviation measured on the **training** set and reused unchanged on the
+#    test set;
+# 2. a **logistic regression** on the standardised numbers, with regularisation strength `C = 0.1` and
+#    up to 3,000 iterations. Regularisation keeps the weights small, which guards against fitting noise
+#    in 12,000 sequences with 256 numbers each (a smaller `C` means stronger regularisation).
 #
-# **Gotchas to tell your assistant:** fit on train, score on test (never score the sequences you fit
-# on); use `make_pipeline(StandardScaler(), LogisticRegression(...))` so the scaling learned on train
-# is reused on test; return both values.
-#
-# **Check:** the test AUROC should be **≈ 0.78**. If you get about 0.82, you probably scored the
-# training vectors: on the sequences it was fitted on, this probe scores about 0.82. The test cell
-# after the TODO checks both.
+# Fit on the training set only. The AUROC compares the probe's probability of "bound" for every test
+# sequence with the true test labels.
 
 # %%
-# TODO-2: the linear probe
-# === Your code here ===
+# TODO-2: the linear probe, as described above. Return (auc, probe).
 def probe_auc(E_train, y_train, E_test, y_test):
+    # === Your code here ===
     probe = make_pipeline(StandardScaler(), LogisticRegression(max_iter=3000, C=0.1))
     probe.fit(E_train, y_train)
     return roc_auc_score(y_test, probe.predict_proba(E_test)[:, 1]), probe
-# === End of your code ===
+    # === End of your code ===
+
 
 auc_fm, _ = probe_auc(E_train, y_train, E_test, y_test)
 results = {"Mistral-DNA (16M), pretrained": auc_fm}
-print(f"Mistral-DNA + linear probe: test AUROC = {auc_fm:.3f}   (want ≈ 0.78)")
+print(f"Mistral-DNA + linear probe: test AUROC = {auc_fm:.3f}")
 
 # %%
 #@title Test TODO-2 - run this cell, nothing to change { display-mode: "form" }
@@ -336,12 +315,12 @@ def test_probe():
     train_auc = roc_auc_score(y_train, probe.predict_proba(E_train)[:, 1])
     assert abs(auc - train_auc) > 1e-6, \
         (f"auc = {auc:.3f} is the AUROC on the training vectors, the ones the probe was fitted on. "
-         "Score the test vectors: roc_auc_score(y_test, probe.predict_proba(E_test)[:, 1])")
+         "Measure it on the test vectors")
     assert abs(auc - test_auc) < 1e-6, \
-        (f"auc = {auc:.3f}, but the returned probe scores {test_auc:.3f} on the test vectors. Use the probability "
-         "of 'bound', probe.predict_proba(E_test)[:, 1], against y_test")
+        (f"auc = {auc:.3f}, but the returned probe scores {test_auc:.3f} on the test vectors: auc must be the AUROC "
+         "of the probe's probability of 'bound' on the test vectors against y_test")
     assert 0.75 <= auc <= 0.81, \
-        f"test AUROC {auc:.3f}, want about 0.78 (0.75 to 0.81): check StandardScaler and LogisticRegression(max_iter=3000, C=0.1)"
+        f"test AUROC {auc:.3f}, want 0.75 to 0.81: check the standardisation and the regularisation strength C = 0.1"
     print(f"TODO-2 passed: test AUROC {auc:.3f} (on the training vectors the same probe scores {train_auc:.3f})")
 
 
@@ -349,7 +328,7 @@ test_probe()
 
 # %%
 #@title Stuck? Run this only if the test failed: it defines our probe_auc() { display-mode: "form" }
-# %include h_fm_probe.py
+# %include-body h_fm_probe.py
 auc_fm, _ = probe_auc(E_train, y_train, E_test, y_test)
 results = {"Mistral-DNA (16M), pretrained": auc_fm}
 print(f"reference probe: test AUROC = {auc_fm:.3f}")
@@ -406,7 +385,6 @@ for name, sub in (("pretrain_config.json", "models/Mixtral-8x7B-v0.1/config.json
 
 cfg = AutoConfig.from_pretrained(DATA_DIR / "pretrain_config.json")
 torch.manual_seed(SEED)
-# float32 weights; autocast does the half-precision maths
 scratch = AutoModelForCausalLM.from_config(cfg, attn_implementation="sdpa").float().to(DEVICE)
 print(f"fresh model: {sum(p.numel() for p in scratch.parameters()) / 1e6:.0f}M parameters, random weights")
 
@@ -419,11 +397,11 @@ print(f"{len(genome):,} pieces of genome, tokenized")
 
 
 def embed_checked(model, seqs):
-    """embed(), but replace any NaN or infinite numbers by 0 (float16 can overflow) and say so."""
+    """embed(), but replace any NaN or infinite numbers by 0 and say so."""
     E = embed(tok, model, seqs)
     bad = int((~np.isfinite(E)).any(1).sum())
     if bad:
-        print(f"WARNING: {bad:,} of {len(E):,} vectors contained NaN or infinite values (float16 overflow); "
+        print(f"WARNING: {bad:,} of {len(E):,} vectors contained NaN or infinite values; "
               "they were set to 0, so this probe score is less reliable")
     return np.nan_to_num(E, nan=0.0, posinf=0.0, neginf=0.0)
 
@@ -431,8 +409,6 @@ def embed_checked(model, seqs):
 auc_before, _ = probe_auc(embed_checked(scratch, S_train), y_train, embed_checked(scratch, S_test), y_test)
 print(f"AGO2 probe BEFORE pretraining: {auc_before:.3f}\n")
 
-# bfloat16 where the GPU supports it; otherwise float16, with a GradScaler so that small gradients do not round to 0
-print("half precision:", "float16 + GradScaler" if AMP_DTYPE == torch.float16 else "bfloat16")
 scaler = torch.amp.GradScaler(enabled=DEVICE.type == "cuda" and AMP_DTYPE == torch.float16)
 opt = torch.optim.AdamW(scratch.parameters(), lr=5e-4, weight_decay=0.01)
 losses, step, t0 = [], 0, time.time()

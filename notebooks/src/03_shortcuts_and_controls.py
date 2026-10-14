@@ -16,7 +16,7 @@
 #    and 5-letter word counts (TODO-2);
 # 2. run the shuffle test on the CNN and on the probe (TODO-3);
 # 3. select bound and unbound sequences with the same composition, then train and test every model
-#    again on them, including a fine-tuned language model (TODO-4).
+#    again on them, including a fine-tuned language model (TODO-4: its size, and your prediction).
 #
 #
 # | cell | what you do |
@@ -107,9 +107,7 @@ for k, v in table.items():
 # the test set (TODO-1c), with the probe function of part 2:
 #
 # - `probe_auc(F_train, y_train, F_test, y_test)` → **returns `(auc, probe)`**; it works on any
-#   feature matrix, not only embeddings.
-#
-# **Check:** `auc_gc` ≈ **0.66**.
+#   feature matrix (one row of numbers per sequence), not only embeddings.
 
 # %%
 #@title One sequence - run this cell, nothing to change { display-mode: "form" }
@@ -118,11 +116,8 @@ print("first 60 letters:", s[:60], "| length:", len(s), "| label:", y_train[0])
 print("letter counts:", {b: s.count(b) for b in "ACGU"})
 
 # %%
-# TODO-1a: write gc_u_one(seq): ONE sequence -> two numbers, (G+C fraction, U fraction).
-#          1. gc = the number of G letters plus the number of C letters, divided by the length of seq
-#             (seq.count("G") counts the G letters)
-#          2. u = the number of U letters, divided by the length of seq
-#          3. return gc, u
+# TODO-1a: write gc_u_one(seq): for ONE sequence, two numbers, in this order: the fraction of its
+#          letters that are G or C, and the fraction that are U.
 def gc_u_one(seq):
     # === Your code here ===
     gc = (seq.count("G") + seq.count("C")) / len(seq)
@@ -136,9 +131,8 @@ print("first 60 letters:", s[:60], "...")
 print(f"G+C fraction {gc:.3f} | U fraction {u:.3f}")
 
 # %%
-# TODO-1b: write gc_u(seqs): a list of N sequences -> a numpy array of shape (N, 2), where row i is
-#          gc_u_one(seqs[i]): column 0 = G+C fraction, column 1 = U fraction.
-#          np.array of a list of N pairs has exactly this shape.
+# TODO-1b: write gc_u(seqs): the two numbers for every sequence of a list, as a numpy array with one
+#          row per sequence and two columns (G+C fraction, U fraction).
 def gc_u(seqs):
     # === Your code here ===
     return np.array([gc_u_one(s) for s in seqs])
@@ -146,13 +140,13 @@ def gc_u(seqs):
 
 
 C3 = gc_u(S_train[:3])
-print("shape:", C3.shape, "(want (3, 2))")
+print("shape:", C3.shape, "(sequences, numbers)")
 for seq, row in zip(S_train[:3], C3):
     print(seq[:40], "... ->", np.round(row, 3))
 
 # %%
-# TODO-1c: the AUROC of a model that sees only these two numbers per sequence. Use probe_auc with the
-#          features gc_u(S_train) and gc_u(S_test); keep the AUROC as auc_gc.
+# TODO-1c: the test AUROC of a model that sees only these two numbers per sequence (trained on the
+#          training sequences, measured on the test sequences). Keep it as auc_gc.
 # === Your code here ===
 auc_gc, _ = probe_auc(gc_u(S_train), y_train, gc_u(S_test), y_test)
 # === End of your code ===
@@ -175,7 +169,7 @@ def test_gc_u():
             raise AssertionError(f"sequence {i}: column 0 is {C[i, 0]:.4f}, want the G+C fraction {gc:.4f}{hint}")
         assert np.isclose(C[i, 1], u), f"sequence {i}: column 1 is {C[i, 1]:.4f}, want the U fraction {u:.4f}"
     assert 0.63 <= auc_gc <= 0.69, \
-        f"auc_gc = {auc_gc:.3f}, want about 0.66: fit probe_auc on gc_u(S_train), y_train and score gc_u(S_test), y_test"
+        f"auc_gc = {auc_gc:.3f}, want 0.63 to 0.69: train on the two numbers of the training sequences, measure on the test sequences"
     print(f"TODO-1 passed: gc_u matches the reference on 500 sequences; auc_gc = {auc_gc:.3f}")
 
 
@@ -226,9 +220,8 @@ plt.tight_layout(); plt.show()
 # You first count the words of one short sequence yourself and compare your counts with
 # `kmer_counts` (TODO-2a). Then you fit the model on the counts of all sequences (TODO-2b).
 #
-# **Tools:** `kmer_counts(seqs, k=5)` → array `(len(seqs), 1024)`, then `probe_auc` as above.
-#
-# **Check:** `auc_k5` ≈ **0.74**.
+# **Tools:** `kmer_counts(seqs, k=5)` → an array with one row of 1,024 numbers per sequence, and
+# `probe_auc` as above.
 
 # %%
 #@title The 1,024 words and one short sequence - run this cell, nothing to change { display-mode: "form" }
@@ -239,10 +232,8 @@ print(len(WORDS5), "words:", WORDS5[:3], "...", WORDS5[-2:])
 print(f"the shortest training sequence, {len(s)} letters:\n{s}")
 
 # %%
-# TODO-2a: write count_words(seq, k=5): how often each k-letter word occurs in seq, as a Counter.
-#          1. the windows of seq are seq[i:i + k] for i = 0, 1, ..., len(seq) - k; they overlap, and a
-#             sequence of length L has L - k + 1 of them
-#          2. Counter(windows) counts how often each different word occurs
+# TODO-2a: write count_words(seq, k=5): how often each k-letter word occurs in seq, counting every
+#          window of k neighbouring letters (the windows overlap), as a Counter: word -> count.
 from collections import Counter
 
 
@@ -262,9 +253,8 @@ for w, n in counts.most_common(6):
     print(f"{w}   {n:10d}   {n / total:9.4f}   {row[WORDS5.index(w)]:11.4f}")
 
 # %%
-# TODO-2b: the AUROC of a linear model on the 5-letter word counts of all sequences:
-#          K_train, K_test = kmer_counts(S_train, 5), kmer_counts(S_test, 5), then probe_auc as in
-#          TODO-1c. Keep the AUROC as auc_k5.
+# TODO-2b: the test AUROC of a linear model on the 5-letter word counts of the sequences (the tools
+#          above, trained and measured as in TODO-1c). Keep it as auc_k5.
 # === Your code here ===
 K_train, K_test = kmer_counts(S_train, 5), kmer_counts(S_test, 5)
 auc_k5, _ = probe_auc(K_train, y_train, K_test, y_test)
@@ -288,7 +278,7 @@ def test_words():
                 (f"sequence {n}, word {w}: your count is {c.get(w, 0)}, kmer_counts gives "
                  f"{K[n, j]:.4f} of {total} windows = {K[n, j] * total:.0f}")
     assert 0.71 <= auc_k5 <= 0.77, \
-        f"auc_k5 = {auc_k5:.3f}, want about 0.74: fit probe_auc on kmer_counts(S_train, 5), y_train and score kmer_counts(S_test, 5), y_test"
+        f"auc_k5 = {auc_k5:.3f}, want 0.71 to 0.77: train on the word counts of the training sequences, measure on the test sequences"
     print(f"TODO-2 passed: your word counts match kmer_counts on 50 sequences; auc_k5 = {auc_k5:.3f}")
 
 
@@ -312,13 +302,13 @@ test_words()
 # score these shuffled "bound" sequences against the real unbound ones.
 #
 # The shuffled sequences keep their composition, so they still differ from the unbound ones in the
-# way TODO-1 measured. A model can therefore score about 0.66 on them from composition alone, and the
-# AUROC has no reason to fall all the way to 0.5.
+# way TODO-1 measured. A model can therefore still separate them from composition alone, about as well
+# as your two-number model (`auc_gc`), and the AUROC has no reason to fall all the way to 0.5.
 #
 # * A model that uses only composition (letters and letter pairs) scores about the same before and
 #   after the shuffle.
 # * A model that also uses letter order beyond neighbouring pairs, such as motifs, loses that part,
-#   and its AUROC drops towards the composition score (≈ 0.66).
+#   and its AUROC drops towards the composition score `auc_gc`.
 # * The shuffle also moves a binding site out of letters 150–190. The CNN weights that region (part
 #   1), so for the CNN the drop mixes letter order and position.
 #
@@ -330,17 +320,16 @@ s_shuf = dinuc_shuffle(s, np.random.default_rng(1))
 print("original:", s[:60], "...")
 print("shuffled:", s_shuf[:60], "...")
 
-# TODO-3a: check what the shuffle kept.
-#          1. write pair_counts(seq): a Counter of the len(seq) - 1 neighbouring letter pairs seq[i:i + 2]
-#             (the same as count_words(seq, 2) from TODO-2a)
+# TODO-3a: check what the shuffle kept. First write pair_counts(seq): how often each pair of
+#          neighbouring letters occurs in seq, as a Counter.
 def pair_counts(seq):
     # === Your code here ===
     return Counter(seq[i:i + 2] for i in range(len(seq) - 1))
     # === End of your code ===
 
 
-#          2. same_pairs = whether pair_counts(s) and pair_counts(s_shuf) are equal (== compares two Counters)
-#          3. same_sequence = whether s and s_shuf are equal
+# TODO-3a, continued: `same_pairs` is True if s and s_shuf have the same pair counts, and
+#          `same_sequence` is True if they are the same sequence.
 # === Your code here ===
 same_pairs = pair_counts(s) == pair_counts(s_shuf)
 same_sequence = s == s_shuf
@@ -349,7 +338,7 @@ pc, ps = pair_counts(s), pair_counts(s_shuf)
 print("\nthe 16 letter-pair counts, original / shuffled:")
 for a in "ACGU":
     print("   ".join(f"{a + b}: {pc[a + b]:3d} / {ps[a + b]:3d}" for b in "ACGU"))
-print("\nsame 16 pair counts:", same_pairs, "(want True) | same sequence:", same_sequence, "(want False)")
+print("\nsame 16 pair counts:", same_pairs, "| same sequence:", same_sequence)
 
 # %%
 #@title Make the shuffled sequences - run this cell { display-mode: "form" }
@@ -365,17 +354,16 @@ y_shuf = np.array([1] * len(shuffled) + [0] * len(unbound))
 # %% [markdown]
 # ### TODO-3b: Run the shuffle test on both models
 #
-# Compute two AUROCs, both against `y_shuf` (1 for the shuffled bound sequences, 0 for the real
-# unbound ones), for the list `shuffled + unbound`:
+# Compute two AUROCs for the list `shuffled + unbound`, both against `y_shuf` (1 for the shuffled bound
+# sequences, 0 for the real unbound ones):
 #
-# * **CNN** → `auc_shuf_cnn`: `score_sequences(cnn, seqs)` gives one probability per sequence.
-# * **Language model** → `auc_shuf_fm`: `embed(tok, fm, dna_seqs)` gives the vectors (the model
-#   expects T, not U: convert each sequence with `to_dna` first), then `probe.predict_proba(vectors)[:, 1]`.
+# * **CNN** → `auc_shuf_cnn`, from the CNN's probability of "bound" for each sequence.
+# * **Language model** → `auc_shuf_fm`, from the probability of "bound" of the probe of part 2 on the
+#   embeddings of the sequences. The language model reads DNA, so U becomes T first (`to_dna`).
 #
-# **Gotchas to tell your assistant:** use the `probe` that was already fitted on the real training
-# vectors; do **not** fit a new one on shuffled data (that would answer a different question).
-#
-# **Check:** CNN ≈ **0.66**, language model ≈ **0.77**.
+# The models are the ones already trained on real sequences: `cnn`, and `probe` on top of the frozen
+# language model. Do **not** train anything on the shuffled sequences; the question is how the trained
+# models respond to them.
 
 # %%
 # TODO-3b: shuffle-test AUROC for the CNN and for Mistral-DNA + probe
@@ -402,10 +390,10 @@ def test_shuffle_test():
     assert abs(auc_shuf_cnn - ref) < 1e-6, \
         (f"auc_shuf_cnn = {auc_shuf_cnn:.3f}, but the CNN scores {ref:.3f} on shuffled + unbound against y_shuf. "
          "Score the list shuffled + unbound in this order, and keep the unbound sequences unshuffled")
-    assert abs(auc_shuf_cnn - 0.66) <= 0.03, f"auc_shuf_cnn = {auc_shuf_cnn:.3f}, want about 0.66 (0.63 to 0.69)"
-    assert abs(auc_shuf_fm - 0.77) <= 0.03, \
-        (f"auc_shuf_fm = {auc_shuf_fm:.3f}, want about 0.77 (0.74 to 0.80): embed to_dna(s) for s in "
-         "shuffled + unbound, and score them with the probe fitted on the real training vectors")
+    ref_fm = roc_auc_score(y_shuf, probe.predict_proba(embed(tok, fm, [to_dna(q) for q in shuffled + unbound]))[:, 1])
+    assert abs(auc_shuf_fm - ref_fm) < 2e-3, \
+        (f"auc_shuf_fm = {auc_shuf_fm:.3f}, but the probe of part 2 scores {ref_fm:.3f} on shuffled + unbound "
+         "against y_shuf. Use the embeddings of these sequences as DNA and the probe already trained on real sequences")
     print(f"TODO-3 passed: the shuffle keeps the letter pairs; CNN {auc_shuf_cnn:.3f}, "
           f"Mistral-DNA + probe {auc_shuf_fm:.3f}, with the unbound sequences unshuffled")
 
@@ -454,8 +442,8 @@ _ = (DATA_DIR / "my_part3_shuffle_results.json").write_text(json.dumps(results, 
 #
 # 1. How much of each model's score can two numbers reproduce?
 # 2. Which model was least affected by the shuffle? Compare its shuffled score with the composition
-#    score (≈ 0.66). What does that suggest it relies on?
-# 3. Two numbers (G+C and U) already reach about 0.66. The unbound sequences are random positions in
+#    score `auc_gc`. What does that suggest it relies on?
+# 3. Two numbers (G+C and U) already separate the classes. The unbound sequences are random positions in
 #    the same genes as the binding sites. Which part of the composition difference could be biology
 #    (AGO2 binds mostly in A/U-rich 3′UTRs), and which part could come from how the unbound positions
 #    were drawn?
@@ -491,8 +479,7 @@ _ = (DATA_DIR / "my_part3_shuffle_results.json").write_text(json.dumps(results, 
 # **original-negatives test set** and the **matched test set**. Both come from the training file, so
 # they differ from the 1,000-sequence held-out test set used in parts 1 and 2 and in sections 1 to 3. The
 # models also train differently here (the CNN for 6 epochs on about 65,000 sequences), so the
-# "original" numbers below differ slightly from sections 1 to 3 (for example the CNN 0.84 here, 0.86
-# there).
+# "original" numbers below differ slightly from those of sections 1 to 3.
 
 # %%
 #@title Build the two benchmarks - run this cell, nothing to change { display-mode: "form" }
@@ -557,9 +544,6 @@ plt.tight_layout(); plt.show()
 # | `auc_fm` | `embed(tok, fm, [to_dna(s) for s in tr])`, same for `test_seqs` |
 #
 # The function is called twice, once per benchmark, so it uses only its arguments and `tok`, `fm`.
-#
-# **Expected:** on `matched`, the 2-number model is close to **0.5** (≈ 0.51). In table order: 0.64,
-# 0.76, 0.81 on `original` and 0.51, 0.73, 0.77 on `matched`.
 
 # %%
 #@title Three simple models on both benchmarks - run this cell, nothing to change { display-mode: "form" }
@@ -609,21 +593,14 @@ for name in BENCH:
 # ## 6. Fine-tuning with LoRA (TODO-4)
 #
 # So far the language model was **frozen**: we only trained a linear probe on top. **Fine-tuning**
-# also updates the model's own weights for the AGO2 task. A 16M-parameter model like Mistral-DNA could
-# be fully fine-tuned on a T4. Models of 500M parameters and more are usually adapted with **LoRA**
-# (low-rank adaptation), so we practise it here. The original weights stay fixed, and each attention
-# projection matrix gets a trainable low-rank correction. These corrections, plus a new output layer,
-# are about 1.6% of the parameters.
+# also updates the model's own weights for the AGO2 task. Large models are usually adapted with **LoRA**
+# (low-rank adaptation), so we practise it here on Mistral-DNA. LoRA keeps every adapted weight matrix
+# $W$ fixed and learns a small correction added to it: $W x$ becomes $(W + BA)\,x$. $B$ and $A$ are thin
+# matrices with a small inner size $r$ (the *rank*); only they, and a new output layer, are trained.
 #
 # We train on the **matched** benchmark, 2 epochs over 20,000 labelled sequences (the frozen probe used
-# 12,000), and test on the matched test set. Write TODO-4, run its test (one batch on a fresh model),
-# then start the training cell and read on while it trains.
-#
-# The setup cell defines what TODO-4 needs: `make_lora()`, which returns a fresh model with LoRA
-# add-ons (`clf`), its optimizer (`opt`) and a gradient scaler (`scaler`); `crit` (the loss); and
-# `batch_logits(list_of_dna_strings)` → one raw score per sequence. On a GPU without bfloat16 the model
-# runs in float16, and the `scaler` multiplies the loss before `backward()` so that small gradients do not
-# round to 0. With bfloat16 (Colab's T4 included) the scaler does nothing, but the code is the same.
+# 12,000), and test on the matched test set. The training step is the one of part 1, and it is given.
+# Before training, you work out how small LoRA's correction is (TODO-4a) and predict the result (TODO-4b).
 
 # %%
 #@title Set up LoRA - run this cell, nothing to change { display-mode: "form" }
@@ -638,7 +615,7 @@ def make_lora():
     """A fresh Mistral-DNA (16M) with LoRA add-ons, its optimizer, and a gradient scaler."""
     torch.manual_seed(SEED)
     model = AutoModelForSequenceClassification.from_pretrained(FM_REPO, num_labels=1, trust_remote_code=True)
-    model = model.float()   # train in float32; autocast runs the forward pass in half precision
+    model = model.float()
     model.config.pad_token_id = tok.pad_token_id
     model = get_peft_model(model, LoraConfig(r=16, lora_alpha=16, lora_dropout=0.05, bias="none", task_type="SEQ_CLS",
                                              target_modules=["q_proj", "k_proj", "v_proj", "o_proj"])).to(DEVICE)
@@ -648,10 +625,6 @@ def make_lora():
 
 
 clf, opt, scaler = make_lora()
-n_train = sum(p.numel() for p in clf.parameters() if p.requires_grad)
-n_all = sum(p.numel() for p in clf.parameters())
-print(f"training {n_train / 1e3:.0f}k of {n_all / 1e6:.1f}M parameters ({n_train / n_all:.1%})")
-print("half precision:", "float16 + GradScaler" if AMP_DTYPE == torch.float16 else "bfloat16")
 crit = nn.BCEWithLogitsLoss()
 LORA_EPOCHS, LORA_N = 2, 20000
 M_tr, my_tr, M_te, my_te = BENCH["matched"]
@@ -671,60 +644,67 @@ def lora_auc():
     clf.train()
     return roc_auc_score(my_te, s)
 
-# %%
+
 def lora_step(seqs, y):
-    """One training step of clf on one batch: seqs = a list of DNA strings, y = their labels. Returns the loss."""
-    # TODO-4: one training step, the four lines of part 1's train(), with backward and step going
-    #         through `scaler` (needed when the GPU runs in float16):
-    #             loss = crit(batch_logits(seqs), y)
-    #             opt.zero_grad()
-    #             scaler.scale(loss).backward()
-    #             scaler.step(opt); scaler.update()
-    # === Your code here ===
+    """One training step of clf on one batch (the training step of part 1). Returns the loss."""
     loss = crit(batch_logits(seqs), y)
     opt.zero_grad()
     scaler.scale(loss).backward()
     scaler.step(opt)
     scaler.update()
-    # === End of your code ===
     return loss
 
+
+R = 16                                   # the rank r of B and A
+W = {n.split(".")[-3]: tuple(p.shape) for n, p in clf.named_parameters()
+     if ".layers.0." in n and n.endswith("base_layer.weight")}
+n_layers = len({n.split(".layers.")[1].split(".")[0] for n, _ in clf.named_parameters() if ".layers." in n})
+print(f"LoRA adapts {len(W)} matrices W in each of the {n_layers} layers; rank r = {R}")
+for name, shape in W.items():
+    print(f"  {name}: W has {shape[0]} rows and {shape[1]} columns")
+
 # %%
-#@title Test TODO-4 - run this cell, nothing to change { display-mode: "form" }
-def test_lora_step():
-    """One batch of 32 through a fresh make_lora() model with lora_step; the model in clf is left as it was."""
-    global clf, opt, scaler
-    saved = clf, opt, scaler
-    try:
-        clf, opt, scaler = make_lora()
-        clf.train()
-        lora = {n: p for n, p in clf.named_parameters() if p.requires_grad and "lora_" in n}
-        before = {n: p.detach().clone() for n, p in lora.items()}
-        for attempt in range(5):   # in float16 the scaler may skip a first step; then try the next batch
-            for p in clf.parameters():
-                if p.requires_grad:
-                    p.grad = torch.full_like(p, 1e6)   # left-over gradients of an earlier step: they must be cleared
-            b = np.arange(32 * attempt, 32 * attempt + 32)
-            scale = scaler.get_scale()
-            loss = lora_step([D_tr[j] for j in b], torch.tensor(ytr[b], dtype=torch.float32, device=DEVICE))
-            if not scaler.is_enabled() or scaler.get_scale() >= scale:
-                break
-        assert torch.is_tensor(loss) and loss.numel() == 1, \
-            f"lora_step returned a {type(loss).__name__}, want the loss: a tensor with one number"
-        assert torch.isfinite(loss).item(), f"the loss is {loss.item()}, want a finite number"
-        changed = [n for n in lora if not torch.equal(lora[n].detach(), before[n])]
-        assert changed, ("no LoRA weight changed after one step: compute the gradients with "
-                         "scaler.scale(loss).backward() after opt.zero_grad(), then call scaler.step(opt) and scaler.update()")
-        stale = [n for n in lora if lora[n].grad is not None and lora[n].grad.abs().mean().item() > 1.0]
-        assert not stale, ("the gradients of an earlier step were still there when the weights moved: "
-                           "call opt.zero_grad() before scaler.scale(loss).backward()")
-        print(f"TODO-4 passed: one batch of 32 on a fresh LoRA model, loss {loss.item():.3f}, "
-              f"{len(changed)} of {len(lora)} LoRA weight matrices changed")
-    finally:
-        clf, opt, scaler = saved
+# TODO-4a: LoRA adds B·A to each of these matrices W. B has as many rows as W and r columns; A has r
+#          rows and as many columns as W. Compute n_lora, the number of trainable numbers in all B and A
+#          matrices of the model, and n_W, the number of numbers in the same matrices W, which stay fixed.
+# === Your code here ===
+n_lora = n_layers * sum(R * (rows + cols) for rows, cols in W.values())
+n_W = n_layers * sum(rows * cols for rows, cols in W.values())
+# === End of your code ===
+print(f"LoRA trains {n_lora:,} numbers to adapt {n_W:,} fixed ones ({n_lora / n_W:.1%})")
+
+# %%
+#@title Test TODO-4a - run this cell, nothing to change { display-mode: "form" }
+def test_lora_count():
+    real = sum(p.numel() for n, p in clf.named_parameters() if "lora_" in n)
+    real_W = sum(p.numel() for n, p in clf.named_parameters() if n.endswith("base_layer.weight"))
+    assert n_W == real_W, f"n_W = {n_W:,}, want {real_W:,}: the numbers in all adapted matrices W (rows x columns), in every layer"
+    assert n_lora == real, \
+        (f"n_lora = {n_lora:,}, the model has {real:,}: for a W with m rows and n columns, B has m x r numbers "
+         f"and A has r x n, in every adapted matrix of every layer")
+    n_all = sum(p.numel() for p in clf.parameters())
+    print(f"TODO-4a passed: {real:,} LoRA numbers; with the new output layer the model trains "
+          f"{sum(p.numel() for p in clf.parameters() if p.requires_grad):,} of its {n_all:,} parameters")
 
 
-test_lora_step()
+test_lora_count()
+
+# %%
+#@title Stuck? Run this only if the test failed: it computes both counts for you { display-mode: "form" }
+n_lora = n_layers * sum(R * (rows + cols) for rows, cols in W.values())
+n_W = n_layers * sum(rows * cols for rows, cols in W.values())
+test_lora_count()
+
+# %%
+#@title The models so far on the matched test set - run this cell { display-mode: "form" }
+for k in ("Mistral-DNA + probe (frozen)", "CNN (part 1 architecture)"):
+    print(f"{k:32s} matched test AUROC {scores['matched'][k]:.3f}")
+
+# %%
+# TODO-4b: before training, write your prediction: will the fine-tuned Mistral-DNA score higher or lower
+#          than the frozen probe and than the CNN on the matched test set, and why? (Free text; the
+#          training cell prints it next to the result.)
+MY_PREDICTION = ""
 
 # %%
 #@title Train with LoRA - run this cell, nothing to change { display-mode: "form" }
@@ -742,32 +722,9 @@ for epoch in range(LORA_EPOCHS):
     print(f"--> after epoch {epoch + 1}: matched test AUROC {lora_auc():.3f}")
 scores["matched"]["Mistral-DNA, LoRA fine-tuned"] = lora_auc()
 print()
-print(f"LoRA fine-tuned: {scores['matched']['Mistral-DNA, LoRA fine-tuned']:.3f}  vs frozen + probe: "
-      f"{scores['matched']['Mistral-DNA + probe (frozen)']:.3f}   ({time.time() - t0:.0f}s)   (want ≈ 0.81)")
-
-# %%
-#@title Stuck? Run this only if the test or the training failed: it trains a fresh LoRA model for you { display-mode: "form" }
-def lora_step(seqs, y):
-    loss = crit(batch_logits(seqs), y)
-    opt.zero_grad()
-    scaler.scale(loss).backward()
-    scaler.step(opt)
-    scaler.update()
-    return loss
-
-
-test_lora_step()
-clf, opt, scaler = make_lora()
-t0 = time.time()
-clf.train()
-for epoch in range(LORA_EPOCHS):
-    order = np.random.default_rng(epoch).permutation(len(D_tr))
-    for i in range(0, len(order), 32):
-        b = order[i:i + 32]
-        loss = lora_step([D_tr[j] for j in b], torch.tensor(ytr[b], dtype=torch.float32, device=DEVICE))
-    print(f"--> after epoch {epoch + 1}: matched test AUROC {lora_auc():.3f}")
-scores["matched"]["Mistral-DNA, LoRA fine-tuned"] = lora_auc()
-print(f"LoRA fine-tuned: {scores['matched']['Mistral-DNA, LoRA fine-tuned']:.3f}  ({time.time() - t0:.0f}s)")
+print(f"LoRA fine-tuned: {scores['matched']['Mistral-DNA, LoRA fine-tuned']:.3f} | frozen + probe: "
+      f"{scores['matched']['Mistral-DNA + probe (frozen)']:.3f} | CNN: {scores['matched']['CNN (part 1 architecture)']:.3f}")
+print("your prediction:", MY_PREDICTION or "(none written)")
 
 # %% [markdown]
 # ## 7. Before and after the control
@@ -792,9 +749,8 @@ _ = (DATA_DIR / "my_part3_matched_results.json").write_text(json.dumps(scores, i
 # %% [markdown]
 # ## 8. Pretraining and the number of labels (optional)
 #
-# The table above compares models trained on different numbers of labels. At equal numbers the CNN
-# still scores higher. With 12,000 labels on matched data it reaches about 0.82, against 0.77 for the
-# frozen probe. A lab studying a new question often has fewer labels than that.
+# The table above compares models trained on different numbers of labels: about 65,000 for the CNN,
+# 20,000 for LoRA and 12,000 for the others. A lab studying a new question often has fewer labels.
 #
 # The next cell compares both approaches trained on 100 to 12,000 labelled sequences (matched
 # benchmark, matched test set). The light grey dashed line is the same language model with **random
