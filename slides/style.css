@@ -95,13 +95,13 @@
 .reveal .goals ul { font-size: 1.05em; }
 .reveal .goals ul li { padding-bottom: 0.3em; }
 .reveal .columns.vcenter { display: flex; align-items: center; }
-.reveal table.agenda { width: 100%; font-size: 0.78em; border-collapse: collapse; margin-top: 0.4em; }
+.reveal table.agenda { width: 100%; font-size: 0.86em; border-collapse: collapse; margin-top: 0.4em; }
 .reveal table.agenda th { color: var(--muted); font-weight: 500; text-align: left; border-bottom: 2px solid #DADCE0; padding: 0.35em 0.5em; }
-.reveal table.agenda td { padding: 0.55em 0.5em; border-bottom: 1px solid #F1F3F4; vertical-align: middle; }
+.reveal table.agenda td { padding: 0.62em 0.5em; border-bottom: 1px solid #F1F3F4; vertical-align: middle; }
 .reveal table.agenda td:first-child { font-weight: 600; white-space: nowrap; }
 .reveal table.agenda .tut { color: #1A73E8; font-weight: 600; }
 .reveal table.agenda .hands { color: #1E8E3E; font-weight: 600; }
-.reveal table.agenda tr.brk td { background: #FEEFC3; color: #B06000; font-weight: 500; padding: 0.35em 0.5em; }
+.reveal table.agenda tr.brk td { background: #FEEFC3; color: #B06000; font-weight: 500; padding: 0.45em 0.5em; }
 .reveal table.agenda code { font-size: 0.85em; }
 /* As in the Triplexis seminar: reveal ships `.reveal img{max-width:95%}`, which quietly draws every figure
    smaller than the height we set. Heights are fitted to each slide (scripts/fit_measured.py), so drop the clamp. */

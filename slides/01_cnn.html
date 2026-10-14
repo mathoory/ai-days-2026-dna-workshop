@@ -142,7 +142,7 @@
 <li><a href="#/the-task" id="/toc-the-task">1 The task</a></li>
 <li><a href="#/learning-from-examples" id="/toc-learning-from-examples">2 Learning from examples</a></li>
 <li><a href="#/testing-a-model" id="/toc-testing-a-model">3 Testing a model</a></li>
-<li><a href="#/the-cnn" id="/toc-the-cnn">4 The CNN</a></li>
+<li><a href="#/the-convolutional-neural-network-cnn" id="/toc-the-convolutional-neural-network-cnn">4 The convolutional neural network (CNN)</a></li>
 <li><a href="#/look-inside" id="/toc-look-inside">5 Look inside</a></li>
 </ul>
 </nav>
@@ -363,8 +363,8 @@
 <section id="rna-and-ago2" class="slide level2">
 <h2>1.1 RNA and AGO2</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/bio_flow_base.png" height="491"></p>
-<p><img data-src="assets/custom/bio_flow_ago2.png" class="fragment" height="491"></p>
+<p><img data-src="assets/custom/bio_flow_base.png" height="682"></p>
+<p><img data-src="assets/custom/bio_flow_ago2.png" class="fragment" height="682"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -646,17 +646,22 @@
 </section>
 <section id="the-loss" class="slide level2">
 <h2>2.8 The loss</h2>
-<ul>
-<li><strong>Binary cross-entropy</strong>: <span class="math inline">\(\;\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#1A73E8}{y_i \log \hat p_i} + \color{#E8710A}{(1 - y_i)\log(1 - \hat p_i)} \,\big]\)</span></li>
-</ul>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/bce_curve.png" class="quarto-figure quarto-figure-center" height="650"></p>
-</figure>
+<p><strong>Binary cross-entropy</strong></p>
+<div class="r-stack">
+<div class="fragment fade-out" data-fragment-index="1">
+<p><span class="math inline">\(\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#1A73E8}{y_i \log \hat p_i} + \color{#BDC1C6}{(1 - y_i)\log(1 - \hat p_i)} \,\big]\)</span></p>
+</div>
+<div class="fragment" data-fragment-index="1">
+<p><span class="math inline">\(\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} + \color{#E8710A}{(1 - y_i)\log(1 - \hat p_i)} \,\big]\)</span></p>
+</div>
+</div>
+<div class="r-stack">
+<p><img data-src="assets/custom/bce_curve_0.png" height="594"></p>
+<p><img data-src="assets/custom/bce_curve_1.png" class="fragment" data-fragment-index="1" height="594"></p>
 </div>
 <aside class="notes">
 <ul>
-<li>One example’s contribution to the loss, against the predicted probability. Blue: a bound example, <span class="math inline">\(-\log \hat p\)</span>, the blue term of the formula. Orange: an unbound example, <span class="math inline">\(-\log(1 - \hat p)\)</span>, the orange term.</li>
+<li>One example’s contribution to the loss, against the predicted probability. First a bound example, <span class="math inline">\(-\log \hat p\)</span>, the blue term of the formula. Click: an unbound example, <span class="math inline">\(-\log(1 - \hat p)\)</span>, the orange term.</li>
 <li>A confident correct prediction costs almost nothing; a confident wrong one costs a lot (<span class="math inline">\(-\log 0.01 = 4.6\)</span>).</li>
 <li>On slide 2.5: predicting 0.90 for a bound sequence gives a loss of 0.10; predicting 0.35 gives 1.04.</li>
 <li>Predicting 0.5 for everything gives <span class="math inline">\(\ln 2 = 0.69\)</span>, the loss of a coin flip.</li>
@@ -735,6 +740,7 @@
 <p><img data-src="assets/custom/lr_training_1.png" class="fragment" height="572"></p>
 <p><img data-src="assets/custom/lr_training_2.png" class="fragment" height="572"></p>
 <p><img data-src="assets/custom/lr_training_3.png" class="fragment" height="572"></p>
+<p><img data-src="assets/custom/lr_training_4.png" class="fragment" height="572"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -817,11 +823,10 @@
 <h2>2.14 From logistic regression to a neural network</h2>
 <ul>
 <li>A <strong>neural network</strong> stacks layers of units, with <strong>ReLU</strong> between them</li>
-<li>A <strong>convolutional neural network (CNN)</strong>: its first layer slides small filters along the sequence (section 4)</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/nn_diagram.png" class="quarto-figure quarto-figure-center" height="540"></p>
+<p><img data-src="assets/custom/nn_diagram.png" class="quarto-figure quarto-figure-center" height="609"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -853,7 +858,12 @@
 <h2>3.1 Train, validate, test</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/data_split.png" class="quarto-figure quarto-figure-center" height="299"></p>
+<p><img data-src="assets/custom/data_split.png" class="quarto-figure quarto-figure-center" height="205"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/overfit_curve.png" class="fragment quarto-figure quarto-figure-center" height="520"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -863,28 +873,7 @@
 <li>Never grade a model on the data it was trained on.</li>
 <li>The notebook prints the held-out AUROC after every epoch, so we do look at the test set during training. That is acceptable for a workshop as long as nobody picks the best epoch by it; in a real project that is the validation set’s job.</li>
 <li>The split is random by sequence. We checked for near-duplicates: 47% of held-out bound sequences have a training sequence within 150 letters on the genome (13% of unbound). On the 698 held-out sequences without one, the CNN scores 0.85 instead of 0.86, so the effect on our results is small. Real projects split by gene or chromosome.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="why-not-the-training-loss" class="slide level2">
-<h2>3.2 Why not the training loss?</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/overfit_curve.png" class="quarto-figure quarto-figure-center" height="766"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
+<li>Click: why not the training loss?</li>
 <li>A larger CNN (about 230,000 weights) trained on only 1,000 sequences, so the effect is easy to see. Loss after every epoch on its training sequences (blue) and on the 1,000 held-out sequences (orange).</li>
 <li>The training loss keeps falling, to almost 0: the model memorises its 1,000 examples.</li>
 <li>The held-out loss falls until epoch 18, then rises: from there on, what the model learns about its training examples does not carry over to new sequences.</li>
@@ -903,7 +892,7 @@
       }</style></aside>
 </section>
 <section id="drawing-the-roc-curve" class="slide level2">
-<h2>3.3 Drawing the ROC curve</h2>
+<h2>3.2 Drawing the ROC curve</h2>
 <p>The scores of our convolutional neural network (CNN, section 4) on the 1,000 held-out sequences</p>
 <div class="r-stack">
 <p><img data-src="assets/custom/roc_frame_0.png" height="626"></p>
@@ -931,20 +920,15 @@
       }</style></aside>
 </section>
 <section id="auroc" class="slide level2">
-<h2>3.4 AUROC</h2>
-<div class="columns">
-<div class="column" style="width:38%;">
-<ul>
-<li class="fragment">All thresholds together give the <strong>ROC curve</strong> (receiver operating characteristic)</li>
-<li class="fragment"><strong>AUROC</strong> (area under the ROC curve): the probability that a random bound sequence scores higher than a random unbound one</li>
-<li class="fragment">0.5 is chance, 1.0 is perfect</li>
-<li class="fragment">It scores the ranking we care about, on sequences the model has not seen</li>
-</ul>
-</div><div class="column" style="width:62%;">
-<p><img data-src="assets/custom/roc_frame_3.png" style="width:100.0%"></p>
-</div></div>
+<h2>3.3 AUROC</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/roc_frame_3.png" class="quarto-figure quarto-figure-center" height="757"></p>
+</figure>
+</div>
 <aside class="notes">
 <ul>
+<li>All thresholds together give the ROC curve (receiver operating characteristic). AUROC is the area under it: the probability that a random bound sequence scores higher than a random unbound one. 0.5 is chance, 1.0 is perfect.</li>
 <li>Every threshold from 1 down to 0 adds a point; joined, they give the curve. The dashed diagonal is a model that ranks at random.</li>
 <li>The area is 0.86 for our CNN: pick one bound and one unbound held-out sequence at random, and 86% of the time the bound one gets the higher score.</li>
 <li>It does not depend on one threshold, so it compares models fairly. It says nothing about why a model scores well.</li>
@@ -962,41 +946,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="overfitting" class="slide level2">
-<h2>3.5 Overfitting</h2>
-<ul>
-<li>A model that scores much higher on its training data than on held-out data has <strong>overfit</strong>: it memorised its training examples. Report the held-out score</li>
-<li>Below: logistic regression on how often each 5-letter word occurs in a sequence (1,024 features; more in part 3). <strong>Regularised</strong>: large weights are penalised, which limits memorising</li>
-</ul>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/probe_trap.png" class="quarto-figure quarto-figure-center" height="440"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>The same model, logistic regression on 5-letter word counts, scored two ways. Blue bars: AUROC on its own training sequences. Orange bars: AUROC on the 1,000 held-out sequences.</li>
-<li>Left: 12,000 training sequences with regularisation. 0.82 on its own training data, 0.74 held out. A small gap is normal.</li>
-<li>Right: 600 sequences and almost no regularisation. 1.00 on its training data, 0.67 held out.</li>
-<li>Underfitting is the opposite: a model too simple for the pattern scores low on both its training data and held-out data.</li>
-<li>Regularisation penalises large weights, which limits how closely a model can fit its training data.</li>
-<li>In any evaluation code, including code an AI assistant wrote, check first which data the score was computed on.</li>
-</ul>
-<p>Next: build the CNN.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="the-cnn" class="title-slide slide level1 center" data-name="CNN">
-<h1>4 The CNN</h1>
+<section id="the-convolutional-neural-network-cnn" class="title-slide slide level1 center" data-name="CNN">
+<h1>4 The convolutional neural network (CNN)</h1>
 
 </section>
 

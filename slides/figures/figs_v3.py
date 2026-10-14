@@ -103,19 +103,19 @@ def agenda():
 
 # ------------------------------------------------------------------ 1.6: biology in two clicks
 def bio_flow(with_ago2):
-    fig, ax = canvas(16, 6.2, ylim=(0, 62))
-    xs = [18, 80, 142]
-    for x, n, l in zip(xs, ["Gene (DNA)", "Messenger RNA (mRNA)", "Protein"], ["A C G T", "A C G U", ""]):
-        label(ax, x, 50, n, fs=30)
+    fig, ax = canvas(16, 8, ylim=(0, 80))
+    xs = [20, 80, 140]
+    for x, n, l in zip(xs, ["Gene (DNA)", "Messenger RNA\n(mRNA)", "Protein"], ["A C G T", "A C G U", ""]):
+        label(ax, x, 64, n, fs=40)
         if l:
-            label(ax, x, 41, l, fs=24, color=MUTED, family=MONO)
-    for (a, b), t in zip([(33, 54), (107, 128)], ["copied", "translated"]):
-        arrow(ax, a, 50, b, 50, color=MUTED, lw=2, ms=24)
-        label(ax, (a + b) / 2, 55, t, fs=22, color=MUTED)
+            label(ax, x, 48, l, fs=34, color=MUTED, family=MONO)
+    for (a, b), tx in zip([(37, 54), (106, 124)], ["copied", "translated"]):
+        arrow(ax, a, 64, b, 64, color=MUTED, lw=3, ms=32)
+        label(ax, (a + b) / 2, 71, tx, fs=28, color=MUTED)
     if with_ago2:
-        label(ax, xs[1], 12, "AGO2, a protein, binds some mRNAs", fs=26, color=ACCENT)
-        arrow(ax, xs[1], 18, xs[1], 35, color=ACCENT, lw=2.5, ms=26)
-        label(ax, xs[2], 36, "less protein", fs=24, color=ACCENT)
+        label(ax, xs[1], 8, "AGO2, a protein, binds some mRNAs", fs=36, color=ACCENT)
+        arrow(ax, xs[1], 15, xs[1], 41, color=ACCENT, lw=3.5, ms=34)
+        label(ax, xs[2], 46, "less protein", fs=34, color=ACCENT)
     save_raw(fig, "bio_flow_ago2" if with_ago2 else "bio_flow_base")
 
 
@@ -171,7 +171,7 @@ def slide_filter():
                 label(ax, x0 + i * dx + cw / 2, rows_y[r] + ch / 2 - 0.3, "1" if on else "0", fs=17,
                       color="white" if on else LIGHT)
         # the window
-        ax.add_patch(Rectangle((x0 + k * dx - 1.2, rows_y[-1] - 1.2), 4 * dx + 0.4, rows_y[0] + ch - rows_y[-1] + 6.4,
+        ax.add_patch(Rectangle((x0 + k * dx - 1.2, rows_y[-1] - 1.2), 4 * dx + 0.4, 83.5 - (rows_y[-1] - 1.2),
                                fill=False, ec=ACCENT, lw=4))
         picked, pre, out = res[k]
         for j, p in enumerate(picked):
@@ -354,7 +354,7 @@ def roc_frames(ls, ly):
     bins = np.linspace(0, 1, 30)
     for k in range(len(th) + 1):
         fig = newfig()
-        a1 = fig.add_axes([0.06, 0.14, 0.46, 0.62]); a2 = fig.add_axes([0.62, 0.14, 0.34, 0.72])
+        a1 = fig.add_axes([0.06, 0.14, 0.5, 0.66]); a2 = fig.add_axes([0.64, 0.14, 0.33, 0.66])
         a1.hist(s[ly == 0], bins, color=UNBOUND, alpha=.9, label="Unbound")
         a1.hist(s[ly == 1], bins, color=BOUND, alpha=.6, label="Bound")
         a1.legend(loc="lower center", ncol=2, bbox_to_anchor=(0.5, 1.12))
@@ -367,8 +367,8 @@ def roc_frames(ls, ly):
             a1.axvline(t, color=HELD_C, lw=3)
             a1.text(t, 1.02, f"threshold {t}", transform=a1.get_xaxis_transform(), color=HELD_C, fontsize=21,
                     ha="center", va="bottom")
-            a1.text(0.99, 0.95, f"bound above: {p:.0%}  (true positive rate)\nunbound above: {f:.0%}  (false positive rate)",
-                    transform=a1.transAxes, ha="right", va="top", fontsize=19, color=INK)
+            a1.text(0.01, 0.97, f"bound above: {p:.0%}  (true positive rate)\nunbound above: {f:.0%}  (false positive rate)",
+                    transform=a1.transAxes, ha="left", va="top", fontsize=19, color=INK)
             for j in range(k + 1):
                 a2.scatter(*pts[j], s=140 if j == k else 70, color=HELD_C if j == k else MUTED, zorder=3)
             a2.annotate(f"threshold {t}", pts[k], xytext=(14, -26), textcoords="offset points", fontsize=18, color=HELD_C)
@@ -378,7 +378,7 @@ def roc_frames(ls, ly):
                 a2.scatter(*pts[j], s=70, color=MUTED, zorder=3)
             a2.text(0.42, 0.2, f"AUROC {auc:.2f}", fontsize=30, color=ACCENT)
         a2.set_xlabel("False positive rate"); a2.set_ylabel("True positive rate")
-        a2.set_xlim(0, 1); a2.set_ylim(0, 1.01); a2.set_aspect("equal")
+        a2.set_xlim(0, 1); a2.set_ylim(0, 1.01)
         save_raw(fig, f"roc_frame_{k}")
 
 

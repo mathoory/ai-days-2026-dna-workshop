@@ -632,7 +632,7 @@
 <li>Left: the standardised embeddings of 40 of the 12,000 training sequences, one row each. Right: the probe, and the held-out AUROC you will compute in TODO-2.</li>
 <li>The same model as part 1 slide 2.11, with 256 inputs instead of 2: 256 weights and one bias.</li>
 <li>Standardising shifts and scales each of the 256 numbers to mean 0 and standard deviation 1, using the training sequences only; the same shift and scale are applied to the test sequences.</li>
-<li>Regularisation (part 1 slide 3.5) keeps the 256 weights small: <code>C = 0.1</code> in scikit-learn, where smaller <code>C</code> means stronger regularisation.</li>
+<li>Regularisation penalises large weights and keeps the 256 weights small: <code>C = 0.1</code> in scikit-learn, where smaller <code>C</code> means stronger regularisation.</li>
 <li>Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.</li>
 </ul>
 <style type="text/css">

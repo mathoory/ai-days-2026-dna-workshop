@@ -213,13 +213,23 @@ def lr_training(tr, ty):
     o = rng.permutation(len(y))
     panels = []
     for k, step in enumerate(steps):
-        ax = fig.add_axes([0.06 + k * 0.215, 0.13, 0.19, 0.62]); panels.append(ax)
+        ax = fig.add_axes([0.075 + k * 0.16, 0.13, 0.138, 0.62]); panels.append(ax)
         ax.scatter(X[o, 0], X[o, 1], c=np.where(y[o] == 1, BOUND, MID), s=22, alpha=.6, lw=0)
         ws, bs = snaps[step]
         xs = np.linspace(X[:, 0].min(), X[:, 0].max(), 50)
         zy = -(ws[0] * (xs - mu[0]) / sd[0] + bs) / ws[1]
         ax.plot(xs, zy * sd[1] + mu[1], color=HELD_C, lw=3)
         ax.set_ylim(X[:, 1].min(), X[:, 1].max())
+        # shade the two sides of the line: where the model says bound (p > 0.5) and unbound (p < 0.5)
+        gx, gy = np.meshgrid(np.linspace(*ax.get_xlim(), 200), np.linspace(*ax.get_ylim(), 200))
+        zz = ws[0] * (gx - mu[0]) / sd[0] + ws[1] * (gy - mu[1]) / sd[1] + bs
+        ax.contourf(gx, gy, (zz > 0).astype(float), levels=[-0.5, 0.5, 1.5], colors=[FAINT, ACCENT_L], alpha=0.8,
+                    zorder=0)
+        if k == 0:                                       # name the two regions once, in the empty corners
+            for (fx, fy), txt, col in (((0.97, 0.95), "model says unbound", MUTED), ((0.03, 0.04), "model says bound", ACCENT)):
+                ax.text(fx, fy, txt, transform=ax.transAxes, ha="right" if fx > 0.5 else "left",
+                        va="top" if fy > 0.5 else "bottom", fontsize=17, color=col, fontweight="bold", zorder=4,
+                        bbox=dict(fc="white", ec="none", alpha=0.85, pad=2))
         w_r, b_r = raw(ws, bs)
         ax.set_title(f"Step {step}\n$w_1$ = {w_r[0]:.1f}\n$w_2$ = {w_r[1]:.1f}\n$b$ = {b_r:.1f}", fontsize=19)
         ax.set_xlabel("G+C fraction")
@@ -227,7 +237,14 @@ def lr_training(tr, ty):
             ax.set_ylabel("U fraction")
         else:
             ax.set_yticklabels([])
-    ax = fig.add_axes([0.72, 0.13, 0.2, 0.62]); panels.append(ax)
+    ax = fig.add_axes([0.59, 0.13, 0.135, 0.62]); panels.append(ax)     # this run's loss, all 300 steps
+    ax.plot(losses, color=TRAIN_C, lw=3)
+    for st in steps:
+        ax.scatter(st, losses[st], s=70, color=TRAIN_C, zorder=3)
+    ax.annotate(f"{losses[0]:.2f}", (0, losses[0]), xytext=(10, 2), textcoords="offset points", fontsize=17)
+    ax.annotate(f"{losses[300]:.2f}", (300, losses[300]), xytext=(-46, 10), textcoords="offset points", fontsize=17)
+    ax.set_title("Loss\n\n\n", fontsize=19); ax.set_xlabel("Step"); ygrid(ax)
+    ax = fig.add_axes([0.785, 0.13, 0.135, 0.62]); panels.append(ax)
     n = 60                                               # the first 60 steps, where the three runs differ
     ax.plot(range(n), other[10.0][:n], color=HELD_C, lw=1.6, marker="o", ms=3)
     ax.plot(range(n), other[0.05][:n], color=MID, lw=3)
@@ -241,9 +258,9 @@ def lr_training(tr, ty):
     ax.set_title("Loss, three learning rates\n\n\n", fontsize=19); ygrid(ax)
     fig.legend(handles=[Line2D([], [], marker="o", ls="", ms=10, color=BOUND, label="Bound"),
                         Line2D([], [], marker="o", ls="", ms=10, color=MID, label="Unbound"),
-                        Line2D([], [], color=HELD_C, lw=3, label="p = 0.5")],
+                        Line2D([], [], color=HELD_C, lw=3, label=r"$\hat p$ = 0.5: undecided")],
                loc="upper right", ncol=3, bbox_to_anchor=(0.98, 1.0))
-    names = [f"lr_training_{k}" for k in range(4)]
+    names = [f"lr_training_{k}" for k in range(5)]
     for k, name in enumerate(names):                     # frames for the slide: one panel per click
         for j, a in enumerate(panels):
             a.set_visible(j <= k)

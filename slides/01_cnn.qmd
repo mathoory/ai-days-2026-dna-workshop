@@ -136,9 +136,9 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ## 1.1 RNA and AGO2
 
 ::: {.r-stack}
-![](assets/custom/bio_flow_base.png){height="491px"}
+![](assets/custom/bio_flow_base.png){height="682px"}
 
-![](assets/custom/bio_flow_ago2.png){.fragment height="491px"}
+![](assets/custom/bio_flow_ago2.png){.fragment height="682px"}
 :::
 
 ::: {.notes}
@@ -268,12 +268,26 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 2.8 The loss
 
-- **Binary cross-entropy**: $\;\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#1A73E8}{y_i \log \hat p_i} + \color{#E8710A}{(1 - y_i)\log(1 - \hat p_i)} \,\big]$
+**Binary cross-entropy**
 
-![](assets/custom/bce_curve.png){fig-align="center" height="650px"}
+::: {.r-stack}
+::: {.fragment .fade-out fragment-index="1"}
+$\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#1A73E8}{y_i \log \hat p_i} + \color{#BDC1C6}{(1 - y_i)\log(1 - \hat p_i)} \,\big]$
+:::
+
+::: {.fragment fragment-index="1"}
+$\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} + \color{#E8710A}{(1 - y_i)\log(1 - \hat p_i)} \,\big]$
+:::
+:::
+
+::: {.r-stack}
+![](assets/custom/bce_curve_0.png){height="594px"}
+
+![](assets/custom/bce_curve_1.png){.fragment fragment-index="1" height="594px"}
+:::
 
 ::: {.notes}
-- One example's contribution to the loss, against the predicted probability. Blue: a bound example, $-\log \hat p$, the blue term of the formula. Orange: an unbound example, $-\log(1 - \hat p)$, the orange term.
+- One example's contribution to the loss, against the predicted probability. First a bound example, $-\log \hat p$, the blue term of the formula. Click: an unbound example, $-\log(1 - \hat p)$, the orange term.
 - A confident correct prediction costs almost nothing; a confident wrong one costs a lot ($-\log 0.01 = 4.6$).
 - On slide 2.5: predicting 0.90 for a bound sequence gives a loss of 0.10; predicting 0.35 gives 1.04.
 - Predicting 0.5 for everything gives $\ln 2 = 0.69$, the loss of a coin flip.
@@ -318,6 +332,8 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ![](assets/custom/lr_training_2.png){.fragment height="572px"}
 
 ![](assets/custom/lr_training_3.png){.fragment height="572px"}
+
+![](assets/custom/lr_training_4.png){.fragment height="572px"}
 :::
 
 ::: {.notes}
@@ -357,9 +373,8 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ## 2.14 From logistic regression to a neural network
 
 - A **neural network** stacks layers of units, with **ReLU** between them
-- A **convolutional neural network (CNN)**: its first layer slides small filters along the sequence (section 4)
 
-![](assets/custom/nn_diagram.png){fig-align="center" height="540px"}
+![](assets/custom/nn_diagram.png){fig-align="center" height="609px"}
 
 ::: {.notes}
 - Left: logistic regression is one unit, a weighted sum of the inputs plus a bias, then the sigmoid.
@@ -375,7 +390,9 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 3.1 Train, validate, test
 
-![](assets/custom/data_split.png){fig-align="center" height="299px"}
+![](assets/custom/data_split.png){fig-align="center" height="205px"}
+
+![](assets/custom/overfit_curve.png){.fragment fig-align="center" height="520px"}
 
 ::: {.notes}
 - An epoch is one pass over the training data.
@@ -383,20 +400,14 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Never grade a model on the data it was trained on.
 - The notebook prints the held-out AUROC after every epoch, so we do look at the test set during training. That is acceptable for a workshop as long as nobody picks the best epoch by it; in a real project that is the validation set's job.
 - The split is random by sequence. We checked for near-duplicates: 47% of held-out bound sequences have a training sequence within 150 letters on the genome (13% of unbound). On the 698 held-out sequences without one, the CNN scores 0.85 instead of 0.86, so the effect on our results is small. Real projects split by gene or chromosome.
-:::
-
-## 3.2 Why not the training loss?
-
-![](assets/custom/overfit_curve.png){fig-align="center" height="766px"}
-
-::: {.notes}
+- Click: why not the training loss?
 - A larger CNN (about 230,000 weights) trained on only 1,000 sequences, so the effect is easy to see. Loss after every epoch on its training sequences (blue) and on the 1,000 held-out sequences (orange).
 - The training loss keeps falling, to almost 0: the model memorises its 1,000 examples.
 - The held-out loss falls until epoch 18, then rises: from there on, what the model learns about its training examples does not carry over to new sequences.
 - The training loss only says how well the model fits what it has seen. What we want is a model that works on sequences it has not seen, so we measure on held-out data.
 :::
 
-## 3.3 Drawing the ROC curve
+## 3.2 Drawing the ROC curve
 
 The scores of our convolutional neural network (CNN, section 4) on the 1,000 held-out sequences
 
@@ -416,49 +427,20 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 - For anyone who knows diagnostic tests: sensitivity against 1 minus specificity.
 :::
 
-## 3.4 AUROC
+## 3.3 AUROC
 
-::: columns
-::: {.column width="38%"}
-::: {.incremental}
-- All thresholds together give the **ROC curve** (receiver operating characteristic)
-- **AUROC** (area under the ROC curve): the probability that a random bound sequence scores higher than a random unbound one
-- 0.5 is chance, 1.0 is perfect
-- It scores the ranking we care about, on sequences the model has not seen
-:::
-:::
-::: {.column width="62%"}
-![](assets/custom/roc_frame_3.png){width="100%"}
-:::
-:::
+![](assets/custom/roc_frame_3.png){fig-align="center" height="757px"}
 
 ::: {.notes}
+- All thresholds together give the ROC curve (receiver operating characteristic). AUROC is the area under it: the probability that a random bound sequence scores higher than a random unbound one. 0.5 is chance, 1.0 is perfect.
 - Every threshold from 1 down to 0 adds a point; joined, they give the curve. The dashed diagonal is a model that ranks at random.
 - The area is 0.86 for our CNN: pick one bound and one unbound held-out sequence at random, and 86% of the time the bound one gets the higher score.
 - It does not depend on one threshold, so it compares models fairly. It says nothing about why a model scores well.
 - The loss is what training lowers, and it is computed on the training data. The AUROC measures what we want, separating bound from unbound, on held-out data.
 :::
 
-## 3.5 Overfitting
-
-- A model that scores much higher on its training data than on held-out data has **overfit**: it memorised its training examples. Report the held-out score
-- Below: logistic regression on how often each 5-letter word occurs in a sequence (1,024 features; more in part 3). **Regularised**: large weights are penalised, which limits memorising
-
-![](assets/custom/probe_trap.png){fig-align="center" height="440px"}
-
-::: {.notes}
-- The same model, logistic regression on 5-letter word counts, scored two ways. Blue bars: AUROC on its own training sequences. Orange bars: AUROC on the 1,000 held-out sequences.
-- Left: 12,000 training sequences with regularisation. 0.82 on its own training data, 0.74 held out. A small gap is normal.
-- Right: 600 sequences and almost no regularisation. 1.00 on its training data, 0.67 held out.
-- Underfitting is the opposite: a model too simple for the pattern scores low on both its training data and held-out data.
-- Regularisation penalises large weights, which limits how closely a model can fit its training data.
-- In any evaluation code, including code an AI assistant wrote, check first which data the score was computed on.
-
-Next: build the CNN.
-:::
-
 ::: {.center}
-# 4 The CNN {data-name="CNN"}
+# 4 The convolutional neural network (CNN) {data-name="CNN"}
 :::
 
 ## 4.1 One-hot encoding (TODO-1) {data-todo="TODO-1"}

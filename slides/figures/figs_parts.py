@@ -232,19 +232,26 @@ def setup_examples(model, tr, ty):
 
 
 def bce_curve():
-    """Binary cross-entropy for one example, against the predicted probability of bound."""
+    """Binary cross-entropy for one example, in two frames: the bound term, then the unbound term."""
     q = np.linspace(0.005, 0.995, 400)
-    fig = newfig(); fig.set_size_inches(16, 7.4)
-    ax = fig.add_axes([0.1, 0.15, 0.85, 0.75])
-    ax.plot(q, -np.log(q), color=BOUND, lw=3.5)
-    ax.plot(q, -np.log(1 - q), color=HELD_C, lw=3.5)
-    ax.text(0.10, 3.4, "True label bound ($y = 1$)\n$-\\log \\hat p$", color=BOUND, fontsize=22, va="center")
-    ax.text(0.66, 3.4, "True label unbound ($y = 0$)\n$-\\log (1 - \\hat p)$", color=HELD_C, fontsize=22, va="center")
-    ax.plot([0.5], [np.log(2)], "o", color=INK, ms=10)
-    ax.annotate("0.69 at $\\hat p = 0.5$", (0.5, np.log(2)), xytext=(0.53, 1.25), fontsize=21, color=INK)
-    ax.set_xlabel(r"Predicted probability of bound, $\hat p$"); ax.set_ylabel("Loss")
-    ax.set_xlim(0, 1); ax.set_ylim(0, 4.2); ygrid(ax)
-    save(fig, "bce_curve")
+    names = []
+    for frame in (0, 1):
+        fig = newfig(); fig.set_size_inches(16, 7.4)
+        ax = fig.add_axes([0.1, 0.15, 0.85, 0.75])
+        cb = BOUND if frame == 0 else LIGHT
+        ax.plot(q, -np.log(q), color=cb, lw=3.5)
+        ax.text(0.10, 3.4, "True label bound ($y = 1$)\n$-\\log \\hat p$", color=cb if frame == 0 else MID,
+                fontsize=22, va="center")
+        if frame == 1:
+            ax.plot(q, -np.log(1 - q), color=HELD_C, lw=3.5)
+            ax.text(0.66, 3.4, "True label unbound ($y = 0$)\n$-\\log (1 - \\hat p)$", color=HELD_C, fontsize=22,
+                    va="center")
+        ax.set_xlabel(r"Predicted probability of bound, $\hat p$"); ax.set_ylabel("Loss")
+        ax.set_xlim(0, 1); ax.set_ylim(0, 4.2); ygrid(ax)
+        fig.savefig(OUT / f"bce_curve_{frame}.png", dpi=120, facecolor="white"); plt.close(fig)
+        names.append(f"bce_curve_{frame}")
+    trim_group(names)
+    print("wrote", names)
 
 
 def lr_rates(tr, ty):
