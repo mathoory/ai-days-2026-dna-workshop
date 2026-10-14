@@ -155,47 +155,63 @@
 <section id="about-me" class="slide level2">
 <h2>1.1 About me</h2>
 <div class="columns">
-<div class="column" style="width:34%;">
-<p><img data-src="assets/mattan.jpg" height="560"></p>
-</div><div class="column" style="width:66%;">
+<div class="column" style="width:60%;">
+<p><img data-src="assets/mattan_circle.png" class="avatar-small"></p>
 <ul>
-<li><strong>Mattan Hoory</strong>: M.Sc. student in Prof.&nbsp;Roee Amit’s lab; TA of 00660121 Medical Diagnostics</li>
-<li>Research: predicting where an RNA strand binds DNA as a triple helix (Triplexis)</li>
+<li><strong>B.Sc. Computer Science</strong>, bioinformatics track, Technion</li>
+<li><strong>Machine learning</strong> at National Taiwan University with Prof.&nbsp;Hsuan-Tien Lin (co-author of <em>Learning from Data</em>)</li>
+<li><strong>M.Sc. Data Science</strong>, Technion; research in Prof.&nbsp;Roee Amit’s lab</li>
+<li><strong>Unit 81</strong>: embedded Linux lead developer</li>
 </ul>
-<p><img data-src="assets/hero_triplex.png" style="width:42.0%"></p>
+</div><div class="column" style="width:40%;">
+<p><img data-src="assets/mattan_taiwan.jpg" height="660"></p>
+<p><span class="caption-small">Taiwan, during the exchange semester (2023)</span></p>
+</div></div>
+
+</section>
+<section id="my-research" class="slide level2">
+<h2>1.2 My research</h2>
+<p><strong>Machine learning for molecular design</strong>: from a sequence to how it binds</p>
+<div class="columns">
+<div class="column" style="width:42%;">
+<p><img data-src="assets/hero_triplex.png" height="520"></p>
+<p><span class="caption-small"><strong>Triplexis</strong>: which DNA sequences an RNA strand binds as a triple helix</span></p>
+</div><div class="column" style="width:58%;">
+<p><img data-src="assets/peptide_pose.png" height="400"></p>
+<p><span class="caption-small"><strong>Peptides</strong> against influenza: screening millions of variants with AlphaFold 3</span></p>
 </div></div>
 
 </section>
 <section id="goals" class="slide level2">
-<h2>1.2 Goals</h2>
+<h2>1.3 Goals</h2>
+<div class="goals">
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><strong>We will</strong></p>
+<p><span class="goal-yes">We will</span></p>
 <ul>
-<li>look inside models that read sequence</li>
-<li>judge when a difference in scores is real</li>
-<li>test whether a model uses biology or a shortcut</li>
+<li class="fragment">look inside models that read sequence</li>
+<li class="fragment">build a mental model of how to approach sequence-based models in AI</li>
+<li class="fragment">use coding agents to bridge the gap to the code</li>
 </ul>
 </div><div class="column" style="width:50%;">
-<p><strong>We will not</strong></p>
+<p><span class="goal-no">We will not</span></p>
 <ul>
-<li>write models from scratch</li>
-<li>learn PyTorch or Hugging Face in depth</li>
-<li>open the transformer</li>
+<li class="fragment">learn to write code</li>
+<li class="fragment">learn PyTorch or Hugging Face in depth</li>
+<li class="fragment">open the transformer</li>
 </ul>
 </div></div>
+</div>
 
 </section>
 <section id="what-you-need" class="slide level2">
-<h2>1.3 What you need</h2>
+<h2>1.4 What you need</h2>
 <div class="columns">
 <div class="column" style="width:58%;">
 <ul>
 <li>A laptop and a Google account</li>
 <li>Colab with a GPU: <em>Runtime → Change runtime type → T4 GPU</em></li>
 <li>Notebooks and slides: <strong><span class="nowrap">mathoory.github.io/ai-days-2026-dna-workshop</span></strong></li>
-<li>Nothing to install; the data download by themselves</li>
-<li>If a cell fails, raise a hand</li>
 </ul>
 </div><div class="column" style="width:42%;">
 <p><img data-src="assets/custom/qr_site.png" style="width:80.0%"></p>
@@ -203,7 +219,7 @@
 
 </section>
 <section id="today" class="slide level2">
-<h2>1.4 Today</h2>
+<h2>1.5 Today</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 33%">
@@ -253,7 +269,7 @@
 
 </section>
 <section id="rna-microrna-and-ago2" class="slide level2">
-<h2>1.5 RNA, microRNA and AGO2</h2>
+<h2>1.6 RNA, microRNA and AGO2</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/bio_flow.png" class="quarto-figure quarto-figure-center" height="509"></p>
@@ -262,7 +278,7 @@
 
 </section>
 <section id="the-seed-rule" class="slide level2">
-<h2>1.6 The seed rule</h2>
+<h2>1.7 The seed rule</h2>
 <ul>
 <li>AGO2 carries a microRNA. Its <strong>seed</strong> (letters 2 to 7) pairs with the target mRNA; this site also pairs letter 8</li>
 </ul>
@@ -274,7 +290,7 @@
 
 </section>
 <section id="the-data" class="slide level2">
-<h2>1.7 The data</h2>
+<h2>1.8 The data</h2>
 <ul>
 <li><strong>Bound</strong>: 48,095 CLIP-seq sites. <strong>Unbound</strong>: 44,251 random positions in the same genes</li>
 <li>The 40-letter measured site sits at letters 150 to 190</li>
@@ -287,7 +303,7 @@
 
 </section>
 <section id="seed-matches-are-enriched-in-bound-sites" class="slide level2">
-<h2>1.8 Seed matches are enriched in bound sites</h2>
+<h2>1.9 Seed matches are enriched in bound sites</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/kmer_enrichment.png" class="quarto-figure quarto-figure-center" height="700"></p>

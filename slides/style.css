@@ -80,3 +80,17 @@
   color: var(--ink); background: #F1F3F4; padding: 0.05em 0.25em; border-radius: 3px; }
 .reveal .nowrap { white-space: nowrap; }
 .reveal .slide-menu-button { display: none !important; }
+
+/* About me: round photo; Goals: green and red headings, larger list text */
+.reveal img.avatar { width: 92%; margin-top: 0.4em; }
+.reveal .caption-small { display: block; font-size: 0.62em; color: var(--muted); text-align: center; margin-top: 0.3em; }
+.reveal .goal-yes, .reveal .goal-no { display: block; font-size: 1.15em; font-weight: 500; margin-bottom: 0.4em; }
+.reveal .goal-yes { color: #1E8E3E; }
+.reveal .goal-no { color: #D93025; }
+.reveal .goal-yes + ul, .reveal .goal-no + ul, .reveal .goal-yes ~ ul, .reveal .goal-no ~ ul { font-size: 1.1em; }
+.reveal img.avatar-small { width: 190px; margin: 0.2em 0 0.4em 0; }
+.reveal img.avatar-small { margin-left: 0 !important; margin-right: auto !important; }
+.reveal .goals { padding-top: 0.6em; }
+.reveal .goals .goal-yes, .reveal .goals .goal-no { font-size: 1.45em; margin-bottom: 0.9em; }
+.reveal .goals ul { font-size: 1.25em; }
+.reveal .goals ul li { padding-bottom: 0.45em; }
