@@ -140,7 +140,7 @@ def page():
   <div class="wrap foot-in">
     <a class="gh" href="{REPO}" target="_blank" rel="noopener">{GITHUB_MARK}<span>mathoory/ai-days-2026-dna-workshop</span></a>
     <p>Data: AGO2 CLIP-seq from the GraphProt benchmark (Maticzka et al. 2014), as used by Pan and Shen (2018).</p>
-    <p>Pipeline ideas from the KAUST Genomic Foundation Models workshop (I. Ullah, 2026), used with permission:
+    <p>Pipeline ideas from the KAUST Genomic Foundation Models workshop (I. Ullah, 2026):
       <a href="https://github.com/bioinfo-kaust/gfm-workshop" target="_blank" rel="noopener">github.com/bioinfo-kaust/gfm-workshop</a></p>
     <p class="built">Updated {built}</p>
   </div>
