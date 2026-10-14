@@ -15,7 +15,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 ![](assets/custom/gc_hist.png){fig-align="center" height="484px"}
 
 ::: {.notes}
-- GC fraction of all 92,346 training sequences: bound filled blue, unbound grey outline, dashed lines at the class means.
+- GC fraction of all 92,346 training sequences: bound filled blue, unbound grey outline; each dashed line is a class's average, named on the plot.
 - Bound sequences have less GC than unbound ones: mean 0.41 against 0.45. It was visible in the data raster in part 1 and in the embedding map in part 2.
 - The unbound sequences are random positions in the same genes as the bound sites. AGO2 sites are often in AU-rich 3′ UTRs (the part of an mRNA after its protein-coding letters), so part of this difference may be real biology and part may come from how the negatives were drawn. Section 2 tests that.
 - Two simple models and one stress test:
@@ -118,31 +118,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 # 5 Beyond the notebook {data-name="Results"}
 :::
 
-## 5.1 Discussion
-
-1. How much of each score do two composition numbers explain?
-2. Which model barely changed after the shuffle, and what does that say about what it uses?
-3. Which part of the GC difference could be AGO2 biology (3′ UTRs, the end of an mRNA after its protein-coding part, are A/U-rich), and which part could come from how the unbound positions were drawn?
-
-::: {.notes}
-- Two minutes with your neighbour.
-- Use the numbers from your notebook. Question 3 connects the shuffle results with the matched data of section 2.
-:::
-
-## 5.2 Fine-tuning against the CNN
-
-![](assets/custom/headtohead.png){fig-align="center" height="741px"}
-
-::: {.notes}
-- Bars: mean AUROC; dots: single runs. Green: CNN from scratch; blue: NT-500M frozen with a probe; purple: NT-500M fine-tuned with LoRA. Left: 500 labels; right: 20,000.
-- Run offline on our A30 server with NT-500M (human reference), on matched data: the same labelled sequences and the same 3,000-sequence matched test set for every model.
-- 20,000 labels: CNN 0.84, frozen probe 0.78, fine-tuned 0.87.
-- 500 labels: CNN 0.66, frozen 0.73, fine-tuned 0.75.
-- CNN and LoRA have three runs each, from different random starting weights; the frozen probe has one run. The CNN and LoRA runs do not overlap at either label count.
-- These fine-tuned models have not been put through the shuffle test yet.
-:::
-
-## 5.3 Test AUROC against the number of labels
+## 5.1 Test AUROC against the number of labels
 
 ![](assets/custom/label_curve2.png){fig-align="center" height="684px"}
 
@@ -152,7 +128,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 - Frozen Mistral-DNA scores higher than the CNN up to about 2,500 labels; above about 5,000 the CNN is better. At 12,000 labels: CNN 0.82, frozen probe 0.77.
 - The same Mistral-DNA architecture with random weights stays between 0.50 and 0.57, so the advantage at low label counts comes from pretraining.
 - Five-letter word counts also score higher than the CNN below about 1,000 labels.
-- Squares: the CNN in the head-to-head experiment of the previous slide, diamonds: NT-500M fine-tuned. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, the draw of training sequences changes the CNN's score by about as much as the differences between models.
+- Squares: the CNN in a separate offline head-to-head run, diamonds: NT-500M fine-tuned with LoRA in the same run. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, the draw of training sequences changes the CNN's score by about as much as the differences between models.
 :::
 
 ::: {.center}
@@ -181,57 +157,24 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 - NT-2.5B was not fine-tuned: our recipe undertrained it at that size.
 :::
 
-## 6.3 Five points to take home
+## 6.3 Conclusions
 
 ::: {.incremental}
-1. Two composition numbers separated bound from unbound (AUROC 0.66)
-2. The encoding limits what a model can use
-3. Check simple baselines first
-4. Test what a model uses with insertions, shuffles and matched data
-5. Frozen pretrained models relied mostly on short-range composition
+- A CNN read AGO2 binding from the RNA letters alone: **AUROC 0.86**
+- Two composition numbers, GC and U, already reached **0.66**: check simple baselines first
+- Shuffles and matched data show what a model uses: the CNN fell from 0.86 to 0.66 when shuffled, GC and U fell to chance on matched data
+- With **few labels** (below about 2,500) a frozen pretrained model with a probe beat the CNN; with **20,000 labels** fine-tuning reached 0.87 against the CNN's 0.84
 :::
 
 ::: {.notes}
-- Point 1: the negatives were random positions in the same genes; on the 1,000 held-out sequences GC and U alone reached 0.66.
-- Point 2: one-hot letters keep order and position, 5-letter word counts drop both, and each tokenizer splits the same stretch of sequence differently.
-- Point 3: two composition numbers reached 0.66 and 5-letter word counts 0.74 (12,000 labels each), against 0.86 for the CNN (92,346 labels).
-- Point 4: the motif insertion against a control of the same letters, the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (GC/U 0.64 to 0.51).
-- Point 5: frozen Mistral-DNA with a probe scored 0.77 against 0.78 under the shuffle and 0.77 on the 3,000-sequence matched test set. In one offline benchmark, NT-500M fine-tuned with LoRA reached 0.87 against the CNN's 0.84 (20,000 labels, 3 runs each); it has not been shuffle-tested.
+- Point 1: held-out AUROC of the part 1 CNN, trained on 92,346 labelled sequences.
+- Point 2: the negatives were random positions in the same genes; on the 1,000 held-out sequences GC and U alone reached 0.66, and 5-letter word counts 0.74.
+- Point 3: the dinucleotide shuffle keeps letters and letter pairs and breaks longer motifs; matched data keeps GC, U and length equal between the classes (GC and U: 0.64 to 0.51). Frozen Mistral-DNA barely changed under the shuffle (0.77 to 0.78), so it relied mostly on short-range composition.
+- Point 4: from the label curve (slide 5.1) and one offline benchmark with NT-500M and LoRA (3,000 matched test sequences, 3 runs each). The thresholds are for this task and will differ for others.
+- For a new problem, the same order: the question and its labels, how the negatives were chosen, simple baselines, the model, then controls.
 :::
 
-## 6.4 When to use a pretrained model
-
-::: {.incremental}
-- **Below about 2,500 labels**: a frozen pretrained model with a probe
-- **About 20,000 labels**: fine-tuning a large pretrained model
-- **Always**: a small task model as the baseline
-:::
-
-::: {.notes}
-- Below about 2,500 labels the frozen probe scored higher than the CNN on this task (slide 5.3).
-- With 20,000 labels, fine-tuned NT-500M (0.87) scored higher than the CNN (0.84) in one offline benchmark (3,000 matched test sequences, 3 runs each).
-- The thresholds are from today's AGO2 label curve (slide 5.3) and will differ between tasks.
-- Whatever model is chosen, the same tests apply: a simple baseline, a shuffle, a matched control.
-- Not tested today: scoring mutations (variants) without labels by how unexpected the model finds them; published results are mixed.
-:::
-
-## 6.5 From a question to a model
-
-::: {.incremental}
-1. **Question**: what to predict, and which experiment gives the labels
-2. **Negatives**: how they were chosen
-3. **Baselines**: composition and word counts
-4. **Model**: train from scratch or adapt, by the number of labels
-5. **Controls**: insert, shuffle, match; report uncertainty
-:::
-
-::: {.notes}
-- This is the procedure we followed today, in the order to apply it to a new problem.
-- Point 2 in full: how the negatives were chosen, and what else differs between the classes.
-- Point 5 in full: report held-out scores with their uncertainty.
-:::
-
-## 6.6 Feedback
+## 6.4 Feedback
 
 ::: columns
 ::: {.column width="58%"}
@@ -248,7 +191,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 - Feedback at the end of the notebook, before the final break (13:50). The link and the QR code open the same form.
 :::
 
-## 6.7 Credits and further reading
+## 6.5 Credits and further reading
 
 <div style="font-size:0.62em;">
 

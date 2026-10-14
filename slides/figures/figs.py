@@ -842,9 +842,15 @@ def gc_hist():
     bins = np.linspace(0.15, 0.8, 60)
     ax.hist(g[y == 0], bins, color=MID, histtype="step", lw=2.5, density=True)
     ax.hist(g[y == 1], bins, color=BOUND, alpha=.45, density=True)
-    ax.axvline(g[y == 1].mean(), color=BOUND, lw=1.8, ls="--"); ax.axvline(g[y == 0].mean(), color=MID, lw=1.8, ls="--")
-    ax.legend(handles=[Patch(color=BOUND, alpha=.45, label=f"Bound (mean {g[y == 1].mean():.2f})"),
-                       Line2D([], [], color=MID, lw=2.5, label=f"Unbound (mean {g[y == 0].mean():.2f})")], loc="upper right")
+    top = ax.get_ylim()[1] * 1.28                       # headroom above the bars for the two labels
+    ax.set_ylim(0, top)
+    for cls, col, ha, dx, name in ((1, BOUND, "right", -0.006, "bound"), (0, MID, "left", 0.006, "unbound")):
+        m = g[y == cls].mean()                           # each class's average, named on the line itself
+        ax.axvline(m, color=col, lw=2.2, ls="--")
+        ax.text(m + dx, top * 0.97, f"average of\n{name}: {m:.2f}", color=col, ha=ha, va="top", fontsize=22,
+                fontweight="bold")
+    ax.legend(handles=[Patch(color=BOUND, alpha=.45, label="Bound"), Line2D([], [], color=MID, lw=2.5, label="Unbound")],
+              loc="upper right")
     ax.set_xlabel("GC fraction"); ax.set_ylabel("Density"); ax.set_yticks([])
     save(fig, "gc_hist")
 

@@ -165,7 +165,7 @@
 </div>
 <aside class="notes">
 <ul>
-<li>GC fraction of all 92,346 training sequences: bound filled blue, unbound grey outline, dashed lines at the class means.</li>
+<li>GC fraction of all 92,346 training sequences: bound filled blue, unbound grey outline; each dashed line is a class’s average, named on the plot.</li>
 <li>Bound sequences have less GC than unbound ones: mean 0.41 against 0.45. It was visible in the data raster in part 1 and in the embedding map in part 2.</li>
 <li>The unbound sequences are random positions in the same genes as the bound sites. AGO2 sites are often in AU-rich 3′ UTRs (the part of an mRNA after its protein-coding letters), so part of this difference may be real biology and part may come from how the negatives were drawn. Section 2 tests that.</li>
 <li>Two simple models and one stress test:
@@ -355,60 +355,8 @@
 
 </section>
 
-<section id="discussion" class="slide level2">
-<h2>5.1 Discussion</h2>
-<ol type="1">
-<li>How much of each score do two composition numbers explain?</li>
-<li>Which model barely changed after the shuffle, and what does that say about what it uses?</li>
-<li>Which part of the GC difference could be AGO2 biology (3′ UTRs, the end of an mRNA after its protein-coding part, are A/U-rich), and which part could come from how the unbound positions were drawn?</li>
-</ol>
-<aside class="notes">
-<ul>
-<li>Two minutes with your neighbour.</li>
-<li>Use the numbers from your notebook. Question 3 connects the shuffle results with the matched data of section 2.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="fine-tuning-against-the-cnn" class="slide level2">
-<h2>5.2 Fine-tuning against the CNN</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/headtohead.png" class="quarto-figure quarto-figure-center" height="741"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>Bars: mean AUROC; dots: single runs. Green: CNN from scratch; blue: NT-500M frozen with a probe; purple: NT-500M fine-tuned with LoRA. Left: 500 labels; right: 20,000.</li>
-<li>Run offline on our A30 server with NT-500M (human reference), on matched data: the same labelled sequences and the same 3,000-sequence matched test set for every model.</li>
-<li>20,000 labels: CNN 0.84, frozen probe 0.78, fine-tuned 0.87.</li>
-<li>500 labels: CNN 0.66, frozen 0.73, fine-tuned 0.75.</li>
-<li>CNN and LoRA have three runs each, from different random starting weights; the frozen probe has one run. The CNN and LoRA runs do not overlap at either label count.</li>
-<li>These fine-tuned models have not been put through the shuffle test yet.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
 <section id="test-auroc-against-the-number-of-labels" class="slide level2">
-<h2>5.3 Test AUROC against the number of labels</h2>
+<h2>5.1 Test AUROC against the number of labels</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/label_curve2.png" class="quarto-figure quarto-figure-center" height="684"></p>
@@ -421,7 +369,7 @@
 <li>Frozen Mistral-DNA scores higher than the CNN up to about 2,500 labels; above about 5,000 the CNN is better. At 12,000 labels: CNN 0.82, frozen probe 0.77.</li>
 <li>The same Mistral-DNA architecture with random weights stays between 0.50 and 0.57, so the advantage at low label counts comes from pretraining.</li>
 <li>Five-letter word counts also score higher than the CNN below about 1,000 labels.</li>
-<li>Squares: the CNN in the head-to-head experiment of the previous slide, diamonds: NT-500M fine-tuned. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, the draw of training sequences changes the CNN’s score by about as much as the differences between models.</li>
+<li>Squares: the CNN in a separate offline head-to-head run, diamonds: NT-500M fine-tuned with LoRA in the same run. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, the draw of training sequences changes the CNN’s score by about as much as the differences between models.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -492,76 +440,21 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="five-points-to-take-home" class="slide level2">
-<h2>6.3 Five points to take home</h2>
-<ol type="1">
-<li class="fragment">Two composition numbers separated bound from unbound (AUROC 0.66)</li>
-<li class="fragment">The encoding limits what a model can use</li>
-<li class="fragment">Check simple baselines first</li>
-<li class="fragment">Test what a model uses with insertions, shuffles and matched data</li>
-<li class="fragment">Frozen pretrained models relied mostly on short-range composition</li>
-</ol>
-<aside class="notes">
+<section id="conclusions" class="slide level2">
+<h2>6.3 Conclusions</h2>
 <ul>
-<li>Point 1: the negatives were random positions in the same genes; on the 1,000 held-out sequences GC and U alone reached 0.66.</li>
-<li>Point 2: one-hot letters keep order and position, 5-letter word counts drop both, and each tokenizer splits the same stretch of sequence differently.</li>
-<li>Point 3: two composition numbers reached 0.66 and 5-letter word counts 0.74 (12,000 labels each), against 0.86 for the CNN (92,346 labels).</li>
-<li>Point 4: the motif insertion against a control of the same letters, the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (GC/U 0.64 to 0.51).</li>
-<li>Point 5: frozen Mistral-DNA with a probe scored 0.77 against 0.78 under the shuffle and 0.77 on the 3,000-sequence matched test set. In one offline benchmark, NT-500M fine-tuned with LoRA reached 0.87 against the CNN’s 0.84 (20,000 labels, 3 runs each); it has not been shuffle-tested.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="when-to-use-a-pretrained-model" class="slide level2">
-<h2>6.4 When to use a pretrained model</h2>
-<ul>
-<li class="fragment"><strong>Below about 2,500 labels</strong>: a frozen pretrained model with a probe</li>
-<li class="fragment"><strong>About 20,000 labels</strong>: fine-tuning a large pretrained model</li>
-<li class="fragment"><strong>Always</strong>: a small task model as the baseline</li>
+<li class="fragment">A CNN read AGO2 binding from the RNA letters alone: <strong>AUROC 0.86</strong></li>
+<li class="fragment">Two composition numbers, GC and U, already reached <strong>0.66</strong>: check simple baselines first</li>
+<li class="fragment">Shuffles and matched data show what a model uses: the CNN fell from 0.86 to 0.66 when shuffled, GC and U fell to chance on matched data</li>
+<li class="fragment">With <strong>few labels</strong> (below about 2,500) a frozen pretrained model with a probe beat the CNN; with <strong>20,000 labels</strong> fine-tuning reached 0.87 against the CNN’s 0.84</li>
 </ul>
 <aside class="notes">
 <ul>
-<li>Below about 2,500 labels the frozen probe scored higher than the CNN on this task (slide 5.3).</li>
-<li>With 20,000 labels, fine-tuned NT-500M (0.87) scored higher than the CNN (0.84) in one offline benchmark (3,000 matched test sequences, 3 runs each).</li>
-<li>The thresholds are from today’s AGO2 label curve (slide 5.3) and will differ between tasks.</li>
-<li>Whatever model is chosen, the same tests apply: a simple baseline, a shuffle, a matched control.</li>
-<li>Not tested today: scoring mutations (variants) without labels by how unexpected the model finds them; published results are mixed.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="from-a-question-to-a-model" class="slide level2">
-<h2>6.5 From a question to a model</h2>
-<ol type="1">
-<li class="fragment"><strong>Question</strong>: what to predict, and which experiment gives the labels</li>
-<li class="fragment"><strong>Negatives</strong>: how they were chosen</li>
-<li class="fragment"><strong>Baselines</strong>: composition and word counts</li>
-<li class="fragment"><strong>Model</strong>: train from scratch or adapt, by the number of labels</li>
-<li class="fragment"><strong>Controls</strong>: insert, shuffle, match; report uncertainty</li>
-</ol>
-<aside class="notes">
-<ul>
-<li>This is the procedure we followed today, in the order to apply it to a new problem.</li>
-<li>Point 2 in full: how the negatives were chosen, and what else differs between the classes.</li>
-<li>Point 5 in full: report held-out scores with their uncertainty.</li>
+<li>Point 1: held-out AUROC of the part 1 CNN, trained on 92,346 labelled sequences.</li>
+<li>Point 2: the negatives were random positions in the same genes; on the 1,000 held-out sequences GC and U alone reached 0.66, and 5-letter word counts 0.74.</li>
+<li>Point 3: the dinucleotide shuffle keeps letters and letter pairs and breaks longer motifs; matched data keeps GC, U and length equal between the classes (GC and U: 0.64 to 0.51). Frozen Mistral-DNA barely changed under the shuffle (0.77 to 0.78), so it relied mostly on short-range composition.</li>
+<li>Point 4: from the label curve (slide 5.1) and one offline benchmark with NT-500M and LoRA (3,000 matched test sequences, 3 runs each). The thresholds are for this task and will differ for others.</li>
+<li>For a new problem, the same order: the question and its labels, how the negatives were chosen, simple baselines, the model, then controls.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -576,7 +469,7 @@
       }</style></aside>
 </section>
 <section id="feedback" class="slide level2">
-<h2>6.6 Feedback</h2>
+<h2>6.4 Feedback</h2>
 <div class="columns">
 <div class="column" style="width:58%;">
 <ul>
@@ -604,7 +497,7 @@
       }</style></aside>
 </section>
 <section id="credits-and-further-reading" class="slide level2">
-<h2>6.7 Credits and further reading</h2>
+<h2>6.5 Credits and further reading</h2>
 <div style="font-size:0.62em;">
 <ul>
 <li><strong>Data</strong>: Maticzka et al.&nbsp;(2014) <em>GraphProt</em>, Genome Biology (the CLIP benchmark and its negatives). Pan and Shen (2018) <em>iDeepE</em>, Bioinformatics (the CNN design we follow).</li>
