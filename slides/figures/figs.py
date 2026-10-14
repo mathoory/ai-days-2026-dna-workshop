@@ -232,9 +232,9 @@ def lr_training(tr, ty):
                         bbox=dict(fc="white", ec="none", alpha=0.85, pad=2))
         w_r, b_r = raw(ws, bs)
         ax.set_title(f"Step {step}\n$w_1$ = {w_r[0]:.1f}\n$w_2$ = {w_r[1]:.1f}\n$b$ = {b_r:.1f}", fontsize=19)
-        ax.set_xlabel(r"$x_1$", fontsize=24)
+        ax.set_xlabel("GC fraction", fontsize=22)
         if k == 0:
-            ax.set_ylabel(r"$x_2$", fontsize=24, rotation=0, labelpad=18)
+            ax.set_ylabel("U fraction", fontsize=22)
         else:
             ax.set_yticklabels([])
     ax = fig.add_axes([0.59, 0.09, 0.135, 0.6]); panels.append(ax)      # this run's loss, all 300 steps
@@ -261,7 +261,7 @@ def lr_training(tr, ty):
                         Line2D([], [], color=HELD_C, lw=3, label=r"$\hat p$ = 0.5: undecided")],
                loc="upper right", ncol=3, bbox_to_anchor=(0.995, 0.945))
     # the model and the update, in the band above the panels (the slide carries no text)
-    fig.text(0.02, 0.985, r"Model:  $\hat p = \sigma\,(w_1 x_1 + w_2 x_2 + b)$,    $x_1$ = share of G and C,  $x_2$ = share of U",
+    fig.text(0.02, 0.985, r"Model:  $\hat p = \sigma\,(w_1 \cdot \mathrm{GC} + w_2 \cdot \mathrm{U} + b)$",
              fontsize=25, va="top", color=INK)
     fig.text(0.02, 0.925, r"Each step:  $(w_1, w_2, b) \leftarrow (w_1, w_2, b) - \eta\, \nabla \mathcal{L}$",
              fontsize=25, va="top", color=INK)

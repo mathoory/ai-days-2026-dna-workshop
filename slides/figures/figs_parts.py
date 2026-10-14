@@ -342,14 +342,14 @@ def nn_diagram():
 
     label(ax, 30, 69, "Logistic regression: one unit", fs=24)
     ins = [(14, 46), (14, 26)]
-    for (x, y), n in zip(ins, [r"$x_1$", r"$x_2$"]):
+    for (x, y), n in zip(ins, ["GC", "U"]):
         node(x, y); label(ax, x - 5, y, n, fs=20, color=MUTED, ha="right")
     out = (40, 36)
     for a in ins:
         edge(a, out)
     node(*out, r=4.2, fc=ACCENT_L); label(ax, out[0], out[1], r"$\sigma$", fs=24)
     arrow(ax, 45, 36, 51, 36); label(ax, 53, 36, r"$\hat p$", fs=24, ha="left")
-    label(ax, 30, 12, r"$\hat p = \sigma(w_1 x_1 + w_2 x_2 + b)$", fs=22, color=MUTED)
+    label(ax, 30, 12, r"$\hat p = \sigma(w_1 \cdot \mathrm{GC} + w_2 \cdot \mathrm{U} + b)$", fs=22, color=MUTED)
 
     x0 = 88
     label(ax, 118, 69, "A neural network: layers of units", fs=24)
