@@ -127,12 +127,12 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 - Fixed words of 6 letters, a vocabulary of $4^6 = 4{,}096$ (Nucleotide Transformer, NT)
 
-![](assets/custom/tokens_kmer.png){fig-align="center" height="421px"}
+![](assets/custom/tokens_kmer.png){fig-align="center" height="281px"}
 
 ::: {.notes}
 - Projected: 1 min.
-- The models read DNA letters, so U becomes T. This is the same stretch of a real bound sequence from our data. Top row: Nucleotide Transformer's 6-mer tokens; bottom row: the same sequence shifted by one letter.
-- Shift the sequence by one letter and every token changes. The letters left over at the end become single-letter tokens.
+- The models read DNA letters, so U becomes T. This is the same stretch of a real bound sequence from our data, cut into Nucleotide Transformer's 6-mer tokens.
+- Shift the sequence by one letter and every token changes.
 - A sequence of n letters becomes about n / 6 tokens, so the model can read six times more sequence for the same cost.
 :::
 
@@ -144,7 +144,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 ::: {.notes}
 - Projected: 2 min.
-- Mistral-DNA's BPE tokenizer on the same bound sequence. Single letters (slide 2.1) are what the CNN read; the 6-mer rows are the previous slide.
+- Mistral-DNA's BPE tokenizer on the same bound sequence. Single letters (slide 2.1) are what the CNN read; the 6-mer row is the previous slide.
 - Start from the 4 letters and count every pair of neighbouring tokens in the genome.
 - Frequent stretches become one token and rare ones stay short, so token lengths vary. Mistral-DNA and DNABERT-2 share one BPE vocabulary.
 - The same stretch is split differently by each tokenizer.

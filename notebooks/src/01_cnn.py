@@ -170,13 +170,26 @@ test_encoding()
 # large and positive for "bound", large and negative for "unbound" (section 4 turns it into a
 # probability). Everything else is your choice: how many blocks, how many filters, how wide.
 #
-# The cell below builds a small example network for a different input (8 × 8 pictures) from the same
-# parts, and `show_shapes` prints what each layer does to the shape. Use `show_shapes` on your own
-# network to build it layer by layer: the shape after flatten tells you how many inputs the linear
-# layer needs.
+# **An example.** A network with two blocks looks like this; the letters stand for numbers you choose:
+#
+# ```python
+# nn.Sequential(
+#     nn.Conv2d(1, a, (4, b)), nn.ReLU(), nn.MaxPool2d((1, c)),
+#     nn.Conv2d(a, d, (1, e)), nn.ReLU(), nn.MaxPool2d((1, c)),
+#     nn.Flatten(),
+#     nn.Linear(f, 1),
+# )
+# ```
+#
+# `a` and `d` are the numbers of filters in the two convolutions, `b` and `e` their widths, and `c` the
+# number of positions per pooling block. The second convolution takes `a` input channels, one per filter
+# of the first. `f` is the number of values after flatten.
+#
+# The cell below defines `show_shapes`, which runs one sequence through your layers and prints the
+# shape after each one. Use it to build your network layer by layer: the shape after flatten gives `f`.
 
 # %%
-#@title ▶ An example network, and show_shapes { display-mode: "form" }
+#@title ▶ show_shapes: the shape after each layer { display-mode: "form" }
 def show_shapes(layers, x=None):
     """Run one input through `layers` one layer at a time and print the shape after each layer."""
     h = encode_batch(train_seqs[:1]) if x is None else x
@@ -188,15 +201,6 @@ def show_shapes(layers, x=None):
             print(f"layer {i}, {layer}: fails on an input of shape {tuple(h.shape[1:])}: {e}")
             return
         print(f"{str(layer)[:38]:38s} {tuple(h.shape[1:])}")
-
-
-example = nn.Sequential(
-    nn.Conv2d(1, 4, (3, 3)), nn.ReLU(), nn.MaxPool2d((2, 2)),   # 4 filters of 3 x 3, then blocks of 2 x 2
-    nn.Flatten(),
-    nn.Linear(4 * 3 * 3, 1),                                    # 4 channels x 3 x 3 numbers after the pooling
-)
-print("an example network for 8 x 8 pictures with one channel:")
-show_shapes(example, torch.zeros(1, 1, 8, 8))
 
 # %%
 class GlobalCNN(nn.Module):
@@ -395,8 +399,7 @@ def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
 
 
 def test_train():
-    """train_step on one batch, then evaluate during 1 epoch on 5,000 training sequences."""
-    global roc_auc_score
+    """train_step on one batch, evaluate against our own AUROC, then 1 epoch on 5,000 training sequences."""
     torch.manual_seed(SEED)
     m = GlobalCNN().to(DEVICE)
     o = optim.Adam(m.parameters(), lr=1e-3)
@@ -413,32 +416,29 @@ def test_train():
         "❌ the weights did not change in train_step: it must compute the gradients and take the optimizer step"
     assert all(q.grad.abs().max().item() < 1e5 for q in m.parameters()), \
         "❌ the gradients of an earlier step were still there: train_step must clear the gradients first"
+    X_test = encode_batch(test_seqs)
+    with torch.no_grad():
+        want = roc_auc_score(test_y, torch.sigmoid(m(X_test.to(DEVICE))).cpu().numpy())
+    weights = [q.detach().clone() for q in m.parameters()]
+    try:
+        got = evaluate(m, X_test, test_y)
+    except Exception as e:
+        raise AssertionError(f"❌ evaluate fails on the held-out test set: {e}") from None
+    assert np.ndim(got) == 0 and np.isfinite(float(got)), \
+        f"❌ evaluate returned {got!r}, want the AUROC as one number"
+    assert abs(float(got) - want) < 1e-4, \
+        (f"❌ evaluate returned {float(got):.4f}, but the held-out AUROC of this model is {want:.4f}: score every "
+         "sequence of X_test and compare the probabilities with test_y")
+    assert all(torch.equal(w0, q.detach()) for w0, q in zip(weights, m.parameters())), \
+        "❌ evaluate changed the weights: it must only score, without training"
     idx = torch.from_numpy(np.random.default_rng(0).choice(len(X_train), 5000, replace=False))
     small_loader = DataLoader(TensorDataset(X_train[idx], y_train[idx]), batch_size=256, shuffle=True, drop_last=True)
-    seen, real_roc_auc_score = [], roc_auc_score
-
-    def spy(y_true, y_score):        # keeps what evaluate passes to roc_auc_score
-        seen.append(np.asarray(y_score))
-        return real_roc_auc_score(y_true, y_score)
-
-    roc_auc_score = spy
-    try:
-        torch.manual_seed(SEED)
-        curve = train(GlobalCNN(), small_loader, test_seqs, test_y, epochs=1)
-    finally:
-        roc_auc_score = real_roc_auc_score
-    assert seen, "❌ evaluate never called roc_auc_score"
-    for pr in seen:
-        assert pr.shape == (len(test_seqs),), \
-            f"❌ evaluate gave scores of shape {pr.shape}, want ({len(test_seqs)},): one score per sequence it was given"
-        assert np.isfinite(pr).all(), "❌ the probabilities contain NaN or infinite values"
-        assert pr.min() >= 0 and pr.max() <= 1, \
-            (f"❌ the evaluated scores range from {pr.min():.2f} to {pr.max():.2f}, so they are logits. "
-             "Turn them into probabilities between 0 and 1 with the sigmoid")
+    torch.manual_seed(SEED)
+    curve = train(GlobalCNN(), small_loader, test_seqs, test_y, epochs=1)
     auc = curve["test_auc"][-1]
     assert 0.5 < auc <= 1, f"❌ the held-out AUROC after 1 epoch on 5,000 sequences is {auc:.3f}, want between 0.5 and 1"
-    print(f"✅ TODO-3 test passed: train_step clears the gradients and moves the weights; evaluate turns "
-          f"the scores into probabilities (held-out AUROC {auc:.3f} after 1 epoch on 5,000 sequences)")
+    print(f"✅ TODO-3 test passed: train_step clears the gradients and moves the weights; evaluate gives the "
+          f"held-out AUROC without changing the weights ({auc:.3f} after 1 epoch on 5,000 sequences)")
 
 
 test_train()
@@ -746,23 +746,6 @@ MY_MOTIF = motifs[MY_FILTER]   # its consensus; or type the motif you read off i
 print(f"filter {MY_FILTER:02d} | testing the motif {MY_MOTIF}")
 
 # %% [markdown]
-# **A first control.** Run the same filter on **unbound** RNA. If it gives the same logo there, it picks
-# up a property of RNA in general (for example, how U-rich it is) and tells you little about AGO2. In
-# that case choose another filter, set `MY_FILTER` above, and rerun that cell and this one.
-
-# %%
-#@title ▶ The same filter on bound and on unbound RNA { display-mode: "form" }
-neg_seqs = [s for s, y in zip(test_seqs, test_y) if y == 0] + \
-           [s for s, y in zip(train_seqs, train_y) if y == 0][:5000]
-acts_neg = filter_activations(model, neg_seqs)
-f = MY_FILTER
-a_n = acts_neg[:, f, :]
-pwm_neg = pwm_of(windows_above(a_n, neg_seqs, cutoff_for(a_n)))
-fig, ax = plt.subplots(1, 2, figsize=(8, 1.8))
-draw_logo(pwms[f], f"Filter {f:02d}, bound RNA", ax[0]); draw_logo(pwm_neg, f"Filter {f:02d}, unbound RNA", ax[1])
-plt.tight_layout(); plt.show()
-
-# %% [markdown]
 # ## 7. Now test it (TODO-5)
 #
 # A logo shows which windows activate one filter. Whether that pattern changes the model's *output* is a
@@ -898,8 +881,6 @@ plt.tight_layout(); plt.show()
 #   another order, tests whether the model's output responds to the pattern.
 # * A strongly activated filter can still lower the score. Its effect on the output passes
 #   through every layer above it, so your curve can go down.
-# * If the logo looks the same on bound and unbound RNA, that filter picks up a property of RNA in
-#   general (for example, how U-rich it is) and tells you little about AGO2.
 # * The CNN's last layer has one weight per (filter, **position**). Almost every sequence in this data
 #   set, bound or unbound, was cut so that the measured ~40-letter site sits at letters 150–190, with
 #   context on both sides (the sequences are 137 to 375 letters long), and the CNN learned to weight
