@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="02_foundation_models_files/libs/clipboard/clipboard.min.js"></script>
+<script src="02_foundation_models_files/libs/quarto-html/tabby.min.js"></script>
+<script src="02_foundation_models_files/libs/quarto-html/popper.min.js"></script>
+<script src="02_foundation_models_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="02_foundation_models_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="02_foundation_models_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="02_foundation_models_files/libs/quarto-html/quarto-syntax-highlighting-226bd0f977fa82dfae4534cac220d79a.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.23">
+
+  <title>Part 2: DNA foundation models</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="02_foundation_models_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="02_foundation_models_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="02_foundation_models_files/libs/revealjs/dist/theme/quarto-00ac2f6af1389919a18f42df5b7c0002.css">
+  <link rel="stylesheet" href="style.css">
+  <link href="02_foundation_models_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="02_foundation_models_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="02_foundation_models_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="02_foundation_models_files/libs/revealjs/plugin/simplemenu/simplemenu.css" rel="stylesheet">
+  <link href="02_foundation_models_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-state="hide-menubar" class="quarto-title-block center">
+  <h1 class="title">Applications of AI in Biotechnology and Genomics</h1>
+  <p class="subtitle">Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory</p>
+
+<div class="quarto-title-authors">
+</div>
+
+</section><section id="TOC">
+<nav role="doc-toc"> 
+<h2 id="toc-title">Table of contents</h2>
+<ul>
+<li><a href="#/from-sequence-to-prediction" id="/toc-from-sequence-to-prediction">1 From sequence to prediction</a></li>
+<li><a href="#/tokenization" id="/toc-tokenization">2 Tokenization</a></li>
+<li><a href="#/embedding" id="/toc-embedding">3 Embedding</a></li>
+<li><a href="#/the-transformer" id="/toc-the-transformer">4 The transformer</a></li>
+<li><a href="#/prediction-heads" id="/toc-prediction-heads">5 Prediction heads</a></li>
+<li><a href="#/hands-on" id="/toc-hands-on">6 Hands-on</a></li>
+<li><a href="#/frozen-models-and-the-cnn" id="/toc-frozen-models-and-the-cnn">7 Frozen models and the CNN</a></li>
+</ul>
+</nav>
+</section>
+<section id="from-sequence-to-prediction" class="title-slide slide level1 center" data-name="Overview">
+<h1>1 From sequence to prediction</h1>
+
+</section>
+
+<section id="pretraining-by-analogy" class="slide level2">
+<h2>1.1 Pretraining, by analogy</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/pretrain_analogy_0.png" height="742"></p>
+<p><img data-src="assets/custom/pretrain_analogy_1.png" class="fragment" height="742"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>A language model reads billions of sentences and learns to predict each next word. No one labels anything: the text supplies its own answers.</li>
+<li>To get “mat” right, a model has to learn grammar, which words go together, something about cats. That knowledge is the point of pretraining.</li>
+<li>Click: a DNA language model does the same on genome sequence. The bottom row is real: the last tokens of a real sequence from our data, cut into Mistral-DNA’s tokens, and the token that follows.</li>
+<li>To predict the next token well, it has to learn which stretches of DNA occur together, and that may include signals that matter for our task.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="pretraining-a-model" class="slide level2">
+<h2>1.2 Pretraining a model</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_adapt_0.png" height="729"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>The same sentence as the last slide. The model is a stack of layers, the <strong>body</strong>. It turns the words into an <strong>embedding</strong>: a vector of numbers that represents the input, in context.</li>
+<li>A small output layer, the <strong>head</strong>, reads the embedding and predicts the next word.</li>
+<li>Pretraining trains the body and the head together on billions of sentences, with no labels: the text supplies its own answers.</li>
+<li>The embedding here is drawn, not computed. On the DNA version (next slide, last clicks) it is real.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="one-model-many-tasks" class="slide level2">
+<h2>1.3 One model, many tasks</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_adapt_1.png" height="729"></p>
+<p><img data-src="assets/custom/d2_adapt_2.png" class="fragment" height="729"></p>
+<p><img data-src="assets/custom/d2_adapt_3.png" class="fragment" height="729"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>The body is learned once and kept. Each new task gets its own small head on the same embedding: sentiment, translation and many more.</li>
+<li>A new task needs far fewer labelled examples than training a model from scratch, because the body already captures much of the language. This is a <strong>foundation model</strong>: pretrain once, adapt many times.</li>
+<li>Click: the same for DNA. Mistral-DNA (16M parameters) was pretrained on the human genome to predict the next token. The input is the end of a real sequence from our data, cut into Mistral-DNA’s tokens, and the embedding is Mistral-DNA’s real output for its last token (the first 12 of 256 numbers).</li>
+<li>Click: new heads for new tasks. Ours predicts AGO2 binding; others predict expression levels, splice sites, and so on.</li>
+<li>The claim to test in parts 2 and 3: what a model learns in pretraining transfers, so each task needs fewer labels.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-pretraining-objectives" class="slide level2">
+<h2>1.4 Two pretraining objectives</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_obj_0.png" height="700"></p>
+<p><img data-src="assets/custom/d2_obj_1.png" class="fragment" height="700"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>Top: the end of a real sequence from our data, cut into Mistral-DNA’s tokens, with the next one hidden. Next-token models (Mistral-DNA, HyenaDNA, Evo) predict each token from the tokens before it. <span class="math inline">\(x_t\)</span> is the token at position <span class="math inline">\(t\)</span>; <span class="math inline">\(x_{&lt;t}\)</span> the tokens before it.</li>
+<li>Click: masked models (Nucleotide Transformer, DNABERT-2) hide about 15% of the tokens and predict each from the tokens on both sides. <span class="math inline">\(x_{\setminus t}\)</span> is all tokens except the hidden ones.</li>
+<li>Both losses are the cross-entropy of part 1: minus the log of the probability the model gives the true token.</li>
+<li>In both, the genome supplies its own targets, so no experimental labels are needed.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-the-model-predicts" class="slide level2">
+<h2>1.5 What the model predicts</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/d2_next.png" class="quarto-figure quarto-figure-center" height="755"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Mistral-DNA, given the real context of the last slide, gives a probability to each of its 4,096 possible next tokens. Light blue: its top 8; orange: the true token, with a much lower probability.</li>
+<li>Its top choice gets about 10%. Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.</li>
+<li>The head turns one score per vocabulary token into these probabilities with the softmax (section 5).</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="four-stages" class="slide level2">
+<h2>1.6 Four stages</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_stages_0.png" height="742"></p>
+<p><img data-src="assets/custom/d2_stages_1.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/d2_stages_2.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/d2_stages_3.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/d2_stages_4.png" class="fragment" height="742"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>These four stages describe most sequence models in use today. This part goes through them in order.</li>
+<li>The example is real: Mistral-DNA on the first 40 letters of one bound sequence (its first 6 tokens shown). One click per stage.</li>
+<li>Click, tokenization: the letters are cut into tokens (section 2).</li>
+<li>Click, embedding: each token becomes a row of 256 numbers taken from a learned table, its <strong>token embedding</strong> (section 3; the first 40 numbers shown). The same token always gets the same row.</li>
+<li>Click, body: the transformer turns them into <strong>contextual embeddings</strong>: still one row per token, but now each row depends on all the tokens (section 4). These are the embeddings of slide 1.2.</li>
+<li>Click, head: in pretraining it predicts the next token; for our task, P(bound), the probability that AGO2 binds (section 5).</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="tokenization" class="title-slide slide level1 center" data-name="Tokens">
+<h1>2 Tokenization</h1>
+<p><img data-src="assets/custom/stage_strip_0.png" height="141"></p>
+</section>
+
+<section id="single-letters" class="slide level2">
+<h2>2.1 Single letters</h2>
+<ul>
+<li>A vocabulary of 4: each letter is a token, as in the CNN</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/tokens_letters.png" class="quarto-figure quarto-figure-center" height="655"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Projected: 1 min.</li>
+<li>The figure and the next two: the same 30 letters of a real bound sequence, one box per token, with the token count on the right.</li>
+<li>A 330-letter sequence is 330 tokens. Every position is kept, but the model has to learn from scratch which letters belong together.</li>
+<li>Some genome models (HyenaDNA, Evo) also read single letters, which needs a model that can handle long inputs: a 1,000-letter sequence is 1,000 tokens.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="k-mers" class="slide level2">
+<h2>2.2 k-mers</h2>
+<ul>
+<li>Fixed words of 6 letters, a vocabulary of <span class="math inline">\(4^6 = 4{,}096\)</span> (Nucleotide Transformer, NT)</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/tokens_kmer.png" class="quarto-figure quarto-figure-center" height="655"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Projected: 1 min.</li>
+<li>The models read DNA letters, so U becomes T. This is the same stretch of a real bound sequence from our data, cut into Nucleotide Transformer’s 6-mer tokens.</li>
+<li>Shift the sequence by one letter and every token changes.</li>
+<li>A sequence of n letters becomes about n / 6 tokens, so the model can read six times more sequence for the same cost.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="byte-pair-encoding-bpe" class="slide level2">
+<h2>2.3 Byte-pair encoding (BPE)</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_bpe_0.png" height="594"></p>
+<p><img data-src="assets/custom/d2_bpe_1.png" class="fragment" height="594"></p>
+<p><img data-src="assets/custom/d2_bpe_2.png" class="fragment" height="594"></p>
+<p><img data-src="assets/custom/d2_bpe_3.png" class="fragment" height="594"></p>
+<p><img data-src="assets/custom/d2_bpe_4.png" class="fragment" height="594"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>Start from single letters; merge the most frequent neighbouring pair into a new token, and repeat. The rules are learned once, on the genome: count every pair of neighbouring tokens, merge the most frequent pair into a new token, and repeat until the vocabulary is full. Mistral-DNA has 4,087 merge rules.</li>
+<li>To cut a new sequence, the rules are applied in the order they were learned. These are Mistral-DNA’s real rules, on the same 30 letters as the last two slides.</li>
+<li>Click: rule 1, A + A → AA, the most frequent pair in the genome. Click: rule 2, T + T → TT. Click: rule 3, T + G → TG.</li>
+<li>Click: after all 15 rules that apply to these letters, 8 tokens, exactly what Mistral-DNA’s tokenizer gives.</li>
+<li>Frequent stretches become one token and rare ones stay short, so token lengths vary. DNABERT-2 also uses BPE.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="batches-padding-and-the-mask" class="slide level2">
+<h2>2.4 Batches: padding and the mask</h2>
+<ul>
+<li>Sequences in a batch are padded to the same number of tokens; the <strong>attention mask</strong> marks the real ones</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/pad_mask.png" class="quarto-figure quarto-figure-center" height="606"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Three real bound sequences (22, 31 and 40 letters, in DNA letters as the model reads them), tokenized together. Each row is one sequence; each cell one token, with its mask value below it.</li>
+<li><code>[CLS]</code> and <code>[SEP]</code> are special tokens the tokenizer adds at the start and end. Shorter sequences are filled with padding tokens up to the longest one in the batch.</li>
+<li>The mask is 1 for real tokens (including <code>[CLS]</code> and <code>[SEP]</code>) and 0 for padding. The model uses it to ignore padding, and the sequence embedding averages the last-layer vectors only where it is 1.</li>
+<li>Without the mask, the padding vectors enter the average, and the same sequence gets a different embedding depending on which batch it is in.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="embedding" class="title-slide slide level1 center" data-name="Embedding">
+<h1>3 Embedding</h1>
+<p><img data-src="assets/custom/stage_strip_1.png" height="141"></p>
+</section>
+
+<section id="token-embeddings" class="slide level2">
+<h2>3.1 Token embeddings</h2>
+<ul>
+<li>Token <span class="math inline">\(i\)</span> becomes row <span class="math inline">\(i\)</span> of a learned table <span class="math inline">\(E\)</span>: <span class="math inline">\(\;e_i = x_i^\top E\)</span></li>
+</ul>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_emb_0.png" height="643"></p>
+<p><img data-src="assets/custom/d2_emb_1.png" class="fragment" height="643"></p>
+</div>
+<aside class="notes">
+<ul>
+<li><span class="math inline">\(x_i\)</span> is the one-hot vector of token <span class="math inline">\(i\)</span>: 4,096 numbers, all 0 except a 1 at position <span class="math inline">\(i\)</span>. Each entry is drawn next to the row of <span class="math inline">\(E\)</span> it multiplies.</li>
+<li><span class="math inline">\(E\)</span> is Mistral-DNA’s real table: 4,096 rows, one per token, of 256 numbers each (first 48 shown); blue positive, orange negative.</li>
+<li>Click: the product keeps only the row where <span class="math inline">\(x_i\)</span> is 1. Token AAA, row 18, becomes its <strong>token embedding</strong> <span class="math inline">\(e_i\)</span>.</li>
+<li>So an embedding layer is a table lookup. The CNN’s one-hot encoding is the same lookup with a fixed 4 × 4 identity table: nothing learned.</li>
+<li>The table is learned during pretraining, so tokens that occur in similar contexts end up with similar rows.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-transformer" class="title-slide slide level1 center" data-name="Transformer">
+<h1>4 The transformer</h1>
+<p><img data-src="assets/custom/stage_strip_2.png" height="141"></p>
+</section>
+
+<section id="the-body-as-a-black-box" class="slide level2">
+<h2>4.1 The body, as a black box</h2>
+<ul>
+<li>One row in per token, one row out; each row out depends on all the tokens</li>
+</ul>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_body_0.png" height="646"></p>
+<p><img data-src="assets/custom/d2_body_1.png" class="fragment" height="646"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>The token TCACTG in a real bound sequence (highlighted). Its token embedding, from the table, goes into the body; out comes its <strong>contextual embedding</strong> (first 32 of 256 numbers shown).</li>
+<li>Click: the same token in a second real sequence. The row going in is identical, because the table has one row per token. The rows coming out differ: inside the body, each token’s row is updated with information from the other tokens (attention).</li>
+<li>Mistral-DNA’s body: 8 layers, 256 numbers per token, up to 512 tokens. Attention alone does not see token order, so the model also adds position information (Mistral-DNA rotates each row by an angle that depends on its position).</li>
+<li>We do not open the layers today. For the exercise we need only the last layer’s output.</li>
+<li>The CNN’s convolutions see a 10-letter window and a few pooled neighbours; a transformer layer can relate any two tokens in the input.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-whole-pipeline-on-one-sequence" class="slide level2" data-todo="TODO-1">
+<h2>4.2 The whole pipeline on one sequence</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/walk_0.png" height="742"></p>
+<p><img data-src="assets/custom/walk_1.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/walk_2.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/walk_3.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/walk_4.png" class="fragment" height="742"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>Mistral-DNA on the first 60 letters of one real sequence; the left column shows where we are in the pipeline.</li>
+<li>1 Tokenization: the letters become 14 tokens, with the special tokens <code>[CLS]</code> and <code>[SEP]</code> added at the start and end (they are not DNA).</li>
+<li>2 Embedding: each token picks its row of the learned table: one row of 256 numbers per token (blue positive, orange negative).</li>
+<li>3 Body: after the 8 transformer layers there is still one row per token, but each row now depends on every token of the sequence.</li>
+<li>4 Prediction head: average the rows over the real tokens, the <strong>sequence embedding</strong>, 256 numbers. In a batch the attention mask keeps padding out of this average (slide 2.4).</li>
+<li>Then a prediction head turns those 256 numbers into P(bound), the probability that AGO2 binds (section 5); you train it in TODO-2.</li>
+<li>A few dimensions are large for almost every token (the vertical stripes). That is common in transformer models and does not depend on the sequence.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="in-the-cnn-and-in-a-dna-language-model" class="slide level2">
+<h2>4.3 In the CNN and in a DNA language model</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_compare_0.png" height="742"></p>
+<p><img data-src="assets/custom/d2_compare_1.png" class="fragment" height="742"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>The same four stages as slide 1.6, at the same place on the slide.</li>
+<li>First the CNN of part 1: single letters, a fixed one-hot table, two convolution layers, one linear layer to a logit.</li>
+<li>Click: Mistral-DNA, stage by stage: BPE tokens (slide 2.3), a learned table (slide 3.1), a transformer body (slide 4.1), and a head for the next token or for your task.</li>
+<li>The CNN’s stages were fixed by us (one-hot) or trained on 92,346 labels. A language model learns its embedding and body from unlabelled genome sequence first.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="prediction-heads" class="title-slide slide level1 center" data-name="Heads">
+<h1>5 Prediction heads</h1>
+<p><img data-src="assets/custom/stage_strip_3.png" height="141"></p>
+</section>
+
+<section id="prediction-heads-1" class="slide level2">
+<h2>5.1 Prediction heads</h2>
+<p><strong>Softmax</strong>: the sigmoid for many classes; one score per token in, probabilities that sum to 1 out</p>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_heads_0.png" height="626"></p>
+<p><img data-src="assets/custom/d2_heads_1.png" class="fragment" height="626"></p>
+<p><img data-src="assets/custom/d2_heads_2.png" class="fragment" height="626"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>Left: the body’s output for the sequence of slide 4.2, one row of 256 numbers per token: its contextual embeddings. One head per click.</li>
+<li>Next token: the last token’s row goes through a linear layer to 4,096 scores, one per vocabulary token; the softmax turns them into probabilities that sum to 1. Masked token: the same, from the hidden token’s row.</li>
+<li>These two are the pretraining heads (slide 1.4). After pretraining they are dropped; the embedding table and the body are kept.</li>
+<li>Our task: the average of all rows, the <strong>sequence embedding</strong> (the 256 numbers of slide 4.2), goes through one linear layer to one number, then the sigmoid: P(bound).</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-linear-probe" class="slide level2" data-todo="TODO-2">
+<h2>5.2 The linear probe</h2>
+<ul>
+<li>A new head, trained on labelled sequences; the body stays frozen</li>
+</ul>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_probe_0.png" height="646"></p>
+<p><img data-src="assets/custom/d2_probe_1.png" class="fragment" height="646"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>The sequence embedding <span class="math inline">\(e = (e_1, \dots, e_{256})\)</span> of slide 4.2: the average of the body’s output rows.</li>
+<li>The head is logistic regression, the model of part 1 (slides 2.10 and 2.11) with 256 inputs instead of 2: each number gets a weight, the weighted sum plus a bias <span class="math inline">\(b\)</span> goes through the sigmoid <span class="math inline">\(\sigma\)</span>, and the result <span class="math inline">\(\hat p\)</span> is the probability that AGO2 binds, P(bound).</li>
+<li>Click: it is trained on 12,000 labelled sequences; three real ones are shown, their sequence embeddings and their labels. Only the 256 weights and the bias are learned; the body stays frozen. This is a <strong>linear probe</strong>.</li>
+<li>Before fitting, each of the 256 numbers is standardised (mean 0, standard deviation 1 on the training sequences), and regularisation keeps the weights small (<code>C = 0.1</code> in scikit-learn).</li>
+<li>Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="from-pretraining-to-our-task" class="slide level2">
+<h2>5.3 From pretraining to our task</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_summary_0.png" height="730"></p>
+<p><img data-src="assets/custom/d2_summary_1.png" class="fragment" height="730"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>1, pretraining: the genome supplies its own targets. The tokenizer’s rules, the embedding table, the body and the next-token head are all learned; Mistral-DNA’s authors did this.</li>
+<li>Click, 2, adapting: the tokenizer, the table and the body are kept as they are (frozen, grey). The next-token head is replaced by a new head for our task, trained on labelled AGO2 sequences.</li>
+<li>Training only the new head is a linear probe, the simplest form of fine-tuning, and this part’s notebook. Updating the body as well is fine-tuning in the full sense; part 3 compares it with the CNN.</li>
+<li>It can help because the body was trained on far more sequence than any one task has labels.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="dna-language-models-2021-to-2025" class="slide level2">
+<h2>5.4 DNA language models, 2021 to 2025</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/landscape.png" class="quarto-figure quarto-figure-center" height="752"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>x: year of publication; y: parameters, log scale. Filled points are masked models, open points next-token models. The vertical line joins the Nucleotide Transformer sizes.</li>
+<li>DNABERT (110M parameters), Nucleotide Transformer (50M to 2.5B), DNABERT-2 and HyenaDNA, then Evo (7B) and Evo 2 (40B).</li>
+<li>Not shown: Enformer, Borzoi and AlphaGenome, trained with labels from thousands of experiments, and the reference models for predicting gene regulation from sequence.</li>
+<li>The wrap-up shows ten models from these families tested on AGO2.</li>
+</ul>
+<p>Next: load a pretrained model and probe it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="hands-on" class="title-slide slide level1 center" data-name="Hands-on">
+<h1>6 Hands-on</h1>
+
+</section>
+
+<section id="loading-a-model-from-hugging-face" class="slide level2">
+<h2>6.1 Loading a model from Hugging Face</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/d2_hf_0.png" height="671"></p>
+<p><img data-src="assets/custom/d2_hf_1.png" class="fragment" height="671"></p>
+<p><img data-src="assets/custom/d2_hf_2.png" class="fragment" height="671"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>The four stages again. The first three come pretrained from the Hugging Face Hub under one name; the prediction head is yours (TODO-2).</li>
+<li>Click: <code>AutoTokenizer.from_pretrained(name)</code> downloads the tokenizer, its 4,096-token vocabulary and merge rules.</li>
+<li>Click: <code>AutoModel.from_pretrained(name)</code> downloads the embedding table and the body: 16M weights, about 60 MB, roughly 10 seconds on Colab.</li>
+<li>The same two calls load any model on the Hub. Each model has a model card: what it was trained on, how, and its known limits.</li>
+<li>The model reads DNA letters, so our U becomes T before tokenizing. Mistral-DNA’s name says 17M because it also counts the next-token head, which we do not use.</li>
+<li>In the notebook, TODO-1 is one function, <code>embed</code>, written from a table that maps each step (tokenize, run the model, last layer, masked mean, collect) to its API.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="your-turn" class="slide level2">
+<h2>6.2 Your turn</h2>
+<p>Open <strong><code>02_foundation_models.ipynb</code></strong>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/your_turn_d2.png" class="quarto-figure quarto-figure-center" height="679"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Signatures: <code>embed(tok, model, seqs)</code> returns an <code>(N, 256)</code> array; <code>probe_auc(...)</code> returns <code>(auc, probe)</code>.</li>
+<li>TODO-1: before writing <code>embed</code>, the notebook prints one sequence’s tokens and a padded pair, and asks how many letters a token holds (about 5) and whether a ~330-letter sequence fits in 512 tokens. The test checks the same vector alone and in a padded batch. Its test checks the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
+<li>TODO-2: the probe trains on 12,000 sequences (the <code>C=0.1</code> setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set; the test cell says so.</li>
+<li>NT-500M (human reference) is a 2 GB download, so its vectors are provided. It scores about 0.79 from these precomputed vectors.</li>
+<li>The live row is section 3 of the notebook: start the cell and read the take-aways while it trains.</li>
+<li>Each TODO has a test cell; the solutions are published on the workshop site during the workshop.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="frozen-models-and-the-cnn" class="title-slide slide level1 center" data-name="Results">
+<h1>7 Frozen models and the CNN</h1>
+
+</section>
+
+<section id="frozen-pretrained-models-against-the-cnn" class="slide level2">
+<h2>7.1 Frozen pretrained models against the CNN</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/results_part2.png" class="quarto-figure quarto-figure-center" height="766"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Show after the notebook. Held-out AUROC on the same 1,000 sequences; bars start at 0.5 (chance). Blue: probes on frozen pretrained models (light blue: the 105M model after 3 minutes of pretraining; grey: random weights); green: the CNN trained on all 92,346 sequences.</li>
+<li>Mistral-DNA with a probe: 0.78. NT-500M, 30 times larger: 0.79. A difference of 0.01 on 1,000 test sequences is within sampling noise, so there is no evidence that size helps here.</li>
+<li>Both are below the part 1 CNN at 0.86, but the CNN was trained on about 92,000 labels and the probes on 12,000. At equal label counts the gap is smaller (part 3: CNN 0.82 vs probe 0.77 at 12,000 labels).</li>
+<li>The 105M model with random weights gives 0.55; after 3 minutes of pretraining, 0.72 in the run on this figure (0.73 in our latest run). That is only a little above the two composition numbers of part 1 (0.66), so it should not be read as learned binding biology.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<p><img src="assets/logo.png" class="slide-logo"></p>
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="02_foundation_models_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="02_foundation_models_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="02_foundation_models_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="02_foundation_models_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="02_foundation_models_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="02_foundation_models_files/libs/revealjs/plugin/simplemenu/simplemenu.js"></script>
+  <script src="02_foundation_models_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="02_foundation_models_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="02_foundation_models_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="02_foundation_models_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="02_foundation_models_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'simplemenu': {"menubarclass":"menubar","menuclass":"menu","activeclass":"active","activeelement":"li","flat":true,"barhtml":{"header":"<div class='menubar'><ul class='menu'></ul></div>","footer":""},"scale":0.42},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: false,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1600,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, Simplemenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <!-- A second menu row under the section menu: one link per TODO slide (slides tagged data-todo). -->
+    <style>
+      .todo-bar { position: fixed; left: 0; right: 0; z-index: 40; display: flex; justify-content: center; gap: 10px;
+                  pointer-events: none; font-family: Roboto, sans-serif; }
+      .todo-bar a { pointer-events: auto; font-size: 12px; line-height: 1; padding: 3px 9px; border-radius: 10px;
+                    color: #1A73E8; background: #E8F0FE; text-decoration: none; }
+      .todo-bar a.active { color: #fff; background: #1A73E8; }
+      .todo-bar a:hover { background: #D2E3FC; }
+      .todo-bar a.active:hover { background: #1A73E8; }
+      .reveal[data-state~="hide-menubar"] ~ .todo-bar, body.hide-todo .todo-bar { display: none; }
+    </style>
+    <script>
+    (function () {
+      function build() {
+        var slides = Reveal.getSlides(), todos = [];
+        slides.forEach(function (s, i) {
+          var t = s.getAttribute("data-todo");
+          if (t) todos.push({ name: t, index: i });
+        });
+        if (!todos.length) return;
+        var bar = document.createElement("div");
+        bar.className = "todo-bar";
+        todos.forEach(function (t) {
+          var a = document.createElement("a");
+          a.href = "#"; a.textContent = t.name;
+          a.addEventListener("click", function (e) { e.preventDefault(); Reveal.slide(t.index); });
+          t.el = a; bar.appendChild(a);
+        });
+        document.body.appendChild(bar);
+        function place() {
+          var mb = document.querySelector(".menubar");
+          var r = mb ? mb.getBoundingClientRect() : null;
+          bar.style.top = ((r && r.height) ? r.bottom + 4 : 30) + "px";
+        }
+        function update() {
+          var cur = Reveal.getIndices().h;
+          var title = Reveal.getCurrentSlide().id === "title-slide";
+          document.body.classList.toggle("hide-todo", title);
+          todos.forEach(function (t) { t.el.classList.toggle("active", t.index === cur); });
+          place();
+        }
+        Reveal.on("slidechanged", update);
+        Reveal.on("resize", place);
+        update();
+      }
+      if (window.Reveal && Reveal.isReady && Reveal.isReady()) build();
+      else window.addEventListener("load", function () {
+        if (Reveal.isReady()) build(); else Reveal.on("ready", build);
+      });
+    })();
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+
+<script>
+(function () {
+  function loaded(sl) {      // reveal loads a slide's images only when it is shown; wait for them
+    return Promise.all([].map.call(sl.querySelectorAll('img'), function (im) {
+      if (im.complete && im.naturalWidth) return Promise.resolve();
+      return new Promise(function (res) { im.addEventListener('load', res); im.addEventListener('error', res);
+                                          setTimeout(res, 4000); });
+    }));
+  }
+  async function go() {
+    document.querySelectorAll('.fragment').forEach(function (f) { f.classList.add('visible'); });
+    var out = [], n = Reveal.getTotalSlides();
+    for (var i = 0; i < n; i++) {
+      Reveal.slide(i);
+      document.querySelectorAll('.fragment').forEach(function (f) { f.classList.add('visible'); });
+      await loaded(Reveal.getCurrentSlide());
+      await new Promise(function (res) { setTimeout(res, 150); });
+      var sl = Reveal.getCurrentSlide(), r = sl.getBoundingClientRect(), s = Reveal.getScale(), bottom = 0;
+      sl.querySelectorAll('img,p,li,table,h2,pre,.MathJax,.katex-display,mjx-container,span').forEach(function (e) {
+        if (e.closest('aside')) return;
+        var b = e.getBoundingClientRect(); if (!b.width) return;
+        bottom = Math.max(bottom, (b.bottom - r.top) / s);
+      });
+      var imgs = [].map.call(sl.querySelectorAll('img'), function (im) {
+        var b = im.getBoundingClientRect(), col = im.closest('.column');
+        return {src: (im.getAttribute('src') || '').split('?')[0], h: b.height / s, w: b.width / s,
+                col: col ? col.getBoundingClientRect().width / s : null, stack: !!im.closest('.r-stack')};
+      }).filter(function (o) { return o.src && o.src.indexOf('logo') < 0 && o.h > 0; });
+      out.push({i: i, title: (sl.querySelector('h1,h2') || {}).textContent || '', bottom: bottom, imgs: imgs});
+    }
+    fetch('http://127.0.0.1:8766/', {method: 'POST', mode: 'no-cors', body: JSON.stringify(out)});
+  }
+  function wait() {
+    if (window.Reveal && Reveal.isReady && Reveal.isReady()) setTimeout(go, 1500); else setTimeout(wait, 200);
+  }
+  wait();
+})();
+</script>
+</body></html>

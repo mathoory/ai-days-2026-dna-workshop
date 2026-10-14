@@ -105,12 +105,26 @@ def agenda():
 def bio_flow(with_ago2):
     """DNA -> mRNA -> protein; on the click, an RNA-binding protein (AGO2) sitting on a site in the mRNA."""
     from matplotlib.patches import FancyBboxPatch
+    if not with_ago2:                                    # top to bottom, to sit in a column beside the protein picture
+        fig, ax = canvas(10, 8, xlim=(0, 100), ylim=(0, 80))
+        rows = [(72, "Gene (DNA)", "A C G T", INK), (40, "Messenger RNA (mRNA)", "A C G U", "#F29A1F"),
+                (8, "Protein", "", "#4A7CBF")]                # as in the picture: RNA orange, protein blue
+        for y, n, l, col in rows:
+            label(ax, 50, y, n, fs=44, color=col, bold=col != INK)
+            if l:
+                label(ax, 50, y - 10, l, fs=38, color=MUTED if col == INK else col, family=MONO)
+        for (a, b), tx in zip([(57, 47), (25, 15)], ["copied", "translated"]):
+            arrow(ax, 50, a, 50, b, color=MUTED, lw=3, ms=32)
+            label(ax, 54, (a + b) / 2, tx, fs=30, color=MUTED, ha="left")
+        save_raw(fig, "bio_flow_base")
+        return
     fig, ax = canvas(16, 8, ylim=(0, 80))
     xs = [20, 80, 140]
     for x, n, l in zip(xs, ["Gene (DNA)", "Messenger RNA\n(mRNA)", "Protein"], ["A C G T", "A C G U", ""]):
-        label(ax, x, 66, n, fs=40)
+        col = {"Gene (DNA)": INK, "Protein": "#4A7CBF"}.get(n, "#F29A1F")   # as in the picture: RNA orange, protein blue
+        label(ax, x, 66, n, fs=40, color=col, bold=col != INK)
         if l:
-            label(ax, x, 51, l, fs=34, color=MUTED, family=MONO)
+            label(ax, x, 51, l, fs=34, color=MUTED if col == INK else col, family=MONO)
     for (a, b), tx in zip([(37, 54), (106, 124)], ["copied", "translated"]):
         arrow(ax, a, 66, b, 66, color=MUTED, lw=3, ms=32)
         label(ax, (a + b) / 2, 73, tx, fs=28, color=MUTED)
@@ -590,7 +604,7 @@ if __name__ == "__main__":
     if run("timeline"):
         timeline()
     if run("bio_flow"):
-        bio_flow(False); bio_flow(True)
+        bio_flow(False)                                  # the AGO2 frame is replaced by the protein picture
     if run("slide_filter"):
         slide_filter()
     if run("toy_cutoff"):
@@ -611,7 +625,7 @@ if __name__ == "__main__":
 
     # crop every click-through group to the union of its ink, so frames fill the slide and still stack exactly
     TRIM_GROUPS = [[f"slide_filter_{k}" for k in range(5)], ["toy_cutoff_0", "toy_cutoff_1"],
-                   [f"roc_frame_{k}" for k in range(4)], ["bio_flow_base", "bio_flow_ago2"]]
+                   [f"roc_frame_{k}" for k in range(4)], ["bio_flow_base"]]
     for g in TRIM_GROUPS:
         if all((OUT / f"{n}.png").exists() for n in g):
             trim_group(g)

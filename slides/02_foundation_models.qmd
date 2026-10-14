@@ -24,84 +24,81 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 ## 1.2 Pretraining a model
 
-![](assets/custom/adapt_0.png){fig-align="center" height="766px"}
-
-::: {.notes}
-- One model (the blue block) and one **head**: a small output layer for one task. In pretraining the task is the next word.
-- The model learns from the text alone, billions of examples, no labels.
+::: {.r-stack}
+![](assets/custom/d2_adapt_0.png){height="729px"}
 :::
 
-## 1.3 Adapting it to new tasks
-
-![](assets/custom/adapt_1.png){fig-align="center" height="737px"}
-
 ::: {.notes}
-- The same model, learned once and kept. Each new task gets its own head: sentiment (positive or negative), translation, and many more.
-- A new task needs far fewer labelled examples than training a model from scratch, because the model already "knows the language".
-- This is the idea of a **foundation model**: pretrain once, adapt many times.
+- The same sentence as the last slide. The model is a stack of layers, the **body**. It turns the words into an **embedding**: a vector of numbers that represents the input, in context.
+- A small output layer, the **head**, reads the embedding and predicts the next word.
+- Pretraining trains the body and the head together on billions of sentences, with no labels: the text supplies its own answers.
+- The embedding here is drawn, not computed. On the DNA version (next slide, last clicks) it is real.
 :::
 
-## 1.4 The same for DNA
+## 1.3 One model, many tasks
 
 ::: {.r-stack}
-![](assets/custom/adapt_2.png){height="730px"}
+![](assets/custom/d2_adapt_1.png){height="729px"}
 
-![](assets/custom/adapt_3.png){.fragment height="730px"}
+![](assets/custom/d2_adapt_2.png){.fragment height="729px"}
+
+![](assets/custom/d2_adapt_3.png){.fragment height="729px"}
 :::
 
 ::: {.notes}
-- Today's model: **Mistral-DNA**, 16M parameters, pretrained on the human genome to predict the next token.
-- Click: new heads for new tasks. Ours predicts AGO2 binding from 92,346 labelled sequences; others predict expression levels, splice sites, and so on.
-- Most models so far, like our CNN, are trained from random weights for one task with that task's labels.
+- The body is learned once and kept. Each new task gets its own small head on the same embedding: sentiment, translation and many more.
+- A new task needs far fewer labelled examples than training a model from scratch, because the body already captures much of the language. This is a **foundation model**: pretrain once, adapt many times.
+- Click: the same for DNA. Mistral-DNA (16M parameters) was pretrained on the human genome to predict the next token. The input is the end of a real sequence from our data, cut into Mistral-DNA's tokens, and the embedding is Mistral-DNA's real output for its last token (the first 12 of 256 numbers).
+- Click: new heads for new tasks. Ours predicts AGO2 binding; others predict expression levels, splice sites, and so on.
 - The claim to test in parts 2 and 3: what a model learns in pretraining transfers, so each task needs fewer labels.
 :::
 
-## 1.5 Pretraining objective: the next token
-
-$\mathcal{L} = -\log p_\theta(x_t \mid x_{<t})$: hide the last token, predict it from the ones before
-
-![](assets/custom/objective_next.png){fig-align="center" height="246px"}
-
-![](assets/custom/next_token.png){.fragment fig-align="center" height="377px"}
-
-::: {.notes}
-- Mistral-DNA, HyenaDNA and Evo are trained this way. $x_t$ is the token at position $t$; $x_{<t}$ the tokens before it.
-- Top: the end of a real context from our data, with the next token hidden.
-- Click: Mistral-DNA's probabilities for its top 8 next tokens (light blue), and the true token (orange) with its much lower probability. Its top choice gets about 10%.
-- Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.
-:::
-
-## 1.6 Pretraining objective: masked tokens
-
-$\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the middle, predict it from both sides
-
-![](assets/custom/objective_masked.png){fig-align="center" height="696px"}
-
-::: {.notes}
-- Nucleotide Transformer and DNABERT-2 are trained this way. $x_{\setminus t}$ is all tokens except the hidden ones.
-- Masked models hide about 15% of the tokens and predict them from the tokens on both sides.
-- In both objectives the genome supplies its own targets, so no experimental labels are needed.
-:::
-
-## 1.7 Four stages
-
-![](assets/custom/stages_0.png){fig-align="center" height="754px"}
-
-::: {.notes}
-- These four stages describe most sequence models in use today. This part goes through them in order; the transformer stays a black box.
-:::
-
-## 1.8 In the CNN and in a DNA language model
+## 1.4 Two pretraining objectives
 
 ::: {.r-stack}
-![](assets/custom/stages_1.png){height="692px"}
+![](assets/custom/d2_obj_0.png){height="700px"}
 
-![](assets/custom/stages_2.png){.fragment height="692px"}
+![](assets/custom/d2_obj_1.png){.fragment height="700px"}
 :::
 
 ::: {.notes}
-- First the CNN of part 1: single letters, a fixed one-hot table, two convolution layers, one linear layer to a logit.
-- Click: Mistral-DNA, stage by stage. The CNN's stages were fixed by us (one-hot) or trained on 92,346 labels. A language model learns its embedding and body from unlabelled genome sequence first.
+- Top: the end of a real sequence from our data, cut into Mistral-DNA's tokens, with the next one hidden. Next-token models (Mistral-DNA, HyenaDNA, Evo) predict each token from the tokens before it. $x_t$ is the token at position $t$; $x_{<t}$ the tokens before it.
+- Click: masked models (Nucleotide Transformer, DNABERT-2) hide about 15% of the tokens and predict each from the tokens on both sides. $x_{\setminus t}$ is all tokens except the hidden ones.
+- Both losses are the cross-entropy of part 1: minus the log of the probability the model gives the true token.
+- In both, the genome supplies its own targets, so no experimental labels are needed.
+:::
+
+## 1.5 What the model predicts
+
+![](assets/custom/d2_next.png){fig-align="center" height="755px"}
+
+::: {.notes}
+- Mistral-DNA, given the real context of the last slide, gives a probability to each of its 4,096 possible next tokens. Light blue: its top 8; orange: the true token, with a much lower probability.
+- Its top choice gets about 10%. Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.
+- The head turns one score per vocabulary token into these probabilities with the softmax (section 5).
+:::
+
+## 1.6 Four stages
+
+::: {.r-stack}
+![](assets/custom/d2_stages_0.png){height="742px"}
+
+![](assets/custom/d2_stages_1.png){.fragment height="742px"}
+
+![](assets/custom/d2_stages_2.png){.fragment height="742px"}
+
+![](assets/custom/d2_stages_3.png){.fragment height="742px"}
+
+![](assets/custom/d2_stages_4.png){.fragment height="742px"}
+:::
+
+::: {.notes}
+- These four stages describe most sequence models in use today. This part goes through them in order.
+- The example is real: Mistral-DNA on the first 40 letters of one bound sequence (its first 6 tokens shown). One click per stage.
+- Click, tokenization: the letters are cut into tokens (section 2).
+- Click, embedding: each token becomes a row of 256 numbers taken from a learned table, its **token embedding** (section 3; the first 40 numbers shown). The same token always gets the same row.
+- Click, body: the transformer turns them into **contextual embeddings**: still one row per token, but now each row depends on all the tokens (section 4). These are the embeddings of slide 1.2.
+- Click, head: in pretraining it predicts the next token; for our task, P(bound), the probability that AGO2 binds (section 5).
 :::
 
 ::: {.center}
@@ -138,87 +135,27 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 ## 2.3 Byte-pair encoding (BPE)
 
-- Merge the most frequent neighbouring pair into a new token; repeat until 4,096 tokens
-
-![](assets/custom/tokens_bpe.png){fig-align="center" height="655px"}
-
-::: {.notes}
-- Projected: 2 min.
-- Mistral-DNA's BPE tokenizer on the same bound sequence. Single letters (slide 2.1) are what the CNN read; the 6-mer row is the previous slide.
-- Start from the 4 letters and count every pair of neighbouring tokens in the genome.
-- Frequent stretches become one token and rare ones stay short, so token lengths vary. Mistral-DNA and DNABERT-2 share one BPE vocabulary.
-- The same stretch is split differently by each tokenizer.
-:::
-
-::: {.center}
-# 3 Embedding {data-name="Embedding"}
-
-![](assets/custom/stage_strip_1.png){height="141px"}
-:::
-
-## 3.1 Token embeddings
-
-- Token $i$ becomes row $i$ of a learned table $E$: $\;e_i = x_i^\top E$
-
-![](assets/custom/emb_lookup.png){fig-align="center" height="655px"}
-
-::: {.notes}
-- Projected: 2 min.
-- Left: the real rows of Mistral-DNA's table for the first four tokens of our example sequence; blue positive, orange negative. The table has 4,096 rows of 256 numbers. Right: the CNN's table.
-- $x_i$ is the one-hot vector of token $i$. Multiplying a one-hot vector by $E$ selects one row of $E$, so an embedding layer is implemented as a table lookup.
-- The CNN's one-hot encoding is the same lookup with a fixed 4 × 4 identity table: nothing learned.
-- The table is learned during pretraining, so tokens that occur in similar contexts end up with similar vectors.
-- These are the input vectors, one per token. Section 4 follows them through the transformer and back out as one vector per sequence.
-:::
-
-::: {.center}
-# 4 The transformer {data-name="Transformer"}
-
-![](assets/custom/stage_strip_2.png){height="141px"}
-:::
-
-## 4.1 The transformer, as a black box
-
-- Each output vector depends on every input token (attention)
-
-![](assets/custom/blackbox.png){fig-align="center" height="650px"}
-
-::: {.notes}
-- Attention alone does not see token order. The model adds position information to the token vectors (Mistral-DNA rotates them by an angle that depends on the position).
-- Projected: 2 min.
-- The strips are real: the first 64 of the 256 numbers for each token, at the input (bottom) and after the last layer (top). The blue lines connect every input token to one output vector.
-- In: one vector per token. Out: one vector per token, the same size (256 numbers).
-- Mistral-DNA: 8 layers, 256 numbers per token, up to 512 tokens, 16M parameters.
-- Inside each layer, attention mixes information between positions (8 attention heads per layer in Mistral-DNA) and a small feed-forward network transforms each position. Mistral-DNA's feed-forward part is a mixture of 8 experts. We do not open these today.
-- The CNN's convolutions see a 10-letter window and then a few pooled neighbours; a transformer layer can relate any two tokens in the input.
-- For the exercise we need only its last layer's output: the token-by-256 matrix on the next slide, averaged into one vector.
-:::
-
-## 4.2 The whole pipeline on one sequence {data-todo="TODO-1"}
-
 ::: {.r-stack}
-![](assets/custom/walk_0.png){height="711px"}
+![](assets/custom/d2_bpe_0.png){height="594px"}
 
-![](assets/custom/walk_1.png){.fragment height="711px"}
+![](assets/custom/d2_bpe_1.png){.fragment height="594px"}
 
-![](assets/custom/walk_2.png){.fragment height="711px"}
+![](assets/custom/d2_bpe_2.png){.fragment height="594px"}
 
-![](assets/custom/walk_3.png){.fragment height="711px"}
+![](assets/custom/d2_bpe_3.png){.fragment height="594px"}
 
-![](assets/custom/walk_4.png){.fragment height="711px"}
+![](assets/custom/d2_bpe_4.png){.fragment height="594px"}
 :::
 
 ::: {.notes}
-- Mistral-DNA on the first 60 letters of one real sequence; the left column shows where we are in the pipeline.
-- 1 Tokenization: the letters become 14 tokens, with the special tokens `[CLS]` and `[SEP]` added at the start and end (they are not DNA).
-- 2 Embedding: each token picks its row of the learned table: one row of 256 numbers per token (blue positive, orange negative).
-- 3 Body: after the 8 transformer layers there is still one row per token, but each row now depends on every token of the sequence.
-- 4 Prediction head: average the rows over the real tokens, the **sequence embedding**, 256 numbers. In a batch the attention mask keeps padding out of this average (next slide).
-- Then the linear probe turns those 256 numbers into P(bound); that is what you train in TODO-2.
-- A few dimensions are large for almost every token (the vertical stripes). That is common in transformer models and does not depend on the sequence.
+- Start from single letters; merge the most frequent neighbouring pair into a new token, and repeat. The rules are learned once, on the genome: count every pair of neighbouring tokens, merge the most frequent pair into a new token, and repeat until the vocabulary is full. Mistral-DNA has 4,087 merge rules.
+- To cut a new sequence, the rules are applied in the order they were learned. These are Mistral-DNA's real rules, on the same 30 letters as the last two slides.
+- Click: rule 1, A + A → AA, the most frequent pair in the genome. Click: rule 2, T + T → TT. Click: rule 3, T + G → TG.
+- Click: after all 15 rules that apply to these letters, 8 tokens, exactly what Mistral-DNA's tokenizer gives.
+- Frequent stretches become one token and rare ones stay short, so token lengths vary. DNABERT-2 also uses BPE.
 :::
 
-## 4.3 Batches: padding and the mask
+## 2.4 Batches: padding and the mask
 
 - Sequences in a batch are padded to the same number of tokens; the **attention mask** marks the real ones
 
@@ -232,6 +169,93 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 :::
 
 ::: {.center}
+# 3 Embedding {data-name="Embedding"}
+
+![](assets/custom/stage_strip_1.png){height="141px"}
+:::
+
+## 3.1 Token embeddings
+
+- Token $i$ becomes row $i$ of a learned table $E$: $\;e_i = x_i^\top E$
+
+::: {.r-stack}
+![](assets/custom/d2_emb_0.png){height="643px"}
+
+![](assets/custom/d2_emb_1.png){.fragment height="643px"}
+:::
+
+::: {.notes}
+- $x_i$ is the one-hot vector of token $i$: 4,096 numbers, all 0 except a 1 at position $i$. Each entry is drawn next to the row of $E$ it multiplies.
+- $E$ is Mistral-DNA's real table: 4,096 rows, one per token, of 256 numbers each (first 48 shown); blue positive, orange negative.
+- Click: the product keeps only the row where $x_i$ is 1. Token AAA, row 18, becomes its **token embedding** $e_i$.
+- So an embedding layer is a table lookup. The CNN's one-hot encoding is the same lookup with a fixed 4 × 4 identity table: nothing learned.
+- The table is learned during pretraining, so tokens that occur in similar contexts end up with similar rows.
+:::
+
+::: {.center}
+# 4 The transformer {data-name="Transformer"}
+
+![](assets/custom/stage_strip_2.png){height="141px"}
+:::
+
+## 4.1 The body, as a black box
+
+- One row in per token, one row out; each row out depends on all the tokens
+
+::: {.r-stack}
+![](assets/custom/d2_body_0.png){height="646px"}
+
+![](assets/custom/d2_body_1.png){.fragment height="646px"}
+:::
+
+::: {.notes}
+- The token TCACTG in a real bound sequence (highlighted). Its token embedding, from the table, goes into the body; out comes its **contextual embedding** (first 32 of 256 numbers shown).
+- Click: the same token in a second real sequence. The row going in is identical, because the table has one row per token. The rows coming out differ: inside the body, each token's row is updated with information from the other tokens (attention).
+- Mistral-DNA's body: 8 layers, 256 numbers per token, up to 512 tokens. Attention alone does not see token order, so the model also adds position information (Mistral-DNA rotates each row by an angle that depends on its position).
+- We do not open the layers today. For the exercise we need only the last layer's output.
+- The CNN's convolutions see a 10-letter window and a few pooled neighbours; a transformer layer can relate any two tokens in the input.
+:::
+
+## 4.2 The whole pipeline on one sequence {data-todo="TODO-1"}
+
+::: {.r-stack}
+![](assets/custom/walk_0.png){height="742px"}
+
+![](assets/custom/walk_1.png){.fragment height="742px"}
+
+![](assets/custom/walk_2.png){.fragment height="742px"}
+
+![](assets/custom/walk_3.png){.fragment height="742px"}
+
+![](assets/custom/walk_4.png){.fragment height="742px"}
+:::
+
+::: {.notes}
+- Mistral-DNA on the first 60 letters of one real sequence; the left column shows where we are in the pipeline.
+- 1 Tokenization: the letters become 14 tokens, with the special tokens `[CLS]` and `[SEP]` added at the start and end (they are not DNA).
+- 2 Embedding: each token picks its row of the learned table: one row of 256 numbers per token (blue positive, orange negative).
+- 3 Body: after the 8 transformer layers there is still one row per token, but each row now depends on every token of the sequence.
+- 4 Prediction head: average the rows over the real tokens, the **sequence embedding**, 256 numbers. In a batch the attention mask keeps padding out of this average (slide 2.4).
+- Then a prediction head turns those 256 numbers into P(bound), the probability that AGO2 binds (section 5); you train it in TODO-2.
+- A few dimensions are large for almost every token (the vertical stripes). That is common in transformer models and does not depend on the sequence.
+:::
+
+## 4.3 In the CNN and in a DNA language model
+
+::: {.r-stack}
+![](assets/custom/d2_compare_0.png){height="742px"}
+
+![](assets/custom/d2_compare_1.png){.fragment height="742px"}
+:::
+
+::: {.notes}
+- The same four stages as slide 1.6, at the same place on the slide.
+- First the CNN of part 1: single letters, a fixed one-hot table, two convolution layers, one linear layer to a logit.
+- Click: Mistral-DNA, stage by stage: BPE tokens (slide 2.3), a learned table (slide 3.1), a transformer body (slide 4.1), and a head for the next token or for your task.
+- The CNN's stages were fixed by us (one-hot) or trained on 92,346 labels. A language model learns its embedding and body from unlabelled genome sequence first.
+:::
+
+::: {.center}
 # 5 Prediction heads {data-name="Heads"}
 
 ![](assets/custom/stage_strip_3.png){height="141px"}
@@ -242,37 +266,54 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 **Softmax**: the sigmoid for many classes; one score per token in, probabilities that sum to 1 out
 
 ::: {.r-stack}
-![](assets/custom/heads_0.png){height="616px"}
+![](assets/custom/d2_heads_0.png){height="626px"}
 
-![](assets/custom/heads_1.png){.fragment height="616px"}
+![](assets/custom/d2_heads_1.png){.fragment height="626px"}
 
-![](assets/custom/heads_2.png){.fragment height="616px"}
+![](assets/custom/d2_heads_2.png){.fragment height="626px"}
 :::
 
 ::: {.notes}
-- One body, three heads; one per click.
-- Next token: the last token's vector goes through a linear layer to 4,096 scores, one per vocabulary token; softmax turns them into probabilities that sum to 1. Masked token: the same, at the hidden position.
-- These two are the pretraining heads (slides 1.5 and 1.6). After pretraining they are discarded and a new task head is attached; the body (and the embedding table) transfers.
-- Our task: average the token vectors (the sequence embedding), then one linear layer to one number, then the sigmoid: P(bound). Before the logistic regression each of the 256 dimensions is standardised.
-- Frozen body, new linear head: a **linear probe** (this part's notebook), which is logistic regression. Body adapted too: fine-tuning (part 3).
+- Left: the body's output for the sequence of slide 4.2, one row of 256 numbers per token: its contextual embeddings. One head per click.
+- Next token: the last token's row goes through a linear layer to 4,096 scores, one per vocabulary token; the softmax turns them into probabilities that sum to 1. Masked token: the same, from the hidden token's row.
+- These two are the pretraining heads (slide 1.4). After pretraining they are dropped; the embedding table and the body are kept.
+- Our task: the average of all rows, the **sequence embedding** (the 256 numbers of slide 4.2), goes through one linear layer to one number, then the sigmoid: P(bound).
 :::
 
 ## 5.2 The linear probe {data-todo="TODO-2"}
 
-- Logistic regression on the 256 numbers of each sequence embedding; the language model stays frozen
-- **Standardised**: each of the 256 numbers shifted and scaled to mean 0, standard deviation 1
+- A new head, trained on labelled sequences; the body stays frozen
 
-![](assets/custom/probe_pipeline.png){fig-align="center" height="444px"}
+::: {.r-stack}
+![](assets/custom/d2_probe_0.png){height="646px"}
+
+![](assets/custom/d2_probe_1.png){.fragment height="646px"}
+:::
 
 ::: {.notes}
-- Left: the standardised embeddings of 40 of the 12,000 training sequences, one row each. Right: the probe, and the held-out AUROC you will compute in TODO-2.
-- The same model as part 1 slide 2.11, with 256 inputs instead of 2: 256 weights and one bias.
-- Standardising shifts and scales each of the 256 numbers to mean 0 and standard deviation 1, using the training sequences only; the same shift and scale are applied to the test sequences.
-- Regularisation penalises large weights and keeps the 256 weights small: `C = 0.1` in scikit-learn, where smaller `C` means stronger regularisation.
+- The sequence embedding $e = (e_1, \dots, e_{256})$ of slide 4.2: the average of the body's output rows.
+- The head is logistic regression, the model of part 1 (slides 2.10 and 2.11) with 256 inputs instead of 2: each number gets a weight, the weighted sum plus a bias $b$ goes through the sigmoid $\sigma$, and the result $\hat p$ is the probability that AGO2 binds, P(bound).
+- Click: it is trained on 12,000 labelled sequences; three real ones are shown, their sequence embeddings and their labels. Only the 256 weights and the bias are learned; the body stays frozen. This is a **linear probe**.
+- Before fitting, each of the 256 numbers is standardised (mean 0, standard deviation 1 on the training sequences), and regularisation keeps the weights small (`C = 0.1` in scikit-learn).
 - Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.
 :::
 
-## 5.3 DNA language models, 2021 to 2025
+## 5.3 From pretraining to our task
+
+::: {.r-stack}
+![](assets/custom/d2_summary_0.png){height="730px"}
+
+![](assets/custom/d2_summary_1.png){.fragment height="730px"}
+:::
+
+::: {.notes}
+- 1, pretraining: the genome supplies its own targets. The tokenizer's rules, the embedding table, the body and the next-token head are all learned; Mistral-DNA's authors did this.
+- Click, 2, adapting: the tokenizer, the table and the body are kept as they are (frozen, grey). The next-token head is replaced by a new head for our task, trained on labelled AGO2 sequences.
+- Training only the new head is a linear probe, the simplest form of fine-tuning, and this part's notebook. Updating the body as well is fine-tuning in the full sense; part 3 compares it with the CNN.
+- It can help because the body was trained on far more sequence than any one task has labels.
+:::
+
+## 5.4 DNA language models, 2021 to 2025
 
 ![](assets/custom/landscape.png){fig-align="center" height="752px"}
 
@@ -291,13 +332,20 @@ Next: load a pretrained model and probe it.
 
 ## 6.1 Loading a model from Hugging Face
 
-![](assets/custom/hf_load.png){fig-align="center" height="766px"}
+::: {.r-stack}
+![](assets/custom/d2_hf_0.png){height="671px"}
+
+![](assets/custom/d2_hf_1.png){.fragment height="671px"}
+
+![](assets/custom/d2_hf_2.png){.fragment height="671px"}
+:::
 
 ::: {.notes}
-- The same two calls load any model on the Hugging Face Hub. Each model has a page with a model card: what it was trained on, how, and its known limits.
-- The model reads DNA letters, so our U becomes T before tokenizing.
-- The download goes to the Colab machine. Mistral-DNA is about 60 MB, roughly 10 seconds.
-- Mistral-DNA has 16M parameters; the "17M" in its name includes an output layer we do not use.
+- The four stages again. The first three come pretrained from the Hugging Face Hub under one name; the prediction head is yours (TODO-2).
+- Click: `AutoTokenizer.from_pretrained(name)` downloads the tokenizer, its 4,096-token vocabulary and merge rules.
+- Click: `AutoModel.from_pretrained(name)` downloads the embedding table and the body: 16M weights, about 60 MB, roughly 10 seconds on Colab.
+- The same two calls load any model on the Hub. Each model has a model card: what it was trained on, how, and its known limits.
+- The model reads DNA letters, so our U becomes T before tokenizing. Mistral-DNA's name says 17M because it also counts the next-token head, which we do not use.
 - In the notebook, TODO-1 is one function, `embed`, written from a table that maps each step (tokenize, run the model, last layer, masked mean, collect) to its API.
 :::
 
@@ -330,4 +378,3 @@ Open **`02_foundation_models.ipynb`**.
 - Both are below the part 1 CNN at 0.86, but the CNN was trained on about 92,000 labels and the probes on 12,000. At equal label counts the gap is smaller (part 3: CNN 0.82 vs probe 0.77 at 12,000 labels).
 - The 105M model with random weights gives 0.55; after 3 minutes of pretraining, 0.72 in the run on this figure (0.73 in our latest run). That is only a little above the two composition numbers of part 1 (0.66), so it should not be read as learned binding biology.
 :::
-

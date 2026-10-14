@@ -238,7 +238,7 @@ def walkthrough(tok, fm, pos):
             fig.text(0.32, 0.38, "The sequence embedding: 256 numbers", fontsize=20, color=INK)
             if k == 4:
                 fig.text(0.63, 0.17, "↓", ha="center", fontsize=30, color=MUTED)
-                fig.text(0.63, 0.08, r"linear probe:  $\hat p = \sigma(w^\top e + b)$  →  P(bound)", ha="center",
+                fig.text(0.63, 0.08, "a prediction head: the probability that AGO2 binds (section 5)", ha="center",
                          fontsize=24, color=GOOD_C)
         fig.savefig(OUT / f"walk_{k}.png", dpi=120, facecolor="white"); plt.close(fig); print("wrote", f"walk_{k}")
 

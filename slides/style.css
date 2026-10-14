@@ -108,3 +108,5 @@
 .reveal img{ max-height:none; max-width:none; object-fit:contain; }
 .reveal .fill-table table { width: 100%; font-size: 0.9em; }
 .reveal .fill-table td, .reveal .fill-table th { padding: 0.42em 0.6em; }
+.reveal .columns.vcenter > .column { align-self: center; }
+.reveal .columns.vcenter > .column > p { margin-top: 0; margin-bottom: 0; }
