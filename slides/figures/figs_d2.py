@@ -80,30 +80,31 @@ def pretrain_analogy(tok, pos):
 
 # ------------------------------------------------------------------ 1.2-1.4 one body, many heads
 def adapt():
-    def frame(rows, name, body="Model"):
-        """rows: (input text, head name, output) per head; all heads share one body."""
+    def frame(rows, name, body="Model", dx=0):
+        """rows: (input text, head name, output) per head; all heads share one body.
+        dx: extra width for a one-line input text (everything right of it moves over)."""
         fig, ax = canvas()
-        block(ax, 62, 22, 30, 46, body, fc=ACCENT, fs=26)
+        block(ax, 37 + dx, 16, 30, 65, body, fc=ACCENT, fs=32)
         n = len(rows)
-        ys = [45] if n == 1 else list(np.linspace(62, 28, n))
-        label(ax, 28, 45, rows[0][0], fs=21, color=INK)
-        arrow(ax, 49, 45, 60, 45, color=MUTED, lw=2, ms=22)
+        ys = [48.5] if n == 1 else list(np.linspace(68, 29, n))
+        label(ax, 15 + dx / 2, 48.5, rows[0][0], fs=27, color=INK)
+        arrow(ax, 29 + dx, 48.5, 35.5 + dx, 48.5, color=MUTED, lw=2.5, ms=26)
         for y, (_, head, out, c) in zip(ys, rows):
-            arrow(ax, 93, 45 + (y - 45) * 0.3, 104, y, color=MUTED, lw=2, ms=22)
-            block(ax, 105, y - 5.5, 29, 11, head, fc=c, fs=20)
-            arrow(ax, 135, y, 140, y, color=MUTED, lw=2, ms=18)
-            label(ax, 141.5, y, out, fs=21, color=INK, ha="left")
-        label(ax, 77, 15, "learned once, kept", fs=18, color=ACCENT)
-        label(ax, 119.5, 15, "one head per task", fs=18, color=MUTED)
+            arrow(ax, 68.5 + dx, 48.5 + (y - 48.5) * 0.4, 77.5 + dx, y, color=MUTED, lw=2.5, ms=26)
+            block(ax, 79 + dx, y - 7.5, 37, 15, head, fc=c, fs=25)
+            arrow(ax, 117.5 + dx, y, 123.5 + dx, y, color=MUTED, lw=2.5, ms=22)
+            label(ax, 125 + dx, y, out, fs=27, color=INK, ha="left")
+        label(ax, 52 + dx, 10, "learned once, kept", fs=23, color=ACCENT)
+        label(ax, 97.5 + dx, 10, "one head per task", fs=23, color=MUTED)
         save_raw(fig, name)
-    frame([("The cat sat on the", "next-word head", "mat", HELD_C)], "adapt_0")
-    frame([("What a great movie!", "next-word head", "and", HELD_C),
-           ("What a great movie!", "sentiment head", "positive", GOOD_C),
-           ("What a great movie!", "translation head", "Quel bon film !", GOOD_C)], "adapt_1")
-    frame([("A sequence of DNA tokens", "next-token head", "the next token", HELD_C)], "adapt_2", body="Mistral-DNA")
-    frame([("A sequence of DNA tokens", "next-token head", "the next token", HELD_C),
-           ("A sequence of DNA tokens", "AGO2 head", "P(bound)", GOOD_C),
-           ("A sequence of DNA tokens", "expression head", "a number", GOOD_C)], "adapt_3", body="Mistral-DNA")
+    frame([("The cat sat on the", "next-word head", "mat", HELD_C)], "adapt_0", dx=11)
+    frame([("What a\ngreat movie!", "next-word head", "and", HELD_C),
+           ("What a\ngreat movie!", "sentiment head", "positive", GOOD_C),
+           ("What a\ngreat movie!", "translation head", "Quel bon film !", GOOD_C)], "adapt_1")
+    frame([("A sequence\nof DNA tokens", "next-token head", "the next token", HELD_C)], "adapt_2", body="Mistral-DNA")
+    frame([("A sequence\nof DNA tokens", "next-token head", "the next token", HELD_C),
+           ("A sequence\nof DNA tokens", "AGO2 head", "P(bound)", GOOD_C),
+           ("A sequence\nof DNA tokens", "expression head", "a number", GOOD_C)], "adapt_3", body="Mistral-DNA")
 
 
 # ------------------------------------------------------------------ objectives: next token and masked token
@@ -115,14 +116,21 @@ def objective_rows(tok, pos):
     label(ax, xs[-1][0] + xs[-1][1] / 2, 5, "from the tokens before it", fs=18, color=MUTED)
     save(fig, "objective_next")
     # masked: one token in the middle is hidden; both sides are visible
-    fig, ax = canvas(16, 3.4, ylim=(0, 34))
+    # wrapped onto two lines at the hidden token: the tokens before it run along line 1, the ones after it
+    # follow it on line 2; one arrow runs under each side and turns into the hidden token. s scales it all up.
     toks = ctx + [nxt]
     m = 4
-    xs = token_row(ax, 4, 17, toks, hide=m, hide_text="[MASK]", fs=20)
-    cx = xs[m][0] + xs[m][1] / 2
-    arrow(ax, xs[0][0] + 3, 8, cx - 5, 8, color=ACCENT, lw=2, ms=20)
-    arrow(ax, xs[-1][0] + xs[-1][1] - 3, 8, cx + 5, 8, color=ACCENT, lw=2, ms=20)
-    label(ax, cx, 3, "from both sides", fs=18, color=ACCENT)
+    s, W, H, cw = 1.6, 71, 36, 16.5
+    fig, ax = canvas(W * s / 10, H * s / 10, xlim=(0, W), ylim=(0, H))
+    y1 = H - 5; y2 = y1 - 16
+    row1 = token_row(ax, 1, y1, toks[:m], fs=36, cw=cw)
+    row2 = token_row(ax, 1, y2, toks[m:], hide=0, hide_text="[MASK]", fs=36, cw=cw)
+    cx = row2[0][0] + row2[0][1] / 2
+    for row, y, yt in ((row1, y1 - 7.6, y2 + 4.8), (row2, y2 - 7.6, y2 - 4.8)):
+        ax.add_patch(FancyArrowPatch((row[-1][0] + row[-1][1] - 2, y), (cx, yt), arrowstyle="-|>", mutation_scale=26,
+                                     color=ACCENT, lw=3, shrinkA=0, shrinkB=0,
+                                     connectionstyle="angle,angleA=0,angleB=90,rad=12"))
+    label(ax, cx + 4, y2 - 12, "from both sides", fs=30, color=ACCENT, ha="left")
     save(fig, "objective_masked")
 
 
@@ -142,10 +150,15 @@ def stages():
             "turn the numbers\ninto an answer"]
     cnn = ["single letters", "one-hot, 4 numbers\n(fixed)", "2 convolution\nlayers", "linear → 1 logit"]
     lm = ["BPE tokens", "a learned table,\n256 numbers", "transformer,\n8 layers", "next token, or\nyour task"]
-    fig, ax = canvas()
-    xs = stage_axes(ax, 62)
-    for x, d in zip(xs, defs):
-        label(ax, x + 15, 50, d, fs=20, color=MUTED, va="top")
+    # the four stages run top to bottom, each with its one-line meaning to the right (fills a near 2:1 slide)
+    W, H, bw, bh, gap = 136, 65, 44, 12, 5
+    fig, ax = canvas(W / 10, H / 10, xlim=(0, W), ylim=(0, H))
+    for k, (s, d) in enumerate(zip(STAGES, defs)):
+        y = H - 1 - bh - k * (bh + gap)
+        block(ax, 1, y, bw, bh, s, fs=32)
+        label(ax, bw + 6, y + bh / 2, d.replace("\n", " "), fs=34, color=MUTED, ha="left")
+        if k < 3:
+            arrow(ax, 1 + bw / 2, y - 0.5, 1 + bw / 2, y - gap + 0.5, color=MUTED, lw=2.5, ms=24)
     save_raw(fig, "stages_0")
     for k in (1, 2):
         fig, ax = canvas()
@@ -255,38 +268,46 @@ def heads():
 
 # ------------------------------------------------------------------ 6.1 loading a model, as a picture
 def hf_load():
-    fig, ax = canvas(16, 6.6, ylim=(0, 66))
-    block(ax, 4, 26, 40, 16, "Hugging Face Hub", fc=INK, fs=24)
-    label(ax, 24, 19, "RaphaelMourad/\nMistral-DNA-v1-17M-hg38", fs=17, color=MUTED, va="top", family=MONO)
-    for y, api, what in ((52, "AutoTokenizer.from_pretrained(name)", "the tokenizer: its 4,096-token vocabulary"),
+    fig, ax = canvas()
+    block(ax, 2, 36, 48, 26, "Hugging Face Hub", fc=INK, fs=30)
+    label(ax, 26, 31, "RaphaelMourad/\nMistral-DNA-v1-17M-hg38", fs=22, color=MUTED, va="top", family=MONO)
+    for y, api, what in ((72, "AutoTokenizer.from_pretrained(name)", "the tokenizer: its 4,096-token vocabulary"),
                          (16, "AutoModel.from_pretrained(name)", "the model: 16M trained weights")):
-        arrow(ax, 45, 34, 58, y, color=MUTED, lw=2, ms=22)
-        label(ax, 60, y + 4, api, fs=19, color=ACCENT, ha="left", family=MONO)
-        label(ax, 60, y - 3, what, fs=20, color=INK, ha="left")
+        arrow(ax, 51, 49, 60, y, color=MUTED, lw=2.5, ms=26)
+        label(ax, 62, y + 5, api, fs=27, color=ACCENT, ha="left", family=MONO)
+        label(ax, 62, y - 4.5, what, fs=27, color=INK, ha="left")
     save(fig, "hf_load")
 
 
 # ------------------------------------------------------------------ 6.2 your turn
 def your_turn_d2():
-    fig, ax = canvas(16, 6.2, ylim=(0, 62))
-    items = [(28, "TODO-1", "embed: sequences in,\none vector each out"),
-             (80, "TODO-2", "probe_auc: logistic regression\non the vectors"),
-             (132, "Live", "pretrain a model from\nrandom weights for 3 minutes")]
-    # 1: tokens -> one vector
-    token_row(ax, 10, 46, ["AAA", "CTG", "CAGAA"], fs=17, colored=True)
-    arrow(ax, 28, 38, 28, 33, color=MUTED, lw=2, ms=18)
+    fig, ax = canvas()
+    xs = [26, 80, 134]
+    items = [(xs[0], "TODO-1", "embed: sequences in,\none vector each out"),
+             (xs[1], "TODO-2", "probe_auc:\nlogistic regression\non the vectors"),
+             (xs[2], "Live", "pretrain a model from\nrandom weights\nfor 3 minutes")]
+    # 1: tokens -> one vector (tokens drawn here at a larger size than token_row)
+    toks, dl = ["AAA", "CTG", "CAGAA"], 3.2
+    ws = [3.4 + dl * len(t) for t in toks]
+    x = xs[0] - (sum(ws) + 1.5 * (len(toks) - 1)) / 2
+    for j, (t, w) in enumerate(zip(toks, ws)):
+        box(ax, x, 72, w, 15, fc=[ACCENT_L, FAINT][j % 2], r=0.8)
+        for q, ch in enumerate(t):
+            label(ax, x + w / 2 + (q - (len(t) - 1) / 2) * dl, 79.5, ch, fs=30, color=BASE[ch], family=MONO, bold=True)
+        x += w + 1.5
+    arrow(ax, xs[0], 70, xs[0], 58, color=MUTED, lw=2.5, ms=26)
     for i in range(16):
-        ax.add_patch(Rectangle((14 + i * 1.75, 27), 1.6, 4.5, fc=DIVERGING((np.sin(i * 1.7) + 1) / 2), ec="none"))
+        ax.add_patch(Rectangle((xs[0] - 21.6 + i * 2.7, 43), 2.5, 13, fc=DIVERGING((np.sin(i * 1.7) + 1) / 2), ec="none"))
     # 2: vector -> sigma -> P(bound)
     for i in range(16):
-        ax.add_patch(Rectangle((64 + i * 1.75, 44), 1.6, 4.5, fc=DIVERGING((np.cos(i * 1.3) + 1) / 2), ec="none"))
-    arrow(ax, 80, 42, 80, 36, color=MUTED, lw=2, ms=18)
-    label(ax, 80, 30, "σ  →  P(bound)", fs=20, color=GOOD_C, bold=True)
+        ax.add_patch(Rectangle((xs[1] - 21.6 + i * 2.7, 74), 2.5, 13, fc=DIVERGING((np.cos(i * 1.3) + 1) / 2), ec="none"))
+    arrow(ax, xs[1], 72, xs[1], 59, color=MUTED, lw=2.5, ms=26)
+    label(ax, xs[1], 50, "σ  →  P(bound)", fs=34, color=GOOD_C, bold=True)
     # live: a block that learns
-    block(ax, 118, 30, 28, 18, "105M model", fc=ACCENT, fs=20)
+    block(ax, xs[2] - 20, 43, 40, 44, "105M model", fc=ACCENT, fs=32)
     for x, todo, what in items:
-        label(ax, x, 18, todo, fs=26, color=ACCENT, bold=True)
-        label(ax, x, 11, what, fs=19, color=INK, va="top")
+        label(ax, x, 35, todo, fs=38, color=ACCENT, bold=True)
+        label(ax, x, 28.5, what, fs=28, color=INK, va="top")
     save(fig, "your_turn_d2")
 
 

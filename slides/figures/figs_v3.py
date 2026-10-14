@@ -407,36 +407,37 @@ def roc_frames(ls, ly):
 # ------------------------------------------------------------------ 4.7 the training loop as a picture
 def train_loop():
     """One training step and the evaluation: flat neutral blocks, one weight of arrow, colour only for meaning."""
-    fig, ax = canvas(16, 8, ylim=(0, 80))
+    fig, ax = canvas(16, 9, ylim=(0, 90))
     BLK, SUB = "#EEF0F2", MUTED
+    H = 18                                              # block height
 
     def node(x, y, w, h, title, sub):
         ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0,rounding_size=0.8", fc=BLK, ec="none"))
-        label(ax, x + 2.2, y + h * 0.62, title, fs=22, color=INK, bold=True, ha="left")
-        label(ax, x + 2.2, y + h * 0.28, sub, fs=17, color=SUB, ha="left")
+        label(ax, x + 2.4, y + h * 0.65, title, fs=28, color=INK, bold=True, ha="left")
+        label(ax, x + 2.4, y + h * 0.29, sub, fs=21, color=SUB, ha="left")
 
     def row(y, items, color):
         for k, (ti, su) in enumerate(items):
-            node(4 + k * 39, y, 32, 13, ti, su)
+            node(4 + k * 39, y, 32, H, ti, su)
             if k < 3:
-                arrow(ax, 36.6 + k * 39, y + 6.5, 42.4 + k * 39, y + 6.5, color=color, lw=2, ms=18)
+                arrow(ax, 36.6 + k * 39, y + H / 2, 42.4 + k * 39, y + H / 2, color=color, lw=2.4, ms=22)
 
-    label(ax, 4, 76, "TRAINING", fs=17, color=INK, ha="left", bold=True)
-    label(ax, 18, 76, "every batch, every epoch", fs=17, color=MUTED, ha="left")
-    y = 55
+    label(ax, 4, 81.5, "TRAINING", fs=21, color=INK, ha="left", bold=True)
+    label(ax, 21.5, 81.5, "every batch, every epoch", fs=21, color=MUTED, ha="left")
+    y = 53
     row(y, [("Batch", "sequences X"), ("Network", "current weights"), ("Scores", "one per sequence"),
             ("Loss", "scores vs labels y")], INK)
-    label(ax, 4, y + 16.5, "forward pass", fs=16, color=INK, ha="left")
-    yb = y - 6                                          # backward pass: under the blocks, back to the network
-    ax.plot([137, 137, 59], [y, yb, yb], color=ACCENT, lw=2, solid_capstyle="round")
-    arrow(ax, 59, yb, 59, y - 0.3, color=ACCENT, lw=2, ms=18)
-    label(ax, 64, yb - 3.6, "backward pass (backpropagation): gradient of the loss for every weight", fs=16,
-          color=ACCENT, ha="left")
-    label(ax, 64, yb - 8.4, "optimizer step: move every weight against its gradient", fs=16, color=INK, ha="left")
-    label(ax, 4, 31, "EVALUATION", fs=17, color=INK, ha="left", bold=True)
-    label(ax, 21, 31, "after every epoch, forward pass only, no learning", fs=17, color=HELD_C, ha="left")
-    row(10, [("Held-out", "sequences"), ("Network", "weights fixed"), ("Sigmoid", "probabilities"),
-             ("AUROC", "vs the true labels")], INK)
+    label(ax, 4, y + H + 3.6, "forward pass", fs=20, color=INK, ha="left")
+    yb = y - 7                                          # backward pass: under the blocks, back to the network
+    ax.plot([137, 137, 59], [y, yb, yb], color=ACCENT, lw=2.4, solid_capstyle="round")
+    arrow(ax, 59, yb, 59, y - 0.3, color=ACCENT, lw=2.4, ms=22)
+    label(ax, 98, yb - 4.6, "backward pass (backpropagation): gradient of the loss for every weight", fs=20,
+          color=ACCENT)
+    label(ax, 98, yb - 10.4, "optimizer step: move every weight against its gradient", fs=20, color=INK)
+    label(ax, 4, 26.6, "EVALUATION", fs=21, color=INK, ha="left", bold=True)
+    label(ax, 25.5, 26.6, "after every epoch, forward pass only, no learning", fs=21, color=HELD_C, ha="left")
+    row(4, [("Held-out", "sequences"), ("Network", "weights fixed"), ("Sigmoid", "probabilities"),
+            ("AUROC", "vs the true labels")], INK)
     save(fig, "train_loop")
 
 
@@ -447,7 +448,7 @@ def your_turn(ls, ly):
     from intuition import cnn_scores, load_cnn
     fig = plt.figure(figsize=(16, 6.2), dpi=120)
     w, gap = 0.172, 0.03
-    axs = [fig.add_axes([0.02 + k * (w + gap), 0.27, w, 0.62]) for k in range(5)]
+    axs = [fig.add_axes([0.02 + k * (w + gap), 0.27, w, 0.71]) for k in range(5)]
     # 1: one-hot
     a = axs[0]; s = "GGACGU"
     for i, c in enumerate(s):
@@ -483,8 +484,8 @@ def your_turn(ls, ly):
                                       ("TODO-3", "train and test it"), ("TODO-4", "read its filters"),
                                       ("TODO-5", "test a motif")]):
         x = 0.02 + k * (w + gap) + w / 2
-        fig.text(x, 0.13, todo, ha="center", fontsize=26, color=ACCENT, fontweight="bold")
-        fig.text(x, 0.04, what, ha="center", fontsize=21, color=INK)
+        fig.text(x, 0.10, todo, ha="center", fontsize=26, color=ACCENT, fontweight="bold")
+        fig.text(x, 0.015, what, ha="center", fontsize=21, color=INK)
     save(fig, "your_turn")
 
 

@@ -68,32 +68,40 @@ def plant_scheme(with_control=True, name="plant_scheme"):
 
 # ------------------------------------------------------------------ part 2
 def _token_rows(rows, name, w, site):
+    # the 30 letters wrap into two lines of 15; each line shows the sequence, then its tokens in boxes.
+    # A token that crosses the wrap is drawn as two pieces of the same colour, one at each line end.
     from transformers import AutoTokenizer
-    h = 6 + 4.2 * len(rows)
-    fig, ax = canvas(16, h, ylim=(0, h * 10))
-    top = h * 10 - 10
-    dx, x0 = 3.6, 36
-    for i, ch in enumerate(w):
-        label(ax, x0 + i * dx, top, ch, fs=24, color=BASE[ch], family=MONO, bold=True)
-    label(ax, 4, top, "Sequence", fs=20, color=MUTED, ha="left")
-    for r, (rname, repo, s_) in enumerate(rows):
-        t = list(s_) if repo is None else None
-        if repo is not None:
-            tok = AutoTokenizer.from_pretrained(repo, trust_remote_code=True)
-            t = tok.convert_ids_to_tokens(tok(s_, add_special_tokens=False)["input_ids"])
-        y = top - 22 - r * 15
-        label(ax, 4, y, rname, fs=19, color=MUTED, ha="left")
-        p = 0 if s_ == w else 1
-        for j, tk in enumerate(t):
-            tk = tk.replace("▁", "").replace("Ġ", "")
-            if not tk or tk[0] in "<[":
+    rname, repo, s_ = rows[0]
+    t = list(s_) if repo is None else None
+    if repo is not None:
+        tok = AutoTokenizer.from_pretrained(repo, trust_remote_code=True)
+        t = tok.convert_ids_to_tokens(tok(s_, add_special_tokens=False)["input_ids"])
+    t = [x.replace("▁", "").replace("Ġ", "") for x in t]
+    t = [x for x in t if x and x[0] not in "<["]
+    assert "".join(t) == w, (t, w)
+    per = (len(w) + 1) // 2
+    W, H = 104, 50
+    fig, ax = canvas(W / 10, H / 10, xlim=(0, W), ylim=(0, H))
+    fs, dx, x0, bh = 44, 4.6, 36, 9.5          # letter size, letter pitch, first letter x, box height
+    lines = [H - 4, H - 4 - 22.5]                # sequence row of each line; its token row sits 10 below
+    for L, ys in enumerate(lines):
+        for i, ch in enumerate(w[L * per:(L + 1) * per]):
+            label(ax, x0 + i * dx, ys, ch, fs=fs, color=BASE[ch], family=MONO, bold=True)
+    label(ax, 1, lines[0], "Sequence", fs=26, color=MUTED, ha="left")
+    label(ax, 1, lines[0] - 10, rname, fs=26, color=MUTED, ha="left")
+    p = 0
+    for j, tk in enumerate(t):
+        for L in range(len(lines)):
+            a, b = max(p, L * per), min(p + len(tk), (L + 1) * per)
+            if a >= b:
                 continue
-            box(ax, x0 + p * dx - 1.85, y - 4.5, len(tk) * dx - 0.45, 9, fc=[ACCENT_L, FAINT][j % 2], r=0.6)
-            for q, ch in enumerate(tk):
-                label(ax, x0 + (p + q) * dx, y, ch, fs=21, color=BASE.get(ch, INK), family=MONO, bold=True)
-            p += len(tk)
-        label(ax, x0 + len(w) * dx + 3, y, f"{sum(1 for x in t if x.replace('▁', '') and x[0] not in '<[')} tokens",
-              fs=18, color=MUTED, ha="left")
+            y = lines[L] - 10
+            box(ax, x0 + (a - L * per) * dx - dx / 2 + 0.25, y - bh / 2, (b - a) * dx - 0.5, bh,
+                fc=[ACCENT_L, FAINT][j % 2], r=0.8)
+            for q in range(a, b):
+                label(ax, x0 + (q - L * per) * dx, y, w[q], fs=fs, color=BASE.get(w[q], INK), family=MONO, bold=True)
+        p += len(tk)
+    label(ax, x0 + (per - 0.5) * dx, lines[1] - 10 - bh / 2 - 4, f"{len(t)} tokens", fs=26, color=MUTED, ha="right")
     save(fig, name)
 
 
@@ -115,22 +123,30 @@ def emb_lookup(pos):
     names = tok.convert_ids_to_tokens(ids)
     v = np.percentile(np.abs(E), 98)
     fig = newfig()
-    fig.set_size_inches(16, 6.4)
-    ax = fig.add_axes([0.20, 0.30, 0.56, 0.56])
+    fig.set_size_inches(16, 16 / 2.198)                  # the save hook keeps this shape (slide's free area)
+    ax = fig.add_axes([0.20, 0.14, 0.54, 0.77])
     ax.imshow(E[ids], cmap=DIVERGING, vmin=-v, vmax=v, aspect="auto", interpolation="nearest")
-    ax.set_yticks(range(len(ids))); ax.set_yticklabels([f"{n}   row {i:,}" for n, i in zip(names, ids)], family=MONO)
-    ax.set_xticks([0, 64, 128, 192, 255]); ax.set_xlabel("256 numbers per token")
-    ax.tick_params(length=0)
+    ax.set_yticks(range(len(ids))); ax.set_yticklabels([f"row {i:,}" for i in ids], family=MONO, fontsize=23)
+    for r, n in enumerate(names):                        # the token's letters, in base colours, left of its row number
+        for q, ch in enumerate(n):
+            ax.annotate(ch, (0, r), xycoords=("axes fraction", "data"), textcoords="offset points",
+                        xytext=(-116 - (len(n) - 1 - q) * 15, 0), ha="center", va="center_baseline", fontsize=24,
+                        family=MONO, fontweight="bold", color=BASE.get(ch, INK))
+    ax.set_xticks([0, 64, 128, 192, 255]); ax.set_xlabel("256 numbers per token", fontsize=25)
+    ax.tick_params(length=0, labelsize=23)
     for sp in ax.spines.values():
         sp.set_visible(False)
-    ax.set_title(f"Mistral-DNA: {E.shape[0]:,} learned rows, four of them")
-    a2 = fig.add_axes([0.83, 0.30, 0.13, 0.56])
+    ax.set_title(f"Mistral-DNA: {E.shape[0]:,} learned rows, four of them", fontsize=27)
+    a2 = fig.add_axes([0.78, 0.14, 0.21, 0.77])
     a2.imshow(np.eye(4), cmap=DIVERGING, vmin=-1, vmax=1, interpolation="nearest")
-    a2.set_yticks(range(4)); a2.set_yticklabels(list("ACGU"), family=MONO); a2.set_xticks([])
+    a2.set_yticks(range(4)); a2.set_yticklabels(list("ACGU"), family=MONO, fontsize=25, fontweight="bold")
+    for t in a2.get_yticklabels():
+        t.set_color(BASE[t.get_text()])
+    a2.set_xticks([])
     a2.tick_params(length=0)
     for sp in a2.spines.values():
         sp.set_visible(False)
-    a2.set_title("The CNN: fixed")
+    a2.set_title("The CNN: fixed", fontsize=27)
     save(fig, "emb_lookup")
 
 
@@ -152,7 +168,7 @@ def blackbox(pos):
     cw = min(0.08, 0.7 / n)
 
     def strip(x, y, vec):
-        a = fig.add_axes([x - cw / 2, y, cw, 0.15])
+        a = fig.add_axes([x - cw / 2, y, cw, 0.24])
         v = np.percentile(np.abs(vec), 97)
         a.imshow(vec.reshape(-1, 1)[:64], cmap=DIVERGING, vmin=-v, vmax=v, aspect="auto", interpolation="nearest")
         a.set_xticks([]); a.set_yticks([])
@@ -160,17 +176,17 @@ def blackbox(pos):
             sp.set_visible(False)
 
     for i, x in enumerate(xs):
-        strip(x, 0.13, H0[i]); strip(x, 0.76, H8[i])
-        fig.text(x, 0.07, names[i], ha="center", fontsize=19, family=MONO, color=INK)
-    band = fig.add_axes([0.0, 0.36, 1.0, 0.32]); band.axis("off")
+        strip(x, 0.095, H0[i]); strip(x, 0.745, H8[i])
+        fig.text(x, 0.025, names[i], ha="center", fontsize=25, family=MONO, color=INK)
+    band = fig.add_axes([0.0, 0.375, 1.0, 0.33]); band.axis("off")
     band.add_patch(Rectangle((0, 0), 1, 1, color=FAINT, transform=band.transAxes))
-    band.text(0.015, 0.5, "Transformer\n8 layers", ha="left", va="center", fontsize=26, color=MUTED,
+    band.text(0.015, 0.5, "Transformer\n8 layers", ha="left", va="center", fontsize=30, color=MUTED,
               transform=band.transAxes)
     j = n // 2
     for x in xs:
-        fig.add_artist(plt.Line2D([x, xs[j]], [0.30, 0.74], color=ACCENT, lw=1.2, alpha=0.7))
-    fig.text(0.015, 0.20, "In", fontsize=22, color=MUTED, va="center")
-    fig.text(0.015, 0.83, "Out", fontsize=22, color=MUTED, va="center")
+        fig.add_artist(plt.Line2D([x, xs[j]], [0.35, 0.73], color=ACCENT, lw=1.4, alpha=0.7))
+    fig.text(0.015, 0.215, "In", fontsize=28, color=MUTED, va="center")
+    fig.text(0.015, 0.865, "Out", fontsize=28, color=MUTED, va="center")
     save(fig, "blackbox")
 
 
@@ -212,21 +228,21 @@ def setup_examples(model, tr, ty):
     u = [i for i in range(len(ty)) if ty[i] == 0][:2]
     rows = [b[0], u[0], b[1], u[1]]
     p = cnn_scores(model, [tr[i] for i in rows])
-    fig, ax = canvas(16, 5.6, ylim=(0, 56))
-    label(ax, 4, 50, "$x$: sequence (first 32 letters)", fs=22, color=MUTED, ha="left")
-    label(ax, 104, 50, "Length", fs=22, color=MUTED)
-    label(ax, 118, 50, "$y$", fs=24, color=MUTED)
-    label(ax, 134, 50, r"$\hat p = g_\theta(x)$", fs=24, color=MUTED)
-    label(ax, 153, 50, "Loss", fs=22, color=MUTED)
+    fig, ax = canvas(16, 8, ylim=(0, 80))
+    label(ax, 1, 71, "$x$: sequence (first 32 letters)", fs=28, color=MUTED, ha="left")
+    label(ax, 104, 71, "Length", fs=28, color=MUTED)
+    label(ax, 118.5, 71, "$y$", fs=32, color=MUTED)
+    label(ax, 135, 71, r"$\hat p = g_\theta(x)$", fs=30, color=MUTED)
+    label(ax, 153, 71, "Loss", fs=28, color=MUTED)
     for r, (i, pi) in enumerate(zip(rows, p)):
-        yy = 39 - r * 10
-        seq(ax, 5, yy, tr[i][:32], fs=20, dx=2.7)
-        label(ax, 5 + 32 * 2.7, yy, "…", fs=20, color=MUTED, ha="left")
-        label(ax, 104, yy, f"{len(tr[i])}", fs=22)
-        label(ax, 118, yy, f"{int(ty[i])}", fs=24, color=BOUND if ty[i] == 1 else MUTED, bold=True)
-        label(ax, 134, yy, f"{pi:.2f}", fs=24)
+        yy = 56 - r * 15
+        seq(ax, 2, yy, tr[i][:32], fs=28, dx=2.8)
+        label(ax, 2 + 32 * 2.8 - 0.4, yy, "…", fs=28, color=MUTED, ha="left")
+        label(ax, 104, yy, f"{len(tr[i])}", fs=30)
+        label(ax, 118.5, yy, f"{int(ty[i])}", fs=32, color=BOUND if ty[i] == 1 else MUTED, bold=True)
+        label(ax, 135, yy, f"{pi:.2f}", fs=32)
         loss = -np.log(pi) if ty[i] == 1 else -np.log(1 - pi)
-        label(ax, 153, yy, f"{loss:.2f}", fs=24, color=HELD_C, bold=True)
+        label(ax, 153, yy, f"{loss:.2f}", fs=32, color=HELD_C, bold=True)
     save(fig, "setup_examples")
     print("setup_examples", [int(ty[i]) for i in rows], [round(float(v), 3) for v in p])
 

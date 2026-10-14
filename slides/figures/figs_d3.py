@@ -40,16 +40,16 @@ def lora_loop():
 
 # ------------------------------------------------------------------ 4.1 your turn
 def your_turn_d3():
-    fig, ax = canvas(16, 6.4, ylim=(0, 64))
-    xs = [30, 80, 130]
+    fig, ax = canvas()
+    xs = [26, 80, 134]
     # 1: two numbers per sequence
     for i, (v, c) in enumerate(((0.41, BASE["G"]), (0.29, BASE["U"]))):
-        ax.add_patch(Rectangle((xs[0] - 9 + i * 10, 30), 7, v * 50, color=c))
-    label(ax, xs[0] - 5.5, 27, "GC", fs=16, color=MUTED); label(ax, xs[0] + 4.5, 27, "U", fs=16, color=MUTED)
+        ax.add_patch(Rectangle((xs[0] - 15 + i * 17, 48), 13, v * 95, color=c))
+    label(ax, xs[0] - 8.5, 44, "GC", fs=24, color=MUTED); label(ax, xs[0] + 8.5, 44, "U", fs=24, color=MUTED)
     # 2: word counts
     rng = np.random.default_rng(2)
     for i, h in enumerate(rng.integers(1, 7, 24)):
-        ax.add_patch(Rectangle((xs[1] - 13 + i * 1.1, 30), 0.8, h * 3, color=ACCENT))
+        ax.add_patch(Rectangle((xs[1] - 21.5 + i * 1.8, 48), 1.35, h * 6.5, color=ACCENT))
     # 3: original and shuffled
     from intuition import dinuc_shuffle
     orig = "UGCUGCUAACUG"
@@ -57,13 +57,13 @@ def your_turn_d3():
     pairs = lambda x: sorted(x[i:i + 2] for i in range(len(x) - 1))  # noqa: E731
     assert pairs(shuf) == pairs(orig)
     for r, s in enumerate((orig, shuf)):
-        seq(ax, xs[2] - 11, 48 - r * 10, s, fs=20, dx=2.4)
-    label(ax, xs[2], 31, "same letter pairs", fs=16, color=MUTED)
+        seq(ax, xs[2] - 19.8, 76 - r * 13, s, fs=32, dx=3.6)
+    label(ax, xs[2], 51, "same letter pairs", fs=24, color=MUTED)
     for x, todo, what in zip(xs, ["TODO-1", "TODO-2", "TODO-3"],
-                             ["two numbers per sequence:\nGC and U", "counts of all\n5-letter words",
+                             ["two numbers\nper sequence:\nGC and U", "counts of all\n5-letter words",
                               "the shuffle test"]):
-        label(ax, x, 18, todo, fs=26, color=ACCENT, bold=True)
-        label(ax, x, 11, what, fs=19, color=INK, va="top")
+        label(ax, x, 35, todo, fs=38, color=ACCENT, bold=True)
+        label(ax, x, 28.5, what, fs=28, color=INK, va="top")
     save(fig, "your_turn_d3")
 
 

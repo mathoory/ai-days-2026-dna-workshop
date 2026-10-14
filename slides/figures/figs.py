@@ -401,14 +401,14 @@ def onehot_big():
     fig, ax = canvas()
     x0, dx = 26, 7.4
     for i, ch in enumerate(s):
-        label(ax, x0 + i * dx, 74, ch, fs=32, color=INK, family=MONO)
+        label(ax, x0 + i * dx, 67, ch, fs=40, color=INK, family=MONO)
         for r, b in enumerate(ALPH):
             on = ch == b
-            ax.add_patch(Rectangle((x0 + i * dx - 3.4, 54 - r * 9), 6.8, 8.4, fc=BASE[b] if on else FAINT,
+            ax.add_patch(Rectangle((x0 + i * dx - 3.4, 50 - r * 12.3), 6.8, 11.7, fc=BASE[b] if on else FAINT,
                                    ec="white", lw=2))
-            label(ax, x0 + i * dx, 58.2 - r * 9, "1" if on else "0", fs=20, color="white" if on else LIGHT)
+            label(ax, x0 + i * dx, 55.85 - r * 12.3, "1" if on else "0", fs=26, color="white" if on else LIGHT)
     for r, b in enumerate(ALPH):
-        label(ax, x0 - 9, 58.2 - r * 9, b, fs=24, color=MUTED)
+        label(ax, x0 - 8, 55.85 - r * 12.3, b, fs=32, color=MUTED)
     save(fig, "onehot_big")
 
 
@@ -504,12 +504,14 @@ def filter_learning(tr, ty, ls, ly):
     f = int(np.argmax(np.abs(snaps[10] - snaps[0]).reshape(10, -1).sum(1)))
     vmax = max(np.abs(snaps[e][f, 0]).max() for e in snaps)
     fig = newfig()
-    axes = [fig.add_axes([0.04 + k * 0.225, 0.2, 0.2, 0.5]) for k in range(4)]
+    axes = [fig.add_axes([0.035 + k * 0.22, 0.03, 0.2, 0.75]) for k in range(4)]
     for k, (ax, e) in enumerate(zip(axes, (0, 1, 3, 10))):
         im = heat(ax, snaps[e][f, 0], vmax, rows=(k == 0))
-        ax.set_title(f"Epoch {e}\nAUROC {aucs[e]:.2f}", loc="center")
-    fig.text(0.04, 0.84, f"Filter {f} during one training run", fontsize=24, color=INK)
-    cb = fig.colorbar(im, cax=fig.add_axes([0.945, 0.2, 0.01, 0.5])); cb.outline.set_visible(False)
+        ax.set_title(f"Epoch {e}\nAUROC {aucs[e]:.2f}", loc="center", fontsize=27)
+        ax.tick_params(axis="y", labelsize=24)
+    fig.text(0.035, 0.935, f"Filter {f} during one training run", fontsize=28, color=INK)
+    cb = fig.colorbar(im, cax=fig.add_axes([0.915, 0.03, 0.012, 0.75])); cb.outline.set_visible(False)
+    cb.ax.tick_params(labelsize=22)
     for k in range(4):                       # frames for the slide: one more epoch per click
         for j, ax in enumerate(axes):
             ax.set_visible(j <= k)
@@ -751,16 +753,18 @@ def landscape():
            ("DNABERT-2", 2023.4, 117e6, "M"), ("HyenaDNA", 2023.5, 6.6e6, "A"), ("Mistral-DNA", 2024.0, 17e6, "A"),
            ("Evo", 2024.2, 7e9, "A"), ("Evo 2", 2025.1, 40e9, "A")]
     fig = newfig()
-    ax = fig.add_axes([0.1, 0.13, 0.86, 0.75])
+    ax = fig.add_axes([0.085, 0.075, 0.905, 0.9])
     ax.plot([2023.0, 2023.0], [50e6, 2.5e9], color=LIGHT, lw=2)
     for n, x, p, kind in pts:
-        ax.scatter(x, p, s=200, zorder=3, color=ACCENT if kind == "M" else HELD_C, edgecolor="white", lw=1.5)
-        ax.text(x + 0.07, p * 1.3, n, fontsize=17)
-    ax.set_yscale("log"); ax.set_xlim(2020.6, 2025.9); ax.set_xticks([2021, 2022, 2023, 2024, 2025])
+        ax.scatter(x, p, s=280, zorder=3, color=ACCENT if kind == "M" else HELD_C, edgecolor="white", lw=1.5)
+        ax.text(x + 0.07, p * 1.35, n, fontsize=21)
+    ax.set_yscale("log"); ax.set_ylim(3e6, 1.2e11)
+    ax.set_xlim(2020.6, 2025.9); ax.set_xticks([2021, 2022, 2023, 2024, 2025])
+    ax.tick_params(labelsize=22)
     ax.set_ylabel("Parameters"); ygrid(ax)
     ax.legend(handles=[Line2D([], [], marker="o", ls="", ms=12, color=ACCENT, label="Masked (fill in the blank)"),
-                       Line2D([], [], marker="o", ls="", ms=12, color=HELD_C, label="Autoregressive (predict next)")],
-              loc="upper left")
+                       Line2D([], [], marker="o", ls="", ms=14, color=HELD_C, label="Autoregressive (predict next)")],
+              loc="upper left", fontsize=23)
     save(fig, "landscape")
 
 
@@ -1004,7 +1008,7 @@ def dumbbell():
 def headtohead():
     d = json.load(open(SPIKE / "s10_headtohead.json"))
     fig = newfig()
-    ax = fig.add_axes([0.08, 0.13, 0.88, 0.7])
+    ax = fig.add_axes([0.08, 0.075, 0.91, 0.835])
     series = [("cnn", "CNN from scratch (3 runs)", CNN_C), ("frozen_probe", "NT-500M frozen + probe (1 run)", FROZEN_C),
               ("lora", "NT-500M fine-tuned with LoRA (3 runs)", TUNED_C)]
     for gi, k in enumerate(("500", "20000")):
@@ -1018,7 +1022,7 @@ def headtohead():
     ax.set_xticks([0, 1]); ax.set_xticklabels(["500 labelled sequences", "20,000 labelled sequences"])
     ax.tick_params(axis="x", length=0)
     ax.set_ylim(0.5, 0.94); ax.set_ylabel("Held-out AUROC, matched negatives"); ygrid(ax)
-    ax.legend(loc="lower center", ncol=3, bbox_to_anchor=(0.5, 1.0), fontsize=17)
+    ax.legend(loc="lower center", ncol=3, bbox_to_anchor=(0.5, 1.0), fontsize=20, columnspacing=1.5)
     save(fig, "headtohead")
 
 

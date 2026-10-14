@@ -227,7 +227,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Examples $(x_i, y_i)$, $i = 1, \dots, N$: a sequence $x_i$ and its label $y_i$ (1 bound, 0 unbound)
 - A model $g_\theta$ with parameters $\theta$ predicts $\hat p = g_\theta(x)$, the probability of bound
 
-![](assets/custom/setup_examples.png){fig-align="center" height="430px"}
+![](assets/custom/setup_examples.png){fig-align="center" height="589px"}
 
 ::: {.notes}
 - Four real training sequences, the first 32 of their 340 letters. $y$ is the CLIP-seq label; $\hat p$ is the prediction of the CNN trained in this part.
@@ -444,7 +444,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 
 - One column per letter, with a 1 in its row; padding columns of 0.25 up to 501
 
-![](assets/custom/onehot_big.png){fig-align="center" height="580px"}
+![](assets/custom/onehot_big.png){fig-align="center" height="657px"}
 
 ::: {.notes}
 - Each column is one letter; the four rows are A, C, G, U, and the coloured cell holds the 1. A sequence becomes a 4 × length matrix. The longest sequence is 375 letters.
@@ -478,17 +478,17 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 ## 4.3 Training changes the filters
 
 ::: {.r-stack}
-![](assets/custom/filter_learning_0.png){height="526px"}
+![](assets/custom/filter_learning_0.png){height="741px"}
 
-![](assets/custom/filter_learning_1.png){.fragment height="526px"}
+![](assets/custom/filter_learning_1.png){.fragment height="741px"}
 
-![](assets/custom/filter_learning_2.png){.fragment height="526px"}
+![](assets/custom/filter_learning_2.png){.fragment height="741px"}
 
-![](assets/custom/filter_learning_3.png){.fragment height="526px"}
+![](assets/custom/filter_learning_3.png){.fragment height="741px"}
 :::
 
 ::: {.notes}
-- Filter 0 at epochs 0, 1, 3 and 10 of one training run, one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.
+- One filter at epochs 0, 1, 3 and 10 of one training run (its number is in the figure), one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.
 - Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.
 - Each step is the update of slide 2.11, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
 :::
@@ -538,7 +538,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 
 ## 4.7 The training step and the evaluation (TODO-3) {data-todo="TODO-3"}
 
-![](assets/custom/train_loop.png){fig-align="center" height="661px"}
+![](assets/custom/train_loop.png){fig-align="center" height="766px"}
 
 ::: {.notes}
 - Top, blue: one training step, repeated for every batch of every epoch. A batch goes through the network, the scores are compared with the labels (the loss), the gradients of the loss say how to change every weight, and the step changes them; then the next batch.
@@ -607,7 +607,7 @@ PWM: position weight matrix, the frequency of each letter at each position
 
 Open **`01_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
 
-![](assets/custom/your_turn.png){fig-align="center" height="629px"}
+![](assets/custom/your_turn.png){fig-align="center" height="701px"}
 
 ::: {.notes}
 - TODO-1: `one_hot` and `encode_batch`. TODO-2: build your own network from the parts. TODO-3: `train_step`, `evaluate`, then the ROC curve. TODO-4: filter 0 step by step, then a logo for every filter. TODO-5: one copy in one sequence, design a control, then both curves.

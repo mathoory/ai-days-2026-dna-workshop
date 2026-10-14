@@ -105,7 +105,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 
 Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embeddings.
 
-![](assets/custom/your_turn_d3.png){fig-align="center" height="511px"}
+![](assets/custom/your_turn_d3.png){fig-align="center" height="701px"}
 
 ::: {.notes}
 - Helpers: TODO-1 `probe_auc` (`gc_u` is written by the students); TODO-2 `Counter`, `kmer_counts(seqs, k=5)`; TODO-3 `dinuc_shuffle`.
@@ -131,7 +131,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 
 ## 5.2 Fine-tuning against the CNN
 
-![](assets/custom/headtohead.png){fig-align="center" height="649px"}
+![](assets/custom/headtohead.png){fig-align="center" height="741px"}
 
 ::: {.notes}
 - Bars: mean AUROC; dots: single runs. Green: CNN from scratch; blue: NT-500M frozen with a probe; purple: NT-500M fine-tuned with LoRA. Left: 500 labels; right: 20,000.
