@@ -27,7 +27,7 @@ SCHEDULE = [
     ("11:50", "12:30", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models"),
     ("12:30", "12:40", "break", "Break", "", None),
     ("12:40", "13:20", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
-    ("13:20", "13:30", "talk", "Wrap-up and feedback", "Mattan Hoory", None),
+    ("13:20", "13:30*", "talk", "Wrap-up and feedback", "Mattan Hoory", None),
 ]
 SUMMARY = {
     "01_cnn": "Build a CNN that predicts AGO2 binding from RNA sequence, then read motifs off its filters and test them.",
@@ -49,7 +49,9 @@ def link(href, text, cls="btn", download=False):
 
 
 def row(start, end, kind, title, who, stem):
-    t = f'<div class="time">{start}<span>{end}</span></div>'
+    t = f'<div class="time">{start}<span>{end.rstrip("*")}</span></div>'
+    if end.endswith("*"):
+        t = f'<div class="time">{start}<span>{end.rstrip("*")}, at the latest 14:00</span></div>'
     if kind == "break":
         return f'<li class="slot break">{t}<div class="what">{title}</div></li>'
     acts = ""
@@ -102,7 +104,7 @@ def page():
   <div class="wrap">
     <p class="kicker">Technion AI Days 2026 &nbsp;/&nbsp; Workshop</p>
     <h1>{TITLE}</h1>
-    <p class="meta">Thursday 15 October 2026, 10:00 to 13:30 &nbsp;/&nbsp; Faculty of Biotechnology and Food Engineering, Technion</p>
+    <p class="meta">Thursday 15 October 2026, 10:00 to 13:30 (at the latest 14:00) &nbsp;/&nbsp; Faculty of Biotechnology and Food Engineering, Technion</p>
     <p class="meta">Prof. Roee Amit &nbsp;and&nbsp; Mattan Hoory</p>
     <p class="host">Hosted by the <a href="{LAB}" target="_blank" rel="noopener">Roee Amit Lab</a></p>
   </div>
@@ -110,6 +112,7 @@ def page():
 <main class="wrap">
   <section>
     <h2>Schedule</h2>
+    <p class="note">Times are estimates. The workshop may run until 14:00.</p>
     <ol class="schedule">
 {slots}
     </ol>

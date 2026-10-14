@@ -47,6 +47,7 @@ main h2 {
   color: var(--muted); padding-bottom: 14px; border-bottom: 1px solid var(--ink); margin-bottom: 8px;
 }
 
+.note { margin: 14px 0 4px; color: var(--muted); font-size: 15px; }
 .start ol { margin: 18px 0 0; padding-left: 22px; }
 .start li { margin: 6px 0; }
 
