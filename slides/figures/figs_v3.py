@@ -268,12 +268,12 @@ def toy_pwm():
 
 # ------------------------------------------------------------------ 2.x the learning flow, on our task
 def learning_flow():
-    steps = [("Collect data", "92,346 sequences,\neach labelled bound or unbound"),
-             ("Choose a hypothesis set", "CNNs of one shape\n(you build one in TODO-2)"),
-             ("Choose an algorithm", "gradient descent\non the loss"),
-             ("Train", "the algorithm finds the\nbest CNN in the set"),
-             ("Evaluate", "on 1,000 held-out sequences\n(AUROC)"),
-             ("Use", "score sequences\nnobody has measured")]
+    steps = [("Collect data", "inputs, each with\nits known answer"),
+             ("Choose a hypothesis set", "a family of models,\nfor example one architecture"),
+             ("Choose an algorithm", "for example gradient\ndescent on the loss"),
+             ("Train", "the algorithm picks the\nbest model in the set"),
+             ("Evaluate", "on held-out data\nthe model never saw"),
+             ("Use", "predict for new inputs\nnobody has measured")]
     fig, ax = canvas()
     for k, (head, sub) in enumerate(steps):
         x, y = 20 + (k % 3) * 50, 72 - (k // 3) * 34
@@ -523,13 +523,13 @@ def activation(kind):
     else:
         ax.plot(z, np.maximum(0, z), color=ACCENT, lw=5)
         ax.axhline(0, color=HAIR, lw=1)
-        for zz in (-3, 2):
+        for zz, off in ((-3, (0, 16)), (2, (18, -6))):
             ax.scatter(zz, max(0, zz), s=120, color=HELD_C, zorder=3)
-            ax.annotate(f"{zz} → {max(0, zz)}", (zz, max(0, zz)), xytext=(10, 14), textcoords="offset points",
-                        fontsize=21, color=HELD_C)
+            ax.annotate(f"{zz} → {max(0, zz)}", (zz, max(0, zz)), xytext=off, textcoords="offset points",
+                        fontsize=21, color=HELD_C, ha="left" if zz > 0 else "center")
         ax.set_ylim(-1, 6.3); ax.set_ylabel("output")
         txt = [r"$\mathrm{ReLU}(z) = \max(0, z)$", "", "negative → 0", "positive → passes unchanged", "",
-               "between the layers of a network,", "so that stacked layers can bend", "the boundary between classes"]
+               "introduces non-linearity"]
     ax.set_xlabel("score z"); ygrid(ax)
     for i, line in enumerate(txt):
         fig.text(0.7, 0.85 - i * 0.075, line, fontsize=26 if i == 0 else 21, color=INK if i == 0 else MUTED, va="top")
@@ -573,3 +573,10 @@ if __name__ == "__main__":
             roc_frames(ls, ly)
         if run("your_turn"):
             your_turn(ls, ly)
+
+    # crop every click-through group to the union of its ink, so frames fill the slide and still stack exactly
+    TRIM_GROUPS = [[f"slide_filter_{k}" for k in range(5)], ["toy_cutoff_0", "toy_cutoff_1"],
+                   [f"roc_frame_{k}" for k in range(4)], ["bio_flow_base", "bio_flow_ago2"]]
+    for g in TRIM_GROUPS:
+        if all((OUT / f"{n}.png").exists() for n in g):
+            trim_group(g)

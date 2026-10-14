@@ -115,82 +115,147 @@ def seed_pairing(pos):
 
 
 def labels_raster(tr, ty):
+    """Two frames: one bound sequence zoomed in (its measured site written out), then all 150 + 150 rows."""
     import matplotlib
     rng = np.random.default_rng(0)
     pos = [s for s, l in zip(tr, ty) if l == 1]; neg = [s for s, l in zip(tr, ty) if l == 0]
-    P = [pos[i] for i in rng.choice(len(pos), 150, replace=False)]
-    N = [neg[i] for i in rng.choice(len(neg), 150, replace=False)]
+    P = sorted([pos[i] for i in rng.choice(len(pos), 150, replace=False)], key=gc)
+    N = sorted([neg[i] for i in rng.choice(len(neg), 150, replace=False)], key=gc)
     cmap = {b: matplotlib.colors.to_rgb(BASE[b]) for b in ALPH}
+    r0 = 105                                                    # the row that is zoomed in on first
 
-    def img(S):
-        S = sorted(S, key=gc)
+    def img(S, only=None):
         M = np.ones((len(S), 330, 3))
         for r, s in enumerate(S):
-            for c, ch in enumerate(s[:330]):
+            if only is not None and abs(r - only) > 2:          # the zoomed row, drawn 5 rows thick
+                continue
+            src = S[only] if only is not None else s
+            for c, ch in enumerate(src[:330]):
                 M[r, c] = cmap.get(ch, (1, 1, 1))
         return M
 
-    fig, axes = plt.subplots(1, 2, figsize=(16, 9), dpi=120)
     titles = (f"Bound: {len(pos):,} sites measured by CLIP-seq", f"Unbound: {len(neg):,} random positions in the same genes")
-    for ax, S, t in ((axes[0], P, titles[0]), (axes[1], N, titles[1])):
-        ax.imshow(img(S), aspect="auto", interpolation="nearest")
-        ax.set_title(t, fontsize=22, pad=46); ax.set_xlabel("Position in the sequence"); ax.set_yticks([])
-        for sp in ax.spines.values():
-            sp.set_visible(False)
-        for x in (150, 190):                                    # the measured site, letters 150 to 190
-            ax.axvline(x, color=INK, lw=3.5)
-        ax.annotate("", (150, -4), (190, -4), annotation_clip=False,
-                    arrowprops=dict(arrowstyle="<->", color=INK, lw=2, shrinkA=0, shrinkB=0))
-        ax.text(170, -7, "measured site", ha="center", va="bottom", fontsize=19, color=INK, fontweight="bold",
-                clip_on=False)
-        ax.set_xticks([0, 50, 100, 150, 190, 250, 300])
-    axes[0].set_ylabel("150 of them, sorted by G+C")
-    fig.legend(handles=[Patch(color=BASE[b], label=b) for b in ALPH], loc="upper right", ncol=4,
-               bbox_to_anchor=(0.98, 0.98), handlelength=1, columnspacing=1.2)
-    fig.subplots_adjust(left=0.05, right=0.98, top=0.82, bottom=0.1, wspace=0.06)
-    save(fig, "labels_raster")
+    names = []
+    for frame in (0, 1):
+        fig, axes = plt.subplots(1, 2, figsize=(16, 9), dpi=120)
+        for k, (ax, S, t) in enumerate(((axes[0], P, titles[0]), (axes[1], N, titles[1]))):
+            if frame == 0 and k == 1:
+                ax.axis("off")
+                continue
+            ax.imshow(img(S, r0 if frame == 0 else None), aspect="auto", interpolation="nearest")
+            ax.set_title(t if frame == 1 else "One bound sequence", fontsize=22, pad=46)
+            ax.set_xlabel("Position in the sequence"); ax.set_yticks([])
+            for sp in ax.spines.values():
+                sp.set_visible(False)
+            for x in (150, 190):                                # the measured site, letters 150 to 190
+                ax.axvline(x, color=INK, lw=3.5)
+            ax.annotate("", (150, -4), (190, -4), annotation_clip=False,
+                        arrowprops=dict(arrowstyle="<->", color=INK, lw=2, shrinkA=0, shrinkB=0))
+            ax.text(170, -7, "measured site", ha="center", va="bottom", fontsize=19, color=INK, fontweight="bold",
+                    clip_on=False)
+            ax.set_xticks([0, 50, 100, 150, 190, 250, 300])
+        if frame == 0:
+            # the measured site of that row, written out large in the empty right half
+            s = P[r0]
+            a1 = axes[1]
+            a1.set_xlim(0, 41); a1.set_ylim(0, 10)
+            for i, ch in enumerate(s[150:191]):
+                a1.add_patch(Rectangle((i + 0.05, 5.0), 0.9, 1.6, color=BASE.get(ch, INK)))
+                a1.text(i + 0.5, 7.3, ch, ha="center", va="center", fontsize=20, family=MONO, fontweight="bold",
+                        color=BASE.get(ch, INK))
+            a1.text(20.5, 8.9, "its measured site, letters 150 to 190", ha="center", fontsize=21, color=INK)
+            a1.text(20.5, 1.0, "1 letter = 1 coloured cell", ha="center", fontsize=19, color=MUTED)
+            # guide lines from the strip's site to the written-out letters
+            for xa, xb in ((150, 0), (191, 41)):
+                fig.add_artist(matplotlib.patches.ConnectionPatch((xa, r0 - 2.5), (xb, 5.0), "data", "data", axesA=axes[0],
+                                                                   axesB=a1, color=MUTED, lw=1.2, ls="--"))
+        else:
+            axes[0].add_patch(Rectangle((-0.5, r0 - 0.9), 330, 1.8, fill=False, ec=INK, lw=2.5))
+            axes[0].set_ylabel("150 of them, sorted by G+C")
+        fig.legend(handles=[Patch(color=BASE[b], label=b) for b in ALPH], loc="upper right", ncol=4,
+                   bbox_to_anchor=(0.98, 0.98), handlelength=1, columnspacing=1.2)
+        fig.subplots_adjust(left=0.05, right=0.98, top=0.82, bottom=0.1, wspace=0.06)
+        fig.savefig(OUT / f"labels_raster_{frame}.png", dpi=120, facecolor="white"); plt.close(fig)
+        names.append(f"labels_raster_{frame}")
+    trim_group(names)
+    print("wrote", names)
 
 
 def lr_training(tr, ty):
+    """Gradient descent on two features: the boundary at steps 0, 1 and 300 with its weights, then the loss."""
     rng = np.random.default_rng(1)
     idx = rng.choice(len(tr), 3000, replace=False)
     X = np.array([[gc(tr[i]), tr[i].count("U") / len(tr[i])] for i in idx]); y = ty[idx].astype(float)
     mu, sd = X.mean(0), X.std(0); Z = (X - mu) / sd
-    w, b, lr = np.array([-1.0, -1.0]), 0.8, 0.5        # a deliberately bad start so the line visibly moves
-    snaps, losses = {}, []
-    for step in range(301):
-        p = 1 / (1 + np.exp(-(Z @ w + b)))
-        losses.append(-np.mean(y * np.log(p + 1e-9) + (1 - y) * np.log(1 - p + 1e-9)))
-        if step in (0, 300):
-            snaps[step] = (w.copy(), b)
-        g = p - y
-        w -= lr * Z.T @ g / len(y); b -= lr * g.mean()
+    steps = (0, 1, 300)
+
+    def run(lr):
+        w, b = np.array([-1.0, -1.0]), 0.8               # a deliberately bad start so the line visibly moves
+        snaps, losses = {}, []
+        for step in range(301):
+            p = 1 / (1 + np.exp(-(Z @ w + b)))
+            losses.append(-np.mean(y * np.log(p + 1e-9) + (1 - y) * np.log(1 - p + 1e-9)))
+            if step in steps:
+                snaps[step] = (w.copy(), b)
+            g = p - y
+            w = w - lr * Z.T @ g / len(y); b = b - lr * g.mean()
+        return snaps, np.array(losses)
+
+    snaps, losses = run(0.5)
+    other = {0.05: run(0.05)[1], 10.0: run(10.0)[1]}
+
+    def raw(ws, bs):
+        """The weights on the raw fractions, as in the slide's equation (training used standardised features)."""
+        w_raw = ws / sd
+        return w_raw, bs - float((ws * mu / sd).sum())
+
     fig = newfig()
     o = rng.permutation(len(y))
-    for k, step in enumerate((0, 300)):
-        ax = fig.add_axes([0.07 + k * 0.31, 0.14, 0.27, 0.7])
-        ax.scatter(X[o, 0], X[o, 1], c=np.where(y[o] == 1, BOUND, MID), s=30, alpha=.6, lw=0)
+    panels = []
+    for k, step in enumerate(steps):
+        ax = fig.add_axes([0.06 + k * 0.215, 0.13, 0.19, 0.62]); panels.append(ax)
+        ax.scatter(X[o, 0], X[o, 1], c=np.where(y[o] == 1, BOUND, MID), s=22, alpha=.6, lw=0)
         ws, bs = snaps[step]
         xs = np.linspace(X[:, 0].min(), X[:, 0].max(), 50)
         zy = -(ws[0] * (xs - mu[0]) / sd[0] + bs) / ws[1]
         ax.plot(xs, zy * sd[1] + mu[1], color=HELD_C, lw=3)
         ax.set_ylim(X[:, 1].min(), X[:, 1].max())
-        ax.set_title(f"Step {step}"); ax.set_xlabel("G+C fraction")
+        w_r, b_r = raw(ws, bs)
+        ax.set_title(f"Step {step}\n$w_1$ = {w_r[0]:.1f}\n$w_2$ = {w_r[1]:.1f}\n$b$ = {b_r:.1f}", fontsize=19)
+        ax.set_xlabel("G+C fraction")
         if k == 0:
             ax.set_ylabel("U fraction")
         else:
             ax.set_yticklabels([])
-    ax = fig.add_axes([0.73, 0.14, 0.24, 0.7])
-    ax.plot(losses, color=TRAIN_C, lw=3)
-    for st in (0, 300):
+    ax = fig.add_axes([0.72, 0.13, 0.2, 0.62]); panels.append(ax)
+    n = 60                                               # the first 60 steps, where the three runs differ
+    ax.plot(range(n), other[10.0][:n], color=HELD_C, lw=1.6, marker="o", ms=3)
+    ax.plot(range(n), other[0.05][:n], color=MID, lw=3)
+    ax.plot(range(n), losses[:n], color=TRAIN_C, lw=3.5)
+    for st in (0, 1):
         ax.scatter(st, losses[st], s=70, color=TRAIN_C, zorder=3)
-        ax.annotate(f"{losses[st]:.2f}", (st, losses[st]), xytext=(10, 8) if st == 0 else (-50, 10), textcoords="offset points")
-    ax.set_title("Loss"); ax.set_xlabel("Step"); ygrid(ax)
+    for txt, yv, c in ((r"$\eta$ = 10", 1.55, HELD_C), (r"$\eta$ = 0.05", other[0.05][n - 1] + 0.035, MID),
+                       (r"$\eta$ = 0.5", losses[n - 1] - 0.035, TRAIN_C)):
+        ax.text(n + 1, yv, txt, color=c, fontsize=18, va="center")
+    ax.set_xlim(-1, n); ax.set_xlabel("Step")
+    ax.set_title("Loss, three learning rates\n\n\n", fontsize=19); ygrid(ax)
     fig.legend(handles=[Line2D([], [], marker="o", ls="", ms=10, color=BOUND, label="Bound"),
                         Line2D([], [], marker="o", ls="", ms=10, color=MID, label="Unbound"),
                         Line2D([], [], color=HELD_C, lw=3, label="p = 0.5")],
                loc="upper right", ncol=3, bbox_to_anchor=(0.98, 1.0))
+    names = [f"lr_training_{k}" for k in range(4)]
+    for k, name in enumerate(names):                     # frames for the slide: one panel per click
+        for j, a in enumerate(panels):
+            a.set_visible(j <= k)
+        fig.savefig(OUT / f"{name}.png", dpi=120, facecolor="white")
+    for a in panels:
+        a.set_visible(True)
+    trim_group(names)
     save(fig, "lr_training")
+    print("lr_training raw weights", {st: tuple(round(float(v), 2) for v in (*raw(*snaps[st])[0], raw(*snaps[st])[1]))
+                                      for st in steps}, "loss", round(losses[0], 3), round(losses[1], 3), round(losses[300], 3),
+          "eta 0.05 end", round(float(other[0.05][-1]), 3), "eta 10 range", round(float(other[10.0][1:].min()), 3),
+          round(float(other[10.0].max()), 3))
 
 
 def auroc(model, ls, ly):
@@ -423,6 +488,7 @@ def filter_learning(tr, ty, ls, ly):
         for j, ax in enumerate(axes):
             ax.set_visible(j <= k)
         fig.savefig(OUT / f"filter_learning_{k}.png", dpi=120, facecolor="white")
+    trim_group([f"filter_learning_{k}" for k in range(4)])
     for ax in axes:
         ax.set_visible(True)
     save(fig, "filter_learning")

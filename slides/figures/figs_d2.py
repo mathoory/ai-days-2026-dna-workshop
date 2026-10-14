@@ -307,6 +307,6 @@ if __name__ == "__main__":
         if run(n):
             job()
     for g in (["pretrain_analogy_0", "pretrain_analogy_1"], ["adapt_0"], ["adapt_1"], ["adapt_2", "adapt_3"], ["stages_0"],
-              ["stages_1", "stages_2"], ["heads_0", "heads_1", "heads_2"]):
+              ["stages_1", "stages_2"], ["heads_0", "heads_1", "heads_2"], [f"walk_{k}" for k in range(5)]):
         if all((OUT / f"{n}.png").exists() for n in g) and (not want or any(n.rsplit("_", 1)[0] in want or n in want for n in g)):
             trim_group(g)

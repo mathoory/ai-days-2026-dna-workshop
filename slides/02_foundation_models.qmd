@@ -10,9 +10,9 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 ## 1.1 Pretraining, by analogy
 
 ::: {.r-stack}
-![](assets/custom/pretrain_analogy_0.png){height="700px"}
+![](assets/custom/pretrain_analogy_0.png){height="742px"}
 
-![](assets/custom/pretrain_analogy_1.png){.fragment height="700px"}
+![](assets/custom/pretrain_analogy_1.png){.fragment height="742px"}
 :::
 
 ::: {.notes}
@@ -24,7 +24,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 ## 1.2 Pretraining a model
 
-![](assets/custom/adapt_0.png){fig-align="center" height="641px"}
+![](assets/custom/adapt_0.png){fig-align="center" height="624px"}
 
 ::: {.notes}
 - One model (the blue block) and one **head**: a small output layer for one task. In pretraining the task is the next word.
@@ -33,7 +33,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 ## 1.3 Adapting it to new tasks
 
-![](assets/custom/adapt_1.png){fig-align="center" height="586px"}
+![](assets/custom/adapt_1.png){fig-align="center" height="570px"}
 
 ::: {.notes}
 - The same model, learned once and kept. Each new task gets its own head: sentiment (positive or negative), translation, and many more.
@@ -44,9 +44,9 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 ## 1.4 The same for DNA
 
 ::: {.r-stack}
-![](assets/custom/adapt_2.png){height="568px"}
+![](assets/custom/adapt_2.png){height="553px"}
 
-![](assets/custom/adapt_3.png){.fragment height="568px"}
+![](assets/custom/adapt_3.png){.fragment height="553px"}
 :::
 
 ::: {.notes}
@@ -60,9 +60,9 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 $\mathcal{L} = -\log p_\theta(x_t \mid x_{<t})$: hide the last token, predict it from the ones before
 
-![](assets/custom/objective_next.png){fig-align="center" width="85%"}
+![](assets/custom/objective_next.png){fig-align="center" height="261px"}
 
-![](assets/custom/next_token.png){.fragment fig-align="center" height="380px"}
+![](assets/custom/next_token.png){.fragment fig-align="center" height="399px"}
 
 ::: {.notes}
 - Mistral-DNA, HyenaDNA and Evo are trained this way. $x_t$ is the token at position $t$; $x_{<t}$ the tokens before it.
@@ -75,7 +75,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{<t})$: hide the last token, predict it
 
 $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the middle, predict it from both sides
 
-![](assets/custom/objective_masked.png){fig-align="center" width="92%"}
+![](assets/custom/objective_masked.png){fig-align="center" height="300px"}
 
 ::: {.notes}
 - Nucleotide Transformer and DNABERT-2 are trained this way. $x_{\setminus t}$ is all tokens except the hidden ones.
@@ -85,7 +85,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 ## 1.7 Four stages
 
-![](assets/custom/stages_0.png){fig-align="center" height="339px"}
+![](assets/custom/stages_0.png){fig-align="center" height="330px"}
 
 ::: {.notes}
 - These four stages describe most sequence models in use today. This part goes through them in order; the transformer stays a black box.
@@ -107,14 +107,14 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 ::: {.center}
 # 2 Tokenization {data-name="Tokens"}
 
-![](assets/custom/stage_strip_0.png){width="80%"}
+![](assets/custom/stage_strip_0.png){height="155px"}
 :::
 
 ## 2.1 Single letters
 
 - A vocabulary of 4: each letter is a token, as in the CNN
 
-![](assets/custom/tokens_letters.png){fig-align="center" height="300px"}
+![](assets/custom/tokens_letters.png){fig-align="center" height="289px"}
 
 ::: {.notes}
 - Projected: 1 min.
@@ -127,7 +127,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 - Fixed words of 6 letters, a vocabulary of $4^6 = 4{,}096$ (Nucleotide Transformer, NT)
 
-![](assets/custom/tokens_kmer.png){fig-align="center" height="445px"}
+![](assets/custom/tokens_kmer.png){fig-align="center" height="430px"}
 
 ::: {.notes}
 - Projected: 1 min.
@@ -140,7 +140,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 - Merge the most frequent neighbouring pair into a new token; repeat until 4,096 tokens
 
-![](assets/custom/tokens_bpe.png){fig-align="center" height="302px"}
+![](assets/custom/tokens_bpe.png){fig-align="center" height="292px"}
 
 ::: {.notes}
 - Projected: 2 min.
@@ -153,14 +153,14 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 ::: {.center}
 # 3 Embedding {data-name="Embedding"}
 
-![](assets/custom/stage_strip_1.png){width="80%"}
+![](assets/custom/stage_strip_1.png){height="155px"}
 :::
 
 ## 3.1 Token embeddings
 
 - Token $i$ becomes row $i$ of a learned table $E$: $\;e_i = x_i^\top E$
 
-![](assets/custom/emb_lookup.png){fig-align="center" height="508px"}
+![](assets/custom/emb_lookup.png){fig-align="center" height="491px"}
 
 ::: {.notes}
 - Projected: 2 min.
@@ -174,14 +174,14 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 ::: {.center}
 # 4 The transformer {data-name="Transformer"}
 
-![](assets/custom/stage_strip_2.png){width="80%"}
+![](assets/custom/stage_strip_2.png){height="155px"}
 :::
 
 ## 4.1 The transformer, as a black box
 
 - Each output vector depends on every input token (attention)
 
-![](assets/custom/blackbox.png){fig-align="center" height="642px"}
+![](assets/custom/blackbox.png){fig-align="center" height="657px"}
 
 ::: {.notes}
 - Attention alone does not see token order. The model adds position information to the token vectors (Mistral-DNA rotates them by an angle that depends on the position).
@@ -197,15 +197,15 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 ## 4.2 The whole pipeline on one sequence {data-todo="TODO-1"}
 
 ::: {.r-stack}
-![](assets/custom/walk_0.png){height="720px"}
+![](assets/custom/walk_0.png){height="741px"}
 
-![](assets/custom/walk_1.png){.fragment height="720px"}
+![](assets/custom/walk_1.png){.fragment height="741px"}
 
-![](assets/custom/walk_2.png){.fragment height="720px"}
+![](assets/custom/walk_2.png){.fragment height="741px"}
 
-![](assets/custom/walk_3.png){.fragment height="720px"}
+![](assets/custom/walk_3.png){.fragment height="741px"}
 
-![](assets/custom/walk_4.png){.fragment height="720px"}
+![](assets/custom/walk_4.png){.fragment height="741px"}
 :::
 
 ::: {.notes}
@@ -222,7 +222,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 - Sequences in a batch are padded to the same number of tokens; the **attention mask** marks the real ones
 
-![](assets/custom/pad_mask.png){fig-align="center" height="596px"}
+![](assets/custom/pad_mask.png){fig-align="center" height="606px"}
 
 ::: {.notes}
 - Three real bound sequences (22, 31 and 40 letters, in DNA letters as the model reads them), tokenized together. Each row is one sequence; each cell one token, with its mask value below it.
@@ -234,7 +234,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 ::: {.center}
 # 5 Prediction heads {data-name="Heads"}
 
-![](assets/custom/stage_strip_3.png){width="80%"}
+![](assets/custom/stage_strip_3.png){height="155px"}
 :::
 
 ## 5.1 Prediction heads
@@ -242,11 +242,11 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 **Softmax**: the sigmoid for many classes; one score per token in, probabilities that sum to 1 out
 
 ::: {.r-stack}
-![](assets/custom/heads_0.png){height="610px"}
+![](assets/custom/heads_0.png){height="626px"}
 
-![](assets/custom/heads_1.png){.fragment height="610px"}
+![](assets/custom/heads_1.png){.fragment height="626px"}
 
-![](assets/custom/heads_2.png){.fragment height="610px"}
+![](assets/custom/heads_2.png){.fragment height="626px"}
 :::
 
 ::: {.notes}
@@ -266,7 +266,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 ::: {.notes}
 - Left: the standardised embeddings of 40 of the 12,000 training sequences, one row each. Right: the probe, and the held-out AUROC you will compute in TODO-2.
-- The same model as part 1 slide 2.14, with 256 inputs instead of 2: 256 weights and one bias.
+- The same model as part 1 slide 2.11, with 256 inputs instead of 2: 256 weights and one bias.
 - Standardising shifts and scales each of the 256 numbers to mean 0 and standard deviation 1, using the training sequences only; the same shift and scale are applied to the test sequences.
 - Regularisation (part 1 slide 3.5) keeps the 256 weights small: `C = 0.1` in scikit-learn, where smaller `C` means stronger regularisation.
 - Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.
@@ -274,7 +274,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 ## 5.3 DNA language models, 2021 to 2025
 
-![](assets/custom/landscape.png){fig-align="center" height="700px"}
+![](assets/custom/landscape.png){fig-align="center" height="711px"}
 
 ::: {.notes}
 - x: year of publication; y: parameters, log scale. Filled points are masked models, open points next-token models. The vertical line joins the Nucleotide Transformer sizes.
@@ -291,7 +291,7 @@ Next: load a pretrained model and probe it.
 
 ## 6.1 Loading a model from Hugging Face
 
-![](assets/custom/hf_load.png){fig-align="center" width="100%"}
+![](assets/custom/hf_load.png){fig-align="center" height="647px"}
 
 ::: {.notes}
 - The same two calls load any model on the Hugging Face Hub. Each model has a page with a model card: what it was trained on, how, and its known limits.
@@ -305,7 +305,7 @@ Next: load a pretrained model and probe it.
 
 Open **`02_foundation_models.ipynb`**.
 
-![](assets/custom/your_turn_d2.png){fig-align="center" width="100%"}
+![](assets/custom/your_turn_d2.png){fig-align="center" height="491px"}
 
 ::: {.notes}
 - Signatures: `embed(tok, model, seqs)` returns an `(N, 256)` array; `probe_auc(...)` returns `(auc, probe)`.
@@ -322,7 +322,7 @@ Open **`02_foundation_models.ipynb`**.
 
 ## 7.1 Frozen pretrained models against the CNN
 
-![](assets/custom/results_part2.png){fig-align="center" height="700px"}
+![](assets/custom/results_part2.png){fig-align="center" height="766px"}
 
 ::: {.notes}
 - Show after the notebook. Held-out AUROC on the same 1,000 sequences; bars start at 0.5 (chance). Blue: probes on frozen pretrained models (light blue: the 105M model after 3 minutes of pretraining; grey: random weights); green: the CNN trained on all 92,346 sequences.

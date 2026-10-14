@@ -11,10 +11,10 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ::: columns
 ::: {.column width="58%"}
-![](assets/custom/timeline.png){height="680px"}
+![](assets/custom/timeline.png){height="697px"}
 :::
 ::: {.column width="42%"}
-![](assets/mattan_taiwan.jpg){height="660px"}
+![](assets/mattan_taiwan.jpg){height="677px"}
 
 [During the exchange semester, Sun Moon Lake (日月潭), Taiwan, 2023]{.caption-small}
 :::
@@ -32,12 +32,12 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ::: {.columns .vcenter}
 ::: {.column width="42%"}
-![](assets/hero_triplex.png){height="520px"}
+![](assets/hero_triplex.png){height="593px"}
 
 [**Triplexis**: design RNA strands that bind a chosen DNA sequence as a triple helix]{.caption-small}
 :::
 ::: {.column width="58%"}
-![](assets/peptide_pose.png){height="400px"}
+![](assets/peptide_pose.png){height="435px"}
 
 [**Peptides** against influenza: screening millions of variants with AlphaFold 3]{.caption-small}
 :::
@@ -93,7 +93,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Notebooks and slides: **[mathoory.github.io/ai-days-2026-dna-workshop]{.nowrap}**
 :::
 ::: {.column width="42%"}
-![](assets/custom/qr_site.png){width="80%"}
+![](assets/custom/qr_site.png){height="671px"}
 
 [Scan for the notebooks and slides]{.caption-small}
 :::
@@ -107,7 +107,20 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 0.5 Agenda
 
-![](assets/custom/agenda.png){fig-align="center" width="100%"}
+```{=html}
+<table class="agenda">
+<thead><tr><th>Time</th><th>Part</th><th class="tut">Tutorial</th><th class="hands">Hands-on</th><th>Notebook</th></tr></thead>
+<tbody>
+<tr><td>11:00</td><td>1. Machine learning and CNNs</td><td class="tut">40 min</td><td></td><td></td></tr>
+<tr class="brk"><td>11:40</td><td colspan="4">Break, 10 min</td></tr>
+<tr><td>11:50</td><td>1. Machine learning and CNNs, continued</td><td></td><td class="hands">25 min</td><td><code>01_cnn</code></td></tr>
+<tr><td>12:15</td><td>2. DNA foundation models</td><td class="tut">30 min</td><td class="hands">20 min</td><td><code>02_foundation_models</code></td></tr>
+<tr class="brk"><td>13:05</td><td colspan="4">Break, 10 min</td></tr>
+<tr><td>13:15</td><td>3. Shortcuts, controls and fine-tuning</td><td class="tut">15 min</td><td class="hands">20 min</td><td><code>03_shortcuts_and_controls</code></td></tr>
+<tr class="brk"><td>13:50</td><td colspan="4">Break, end at 14:00</td></tr>
+</tbody>
+</table>
+```
 
 ::: {.notes}
 - Projected: 1 min.
@@ -123,9 +136,9 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ## 1.1 RNA and AGO2
 
 ::: {.r-stack}
-![](assets/custom/bio_flow_base.png){height="509px"}
+![](assets/custom/bio_flow_base.png){height="491px"}
 
-![](assets/custom/bio_flow_ago2.png){.fragment height="509px"}
+![](assets/custom/bio_flow_ago2.png){.fragment height="491px"}
 :::
 
 ::: {.notes}
@@ -138,10 +151,15 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 1.2 The data
 
-![](assets/custom/labels_raster.png){fig-align="center" height="735px"}
+::: {.r-stack}
+![](assets/custom/labels_raster_0.png){height="735px"}
+
+![](assets/custom/labels_raster_1.png){.fragment height="735px"}
+:::
 
 ::: {.notes}
 - Projected: 2 min.
+- First one bound sequence: each letter is one coloured cell; its measured site written out on the right. Click: 150 bound and 150 unbound sequences, the same row outlined.
 - CLIP-seq: an experiment that captures the RNA a protein binds. The 40-letter measured site sits at letters 150 to 190 (the black lines).
 - Each row is one sequence, one colour per letter (A green, C blue, G yellow, U red); 150 of each class, sorted by G+C, first 330 letters. The white stripes on the right are sequence ends.
 - Counts are the training file; 1,000 more sequences (500 of each) are held out as the test set.
@@ -155,64 +173,25 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 # 2 Learning from examples {data-name="Learning"}
 :::
 
-## 2.1 What is learning?
+## 2.1 What is learning, and why machine learning?
 
 ::: {.incremental}
 - **Learning**: observations → learning → a skill
 - **Machine learning**: data → an algorithm → a skill
+- A skill improves a **performance measure**: earlier detection of disease, or today, finding where AGO2 binds
+- Define "tree" and write a program for it: **hard**. Learn trees from examples: **a 3-year-old can do it**
 :::
+
+![](assets/ash_tree.jpg){.fragment fragment-index="3" fig-align="center" height="349px"}
 
 ::: {.notes}
 - Ask the room for a definition before showing these.
-- A person learns from experience accumulated from observations; a machine learns from experience computed from data.
-- Machine learning automates learning from data in order to predict or decide.
-:::
-
-## 2.2 What is a skill?
-
-::: {.incremental}
-- A skill improves a **performance measure**
-- Diagnostics: patient data → machine learning → earlier detection of disease
-- Today: RNA sequences → machine learning → where AGO2 binds
-:::
-
-::: {.notes}
+- A person learns from experience accumulated from observations; a machine learns from experience computed from data. Machine learning automates learning from data in order to predict or decide.
 - The performance measure makes "learning" testable: accuracy, or today the AUROC (section 3).
+- Writing down rules that recognise every tree is hard; showing examples is easy. The same holds for binding sites: nobody can write down the full rule for where AGO2 binds.
 :::
 
-## 2.3 Why machine learning?
-
-::: columns
-::: {.column width="55%"}
-::: {.incremental}
-- Define "tree" and write a program for it: **hard**
-- Learn trees from examples: **a 3-year-old can do it**
-:::
-:::
-::: {.column width="45%"}
-![](assets/ash_tree.jpg){height="560px"}
-:::
-:::
-
-::: {.notes}
-- Writing down rules that recognise every tree is hard; showing examples is easy.
-- When data are available, learning from them can be easier than designing an algorithm by hand. The same holds for binding sites: nobody can write down the full rule for where AGO2 binds.
-:::
-
-## 2.4 When to use machine learning?
-
-::: {.incremental}
-1. There is an underlying pattern to learn
-2. There is no easy rule to program it
-3. There are data about the pattern
-:::
-
-::: {.notes}
-- All three hold for AGO2: binding is not random (1), there is no simple rule for it (2), and CLIP-seq measured tens of thousands of sites (3).
-- If (1) fails, there is nothing to learn; if (2) fails, write the rule; if (3) fails, there is nothing to learn from.
-:::
-
-## 2.5 A short history
+## 2.2 A short history
 
 ![](assets/ml_timeline.png){fig-align="center" height="760px"}
 
@@ -221,84 +200,92 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - The ideas are old; the data and computing power that make them work at scale are recent.
 :::
 
-## 2.6 Statistics, machine learning and AI
+## 2.3 Statistics, machine learning and AI
 
 ::: {.incremental}
 - **Statistics**: use data to make inferences about a population or a process
 - **Machine learning**: use data to find a function $g$ that approximates an unknown target $f$
 - **AI**: compute something that shows intelligent behaviour
+- **Use machine learning when**
+    - there is a pattern to learn
+    - there is no easy rule to program it
+    - there are data about it
 :::
 
 ::: {.notes}
 - Statistics gives machine learning many of its tools; traditional statistics cares more about provable results under assumptions, less about computation.
 - Machine learning is one route to AI. Chess: traditional AI searches a game tree; machine learning learns from board positions.
+- When: all three hold for AGO2. Binding is not random (1), there is no simple rule for it (2), and CLIP-seq measured tens of thousands of sites (3). If (1) fails, there is nothing to learn; if (2) fails, write the rule; if (3) fails, there is nothing to learn from.
 :::
 
-## 2.7 AI, machine learning, deep learning
+## 2.4 AI, machine learning, deep learning
 
 ![](assets/meme_iceberg.jpg){fig-align="center" height="760px"}
 
-## 2.8 Notation
-
-| | Symbol | Today |
-|:--|:--|:--|
-| Input space | $\mathcal{X}$ | RNA sequences |
-| Output space | $\mathcal{Y}$ | 1 bound, 0 unbound |
-| Training examples | $D = \{(x_i, y_i)\}_{i=1}^{N}$ | 92,346 labelled sequences |
-| Unknown target | $f: \mathcal{X} \to \mathcal{Y}$ | where AGO2 binds |
-| Hypothesis set | $\mathcal{H}$ | all CNNs of one shape |
-| Learning algorithm | $\mathcal{A}$ | gradient descent |
-| Final hypothesis | $g \approx f$ | the trained CNN |
-
-::: {.notes}
-- The notation of tutorial 1, filled in with today's task.
-- $f$ is unknown: we only see it through the examples. The algorithm picks one $g$ from $\mathcal{H}$.
-:::
-
-## 2.9 The learning flow
-
-![](assets/custom/learning_flow.png){fig-align="center" width="100%"}
-
-::: {.notes}
-- The six steps of any supervised learning project, here for today's task.
-- Step 2 is the choice of architecture (TODO-2); steps 3 and 4 are the training loop (TODO-3); step 5 is section 3.
-- Step 6 is why we do it: the trained model scores sequences nobody has measured.
-:::
-
-## 2.10 Supervised learning
+## 2.5 Supervised learning
 
 - Examples $(x_i, y_i)$, $i = 1, \dots, N$: a sequence $x_i$ and its label $y_i$ (1 bound, 0 unbound)
-- A model $f_\theta$ with parameters $\theta$ predicts $\hat p = f_\theta(x)$, the probability of bound
+- A model $g_\theta$ with parameters $\theta$ predicts $\hat p = g_\theta(x)$, the probability of bound
 
-![](assets/custom/setup_examples.png){fig-align="center" height="458px"}
+![](assets/custom/setup_examples.png){fig-align="center" height="442px"}
 
 ::: {.notes}
 - Four real training sequences, the first 32 of their 340 letters. $y$ is the CLIP-seq label; $\hat p$ is the prediction of the CNN trained in this part.
-- Supervised learning: every training example comes with its answer. Here $N$ = 92,346.
+- Supervised learning: every training example comes with its answer. Here $N$ = 92,346. The next slide gives these symbols their tutorial-1 names.
 - Training chooses $\theta$ so that $\hat p$ is close to $y$ on the training examples. The goal is good predictions on sequences the model has not seen (section 3).
 - The second bound example gets 0.35 and the second unbound one 0.52: the model is often uncertain, and sometimes wrong.
 :::
 
-## 2.11 The loss
+## 2.6 Notation
 
-- **Binary cross-entropy**: $\;\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, y_i \log \hat p_i + (1 - y_i)\log(1 - \hat p_i) \,\big]$
-
-![](assets/custom/bce_curve.png){fig-align="center" height="596px"}
+::: {.fill-table}
+| | Symbol | Meaning |
+|:---------|:---------|:------------------|
+| Input space | $\mathcal{X}$ | what we observe |
+| Output space | $\mathcal{Y}$ | the answers |
+| Training examples | $D = \{(x_i, y_i)\}_{i=1}^{N}$ | inputs with known answers |
+| Unknown target | $f: \mathcal{X} \to \mathcal{Y}$ | the true input-to-answer relation |
+| Hypothesis set | $\mathcal{H}$ | the models we allow, $g_\theta$ for every $\theta$ |
+| Learning algorithm | $\mathcal{A}$ | how one $g_\theta$ is picked |
+| Final hypothesis | $g_\theta \approx f$ | the trained model |
+:::
 
 ::: {.notes}
-- One example's contribution to the loss, against the predicted probability. Blue: a bound example, $-\log \hat p$. Grey: an unbound example, $-\log(1 - \hat p)$.
+- The notation of tutorial 1. $f$ is unknown: we only see it through the examples. The algorithm picks one $g_\theta$ from $\mathcal{H}$.
+- Today: $\mathcal{X}$ RNA sequences; $\mathcal{Y}$ 1 bound, 0 unbound; $D$ 92,346 labelled sequences; $f$ where AGO2 binds; $\mathcal{H}$ all CNNs of one shape; $\mathcal{A}$ gradient descent; $g_\theta$ the trained CNN.
+:::
+
+## 2.7 The learning flow
+
+![](assets/custom/learning_flow.png){fig-align="center" height="534px"}
+
+::: {.notes}
+- The six steps of any supervised learning project.
+- Today: 92,346 labelled sequences; a CNN of one shape; gradient descent; held-out AUROC on 1,000 sequences.
+- Step 2 is the choice of architecture (TODO-2); steps 3 and 4 are the training loop (TODO-3); step 5 is section 3.
+- Step 6 is why we do it: the trained model scores sequences nobody has measured.
+:::
+
+## 2.8 The loss
+
+- **Binary cross-entropy**: $\;\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#1A73E8}{y_i \log \hat p_i} + \color{#E8710A}{(1 - y_i)\log(1 - \hat p_i)} \,\big]$
+
+![](assets/custom/bce_curve.png){fig-align="center" height="650px"}
+
+::: {.notes}
+- One example's contribution to the loss, against the predicted probability. Blue: a bound example, $-\log \hat p$, the blue term of the formula. Orange: an unbound example, $-\log(1 - \hat p)$, the orange term.
 - A confident correct prediction costs almost nothing; a confident wrong one costs a lot ($-\log 0.01 = 4.6$).
-- On slide 2.10: predicting 0.90 for a bound sequence gives a loss of 0.11; predicting 0.35 gives 1.05.
+- On slide 2.5: predicting 0.90 for a bound sequence gives a loss of 0.10; predicting 0.35 gives 1.04.
 - Predicting 0.5 for everything gives $\ln 2 = 0.69$, the loss of a coin flip.
 - Tutorial 1 used the mean squared error, for predicting a number. Cross-entropy is the standard loss for a predicted probability.
 :::
 
-## 2.12 Features: chosen or learned
+## 2.9 Features: chosen or learned
 
 ::: {.r-stack}
-![](assets/custom/features_0.png){height="700px"}
+![](assets/custom/features_0.png){height="742px"}
 
-![](assets/custom/features_1.png){.fragment height="700px"}
+![](assets/custom/features_1.png){.fragment height="742px"}
 :::
 
 ::: {.notes}
@@ -308,9 +295,9 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Nobody told the CNN to look at G+C. Part 3 checks how much of what it learned is composition anyway.
 :::
 
-## 2.13 The sigmoid: from a score to a probability
+## 2.10 The sigmoid: from a score to a probability
 
-![](assets/custom/sigmoid.png){fig-align="center" height="680px"}
+![](assets/custom/sigmoid.png){fig-align="center" height="633px"}
 
 ::: {.notes}
 - A model first computes a score $z$, any number (a weighted sum of the features plus a bias). The sigmoid turns it into a probability between 0 and 1.
@@ -318,40 +305,37 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Every model today ends with a sigmoid. The score before it is called the **logit**.
 :::
 
-## 2.14 Gradient descent
+## 2.11 Gradient descent
 
-$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$, on $\;\hat p = \sigma(w^\top x + b)$ with $x$ = (G+C fraction, U fraction)
+- Model: $\hat p = \sigma\big(w_1 \cdot \text{G+C fraction} + w_2 \cdot \text{U fraction} + b\big)$
+- Each step: $(w_1, w_2, b) \leftarrow (w_1, w_2, b) - \eta \, \nabla \mathcal{L}$
 
-![](assets/custom/lr_training.png){fig-align="center" height="690px"}
+::: {.r-stack}
+![](assets/custom/lr_training_0.png){height="572px"}
+
+![](assets/custom/lr_training_1.png){.fragment height="572px"}
+
+![](assets/custom/lr_training_2.png){.fragment height="572px"}
+
+![](assets/custom/lr_training_3.png){.fragment height="572px"}
+:::
 
 ::: {.notes}
 - The update: $\theta$ are all the parameters, $\mathcal{L}$ the loss, $\eta$ the learning rate. Start from some $\theta$, compute the gradient of the loss with respect to every parameter, move each parameter against its gradient, scaled by $\eta$, and repeat.
-- Left and middle: 3,000 training sequences, one point each, placed by their two features, G+C fraction and U fraction (previous slides); blue bound, grey unbound. The orange line is where the predicted probability equals 0.5, at step 0 (a deliberately bad start) and after 300 steps. Right: the loss at each step.
+- Left and middle: 3,000 training sequences, one point each, placed by their two features, G+C fraction and U fraction (previous slides); blue bound, grey unbound. The orange line is where the predicted probability equals 0.5: at step 0 (a deliberately bad start), after one step, and after 300 steps. Each title gives that step's $w_1$, $w_2$ and $b$. Right: the loss at each step.
 - The smallest possible model on our data: two features per sequence and three parameters (two weights and a bias).
-- The loss (slide 2.11) falls from 0.77 at the bad start to 0.67.
+- The loss (slide 2.8) falls from 0.77 at the bad start to 0.67.
 - How well these two numbers separate the classes on held-out data: AUROC 0.66 (part 3).
 - Our CNN has 2,491 parameters. The genome models have millions to billions.
-:::
-
-## 2.15 The learning rate
-
-- $\eta$ sets the size of each step
-
-![](assets/custom/lr_rates.png){fig-align="center" height="642px"}
-
-::: {.notes}
-- The model of slide 2.14, from the same bad start, trained with three learning rates. Training loss after each step.
-- $\eta$ = 0.05: every step goes downhill, but after 40 steps the loss is still 0.72.
-- $\eta$ = 2: the loss reaches 0.67 within a few steps.
-- $\eta$ = 10: each step overshoots the minimum, and the loss jumps between 0.7 and 1.75.
+- The learning rate $\eta$ sets the size of each step (right). Same model and start, three learning rates: $\eta$ = 0.05 moves too slowly; $\eta$ = 0.5 is the run on the left; $\eta$ = 10 overshoots the minimum and the loss jumps up and down.
 - The learning rate is set before training, a hyperparameter, and chosen on validation data (section 3). The notebook uses Adam with $\eta$ = 0.001.
 :::
 
-## 2.16 Mini-batches and epochs
+## 2.12 Mini-batches and epochs
 
 - Each step uses a **batch** of 256 sequences; an **epoch** is one pass over all 92,346 (360 steps)
 
-![](assets/custom/sgd_noise.png){fig-align="center" height="596px"}
+![](assets/custom/sgd_noise.png){fig-align="center" height="606px"}
 
 ::: {.notes}
 - The CNN of this part, trained as in the notebook: 10 epochs, 3,600 steps. Light blue: the loss on each batch. Dark blue: the mean over each epoch.
@@ -360,17 +344,17 @@ $\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$, on $\;\hat p = \
 - 92,346 / 256 gives 360 full batches; the notebook drops the incomplete last one (`drop_last=True`) and reshuffles the order every epoch.
 :::
 
-## 2.17 ReLU: the bend between layers
+## 2.13 ReLU
 
-![](assets/custom/relu.png){fig-align="center" height="680px"}
+![](assets/custom/relu.png){fig-align="center" height="642px"}
 
 ::: {.notes}
 - ReLU (rectified linear unit) keeps positive values and sets negative ones to 0.
-- Inside a network it sits after each layer's weighted sums. Without it, a stack of weighted sums is just one weighted sum, a straight boundary like logistic regression. With it, the network can learn curved boundaries.
+- It introduces non-linearity. Without it, a stack of weighted sums is just one weighted sum, a straight boundary like logistic regression.
 - In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.4).
 :::
 
-## 2.18 From logistic regression to a neural network
+## 2.14 From logistic regression to a neural network
 
 - A **neural network** stacks layers of units, with **ReLU** between them
 - A **convolutional neural network (CNN)**: its first layer slides small filters along the sequence (section 4)
@@ -381,7 +365,7 @@ $\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$, on $\;\hat p = \
 - Left: logistic regression is one unit, a weighted sum of the inputs plus a bias, then the sigmoid.
 - Right: a hidden layer of units, each a weighted sum followed by ReLU, feeds the output unit.
 - Without the nonlinearity, stacked weighted sums add up to a single weighted sum, which is no more expressive than logistic regression.
-- Training is the same as on slide 2.14. `loss.backward()` computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.
+- Training is the same as on slide 2.11. `loss.backward()` computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.
 - The CNN of section 4 is a network of this kind in which each first-layer unit looks at a 10-letter window.
 :::
 
@@ -391,7 +375,7 @@ $\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$, on $\;\hat p = \
 
 ## 3.1 Train, validate, test
 
-![](assets/custom/data_split.png){fig-align="center" width="100%"}
+![](assets/custom/data_split.png){fig-align="center" height="299px"}
 
 ::: {.notes}
 - An epoch is one pass over the training data.
@@ -403,7 +387,7 @@ $\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$, on $\;\hat p = \
 
 ## 3.2 Why not the training loss?
 
-![](assets/custom/overfit_curve.png){fig-align="center" height="700px"}
+![](assets/custom/overfit_curve.png){fig-align="center" height="766px"}
 
 ::: {.notes}
 - A larger CNN (about 230,000 weights) trained on only 1,000 sequences, so the effect is easy to see. Loss after every epoch on its training sequences (blue) and on the 1,000 held-out sequences (orange).
@@ -417,11 +401,11 @@ $\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$, on $\;\hat p = \
 The scores of our convolutional neural network (CNN, section 4) on the 1,000 held-out sequences
 
 ::: {.r-stack}
-![](assets/custom/roc_frame_0.png){height="600px"}
+![](assets/custom/roc_frame_0.png){height="626px"}
 
-![](assets/custom/roc_frame_1.png){.fragment height="600px"}
+![](assets/custom/roc_frame_1.png){.fragment height="626px"}
 
-![](assets/custom/roc_frame_2.png){.fragment height="600px"}
+![](assets/custom/roc_frame_2.png){.fragment height="626px"}
 :::
 
 ::: {.notes}
@@ -481,7 +465,7 @@ Next: build the CNN.
 
 - One column per letter, with a 1 in its row; padding columns of 0.25 up to 501
 
-![](assets/custom/onehot_big.png){fig-align="center" height="611px"}
+![](assets/custom/onehot_big.png){fig-align="center" height="591px"}
 
 ::: {.notes}
 - Each column is one letter; the four rows are A, C, G, U, and the coloured cell holds the 1. A sequence becomes a 4 × length matrix. The longest sequence is 375 letters.
@@ -493,15 +477,15 @@ Next: build the CNN.
 ## 4.2 A filter slides along the sequence
 
 ::: {.r-stack}
-![](assets/custom/slide_filter_0.png){height="700px"}
+![](assets/custom/slide_filter_0.png){height="742px"}
 
-![](assets/custom/slide_filter_1.png){.fragment height="700px"}
+![](assets/custom/slide_filter_1.png){.fragment height="742px"}
 
-![](assets/custom/slide_filter_2.png){.fragment height="700px"}
+![](assets/custom/slide_filter_2.png){.fragment height="742px"}
 
-![](assets/custom/slide_filter_3.png){.fragment height="700px"}
+![](assets/custom/slide_filter_3.png){.fragment height="742px"}
 
-![](assets/custom/slide_filter_4.png){.fragment height="700px"}
+![](assets/custom/slide_filter_4.png){.fragment height="742px"}
 :::
 
 ::: {.notes}
@@ -516,7 +500,7 @@ Next: build the CNN.
 
 - The same 40 weights at every position: **weight sharing**
 
-![](assets/custom/filter_dot.png){fig-align="center" height="642px"}
+![](assets/custom/filter_dot.png){fig-align="center" height="657px"}
 
 ::: {.notes}
 - A real learned filter (filter 7) from the trained CNN, applied to the real window where it responds most strongly. The slides from 4.7 on use filter 0.
@@ -532,14 +516,14 @@ Next: build the CNN.
 
 ::: {.notes}
 - The same filter (filter 7): its output at every position of one bound sequence, after ReLU. x: position; y: output.
-- ReLU (slide 2.17) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.
+- ReLU (slide 2.13) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.
 :::
 
 ## 4.5 Channels and pooling
 
 - 10 filters give 10 output rows, **channels**; **max pooling** keeps the largest of every 3 positions
 
-![](assets/custom/channels_pool.png){fig-align="center" height="596px"}
+![](assets/custom/channels_pool.png){fig-align="center" height="606px"}
 
 ::: {.notes}
 - One bound sequence of 340 letters, the one on slide 4.4, positions 210 to 330 (filter 7 peaks at 273). Top: the output of all 10 first-layer filters after ReLU at each position; darker blue is larger. Bottom: after max pooling, one value per block of 3 positions.
@@ -551,7 +535,7 @@ Next: build the CNN.
 
 ## 4.6 Build your network (TODO-2) {data-todo="TODO-2"}
 
-![](assets/custom/cnn_template.png){fig-align="center" width="100%"}
+![](assets/custom/cnn_template.png){fig-align="center" height="389px"}
 
 ::: {.notes}
 - The parts: a convolution slides its filters along the sequence (one output row, a channel, per filter); ReLU sets negative values to 0; max pooling keeps the largest value of each block of neighbouring positions, so the rows get shorter; flatten lays everything out in one row; a linear layer makes one number, the logit.
@@ -565,24 +549,24 @@ Next: build the CNN.
 ## 4.7 Training changes the filters
 
 ::: {.r-stack}
-![](assets/custom/filter_learning_0.png){height="640px"}
+![](assets/custom/filter_learning_0.png){height="585px"}
 
-![](assets/custom/filter_learning_1.png){.fragment height="640px"}
+![](assets/custom/filter_learning_1.png){.fragment height="585px"}
 
-![](assets/custom/filter_learning_2.png){.fragment height="640px"}
+![](assets/custom/filter_learning_2.png){.fragment height="585px"}
 
-![](assets/custom/filter_learning_3.png){.fragment height="640px"}
+![](assets/custom/filter_learning_3.png){.fragment height="585px"}
 :::
 
 ::: {.notes}
 - Filter 0 at epochs 0, 1, 3 and 10 of one training run, one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.
 - Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.
-- Each step is the update of slide 2.14, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
+- Each step is the update of slide 2.11, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
 :::
 
 ## 4.8 The training step and the evaluation (TODO-3) {data-todo="TODO-3"}
 
-![](assets/custom/train_loop.png){fig-align="center" height="720px"}
+![](assets/custom/train_loop.png){fig-align="center" height="766px"}
 
 ::: {.notes}
 - Top, blue: one training step, repeated for every batch of every epoch. A batch goes through the network, the scores are compared with the labels (the loss), the gradients of the loss say how to change every weight, and the step changes them; then the next batch.
@@ -597,9 +581,9 @@ Next: build the CNN.
 ## 5.1 Which windows does a filter like?
 
 ::: {.r-stack}
-![](assets/custom/toy_cutoff_0.png){height="700px"}
+![](assets/custom/toy_cutoff_0.png){height="742px"}
 
-![](assets/custom/toy_cutoff_1.png){.fragment height="700px"}
+![](assets/custom/toy_cutoff_1.png){.fragment height="742px"}
 :::
 
 ::: {.notes}
@@ -636,7 +620,7 @@ PWM: position weight matrix, the frequency of each letter at each position
 
 - Insert one filter's consensus 1 to 7 times. Which control shows that its pattern matters?
 
-![](assets/custom/plant_scheme_motif.png){fig-align="center" height="470px"}
+![](assets/custom/plant_scheme_motif.png){fig-align="center" height="455px"}
 
 ::: {.notes}
 - Projected: 1 min.
@@ -651,7 +635,7 @@ PWM: position weight matrix, the frequency of each letter at each position
 
 Open **`01_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
 
-![](assets/custom/your_turn.png){fig-align="center" width="100%"}
+![](assets/custom/your_turn.png){fig-align="center" height="515px"}
 
 ::: {.notes}
 - TODO-1: `one_hot` and `encode_batch`. TODO-2: build your own network from the parts. TODO-3: `train_step`, `evaluate`, then the ROC curve. TODO-4: filter 0 step by step, then a logo for every filter. TODO-5: one copy in one sequence, design a control, then both curves.
