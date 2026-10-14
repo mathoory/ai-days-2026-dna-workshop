@@ -697,7 +697,7 @@
 <li>The same calls load any model on the Hugging Face Hub. Each model has a page with a model card: what it was trained on, how, and its known limits.</li>
 <li>The download goes to the Colab machine. Mistral-DNA is about 60 MB, roughly 10 seconds.</li>
 <li>Mistral-DNA has 16M parameters; the “17M” in its name includes an output layer we do not use.</li>
-<li>From here TODO-1 goes in steps: tokenize the sequence, run the model and keep its last layer, then the masked mean of slide 4.3.</li>
+<li>In the notebook, TODO-1 is one function, <code>embed</code>, written from a table that maps each step (tokenize, run the model, last layer, masked mean of slide 4.3, collect) to its API.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -732,7 +732,7 @@
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">TODO-1</td>
-<td style="text-align: left;">one sequence: tokens, last layer, masked mean; then <code>embed</code> for a list</td>
+<td style="text-align: left;"><code>embed</code>: tokens, last layer, average over real tokens</td>
 <td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">9 min</td>
 </tr>
@@ -754,11 +754,11 @@
 <ul>
 <li>Given cells (setup, loading Mistral-DNA, 2-D map, NT-500M vectors, take-aways): about 12 min. Projected hands-on total: about 32 min.</li>
 <li>Signatures: <code>embed(tok, model, seqs)</code> returns an <code>(N, 256)</code> array; <code>probe_auc(...)</code> returns <code>(auc, probe)</code>.</li>
-<li>TODO-1 goes in four steps: tokenize one sequence (1a), run the model on it (1b), the masked mean (1c), then <code>embed</code> for a list in batches (1d). Its test checks the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
+<li>TODO-1: before writing <code>embed</code>, the notebook prints one sequence’s tokens and a padded pair, and asks how many letters a token holds (about 5) and whether a ~330-letter sequence fits in 512 tokens. The test checks the same vector alone and in a padded batch. Its test checks the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
 <li>TODO-2: the probe trains on 12,000 sequences (the <code>C=0.1</code> setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set; the test cell says so.</li>
 <li>NT-500M (human reference) is a 2 GB download, so its vectors are provided. It scores about 0.79 from these precomputed vectors.</li>
 <li>The live row is section 3 of the notebook (slide 7.3): start the cell and read the take-aways while it trains.</li>
-<li>Each TODO has a test cell and a “Stuck?” cell that loads our version.</li>
+<li>Each TODO has a test cell; the solutions are published on the workshop site during the workshop.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {

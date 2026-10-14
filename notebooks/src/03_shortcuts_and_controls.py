@@ -28,11 +28,10 @@
 # Before you start: *Runtime → Change runtime type → T4 GPU*.
 
 # %% [markdown]
-# ## 0. Setup and rejoin
+# ## 0. Setup
 #
-# Run the setup cells, then the rejoin cell. It uses your files if you upload them (`USE_MY_FILES = True`):
-# `my_cnn.pt` from part 1 (`01_cnn`) and `my_emb_mistral17m.npz` from part 2
-# (`02_foundation_models`). Otherwise it uses ours.
+# Run the setup cells. The last one loads our CNN from part 1 (the network of the part 1 slides) and our
+# Mistral-DNA embeddings from part 2, so everyone starts from the same models.
 
 # %%
 # %include h_setup.py
@@ -57,14 +56,9 @@
 # %include h_shortcuts.py
 
 # %%
-#@title ▶ Rejoin here: the CNN (part 1) and the vectors (part 2), yours or ours { display-mode: "form" }
-USE_MY_FILES = False   # True = upload my_cnn.pt and/or my_emb_mistral17m.npz from parts 1 and 2
-if USE_MY_FILES:
-    upload_yours()
+#@title ▶ The CNN (part 1) and the embeddings (part 2) { display-mode: "form" }
 S_train, y_train, S_test, y_test = workshop_data()
-emb = DATA_DIR / "my_emb_mistral17m.npz"
-d = np.load(emb if emb.exists() else fetch("emb_mistral17m.npz"))
-print("vectors:", "YOURS from part 2" if emb.exists() else "the reference ones")
+d = np.load(fetch("emb_mistral17m.npz"))
 E_train, E_test = d["train"], d["test"]
 cnn = load_cnn()
 tok, fm = load_fm(FM_REPO)
@@ -72,14 +66,7 @@ tok, fm = load_fm(FM_REPO)
 table = {}
 table["CNN (part 1)"] = roc_auc_score(y_test, score_sequences(cnn, S_test))
 table["Mistral-DNA + probe (part 2)"], probe = probe_auc(E_train, y_train, E_test, y_test)
-# The shuffle test (TODO-3) embeds sequences with the reference embed() of this notebook. If you
-# uploaded your own vectors, they may come from a slightly different embed(), so for the shuffle test
-# we refit the probe on the reference vectors, which come from the same function.
 probe_real = table["Mistral-DNA + probe (part 2)"]
-if emb.exists():
-    d_ref = np.load(fetch("emb_mistral17m.npz"))
-    probe_real, probe = probe_auc(d_ref["train"], y_train, d_ref["test"], y_test)
-    print(f"(shuffle test: probe refitted on the reference vectors, test AUROC {probe_real:.3f})")
 for k, v in table.items():
     print(f"{k:32s} test AUROC {v:.3f}")
 

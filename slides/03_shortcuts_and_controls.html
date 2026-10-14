@@ -409,7 +409,7 @@
 </tr>
 <tr class="odd">
 <td style="text-align: left;">TODO-3</td>
-<td style="text-align: left;">shuffle one sequence, then the shuffle test on CNN and probe</td>
+<td style="text-align: left;">check what one shuffle keeps (with <code>count_words</code>), then the shuffle test</td>
 <td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">10 min</td>
 </tr>
@@ -429,7 +429,7 @@
 <li>TODO-3: score the shuffled sequences with the probe already fitted on real sequences.</li>
 <li><code>shortcut_scores</code> is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.</li>
 <li>TODO-4: count LoRA’s numbers (4a) and write a prediction (4b), then start the training cell and read on while it trains. Expected after training: about 0.81, between the frozen probe (0.77) and the CNN (0.84).</li>
-<li>The label curve (optional, 2 min) is precomputed. Each TODO has a test cell and a “Stuck?” cell.</li>
+<li>The label curve (optional, 2 min) is precomputed. Each TODO has a test cell; the solutions are published on the workshop site during the workshop.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -616,8 +616,8 @@
 
 </section>
 
-<section id="the-day-in-nine-results" class="slide level2">
-<h2>6.1 The day in nine results</h2>
+<section id="the-day-in-eight-results" class="slide level2">
+<h2>6.1 The day in eight results</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 33%">
@@ -644,35 +644,30 @@
 </tr>
 <tr class="odd">
 <td style="text-align: left;">1</td>
-<td style="text-align: left;">responds to one inserted seed site</td>
-<td style="text-align: left;">miR-15/16 0.53 vs 0.30 shuffled</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1</td>
 <td style="text-align: left;">it weighs position</td>
 <td style="text-align: left;">effect only at letters ~140–190</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">2</td>
 <td style="text-align: left;">frozen pretrained models + probe</td>
 <td style="text-align: left;">0.78–0.79</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">3</td>
 <td style="text-align: left;">two composition numbers alone</td>
 <td style="text-align: left;">0.66</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">3</td>
 <td style="text-align: left;">dinucleotide shuffle</td>
 <td style="text-align: left;">CNN 0.86 → 0.66, probe 0.78 → 0.77</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">3</td>
 <td style="text-align: left;">composition-matched data</td>
 <td style="text-align: left;">G+C/U 0.64 → 0.51, CNN 0.84 → 0.84</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">3</td>
 <td style="text-align: left;">Mistral-DNA + LoRA, 20,000 labels</td>
 <td style="text-align: left;">0.81 matched (frozen 0.77)</td>
@@ -682,7 +677,6 @@
 <aside class="notes">
 <ul>
 <li>Each row is a measured number from today; the slides of each part have the figure behind it.</li>
-<li>The miR-15/16 row is the only seed site with an effect clearly beyond its shuffled controls (0.30 ± 0.09 in the reference run). miR-19 (0.42 against 0.34 ± 0.06) was slightly beyond one standard deviation; miR-30 and let-7 were within the spread.</li>
 <li>The position row comes from inserting one copy at every position: the score changes only where the measured site is in almost every sequence.</li>
 </ul>
 <style type="text/css">
@@ -738,7 +732,7 @@
 <li>Point 1: the negatives were random positions in the same genes; on the 1,000 held-out sequences G+C and U alone reached 0.66.</li>
 <li>Point 2: one-hot letters keep order and position, 5-letter word counts drop both, and each tokenizer splits the same seed site differently.</li>
 <li>Point 3: two composition numbers reached 0.66 and 5-letter word counts 0.74 (12,000 labels each), against 0.86 for the CNN (92,346 labels).</li>
-<li>Point 4: the insertion test (miR-15/16 0.53 against 0.30 shuffled), the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (G+C/U 0.64 to 0.51).</li>
+<li>Point 4: the motif insertion against a control of the same letters, the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (G+C/U 0.64 to 0.51).</li>
 <li>Point 5: frozen Mistral-DNA with a probe scored 0.77 against 0.78 under the shuffle and 0.77 on the 3,000-sequence matched test set. In one offline benchmark, NT-500M fine-tuned with LoRA reached 0.87 against the CNN’s 0.84 (20,000 labels, 3 runs each); it has not been shuffle-tested.</li>
 </ul>
 <style type="text/css">

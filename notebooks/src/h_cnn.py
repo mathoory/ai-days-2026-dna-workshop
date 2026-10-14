@@ -28,16 +28,8 @@ def score_sequences(model, seqs, batch=1024):
     return np.concatenate(out)
 
 
-def load_cnn(mine="my_cnn.pt", ours="cnn.pt"):
-    """Your CNN from part 1 if you uploaded it and it loads; otherwise ours."""
+def load_cnn(ours="cnn.pt"):
+    """Our trained CNN from part 1."""
     model = GlobalCNN().to(DEVICE)
-    if (DATA_DIR / mine).exists():
-        try:
-            model.load_state_dict(torch.load(DATA_DIR / mine, map_location=DEVICE))
-            print("loaded YOUR CNN from part 1")
-            return model.eval()
-        except Exception as e:
-            print(f"your {mine} doesn't match the part 1 architecture ({type(e).__name__}) - using ours")
     model.load_state_dict(torch.load(fetch(ours), map_location=DEVICE))
-    print("loaded the reference CNN")
     return model.eval()

@@ -174,7 +174,6 @@ test_embed()
 t0 = time.time()
 E_train, E_test = embed(tok, fm, S_train), embed(tok, fm, S_test)
 print(f"embedded {len(S_train) + len(S_test):,} sequences in {time.time() - t0:.1f}s -> {E_train.shape[1]} numbers each")
-np.savez_compressed(DATA_DIR / "my_emb_mistral17m.npz", train=E_train, test=E_test)
 
 # %% [markdown]
 # ### A 2-D map of the vectors
@@ -405,7 +404,3 @@ _ = (DATA_DIR / "my_part2_results.json").write_text(json.dumps(results, indent=1
 #   numbers of labels.
 #
 # An AUROC does not tell you what signal a model uses. Part 3 tests that.
-
-# %%
-#@title ▶ Download your vectors (optional: part 3 can use them, or ours) { display-mode: "form" }
-download_outputs("my_emb_mistral17m.npz")

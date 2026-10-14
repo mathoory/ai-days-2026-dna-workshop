@@ -229,7 +229,7 @@
 <li>Colab with a GPU: <em>Runtime → Change runtime type → T4 GPU</em></li>
 <li>Notebooks and slides: <strong><span class="nowrap">mathoory.github.io/ai-days-2026-dna-workshop</span></strong></li>
 <li>Nothing to install; the data download by themselves</li>
-<li>If a cell fails, raise a hand, or run its “Stuck?” cell and continue</li>
+<li>If a cell fails, raise a hand</li>
 </ul>
 </div><div class="column" style="width:42%;">
 <p><img data-src="assets/custom/qr_site.png" style="width:80.0%"></p>
@@ -361,7 +361,7 @@
 <li>Projected: 1 min.</li>
 <li>Top row: a real bound sequence from our data, written 5′ to 3′. Bottom row: miR-16, written 3′ to 5′ so that paired letters line up; the vertical lines mark the pairs.</li>
 <li>The bold letters are the miR-16 site UGCUGCU. It pairs with microRNA letters 2 to 8, the seed (letters 2 to 7) plus letter 8.</li>
-<li>Hypothesis for the day: a model that learned AGO2 targeting should respond to seed sites like this one. The last slide of this part tests it (an optional cell in the notebook).</li>
+<li>Hypothesis for the day: a model that learned AGO2 targeting should respond to seed sites like this one.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -421,7 +421,7 @@
 <li>Counted inside the 40-letter measured sites. One bar per 7-letter word: the fraction of bound sites that contain it divided by the fraction of unbound sites. The 16 most enriched words among those found in at least 150 bound sites; the text after each bar is the percentage of bound sites that contain the word.</li>
 <li>Black bars are seed matches of known microRNAs. The top word, UUUGCAC, is the seed match of miR-19 (6 times enriched). GCUGCUA (miR-15/16, letters 2 to 7 plus an A) and UGUUUAC (miR-30) are also in the list. The 7-letter miR-15/16 site UGCUGCU of slide 1.6 is not among these 16.</li>
 <li>Even the most enriched word occurs in only 1.3% of bound sites (0.4 to 1.3% across the 16), so no single word separates the classes.</li>
-<li>A model that learned AGO2 targeting should respond to these words. This part ends by testing whether our CNN does.</li>
+<li>A model that learned AGO2 targeting should respond to these words.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -767,7 +767,7 @@
 <li>Each column is one letter; the four rows are A, C, G, U, and the dark cell holds the 1. A sequence becomes a 4 × length matrix. The longest sequence is 375 letters.</li>
 <li>A padding column of 0.25 means “unknown letter”: each base equally likely. 501 is the input width used by Pan and Shen, whose CNN this one follows.</li>
 <li>If asked why not A=1, C=2, G=3, U=4: that would impose an order (G “greater than” C) with no biological meaning. One-hot keeps the four letters equally far apart.</li>
-<li>TODO-1 writes the conversion: <code>one_hot</code> for one sequence (TODO-1a), then <code>encode_batch</code> for a list of sequences (TODO-1b). A test cell checks 201 sequences, including padding and an unknown letter. The rest of the notebook then uses a faster version with identical output.</li>
+<li>TODO-1 writes the conversion: <code>one_hot</code> for one sequence (TODO-1a), then <code>encode_batch</code> for a list of sequences (TODO-1b). A test cell checks 201 sequences, including padding and an unknown letter. The rest of the notebook uses the students’ own <code>encode_batch</code>.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -865,59 +865,24 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-network-todo-2" class="slide level2">
-<h2>4.5 The network (TODO-2)</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Layer</th>
-<th style="text-align: left;">Output shape</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">input</td>
-<td style="text-align: left;"><span class="math inline">\(1 \times 4 \times 501\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>Conv2d(1, 10, (4, 10))</code> + ReLU</td>
-<td style="text-align: left;"><span class="math inline">\(10 \times 1 \times 492\)</span></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>MaxPool2d((1, 3))</code></td>
-<td style="text-align: left;"><span class="math inline">\(10 \times 1 \times 164\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>Conv2d(10, 20, (1, 5))</code> + ReLU</td>
-<td style="text-align: left;"><span class="math inline">\(20 \times 1 \times 160\)</span></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>MaxPool2d((1, 3))</code></td>
-<td style="text-align: left;"><span class="math inline">\(20 \times 1 \times 53\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>Flatten</code> → <code>Linear(1060, 1)</code></td>
-<td style="text-align: left;">one score, a <strong>logit</strong> (any real number)</td>
-</tr>
-</tbody>
-</table>
+<section id="build-your-network-todo-2" class="slide level2">
+<h2>4.5 Build your network (TODO-2)</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/cnn_template.png" class="quarto-figure quarto-figure-center" height="402"></p>
+</figure>
+</div>
 <ul>
-<li>2,491 parameters. No sigmoid inside the network: <code>BCEWithLogitsLoss</code> applies it.</li>
+<li>Build it from these parts; you choose how many blocks, how many filters and how wide</li>
 </ul>
 <aside class="notes">
 <ul>
-<li>10 first-layer filters, each 4 × 10. Each produces one output row, a channel.</li>
-<li>Max pooling keeps the largest value in each block of 3 positions.</li>
-<li>The second convolution combines nearby first-layer outputs: 20 channels, each looking at 5 pooled positions.</li>
-<li>The final linear layer has one weight per channel and pooled position: 20 × 53 = 1,060 weights. Slide 6.2 shows them after training.</li>
-<li>Both convolutions move one position at a time (stride 1) and add no padding of their own, so each output row is shorter than its input by the kernel width minus 1 (501 − 9 = 492, 164 − 4 = 160). The pooling layers move 3 positions at a time (stride 3).</li>
-<li>Receptive field: one second-layer output depends on 5 pooled positions, which cover 15 first-layer positions, which cover 24 letters. After the second pooling, one value covers 30 letters.</li>
-<li>The 2,491 parameters are weights plus biases: 410 in the first convolution, 1,020 in the second and 1,061 in the linear layer.</li>
-<li>A logit is any real number; the sigmoid turns it into a probability between 0 and 1. <code>BCEWithLogitsLoss</code> applies the sigmoid and the binary cross-entropy in one step.</li>
+<li>The parts: a convolution slides its filters along the sequence (one output row, a channel, per filter); ReLU sets negative values to 0; max pooling keeps the largest value of each block of neighbouring positions, so the rows get shorter; flatten lays everything out in one row; a linear layer makes one number, the logit.</li>
+<li>Two rules: the first filters cover all 4 letter rows, and the network ends with one number per sequence. Everything else is the students’ choice; the notebook prints the shape after every layer (<code>show_shapes</code>), which tells them how many inputs the linear layer needs.</li>
+<li>Our reference network, used on the results slides: 10 filters of 4 × 10, ReLU, pooling by 3; 20 filters covering 5 pooled positions, ReLU, pooling by 3; flatten (20 × 53 = 1,060 numbers); linear to one logit. 2,491 parameters: 410 in the first convolution, 1,020 in the second, 1,061 in the linear layer.</li>
+<li>Shapes in our network: 4 × 501 → 10 × 492 → 10 × 164 → 20 × 160 → 20 × 53 → 1,060 → 1. A convolution shortens a row by the filter width minus 1; pooling by 3 divides its length by 3.</li>
+<li>No sigmoid inside the network: the loss (<code>BCEWithLogitsLoss</code>) applies it.</li>
+<li>Students who finish early can try other networks and compare held-out AUROCs against the ±0.025 noise.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -971,7 +936,7 @@
 <aside class="notes">
 <ul>
 <li>The training loop in pseudocode, the same as in the notebook. Students write the code with their assistant; the pseudocode is what they need to understand.</li>
-<li>TODO-3a runs one training step by hand on one batch: the loss, one gradient, one step, and the loss again on the same batch, now lower. TODO-3b is the training step inside the loop of <code>train()</code>; TODO-3c is the evaluation. The test cell trains one epoch on 5,000 sequences and checks that the evaluation used probabilities.</li>
+<li>TODO-3a: <code>train_step</code>, one training step on one batch; the notebook runs it five times on the same batch so the loss falls. TODO-3b: <code>evaluate</code>, the held-out AUROC without learning. The given <code>train()</code> calls both for every batch and epoch, and measures from epoch 0, so the curves show the start and training against held-out. TODO-3c: the ROC curve of the trained model.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1020,23 +985,23 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="test-a-logo-insert-it-against-a-shuffled-copy-todo-5" class="slide level2">
-<h2>5.2 Test a logo: insert it, against a shuffled copy (TODO-5)</h2>
+<section id="test-a-logo-insert-it-into-random-rna-todo-5" class="slide level2">
+<h2>5.2 Test a logo: insert it into random RNA (TODO-5)</h2>
 <ul>
-<li>Insert one filter’s consensus 1 to 7 times; control: the same letters, shuffled</li>
+<li>Insert one filter’s consensus 1 to 7 times. Which control shows that its pattern matters?</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/plant_scheme.png" class="quarto-figure quarto-figure-center" height="405"></p>
+<p><img data-src="assets/custom/plant_scheme_motif.png" class="quarto-figure quarto-figure-center" height="470"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>Projected: 1 min.</li>
-<li>The bars are a 330-letter random RNA sequence; each box is one inserted copy. <code>plant(seqs, motif, copies)</code> writes copy n starting at letter 40 + 45(n − 1), so 7 copies fit. Top row: the motif; bottom row: the same letters shuffled. Shaded: letters 150 to 190, where the measured site is in the real data.</li>
+<li>The bar is a 330-letter random RNA sequence; each box is one inserted copy. <code>plant(seqs, motif, copies)</code> writes copy n starting at letter 40 + 45(n − 1), so 7 copies fit. Shaded: letters 150 to 190, where the measured site is in the real data.</li>
 <li>The consensus is the filter’s most frequent letter at each position: a candidate motif.</li>
-<li>Both versions go into the same 1,000 random RNA sequences at the same places, and the CNN scores them.</li>
-<li>The shuffled copy has the same letters, so the difference between the two curves is what the letter order adds.</li>
+<li>The question to leave with the room: if the score goes up, is it the pattern or only the letters each copy adds (a U-rich motif adds U letters)? The students design the control in TODO-5b; the notebook states this problem and hints at building it from the motif’s own letters.</li>
+<li>The intended control is the same letters in another order, inserted at the same places: the difference between the two curves is then what the letter order adds. The debrief slides (6.5, 6.6) show it.</li>
 <li>This turns a logo, which is only a description of what a filter responds to, into an experiment on the whole model’s output.</li>
 </ul>
 <style type="text/css">
@@ -1078,13 +1043,13 @@
 </tr>
 <tr class="even">
 <td style="text-align: left;">TODO-2</td>
-<td style="text-align: left;">build the network</td>
+<td style="text-align: left;">build your own network from the parts</td>
 <td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">7 min</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">TODO-3</td>
-<td style="text-align: left;">one batch by hand, then the loop in <code>train()</code></td>
+<td style="text-align: left;"><code>train_step</code>, <code>evaluate</code>, then the ROC curve</td>
 <td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">7 min</td>
 </tr>
@@ -1096,7 +1061,7 @@
 </tr>
 <tr class="odd">
 <td style="text-align: left;">TODO-5</td>
-<td style="text-align: left;">one copy in one sequence, then the motif and a shuffled copy</td>
+<td style="text-align: left;">one copy in one sequence, design a control, then both curves</td>
 <td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">8 min</td>
 </tr>
@@ -1104,10 +1069,10 @@
 </table>
 <aside class="notes">
 <ul>
-<li>Given cells (setup, data, motif toolkit, take-aways): about 12 min. Projected hands-on total: about 46 min, 51 with the optional sections.</li>
-<li>TODO-3 check: about 0.79 after epoch 1 and 0.86 after epoch 10. Encoding and 10 epochs take about a minute on Colab.</li>
+<li>Given cells (setup, data, motif toolkit, take-aways): about 12 min. Projected hands-on total: about 46 min.</li>
+<li>TODO-3: our network reaches about 0.79 after epoch 1 and 0.86 after epoch 10; the students’ networks differ. Encoding and 10 epochs take about a minute on Colab.</li>
 <li>Helpers for TODO-4: <code>acts[:, f, :]</code>, <code>cutoff_for</code>, <code>windows_above</code>, <code>pwm_of</code>; then set <code>MY_FILTER</code> and <code>MY_MOTIF</code>. TODO-4 ends with choosing a motif. TODO-5 uses <code>plant</code>, first on one sequence (TODO-5a), then on all 1,000 (TODO-5b).</li>
-<li>Each TODO has a test cell and, below it, a “Stuck?” cell that loads our version.</li>
+<li>Each TODO has a test cell; the solutions are published on the workshop site during the workshop.</li>
 <li>Notebook section 5, right after training, downloads <code>my_cnn.pt</code>, which part 3 can load.</li>
 </ul>
 <style type="text/css">
@@ -1268,35 +1233,6 @@
 <li>The motif changes the score only between about letters 140 and 190, where almost every sequence in the data has its measured site: up to about +0.35 inside, dips of about −0.1 at both edges.</li>
 <li>The shuffled copy gets much of the same increase there (up to about +0.26), so a good part of the effect comes from which letters are in that region, whatever their order.</li>
 <li>This is the last-layer pattern from slide 6.2: the CNN weighs positions. It reflects how the data were cut, and it means the answer to “does this motif matter?” depends on where it is placed.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="the-cnn-responds-to-one-of-four-seed-sites" class="slide level2">
-<h2>6.7 The CNN responds to one of four seed sites</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/planting_bars.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>The hypothesis from slide 1.6: a model that learned AGO2 targeting should respond to seed sites. This is the optional bonus cell.</li>
-<li>6 copies of each site inserted into the 500 unbound held-out sequences. Black: the site. Grey: the same letters shuffled, mean and standard deviation over 10 shuffles. Dotted: nothing inserted (about 0.29).</li>
-<li>miR-15/16 (UGCUGCU): 0.53 against 0.30 ± 0.09, a clear effect. miR-19: 0.42 against 0.34 ± 0.06, slightly more than one standard deviation. miR-30 (0.37 against 0.38) and let-7 (0.39 against 0.38) lie within the spread of their shuffles.</li>
-<li>Of the 6 copies, only copy 4 (letter 175) is in letters 150 to 190, the region the CNN weighs.</li>
-<li>The CNN was not given seed sites and responds to one of the four tested. None of the ten logos shows this site; the insertion test detected the response.</li>
-<li>Inside the 40-letter measured site, these seed sites are 3 to 6 times enriched in bound sequences but occur in only about 1 to 2% of them, so the signal is weak.</li>
-<li>The notebook’s shuffle numbers differ slightly from these because the shuffles are random.</li>
 </ul>
 <p>Next, after the break: part 2, DNA foundation models, pretrained on the whole genome.</p>
 <style type="text/css">

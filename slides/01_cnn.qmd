@@ -72,7 +72,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ::: {.notes}
 - Projected: 1 min.
 - The QR code opens the same repository link.
-- Every notebook runs on its own. At the end of a notebook participants can download their results and upload them in the next; otherwise the notebook loads ours.
+- Every notebook runs on its own. Part 3 starts from our CNN and our embeddings, so everyone has the same models there.
 :::
 
 ## 1.4 Today
@@ -451,7 +451,6 @@ Open **`01_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
 - TODO-3: our network reaches about 0.79 after epoch 1 and 0.86 after epoch 10; the students' networks differ. Encoding and 10 epochs take about a minute on Colab.
 - Helpers for TODO-4: `acts[:, f, :]`, `cutoff_for`, `windows_above`, `pwm_of`; then set `MY_FILTER` and `MY_MOTIF`. TODO-4 ends with choosing a motif. TODO-5 uses `plant`, first on one sequence (TODO-5a), then on all 1,000 (TODO-5b).
 - Each TODO has a test cell; the solutions are published on the workshop site during the workshop.
-- Notebook section 5, right after training, downloads `my_cnn.pt`, which part 3 can load.
 :::
 
 ::: {.center}

@@ -38,7 +38,7 @@
 # ## 0. Setup
 #
 # Run the next two cells. The first one also installs `logomaker`, which draws the sequence logos in
-# section 7.
+# section 6.
 
 # %%
 # %include h_setup.py
@@ -48,7 +48,7 @@
 # %include h_data.py
 
 # %% [markdown]
-# # Build a CNN (sections 1 to 5)
+# # Build a CNN (sections 1 to 4)
 #
 # ## 1. The data
 #
@@ -454,8 +454,6 @@ EPOCHS = 10
 torch.manual_seed(SEED)
 model = GlobalCNN()
 curve = train(model, train_loader, test_seqs, test_y, epochs=EPOCHS)
-torch.save(model.state_dict(), DATA_DIR / "my_cnn.pt")
-print(f"\nsaved to {DATA_DIR / 'my_cnn.pt'}")
 
 # %%
 #@title ▶ Plot the learning curves { display-mode: "form" }
@@ -532,18 +530,7 @@ def test_roc():
 test_roc()
 
 # %% [markdown]
-# ## 5. Take your model with you
-#
-# Each Colab notebook runs on its own machine. Download your trained CNN now. At the start of part 3
-# (`03_shortcuts_and_controls`) you can upload it, or use ours. Part 3 can use your CNN if it has the
-# same layers as ours (our network is in part 3's setup); otherwise it uses ours.
-
-# %%
-#@title ▶ Download my_cnn.pt { display-mode: "form" }
-download_outputs("my_cnn.pt")
-
-# %% [markdown]
-# # Look inside the CNN (sections 6 to 10)
+# # Look inside the CNN (sections 5 to 7)
 #
 # Your CNN scores well, so it has picked up some signal that separates bound from unbound RNA. This
 # half asks what that signal is, and then tests the answer. The cells below use `model`, the CNN
@@ -556,7 +543,7 @@ download_outputs("my_cnn.pt")
 #    and check whether the model's score goes up.
 
 # %% [markdown]
-# ## 6. The toolkit (given)
+# ## 5. The toolkit (given)
 #
 # Read the names and descriptions. You will combine these functions in the TODOs below.
 #
@@ -661,7 +648,7 @@ def score_sequences(model, seqs, batch=1024):
 print(f"toolkit ready (filter width = {KERNEL})")
 
 # %% [markdown]
-# ## 7. Read a motif off the model (TODO-4)
+# ## 6. Read a motif off the model (TODO-4)
 #
 # For each filter: compute its threshold, collect the windows above it, turn them into a letter
 # frequency table, and record its consensus (the most frequent letter at each position). You do this
@@ -677,7 +664,7 @@ n_filters = acts.shape[1]
 print("activations:", acts.shape, "-> (sequences, filters, positions) for", len(pos_seqs), "bound sequences")
 
 # %%
-# TODO-4a: filter 0, step by step, with the toolkit of section 6. `acts` holds the activations of
+# TODO-4a: filter 0, step by step, with the toolkit of section 5. `acts` holds the activations of
 #          every filter on the bound sequences `pos_seqs` (sequences, filters, positions). Produce:
 #          acts_0       the activations of filter 0 only (one row per sequence, one column per position)
 #          cut_0        filter 0's threshold
@@ -783,7 +770,7 @@ draw_logo(pwms[f], f"Filter {f:02d}, bound RNA", ax[0]); draw_logo(pwm_neg, f"Fi
 plt.tight_layout(); plt.show()
 
 # %% [markdown]
-# ## 8. Now test it (TODO-5)
+# ## 7. Now test it (TODO-5)
 #
 # A logo shows which windows activate one filter. Whether that pattern changes the model's *output* is a
 # separate question, and you answer it by intervening: insert your motif into random RNA sequences
@@ -810,7 +797,7 @@ print(f"your motif: {MY_MOTIF}")
 
 # %%
 # TODO-5a: one copy of MY_MOTIF in one sequence. `one` is the first random sequence of `canvas`;
-#          `one_planted` is the same sequence with one copy of MY_MOTIF inserted (toolkit, section 6);
+#          `one_planted` is the same sequence with one copy of MY_MOTIF inserted (toolkit, section 5);
 #          `score_before` and `score_after` are the model's scores of the two.
 # === Your code here ===
 one = canvas[0]

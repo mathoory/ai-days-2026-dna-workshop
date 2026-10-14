@@ -126,7 +126,7 @@ for each batch (DNA strings, labels):
 
 ## 4.1 Your turn
 
-Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rejoin cell to load yours.
+Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embeddings.
 
 | Step | Task | Check | Time |
 |:--|:--|:--|:--|
@@ -137,7 +137,6 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 
 ::: {.notes}
 - Given cells (setup, `shortcut_scores`, CNN retrain, before and after, take-aways): about 12 min. Projected hands-on total: about 39 min, 41 with the optional section, including LoRA training.
-- The rejoin cell is at the end of section 0; keep `USE_MY_FILES = False` to use our files.
 - Helpers: TODO-1 `probe_auc` (`gc_u` is written by the students); TODO-2 `Counter`, `kmer_counts(seqs, k=5)`; TODO-3 `dinuc_shuffle`; TODO-4 the shapes of W printed above it.
 - TODO-3: score the shuffled sequences with the probe already fitted on real sequences.
 - `shortcut_scores` is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.
