@@ -11,7 +11,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ::: columns
 ::: {.column width="58%"}
-![](assets/custom/timeline.png){height="640px"}
+![](assets/custom/timeline.png){height="680px"}
 :::
 ::: {.column width="42%"}
 ![](assets/mattan_taiwan.jpg){height="660px"}

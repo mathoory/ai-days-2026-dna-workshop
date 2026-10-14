@@ -29,15 +29,21 @@ def timeline():
             ("2020 to 2024", "B.Sc. Computer Science, Technion", "Bioinformatics track"),
             ("2023", "Exchange semester, National Taiwan University", "Machine learning with Prof. Hsuan-Tien Lin"),
             ("2024 to 2026", "M.Sc. Data Science, Technion", "Research in Prof. Roee Amit's lab")]
-    fig, ax = canvas(10, 7.6, xlim=(0, 100), ylim=(0, 76))
-    ys = [66, 47, 28, 9]
-    ax.plot([6, 6], [ys[-1], ys[0]], color=HAIR, lw=4, zorder=1, solid_capstyle="round")
+    fig, ax = canvas(10, 8.6, xlim=(0, 100), ylim=(0, 86))
+    ys = [76, 57, 38, 19]
+    y_ta = 4                                 # a sub-entry of the M.Sc.: smaller, indented, grey dot
+    ax.plot([6, 6], [y_ta, ys[0]], color=HAIR, lw=4, zorder=1, solid_capstyle="round")
     for y, (yr, title, sub) in zip(ys, rows):
         ax.add_patch(plt.Circle((6, y), 1.9, color=ACCENT, zorder=2))
         ax.add_patch(plt.Circle((6, y), 0.8, color="white", zorder=3))
         label(ax, 13, y + 5.2, yr, fs=19, color=ACCENT, ha="left", bold=True)
         label(ax, 13, y, title, fs=23, ha="left")
         label(ax, 13, y - 5.0, sub, fs=19, color=MUTED, ha="left")
+    ax.add_patch(plt.Circle((6, y_ta + 2), 1.1, color=MID, zorder=2))
+    ax.plot([8, 15], [y_ta + 2, y_ta + 2], color=HAIR, lw=2, zorder=1)
+    label(ax, 17, y_ta + 2, "Teaching assistant", fs=20, ha="left")
+    label(ax, 17, y_ta - 2.6, "Medical Diagnostics (Intro to Deep Learning for Biotechnology)", fs=16, color=MUTED,
+          ha="left")
     save(fig, "timeline")
 
 
