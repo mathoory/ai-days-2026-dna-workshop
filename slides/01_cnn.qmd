@@ -30,7 +30,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 **Machine learning for molecular design**: from a sequence to how it binds
 
-::: columns
+::: {.columns .vcenter}
 ::: {.column width="42%"}
 ![](assets/hero_triplex.png){height="520px"}
 
