@@ -34,7 +34,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ::: {.column width="42%"}
 ![](assets/hero_triplex.png){height="520px"}
 
-[**Triplexis**: which DNA sequences an RNA strand binds as a triple helix]{.caption-small}
+[**Triplexis**: design RNA strands that bind a chosen DNA sequence as a triple helix]{.caption-small}
 :::
 ::: {.column width="58%"}
 ![](assets/peptide_pose.png){height="400px"}
