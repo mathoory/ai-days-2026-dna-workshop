@@ -24,15 +24,17 @@ SCHEDULE = [
     ("10:50", "11:00", "break", "Break", "", None),
     ("11:00", "11:50", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn"),
     ("11:50", "12:00", "break", "Break", "", None),
-    ("12:00", "12:40", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models"),
-    ("12:40", "12:50", "break", "Break", "", None),
-    ("12:50", "13:30", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
-    ("13:30", "13:40", "talk", "Wrap-up and feedback", "Mattan Hoory", None),
+    ("12:00", "12:25", "talk", "Part 1. Hands-on: the notebook", "", None),
+    ("12:25", "12:55", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models"),
+    ("12:55", "13:15", "talk", "Part 2. Hands-on: the notebook", "", None),
+    ("13:15", "13:25", "break", "Break", "", None),
+    ("13:25", "13:40", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
+    ("13:40", "14:00", "talk", "Part 3. Hands-on: the notebook, then feedback", "", None),
 ]
 SUMMARY = {
     "01_cnn": "Build a CNN that predicts AGO2 binding from RNA sequence, then read motifs off its filters and test them.",
     "02_foundation_models": "Turn sequences into vectors with a pretrained DNA language model and train a linear probe on them.",
-    "03_shortcuts_and_controls": "Measure what composition alone explains, run a shuffle test and a matched control, and fine-tune with LoRA.",
+    "03_shortcuts_and_controls": "Measure what composition alone explains, then test the models with a shuffle and a matched control.",
 }
 GITHUB_MARK = ('<svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 '
                '3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23'
@@ -122,7 +124,7 @@ def page():
 <main class="wrap">
   <section>
     <h2>Schedule</h2>
-    <p class="note">Times are estimates. The workshop may run until 14:00.</p>
+    <p class="note">Times are estimates.</p>
     <ol class="schedule">
 {slots}
     </ol>
