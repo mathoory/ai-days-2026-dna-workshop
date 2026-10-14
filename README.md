@@ -1,13 +1,13 @@
 # Applications of AI in Biotechnology and Genomics: AI Days 2026 workshop
 
 Technion AI Days, Thu 15.10.2026. Prof. Roee Amit opens at 10:00; the three hands-on parts run from 11:00
-to 13:30. All parts use the AGO2 CLIP-seq data of the GraphProt benchmark (Maticzka et al. 2014).
+to 13:30, then a wrap-up until 13:40. All parts use the AGO2 CLIP-seq data of the GraphProt benchmark (Maticzka et al. 2014).
 
 | part | notebook | deck | you write |
 |---|---|---|---|
 | 1 Machine learning and CNNs (11:00) | `notebooks/01_cnn.ipynb` | `slides/01_cnn.qmd` | one-hot encoding, the CNN layers, held-out AUROC, a logo for every filter, motif insertion against a shuffled copy |
-| 2 DNA foundation models (11:50) | `notebooks/02_foundation_models.ipynb` | `slides/02_foundation_models.qmd` | `embed()`, `probe_auc()` |
-| 3 Shortcuts, controls and fine-tuning (12:40) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks, the LoRA training step |
+| 2 DNA foundation models (12:00) | `notebooks/02_foundation_models.ipynb` | `slides/02_foundation_models.qmd` | `embed()`, `probe_auc()` |
+| 3 Shortcuts, controls and fine-tuning (12:50) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks, the LoRA training step |
 
 Open a notebook in Colab, choose *Runtime → Change runtime type → T4 GPU*, and run from the top. Every
 notebook runs on its own: the data and our reference files download from

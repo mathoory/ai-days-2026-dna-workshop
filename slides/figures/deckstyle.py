@@ -43,8 +43,12 @@ NAVY = INK
 # sequence logos keep the conventional base colours (the only place with four colours)
 BASE = {"A": "#0F9D58", "C": "#4285F4", "G": "#F4B400", "U": "#DB4437", "T": "#DB4437", "N": LIGHT}
 
+# training vs held-out, everywhere: blue vs orange; a third line colour for "good"
+TRAIN_C, HELD_C, GOOD_C = "#1A73E8", "#E8710A", "#1E8E3E"
+TRAIN_L = "#AECBFA"
+
 from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
-DIVERGING = LinearSegmentedColormap.from_list("ink_white_accent", [MUTED, "#FFFFFF", ACCENT])
+DIVERGING = LinearSegmentedColormap.from_list("orange_white_accent", [HELD_C, "#FFFFFF", ACCENT])
 SEQUENTIAL = LinearSegmentedColormap.from_list("white_accent", ["#E8F0FE", ACCENT, "#174EA6"])
 MONO = ["Consolas", "DejaVu Sans Mono"]
 

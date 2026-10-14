@@ -120,7 +120,7 @@ def labels_raster(tr, ty):
     pos = [s for s, l in zip(tr, ty) if l == 1]; neg = [s for s, l in zip(tr, ty) if l == 0]
     P = [pos[i] for i in rng.choice(len(pos), 150, replace=False)]
     N = [neg[i] for i in rng.choice(len(neg), 150, replace=False)]
-    cmap = {b: matplotlib.colors.to_rgb(INK if b in "GC" else HAIR) for b in ALPH}
+    cmap = {b: matplotlib.colors.to_rgb(BASE[b]) for b in ALPH}
 
     def img(S):
         S = sorted(S, key=gc)
@@ -137,7 +137,7 @@ def labels_raster(tr, ty):
         for sp in ax.spines.values():
             sp.set_visible(False)
     axes[0].set_ylabel("150 sequences, sorted by G+C")
-    fig.legend(handles=[Patch(color=INK, label="G or C"), Patch(color=HAIR, label="A or U")], loc="upper right", ncol=2,
+    fig.legend(handles=[Patch(color=BASE[b], label=b) for b in ALPH], loc="upper right", ncol=4,
                bbox_to_anchor=(0.98, 0.98), handlelength=1, columnspacing=1.2)
     fig.subplots_adjust(left=0.05, right=0.98, top=0.86, bottom=0.11, wspace=0.06)
     save(fig, "labels_raster")
@@ -165,7 +165,7 @@ def lr_training(tr, ty):
         ws, bs = snaps[step]
         xs = np.linspace(X[:, 0].min(), X[:, 0].max(), 50)
         zy = -(ws[0] * (xs - mu[0]) / sd[0] + bs) / ws[1]
-        ax.plot(xs, zy * sd[1] + mu[1], color=INK, lw=3)
+        ax.plot(xs, zy * sd[1] + mu[1], color=HELD_C, lw=3)
         ax.set_ylim(X[:, 1].min(), X[:, 1].max())
         ax.set_title(f"Step {step}"); ax.set_xlabel("G+C fraction")
         if k == 0:
@@ -173,14 +173,14 @@ def lr_training(tr, ty):
         else:
             ax.set_yticklabels([])
     ax = fig.add_axes([0.73, 0.14, 0.24, 0.7])
-    ax.plot(losses, color=INK, lw=3)
+    ax.plot(losses, color=TRAIN_C, lw=3)
     for st in (0, 300):
-        ax.scatter(st, losses[st], s=70, color=INK, zorder=3)
+        ax.scatter(st, losses[st], s=70, color=TRAIN_C, zorder=3)
         ax.annotate(f"{losses[st]:.2f}", (st, losses[st]), xytext=(10, 8) if st == 0 else (-50, 10), textcoords="offset points")
     ax.set_title("Loss"); ax.set_xlabel("Step"); ygrid(ax)
     fig.legend(handles=[Line2D([], [], marker="o", ls="", ms=10, color=BOUND, label="Bound"),
                         Line2D([], [], marker="o", ls="", ms=10, color=UNB, label="Unbound"),
-                        Line2D([], [], color=INK, lw=3, label="p = 0.5")],
+                        Line2D([], [], color=HELD_C, lw=3, label="p = 0.5")],
                loc="upper right", ncol=3, bbox_to_anchor=(0.98, 1.0))
     save(fig, "lr_training")
 
@@ -246,8 +246,8 @@ def probe_trap(tr, ty):
     fig = newfig()
     ax = fig.add_axes([0.09, 0.13, 0.86, 0.7])
     x = np.array([0, 1])
-    ax.bar(x - 0.17, [a_tr, o_tr], 0.32, color=LIGHT, label="Scored on its own training sequences")
-    ax.bar(x + 0.17, [a_te, o_te], 0.32, color=INK, label="Scored on the held-out sequences")
+    ax.bar(x - 0.17, [a_tr, o_tr], 0.32, color=TRAIN_C, label="Scored on its own training sequences")
+    ax.bar(x + 0.17, [a_te, o_te], 0.32, color=HELD_C, label="Scored on the held-out sequences")
     for xi, a, b in zip(x, (a_tr, o_tr), (a_te, o_te)):
         ax.text(xi - 0.17, a + 0.008, f"{a:.2f}", ha="center")
         ax.text(xi + 0.17, b + 0.008, f"{b:.2f}", ha="center")
@@ -309,7 +309,7 @@ def onehot_big():
         label(ax, x0 + i * dx, 74, ch, fs=32, color=INK, family=MONO)
         for r, b in enumerate(ALPH):
             on = ch == b
-            ax.add_patch(Rectangle((x0 + i * dx - 3.4, 54 - r * 9), 6.8, 8.4, fc=INK if on else FAINT,
+            ax.add_patch(Rectangle((x0 + i * dx - 3.4, 54 - r * 9), 6.8, 8.4, fc=BASE[b] if on else FAINT,
                                    ec="white", lw=2))
             label(ax, x0 + i * dx, 58.2 - r * 9, "1" if on else "0", fs=20, color="white" if on else LIGHT)
     for r, b in enumerate(ALPH):
@@ -332,9 +332,12 @@ def filter_dot(model, pos, neg):
     im = heat(a1, W, v); a1.set_title(f"Filter {f}: weights")
     cb = fig.colorbar(im, cax=fig.add_axes([0.44, 0.45, 0.008, 0.35])); cb.outline.set_visible(False)
     cb.set_ticks([-round(v, 1), 0, round(v, 1)])
-    a2.imshow(X, cmap="Greys", vmin=0, vmax=1, aspect="auto")
+    from matplotlib.colors import to_rgb
+    a2.imshow(np.array([[to_rgb(BASE[ALPH[r]]) if X[r, c] else (0.945, 0.953, 0.957) for c in range(10)] for r in range(4)]), aspect="auto")
     a2.set_yticks(range(4)); a2.set_yticklabels(list(ALPH)); a2.tick_params(length=0)
     a2.set_xticks(range(10)); a2.set_xticklabels(list(win), family=MONO)
+    for t_ in a2.get_xticklabels():
+        t_.set_color(BASE[t_.get_text()]); t_.set_fontweight("bold")
     for sp in a2.spines.values():
         sp.set_visible(False)
     a2.set_title("A real window (one-hot)")
@@ -355,7 +358,7 @@ def activation_track(model, f, pos):
     j = int(np.argmax(a))
     fig = newfig()
     ax = fig.add_axes([0.08, 0.14, 0.88, 0.7])
-    ax.bar(range(len(a)), a, color=[INK if k == j else LIGHT for k in range(len(a))], width=1.0)
+    ax.bar(range(len(a)), a, color=[ACCENT if k == j else TRAIN_L for k in range(len(a))], width=1.0)
     ax.set_xlim(-1, len(a)); ax.set_ylabel(f"Filter {f} output"); ax.set_xlabel("Position along one bound sequence")
     ax.annotate(s[j:j + 10], (j, a[j]), xytext=(j + 20 if j < 0.6 * len(a) else j - 120, a[j] * 0.97),
                 fontsize=24, family=MONO, color=INK, va="center", arrowprops=dict(arrowstyle="-", color=MUTED, lw=1.2))
@@ -408,6 +411,12 @@ def filter_learning(tr, ty, ls, ly):
         ax.set_title(f"Epoch {e}\nAUROC {aucs[e]:.2f}", loc="center")
     fig.text(0.04, 0.84, f"Filter {f} during one training run", fontsize=24, color=INK)
     cb = fig.colorbar(im, cax=fig.add_axes([0.945, 0.2, 0.01, 0.5])); cb.outline.set_visible(False)
+    for k in range(4):                       # frames for the slide: one more epoch per click
+        for j, ax in enumerate(axes):
+            ax.set_visible(j <= k)
+        fig.savefig(OUT / f"filter_learning_{k}.png", dpi=120, facecolor="white")
+    for ax in axes:
+        ax.set_visible(True)
     save(fig, "filter_learning")
     print("filter_learning filter", f, {e: round(a, 3) for e, a in aucs.items()})
 

@@ -4,13 +4,13 @@
 |---|---|---|---|---|
 | 10:00–10:50 | Roee | Opening lecture (biology) | Roee's | none |
 | 10:50–11:00 | | Break | | |
-| 11:00–11:40 | Mattan | 1. Machine learning and CNNs | `01_cnn` | `01_cnn.ipynb` |
-| 11:40–11:50 | | Break | | |
-| 11:50–12:30 | Mattan | 2. DNA foundation models | `02_foundation_models` | `02_foundation_models.ipynb` |
-| 12:30–12:40 | | Break | | |
-| 12:40–13:20 | Mattan | 3. Shortcuts, controls and fine-tuning | `03_shortcuts_and_controls` | `03_shortcuts_and_controls.ipynb` |
-| 13:20–13:30 | Mattan | Wrap-up and feedback | end of `03_shortcuts_and_controls` | none |
-| 13:30–14:00 | | Buffer | | |
+| 11:00–11:50 | Mattan | 1. Machine learning and CNNs (30 min talk, 20 min notebook) | `01_cnn` | `01_cnn.ipynb` |
+| 11:50–12:00 | | Break | | |
+| 12:00–12:40 | Mattan | 2. DNA foundation models | `02_foundation_models` | `02_foundation_models.ipynb` |
+| 12:40–12:50 | | Break | | |
+| 12:50–13:30 | Mattan | 3. Shortcuts, controls and fine-tuning | `03_shortcuts_and_controls` | `03_shortcuts_and_controls.ipynb` |
+| 13:30–13:40 | Mattan | Wrap-up and feedback | end of `03_shortcuts_and_controls` | none |
+| 13:40–14:00 | | Buffer | | |
 
 ## Projected minutes, before any cuts
 
@@ -19,11 +19,11 @@ the "about N min" section headings (reading, typing and T4 compute). Both are es
 
 | Part | Budget | Talk | Notebook | Debrief | Projected | Over |
 |---|---|---|---|---|---|---|
-| 1. Machine learning and CNNs | 40 | 32 (task and biology 12, learning and testing 8, CNN 9, look inside 3) | 46 | 8 | 86 | +46 |
+| 1. Machine learning and CNNs | 50 (30 talk, 20 notebook) | 32 (task and biology 12, learning and testing 8, CNN 9, look inside 3) | 46 | 8 | 86 | +36 |
 | 2. DNA foundation models | 40 | 20 (overview, tokenization, embedding, transformer, heads) | 32 | 5 | 57 | +17 |
 | 3. Shortcuts, controls and fine-tuning | 40 | 10 (shortcuts, control, fine-tuning) | 39 (+2 optional) | 8 | 57 | +17 |
 | Wrap-up | 10 | 10 | | | 10 | 0 |
-| **Total** | **130** | | | | **210** | **+80 (+50 after the buffer)** |
+| **Total** | **140** | | | | **210** | **+70 (+50 after the buffer)** |
 
 Measured on a Colab T4 (13.10, no errors): compute is 1.8, 4.1 and 4.7 min for the three notebooks
 (excluding the "Stuck?" cells). The longest waits are live pretraining (3.7 min) and LoRA training (3.2 min);

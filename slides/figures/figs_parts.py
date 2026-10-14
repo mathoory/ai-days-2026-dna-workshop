@@ -51,7 +51,7 @@ def plant_scheme(with_control=True, name="plant_scheme"):
     L, k = 330, 9
     ax.axvspan(150, 190, color=FAINT, zorder=0)
     ax.text(170, 2.62, "Measured site\n(letters 150 to 190)", ha="center", va="bottom", fontsize=19, color=MUTED)
-    rows = [(1.6, "Motif", INK)] + ([(0.5, "Same letters, shuffled", MID)] if with_control else [])
+    rows = [(1.6, "Motif", ACCENT)] + ([(0.5, "Same letters, shuffled", HELD_C)] if with_control else [])
     for y, row_name, c in rows:
         ax.plot([0, L], [y, y], color=HAIR, lw=8, solid_capstyle="butt", zorder=1)
         for n in range(1, 8):
@@ -250,7 +250,7 @@ def lr_rates(tr, ty):
     Z = (X - X.mean(0)) / X.std(0)
     fig = newfig(); fig.set_size_inches(16, 7.4)
     ax = fig.add_axes([0.1, 0.15, 0.66, 0.75])
-    for lr, c, lw in [(0.05, LIGHT, 3.5), (2.0, INK, 3.5), (10.0, ACCENT, 2.2)]:
+    for lr, c, lw in [(0.05, MID, 3.5), (2.0, GOOD_C, 3.5), (10.0, HELD_C, 2.2)]:
         w, b, L = np.array([-1.0, -1.0]), 0.8, []
         for _ in range(41):
             p = 1 / (1 + np.exp(-(Z @ w + b)))
@@ -284,14 +284,14 @@ def sgd_noise(tr, ty):
     L = np.array(losses)
     fig = newfig(); fig.set_size_inches(16, 7.4)
     ax = fig.add_axes([0.1, 0.15, 0.66, 0.75])
-    ax.plot(L, color=LIGHT, lw=0.8)
+    ax.plot(L, color=TRAIN_L, lw=0.8)
     m = L.reshape(10, n_per).mean(1)
-    ax.plot((np.arange(10) + 0.5) * n_per, m, color=INK, lw=3, marker="o", ms=9)
+    ax.plot((np.arange(10) + 0.5) * n_per, m, color=TRAIN_C, lw=3, marker="o", ms=9)
     for e in range(1, 10):
         ax.axvline(e * n_per, color=HAIR, lw=1, zorder=0)
     ax.set_xticks([e * n_per for e in range(0, 11, 2)]); ax.set_xticklabels([f"{e * n_per:,}" for e in range(0, 11, 2)])
     ax.set_xlabel(f"Step (one epoch = {n_per} steps)"); ax.set_ylabel("Training loss"); ax.set_xlim(0, 10 * n_per)
-    ax.text(10.15 * n_per, m[-1] - 0.02, "Mean per epoch", color=INK, fontsize=21, va="center")
+    ax.text(10.15 * n_per, m[-1] - 0.02, "Mean per epoch", color=TRAIN_C, fontsize=21, va="center")
     ax.text(10.15 * n_per, np.percentile(L[-n_per:], 99), "One batch\n(256 sequences)", color=MUTED, fontsize=21, va="center")
     save(fig, "sgd_noise")
     print("sgd_noise steps/epoch", n_per, "epoch means", [round(v, 3) for v in m], "batch range last epoch",
