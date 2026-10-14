@@ -110,11 +110,10 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 | 11:00 | 1. Machine learning and CNNs, talk | |
 | 11:40 | Break | |
 | 11:50 | 1. Notebook | `01_cnn` |
-| 12:15 | Break | |
-| 12:25 | 2. DNA foundation models, talk and notebook | `02_foundation_models` |
-| 13:15 | Break | |
-| 13:25 | 3. Shortcuts, controls and fine-tuning, talk and notebook | `03_shortcuts_and_controls` |
-| 14:00 | End | |
+| 12:15 | 2. DNA foundation models, talk and notebook | `02_foundation_models` |
+| 13:05 | Break | |
+| 13:15 | 3. Shortcuts, controls and fine-tuning, talk and notebook | `03_shortcuts_and_controls` |
+| 13:50 | Break, end at 14:00 | |
 
 ::: {.notes}
 - Projected: 1 min.

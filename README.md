@@ -6,8 +6,8 @@ Technion AI Days, Thu 15.10.2026. Prof. Roee Amit opens at 10:00; the three part
 | part | notebook | deck | you write |
 |---|---|---|---|
 | 1 Machine learning and CNNs (11:00) | `notebooks/01_cnn.ipynb` | `slides/01_cnn.qmd` | one-hot encoding, the CNN layers, held-out AUROC, a logo for every filter, motif insertion against a shuffled copy |
-| 2 DNA foundation models (12:25) | `notebooks/02_foundation_models.ipynb` | `slides/02_foundation_models.qmd` | `embed()`, `probe_auc()` |
-| 3 Shortcuts, controls and fine-tuning (13:25) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks |
+| 2 DNA foundation models (12:15) | `notebooks/02_foundation_models.ipynb` | `slides/02_foundation_models.qmd` | `embed()`, `probe_auc()` |
+| 3 Shortcuts, controls and fine-tuning (13:15) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks |
 
 Open a notebook in Colab, choose *Runtime → Change runtime type → T4 GPU*, and run from the top. Every
 notebook runs on its own: the data and our reference files download from
