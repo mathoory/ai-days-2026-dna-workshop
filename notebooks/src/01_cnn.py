@@ -55,11 +55,6 @@
 # Each sequence is a string over the 4-letter RNA alphabet `A C G U`. The *train* files are used to
 # fit the model. The *ls* files hold 1,000 other sequences, the **held-out test set**, which we use only
 # for evaluation.
-#
-# The split is random by sequence, so some test sequences lie near a training sequence in the same
-# gene. We checked whether this inflates the score. On the 698 test sequences with no training
-# sequence centred within 150 letters, our CNN scores 0.85, against 0.86 on all 1,000, so the score
-# barely changes. Real projects split by gene or by chromosome.
 
 # %%
 #@title Load the sequences - run this cell, nothing to change { display-mode: "form" }
@@ -290,7 +285,7 @@ plt.title("Learning curve"); plt.tight_layout(); plt.show()
 
 # %% [markdown]
 # **Reading your result.** The curve should climb quickly and level off at about **0.86** (0.86 to
-# 0.87). In our tests, three seeds finished within 0.01 of each other. The test set has only 1,000
+# 0.87). The test set has only 1,000
 # sequences, so any AUROC on it has a sampling uncertainty of about ±0.025 (95% range, part 1 talk).
 # A difference of 0.01 (0.85 against 0.86) is within this noise; a difference of 0.06 (0.80 against 0.86) is not.
 
@@ -535,7 +530,7 @@ copies = list(range(1, 8))              # 7 copies fit into a 330-letter sequenc
 
 # TODO-5: fill real_scores and control_scores with the MEAN model score after inserting
 #         c copies (for every c in `copies`) of MY_MOTIF and of `shuffled`, respectively.
-#         Expected: two lists of 7 numbers between 0 and 1. In our runs the motif's score jumps
+#         Expected: two lists of 7 numbers between 0 and 1. The motif's score usually jumps
 #         at copy 4 (letter 175); the plot below compares the two lists.
 # === Your code here ===
 real_scores = [score_sequences(model, plant(canvas, MY_MOTIF, c)).mean() for c in copies]
@@ -596,7 +591,7 @@ plt.tight_layout(); plt.show()
 # * The CNN's last layer has one weight per (filter, **position**). Almost every sequence in this data
 #   set, bound or unbound, was cut so that the measured ~40-letter site sits at letters 150–190, with
 #   context on both sides (the sequences are 137 to 375 letters long), and the CNN learned to weight
-#   that region. In our runs the shuffled copy gets much of the same increase there, so part of the effect
+#   that region. The shuffled copy gets much of the same increase there, so part of the effect
 #   comes from which letters occupy positions 150–190, whatever their order. A motif's effect on the score
 #   depends on where it is placed.
 #

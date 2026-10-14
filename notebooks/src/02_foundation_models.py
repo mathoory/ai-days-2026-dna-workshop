@@ -251,8 +251,7 @@ print(f"NT-500M + probe: {auc_nt:.3f}   vs   Mistral-DNA (16M): {auc_fm:.3f}")
 # of the human genome. We probe it on AGO2 before and after.
 #
 # Start the cell (about 4 minutes on a T4), then read **What to take away** below the Summary cell
-# while the loss goes down. A T4 runs about 1,200 steps in the 3 minutes, against about 1,800 on our A30
-# test GPU; in our Colab test the probe still went from 0.57 to 0.72.
+# while the loss goes down. A T4 runs about 1,200 training steps in the 3 minutes.
 
 # %%
 #@title Pretrain from scratch for a few minutes - run this cell { display-mode: "form" }
@@ -268,8 +267,7 @@ for name, sub in (("pretrain_config.json", "models/Mixtral-8x7B-v0.1/config.json
 
 cfg = AutoConfig.from_pretrained(DATA_DIR / "pretrain_config.json")
 torch.manual_seed(SEED)
-# the config specifies bfloat16 weights; keep them in float32 and let autocast do the half-precision maths
-# (a GradScaler cannot unscale bfloat16 gradients, which breaks the float16 path on a T4)
+# float32 weights; autocast does the half-precision maths
 scratch = AutoModelForCausalLM.from_config(cfg, attn_implementation="sdpa").float().to(DEVICE)
 print(f"fresh model: {sum(p.numel() for p in scratch.parameters()) / 1e6:.0f}M parameters, random weights")
 
@@ -294,7 +292,7 @@ def embed_checked(model, seqs):
 auc_before, _ = probe_auc(embed_checked(scratch, S_train), y_train, embed_checked(scratch, S_test), y_test)
 print(f"AGO2 probe BEFORE pretraining: {auc_before:.3f}\n")
 
-# bfloat16 where supported; float16 on a T4, with a GradScaler so that small gradients do not round to 0
+# bfloat16 where the GPU supports it; otherwise float16, with a GradScaler so that small gradients do not round to 0
 print("half precision:", "float16 + GradScaler" if AMP_DTYPE == torch.float16 else "bfloat16")
 scaler = torch.amp.GradScaler(enabled=DEVICE.type == "cuda" and AMP_DTYPE == torch.float16)
 opt = torch.optim.AdamW(scratch.parameters(), lr=5e-4, weight_decay=0.01)

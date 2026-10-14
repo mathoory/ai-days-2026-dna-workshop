@@ -446,14 +446,14 @@ for name in BENCH:
 #
 # The setup cell defines what TODO-5 needs: `make_lora()`, which returns a fresh model with LoRA
 # add-ons (`clf`), its optimizer (`opt`) and a gradient scaler (`scaler`); `crit` (the loss); and
-# `batch_logits(list_of_dna_strings)` → one raw score per sequence. On a T4 the model runs in float16,
-# and the `scaler` multiplies the loss before `backward()` so that small gradients do not round to 0.
-# On a GPU with bfloat16 the scaler does nothing.
+# `batch_logits(list_of_dna_strings)` → one raw score per sequence. On a GPU without bfloat16 the model
+# runs in float16, and the `scaler` multiplies the loss before `backward()` so that small gradients do not
+# round to 0. With bfloat16 (Colab's T4 included) the scaler does nothing, but the code is the same.
 
 # %%
 #@title Set up LoRA - run this cell, nothing to change { display-mode: "form" }
-!pip -q install peft==0.21.2   # tested with peft 0.21.2 and Colab's preinstalled transformers (5.19 in our tests)
-# Colab ships torchao 0.10, which peft 0.21 rejects (it needs > 0.16). This notebook does not use torchao.
+!pip -q install peft==0.21.2   # pinned version
+# remove a package that this peft version cannot load (not used here)
 !pip -q uninstall -y torchao
 from peft import LoraConfig, get_peft_model
 from transformers import AutoModelForSequenceClassification
@@ -463,7 +463,7 @@ def make_lora():
     """A fresh Mistral-DNA (16M) with LoRA add-ons, its optimizer, and a gradient scaler."""
     torch.manual_seed(SEED)
     model = AutoModelForSequenceClassification.from_pretrained(FM_REPO, num_labels=1, trust_remote_code=True)
-    model = model.float()   # the checkpoint is stored in bfloat16; float32 weights + autocast work with the GradScaler
+    model = model.float()   # train in float32; autocast runs the forward pass in half precision
     model.config.pad_token_id = tok.pad_token_id
     model = get_peft_model(model, LoraConfig(r=16, lora_alpha=16, lora_dropout=0.05, bias="none", task_type="SEQ_CLS",
                                              target_modules=["q_proj", "k_proj", "v_proj", "o_proj"])).to(DEVICE)
@@ -506,7 +506,7 @@ for epoch in range(LORA_EPOCHS):
         b = order[i:i + 32]
         y = torch.tensor(ytr[b], dtype=torch.float32, device=DEVICE)
         # TODO-5: one training step, the four lines of part 1's train(), with backward and step going
-        #         through `scaler` (needed for float16 on a T4):
+        #         through `scaler` (needed when the GPU runs in float16):
         #             loss = crit(batch_logits(<the DNA strings of this batch>), y)
         #             opt.zero_grad()
         #             scaler.scale(loss).backward()
