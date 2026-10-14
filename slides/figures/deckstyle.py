@@ -27,7 +27,7 @@ FAINT = "#F1F3F4"
 ACCENT, ACCENT_L = "#1A73E8", "#D2E3FC"
 
 # one accent; everything else is ink and greys
-BOUND, UNBOUND = ACCENT, LIGHT
+BOUND, UNBOUND = ACCENT, "#9AA0A6"
 CNN_C, FROZEN_C, TUNED_C, SHORTCUT_C = INK, MID, ACCENT, MID
 
 # old names, kept so older helper modules still import

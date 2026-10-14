@@ -129,6 +129,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 :::
 
 ::: {.notes}
+- AGO2 is Argonaute 2.
 - Top row, left to right: a gene's DNA (letters A, C, G, T) is copied into a messenger RNA (mRNA, letters A, C, G, U), which the cell translates into a protein. RNA uses U where DNA has T.
 - Click: AGO2 is a protein that binds some mRNAs; where it binds, the mRNA yields less protein.
 - Our question for the day: from the RNA letters alone, can a model tell where AGO2 binds?
@@ -137,7 +138,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 1.7 The data
 
-- **Bound**: 48,095 CLIP-seq sites. **Unbound**: 44,251 random positions in the same genes
+- **Bound**: 48,095 sites measured by CLIP-seq, an experiment that captures the RNA a protein binds. **Unbound**: 44,251 random positions in the same genes
 - The 40-letter measured site sits at letters 150 to 190
 
 ![](assets/custom/labels_raster.png){fig-align="center" height="538px"}
@@ -294,39 +295,61 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Tutorial 1 used the mean squared error, for predicting a number. Cross-entropy is the standard loss for a predicted probability.
 :::
 
-## 2.12 Gradient descent
+## 2.12 Features: chosen or learned
 
-$$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
+::: {.r-stack}
+![](assets/custom/features_0.png){height="700px"}
 
-- On our data: $\;\hat p = \sigma(w^\top x + b)$, $\;x$ = (G+C fraction, U fraction)
+![](assets/custom/features_1.png){.fragment height="700px"}
+:::
 
-![](assets/custom/lr_training.png){fig-align="center" height="547px"}
+::: {.notes}
+- A model needs numbers. Classic machine learning: we decide which numbers describe a sequence, its **features**, and the model learns how to weigh them.
+- Our first model uses two features of one real bound sequence: its G+C fraction (0.40) and its U fraction (0.28). Why these two: slide 1.7 showed that bound sequences are richer in A and U than unbound ones (mean G+C 0.41 against 0.45), so they are the obvious first guess, and two numbers can be drawn on a slide.
+- Click: deep learning gives the model the raw letters (one-hot, section 4) and lets it learn its own features during training. In a CNN these are the filters: real filters of our trained network are shown, blue positive and orange negative weights.
+- Nobody told the CNN to look at G+C. Part 3 checks how much of what it learned is composition anyway.
+:::
+
+## 2.13 The sigmoid: from a score to a probability
+
+![](assets/custom/sigmoid.png){fig-align="center" height="680px"}
+
+::: {.notes}
+- A model first computes a score $z$, any number (a weighted sum of the features plus a bias). The sigmoid turns it into a probability between 0 and 1.
+- Score 0 means 0.5, no preference; the larger the score, the closer to 1 (bound); the more negative, the closer to 0 (unbound).
+- Every model today ends with a sigmoid. The score before it is called the **logit**.
+:::
+
+## 2.14 Gradient descent
+
+$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$, on $\;\hat p = \sigma(w^\top x + b)$ with $x$ = (G+C fraction, U fraction)
+
+![](assets/custom/lr_training.png){fig-align="center" height="690px"}
 
 ::: {.notes}
 - The update: $\theta$ are all the parameters, $\mathcal{L}$ the loss, $\eta$ the learning rate. Start from some $\theta$, compute the gradient of the loss with respect to every parameter, move each parameter against its gradient, scaled by $\eta$, and repeat.
-- Left and middle: 3,000 training sequences, one point each, placed by G+C fraction and U fraction; blue bound, grey unbound. The orange line is where the predicted probability equals 0.5, at step 0 (a deliberately bad start) and after 300 steps. Right: the loss at each step.
+- Left and middle: 3,000 training sequences, one point each, placed by their two features, G+C fraction and U fraction (previous slides); blue bound, grey unbound. The orange line is where the predicted probability equals 0.5, at step 0 (a deliberately bad start) and after 300 steps. Right: the loss at each step.
 - The smallest possible model on our data: two features per sequence and three parameters (two weights and a bias).
-- $\sigma(z) = 1/(1+e^{-z})$ turns any score into a probability between 0 and 1. Every model today ends with a sigmoid.
 - The loss (slide 2.11) falls from 0.77 at the bad start to 0.67.
 - How well these two numbers separate the classes on held-out data: AUROC 0.66 (part 3).
 - Our CNN has 2,491 parameters. The genome models have millions to billions.
 :::
 
-## 2.13 The learning rate
+## 2.15 The learning rate
 
 - $\eta$ sets the size of each step
 
 ![](assets/custom/lr_rates.png){fig-align="center" height="642px"}
 
 ::: {.notes}
-- The model of slide 2.12, from the same bad start, trained with three learning rates. Training loss after each step.
+- The model of slide 2.14, from the same bad start, trained with three learning rates. Training loss after each step.
 - $\eta$ = 0.05: every step goes downhill, but after 40 steps the loss is still 0.72.
 - $\eta$ = 2: the loss reaches 0.67 within a few steps.
 - $\eta$ = 10: each step overshoots the minimum, and the loss jumps between 0.7 and 1.75.
 - The learning rate is set before training, a hyperparameter, and chosen on validation data (section 3). The notebook uses Adam with $\eta$ = 0.001.
 :::
 
-## 2.14 Mini-batches and epochs
+## 2.16 Mini-batches and epochs
 
 - Each step uses a **batch** of 256 sequences; an **epoch** is one pass over all 92,346 (360 steps)
 
@@ -339,17 +362,28 @@ $$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
 - 92,346 / 256 gives 360 full batches; the notebook drops the incomplete last one (`drop_last=True`) and reshuffles the order every epoch.
 :::
 
-## 2.15 From logistic regression to a neural network
+## 2.17 ReLU: the bend between layers
 
-- A **neural network** stacks layers of units, with **ReLU**, $\max(0, z)$, between them
+![](assets/custom/relu.png){fig-align="center" height="680px"}
 
-![](assets/custom/nn_diagram.png){fig-align="center" height="629px"}
+::: {.notes}
+- ReLU (rectified linear unit) keeps positive values and sets negative ones to 0.
+- Inside a network it sits after each layer's weighted sums. Without it, a stack of weighted sums is just one weighted sum, a straight boundary like logistic regression. With it, the network can learn curved boundaries.
+- In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.4).
+:::
+
+## 2.18 From logistic regression to a neural network
+
+- A **neural network** stacks layers of units, with **ReLU** between them
+- A **convolutional neural network (CNN)**: its first layer slides small filters along the sequence (section 4)
+
+![](assets/custom/nn_diagram.png){fig-align="center" height="540px"}
 
 ::: {.notes}
 - Left: logistic regression is one unit, a weighted sum of the inputs plus a bias, then the sigmoid.
 - Right: a hidden layer of units, each a weighted sum followed by ReLU, feeds the output unit.
 - Without the nonlinearity, stacked weighted sums add up to a single weighted sum, which is no more expressive than logistic regression.
-- Training is the same as on slide 2.12. `loss.backward()` computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.
+- Training is the same as on slide 2.14. `loss.backward()` computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.
 - The CNN of section 4 is a network of this kind in which each first-layer unit looks at a 10-letter window.
 :::
 
@@ -382,12 +416,14 @@ $$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
 
 ## 3.3 Drawing the ROC curve
 
+The scores of our convolutional neural network (CNN, section 4) on the 1,000 held-out sequences
+
 ::: {.r-stack}
-![](assets/custom/roc_frame_0.png){height="640px"}
+![](assets/custom/roc_frame_0.png){height="600px"}
 
-![](assets/custom/roc_frame_1.png){.fragment height="640px"}
+![](assets/custom/roc_frame_1.png){.fragment height="600px"}
 
-![](assets/custom/roc_frame_2.png){.fragment height="640px"}
+![](assets/custom/roc_frame_2.png){.fragment height="600px"}
 :::
 
 ::: {.notes}
@@ -403,8 +439,8 @@ $$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
 ::: columns
 ::: {.column width="38%"}
 ::: {.incremental}
-- All thresholds together give the **ROC curve**
-- **AUROC**: the area under it, the probability that a random bound sequence scores higher than a random unbound one
+- All thresholds together give the **ROC curve** (receiver operating characteristic)
+- **AUROC** (area under the ROC curve): the probability that a random bound sequence scores higher than a random unbound one
 - 0.5 is chance, 1.0 is perfect
 - It scores the ranking we care about, on sequences the model has not seen
 :::
@@ -424,8 +460,9 @@ $$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
 ## 3.5 Overfitting
 
 - A model that scores much higher on its training data than on held-out data has **overfit**: it memorised its training examples. Report the held-out score
+- Below: logistic regression on how often each 5-letter word occurs in a sequence (1,024 features; more in part 3). **Regularised**: large weights are penalised, which limits memorising
 
-![](assets/custom/probe_trap.png){fig-align="center" height="596px"}
+![](assets/custom/probe_trap.png){fig-align="center" height="440px"}
 
 ::: {.notes}
 - The same model, logistic regression on 5-letter word counts, scored two ways. Blue bars: AUROC on its own training sequences. Orange bars: AUROC on the 1,000 held-out sequences.
@@ -497,7 +534,7 @@ Next: build the CNN.
 
 ::: {.notes}
 - The same filter (filter 7): its output at every position of one bound sequence, after ReLU. x: position; y: output.
-- ReLU (slide 2.15) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.
+- ReLU (slide 2.17) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.
 :::
 
 ## 4.5 Channels and pooling
@@ -542,7 +579,7 @@ Next: build the CNN.
 ::: {.notes}
 - Filter 0 at epochs 0, 1, 3 and 10 of one training run, one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.
 - Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.
-- Each step is the update of slide 2.12, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
+- Each step is the update of slide 2.14, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
 :::
 
 ## 4.8 The training step and the evaluation (TODO-3)
@@ -575,6 +612,8 @@ Next: build the CNN.
 :::
 
 ## 5.2 From hits to a logo
+
+PWM: position weight matrix, the frequency of each letter at each position
 
 ![](assets/custom/toy_pwm.png){fig-align="center" height="700px"}
 

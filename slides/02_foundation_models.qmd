@@ -125,7 +125,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 ## 2.2 k-mers
 
-- Fixed words of 6 letters, a vocabulary of $4^6 = 4{,}096$ (Nucleotide Transformer)
+- Fixed words of 6 letters, a vocabulary of $4^6 = 4{,}096$ (Nucleotide Transformer, NT)
 
 ![](assets/custom/tokens_kmer.png){fig-align="center" height="445px"}
 
@@ -239,12 +239,14 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 
 ## 5.1 Prediction heads
 
+**Softmax**: the sigmoid for many classes; one score per token in, probabilities that sum to 1 out
+
 ::: {.r-stack}
-![](assets/custom/heads_0.png){height="645px"}
+![](assets/custom/heads_0.png){height="610px"}
 
-![](assets/custom/heads_1.png){.fragment height="645px"}
+![](assets/custom/heads_1.png){.fragment height="610px"}
 
-![](assets/custom/heads_2.png){.fragment height="645px"}
+![](assets/custom/heads_2.png){.fragment height="610px"}
 :::
 
 ::: {.notes}
@@ -258,12 +260,13 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 ## 5.2 The linear probe
 
 - Logistic regression on the 256 numbers of each sequence embedding; the language model stays frozen
+- **Standardised**: each of the 256 numbers shifted and scaled to mean 0, standard deviation 1
 
-![](assets/custom/probe_pipeline.png){fig-align="center" height="545px"}
+![](assets/custom/probe_pipeline.png){fig-align="center" height="490px"}
 
 ::: {.notes}
 - Left: the standardised embeddings of 40 of the 12,000 training sequences, one row each. Right: the probe, and the held-out AUROC you will compute in TODO-2.
-- The same model as part 1 slide 2.12, with 256 inputs instead of 2: 256 weights and one bias.
+- The same model as part 1 slide 2.14, with 256 inputs instead of 2: 256 weights and one bias.
 - Standardising shifts and scales each of the 256 numbers to mean 0 and standard deviation 1, using the training sequences only; the same shift and scale are applied to the test sequences.
 - Regularisation (part 1 slide 3.5) keeps the 256 weights small: `C = 0.1` in scikit-learn, where smaller `C` means stronger regularisation.
 - Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.

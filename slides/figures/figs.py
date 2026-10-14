@@ -161,7 +161,7 @@ def lr_training(tr, ty):
     o = rng.permutation(len(y))
     for k, step in enumerate((0, 300)):
         ax = fig.add_axes([0.07 + k * 0.31, 0.14, 0.27, 0.7])
-        ax.scatter(X[o, 0], X[o, 1], c=np.where(y[o] == 1, BOUND, UNB), s=12, alpha=.55, lw=0)
+        ax.scatter(X[o, 0], X[o, 1], c=np.where(y[o] == 1, BOUND, MID), s=30, alpha=.6, lw=0)
         ws, bs = snaps[step]
         xs = np.linspace(X[:, 0].min(), X[:, 0].max(), 50)
         zy = -(ws[0] * (xs - mu[0]) / sd[0] + bs) / ws[1]
@@ -179,7 +179,7 @@ def lr_training(tr, ty):
         ax.annotate(f"{losses[st]:.2f}", (st, losses[st]), xytext=(10, 8) if st == 0 else (-50, 10), textcoords="offset points")
     ax.set_title("Loss"); ax.set_xlabel("Step"); ygrid(ax)
     fig.legend(handles=[Line2D([], [], marker="o", ls="", ms=10, color=BOUND, label="Bound"),
-                        Line2D([], [], marker="o", ls="", ms=10, color=UNB, label="Unbound"),
+                        Line2D([], [], marker="o", ls="", ms=10, color=MID, label="Unbound"),
                         Line2D([], [], color=HELD_C, lw=3, label="p = 0.5")],
                loc="upper right", ncol=3, bbox_to_anchor=(0.98, 1.0))
     save(fig, "lr_training")
@@ -956,7 +956,7 @@ def label_curve():
     fig = newfig()
     ax = fig.add_axes([0.08, 0.13, 0.68, 0.75])
     lab = {"cnn": ("CNN", CNN_C, "-"), "fm_probe": ("Mistral-DNA, frozen", FROZEN_C, "-"),
-           "kmer5": ("5-letter word counts", MID, ":"), "random_probe": ("Mistral-DNA, random weights", LIGHT, "--")}
+           "kmer5": ("5-letter word counts", MID, ":"), "random_probe": ("Mistral-DNA, random weights", MID, "--")}
     for k, (name, c, ls_) in lab.items():
         m = np.array([d[str(n)][k]["mean"] for n in ns]); sd = np.array([d[str(n)][k]["sd"] for n in ns])
         ax.fill_between(ns, m - sd, m + sd, color=c, alpha=.12, lw=0)

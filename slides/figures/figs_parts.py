@@ -311,7 +311,7 @@ def nn_diagram():
             label(ax, x, y, txt, fs=17)
 
     def edge(a, b):
-        ax.plot([a[0], b[0]], [a[1], b[1]], color=LIGHT, lw=1.4, zorder=1)
+        ax.plot([a[0], b[0]], [a[1], b[1]], color=MID, lw=1.4, zorder=1)
 
     label(ax, 30, 69, "Logistic regression: one unit", fs=24)
     ins = [(14, 46), (14, 26)]
@@ -425,7 +425,7 @@ def probe_pipeline():
     arrow(a2, 56, 33, 66, 33, lw=2, ms=22)
     label(a2, 82, 37, "Held-out AUROC", fs=22)
     label(a2, 82, 28, "?", fs=30, color=ACCENT, bold=True)
-    label(a2, 34, 52, "Logistic regression (part 1, slide 2.12)", fs=20, color=MUTED)
+    label(a2, 34, 52, "Logistic regression (part 1, slide 2.14)", fs=20, color=MUTED)
     save(fig, "probe_pipeline")
 
 

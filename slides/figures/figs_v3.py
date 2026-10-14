@@ -394,9 +394,98 @@ def your_turn(ls, ly):
     save(fig, "your_turn")
 
 
+# ------------------------------------------------------------------ 2.x features: chosen by us, or learned
+def features(tr, ty):
+    """One real bound sequence: two numbers we chose (classic ML), or one-hot letters and learned filters (deep learning)."""
+    from intuition import load_cnn
+    s = next(x for x, l in zip(tr, ty) if l == 1 and len(x) > 300)
+    gcf = (s.count("G") + s.count("C")) / len(s); uf = s.count("U") / len(s)
+    W = load_cnn().net[0].weight.detach().cpu().numpy()[:3, 0]          # three real first-layer filters
+    frames_ = []
+    for k in (0, 1):
+        fig, ax = canvas()
+        for row, y in ((0, 66), (1, 24)):
+            if row > k:
+                continue
+            seq(ax, 4, y, s[:18], fs=19, dx=2.3)
+            label(ax, 4 + 18 * 2.3, y, "…", fs=20, color=MUTED, ha="left")
+            arrow(ax, 50, y, 58, y, color=MUTED, lw=2, ms=20)
+        label(ax, 4, 82, "Classic machine learning: we choose the features", fs=23, color=INK, ha="left", bold=True)
+        box(ax, 60, 70, 30, 8, f"G+C fraction  {gcf:.2f}", fc=ACCENT_L, fs=19)
+        box(ax, 60, 56, 30, 8, f"U fraction  {uf:.2f}", fc=ACCENT_L, fs=19)
+        label(ax, 75, 50, "2 numbers, chosen by us", fs=17, color=MUTED)
+        arrow(ax, 92, 66, 100, 66, color=MUTED, lw=2, ms=20)
+        label(ax, 116, 66, "logistic\nregression", fs=20, color=INK)
+        arrow(ax, 132, 66, 140, 66, color=MUTED, lw=2, ms=20)
+        label(ax, 147, 66, r"$\hat p$", fs=26, color=INK)
+        if k == 1:
+            label(ax, 4, 40, "Deep learning: the model learns its features from the letters", fs=23, color=INK,
+                  ha="left", bold=True)
+            for i, ch in enumerate(s[:8]):                                  # one-hot letters
+                for r, b in enumerate("ACGU"):
+                    ax.add_patch(Rectangle((60 + i * 2.6, 28 - r * 2.6), 2.4, 2.4, fc=BASE[ch] if b == ch else FAINT,
+                                           ec="none"))
+            label(ax, 71, 15, "one-hot letters", fs=17, color=MUTED)
+            arrow(ax, 82, 24, 90, 24, color=MUTED, lw=2, ms=20)
+            for j in range(3):                                              # real learned filters
+                v = np.abs(W[j]).max()
+                for r in range(4):
+                    for c in range(10):
+                        ax.add_patch(Rectangle((92 + c * 1.2, 30 - j * 6 - r * 1.2), 1.1, 1.1,
+                                               fc=DIVERGING((W[j, r, c] / v + 1) / 2), ec="none"))
+            label(ax, 98, 11, "filters learned\nin training", fs=17, color=MUTED)
+            arrow(ax, 106, 24, 114, 24, color=MUTED, lw=2, ms=20)
+            label(ax, 123, 24, "network", fs=20, color=INK)
+            arrow(ax, 132, 24, 140, 24, color=MUTED, lw=2, ms=20)
+            label(ax, 147, 24, r"$\hat p$", fs=26, color=INK)
+        save_raw(fig, f"features_{k}")
+        frames_.append(f"features_{k}")
+    trim_group(frames_)
+    print("features G+C", round(gcf, 3), "U", round(uf, 3))
+
+
+def activation(kind):
+    """The sigmoid (score -> probability) or ReLU (negative -> 0), each as one plot."""
+    z = np.linspace(-6, 6, 400)
+    fig = plt.figure(figsize=(16, 7.2), dpi=120)
+    ax = fig.add_axes([0.1, 0.15, 0.55, 0.75])
+    if kind == "sigmoid":
+        ax.plot(z, 1 / (1 + np.exp(-z)), color=ACCENT, lw=5)
+        ax.axhline(0.5, color=HAIR, ls="--", lw=1.5); ax.axhline(1, color=HAIR, lw=1); ax.axhline(0, color=HAIR, lw=1)
+        for zz in (-3, 0, 3):
+            pz = 1 / (1 + np.exp(-zz))
+            ax.scatter(zz, pz, s=120, color=HELD_C, zorder=3)
+            ax.annotate(f"z = {zz} → {pz:.2f}", (zz, pz), xytext=(14, -26 if zz > 0 else 10), textcoords="offset points",
+                        fontsize=21, color=HELD_C)
+        ax.set_ylim(-0.05, 1.08); ax.set_ylabel("probability of bound")
+        txt = [r"$\sigma(z) = \dfrac{1}{1 + e^{-z}}$", "", "any score in,", "a number between 0 and 1 out", "",
+               "score 0 → 0.5", "large positive → close to 1", "large negative → close to 0"]
+    else:
+        ax.plot(z, np.maximum(0, z), color=ACCENT, lw=5)
+        ax.axhline(0, color=HAIR, lw=1)
+        for zz in (-3, 2):
+            ax.scatter(zz, max(0, zz), s=120, color=HELD_C, zorder=3)
+            ax.annotate(f"{zz} → {max(0, zz)}", (zz, max(0, zz)), xytext=(10, 14), textcoords="offset points",
+                        fontsize=21, color=HELD_C)
+        ax.set_ylim(-1, 6.3); ax.set_ylabel("output")
+        txt = [r"$\mathrm{ReLU}(z) = \max(0, z)$", "", "negative → 0", "positive → passes unchanged", "",
+               "between the layers of a network,", "so that stacked layers can bend", "the boundary between classes"]
+    ax.set_xlabel("score z"); ygrid(ax)
+    for i, line in enumerate(txt):
+        fig.text(0.7, 0.85 - i * 0.075, line, fontsize=26 if i == 0 else 21, color=INK if i == 0 else MUTED, va="top")
+    save(fig, kind)
+
+
 if __name__ == "__main__":
     want = set(sys.argv[1:])
     run = (lambda n: not want or n in want)
+    if run("sigmoid"):
+        activation("sigmoid")
+    if run("relu"):
+        activation("relu")
+    if run("features"):
+        from intuition import split
+        features(*split("train"))
     if run("learning_flow"):
         learning_flow()
     if run("data_split"):

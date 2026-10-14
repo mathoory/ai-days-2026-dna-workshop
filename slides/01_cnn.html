@@ -353,6 +353,7 @@
 </div>
 <aside class="notes">
 <ul>
+<li>AGO2 is Argonaute 2.</li>
 <li>Top row, left to right: a gene’s DNA (letters A, C, G, T) is copied into a messenger RNA (mRNA, letters A, C, G, U), which the cell translates into a protein. RNA uses U where DNA has T.</li>
 <li>Click: AGO2 is a protein that binds some mRNAs; where it binds, the mRNA yields less protein.</li>
 <li>Our question for the day: from the RNA letters alone, can a model tell where AGO2 binds?</li>
@@ -373,7 +374,7 @@
 <section id="the-data" class="slide level2">
 <h2>1.7 The data</h2>
 <ul>
-<li><strong>Bound</strong>: 48,095 CLIP-seq sites. <strong>Unbound</strong>: 44,251 random positions in the same genes</li>
+<li><strong>Bound</strong>: 48,095 sites measured by CLIP-seq, an experiment that captures the RNA a protein binds. <strong>Unbound</strong>: 44,251 random positions in the same genes</li>
 <li>The 40-letter measured site sits at letters 150 to 190</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
@@ -714,23 +715,69 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="gradient-descent" class="slide level2">
-<h2>2.12 Gradient descent</h2>
-<p><span class="math display">\[\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}\]</span></p>
+<section id="features-chosen-or-learned" class="slide level2">
+<h2>2.12 Features: chosen or learned</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/features_0.png" height="700"></p>
+<p><img data-src="assets/custom/features_1.png" class="fragment" height="700"></p>
+</div>
+<aside class="notes">
 <ul>
-<li>On our data: <span class="math inline">\(\;\hat p = \sigma(w^\top x + b)\)</span>, <span class="math inline">\(\;x\)</span> = (G+C fraction, U fraction)</li>
+<li>A model needs numbers. Classic machine learning: we decide which numbers describe a sequence, its <strong>features</strong>, and the model learns how to weigh them.</li>
+<li>Our first model uses two features of one real bound sequence: its G+C fraction (0.40) and its U fraction (0.28). Why these two: slide 1.7 showed that bound sequences are richer in A and U than unbound ones (mean G+C 0.41 against 0.45), so they are the obvious first guess, and two numbers can be drawn on a slide.</li>
+<li>Click: deep learning gives the model the raw letters (one-hot, section 4) and lets it learn its own features during training. In a CNN these are the filters: real filters of our trained network are shown, blue positive and orange negative weights.</li>
+<li>Nobody told the CNN to look at G+C. Part 3 checks how much of what it learned is composition anyway.</li>
 </ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-sigmoid-from-a-score-to-a-probability" class="slide level2">
+<h2>2.13 The sigmoid: from a score to a probability</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/lr_training.png" class="quarto-figure quarto-figure-center" height="547"></p>
+<p><img data-src="assets/custom/sigmoid.png" class="quarto-figure quarto-figure-center" height="680"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>A model first computes a score <span class="math inline">\(z\)</span>, any number (a weighted sum of the features plus a bias). The sigmoid turns it into a probability between 0 and 1.</li>
+<li>Score 0 means 0.5, no preference; the larger the score, the closer to 1 (bound); the more negative, the closer to 0 (unbound).</li>
+<li>Every model today ends with a sigmoid. The score before it is called the <strong>logit</strong>.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gradient-descent" class="slide level2">
+<h2>2.14 Gradient descent</h2>
+<p><span class="math inline">\(\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}\)</span>, on <span class="math inline">\(\;\hat p = \sigma(w^\top x + b)\)</span> with <span class="math inline">\(x\)</span> = (G+C fraction, U fraction)</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/lr_training.png" class="quarto-figure quarto-figure-center" height="690"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>The update: <span class="math inline">\(\theta\)</span> are all the parameters, <span class="math inline">\(\mathcal{L}\)</span> the loss, <span class="math inline">\(\eta\)</span> the learning rate. Start from some <span class="math inline">\(\theta\)</span>, compute the gradient of the loss with respect to every parameter, move each parameter against its gradient, scaled by <span class="math inline">\(\eta\)</span>, and repeat.</li>
-<li>Left and middle: 3,000 training sequences, one point each, placed by G+C fraction and U fraction; blue bound, grey unbound. The orange line is where the predicted probability equals 0.5, at step 0 (a deliberately bad start) and after 300 steps. Right: the loss at each step.</li>
+<li>Left and middle: 3,000 training sequences, one point each, placed by their two features, G+C fraction and U fraction (previous slides); blue bound, grey unbound. The orange line is where the predicted probability equals 0.5, at step 0 (a deliberately bad start) and after 300 steps. Right: the loss at each step.</li>
 <li>The smallest possible model on our data: two features per sequence and three parameters (two weights and a bias).</li>
-<li><span class="math inline">\(\sigma(z) = 1/(1+e^{-z})\)</span> turns any score into a probability between 0 and 1. Every model today ends with a sigmoid.</li>
 <li>The loss (slide 2.11) falls from 0.77 at the bad start to 0.67.</li>
 <li>How well these two numbers separate the classes on held-out data: AUROC 0.66 (part 3).</li>
 <li>Our CNN has 2,491 parameters. The genome models have millions to billions.</li>
@@ -748,7 +795,7 @@
       }</style></aside>
 </section>
 <section id="the-learning-rate" class="slide level2">
-<h2>2.13 The learning rate</h2>
+<h2>2.15 The learning rate</h2>
 <ul>
 <li><span class="math inline">\(\eta\)</span> sets the size of each step</li>
 </ul>
@@ -759,7 +806,7 @@
 </div>
 <aside class="notes">
 <ul>
-<li>The model of slide 2.12, from the same bad start, trained with three learning rates. Training loss after each step.</li>
+<li>The model of slide 2.14, from the same bad start, trained with three learning rates. Training loss after each step.</li>
 <li><span class="math inline">\(\eta\)</span> = 0.05: every step goes downhill, but after 40 steps the loss is still 0.72.</li>
 <li><span class="math inline">\(\eta\)</span> = 2: the loss reaches 0.67 within a few steps.</li>
 <li><span class="math inline">\(\eta\)</span> = 10: each step overshoots the minimum, and the loss jumps between 0.7 and 1.75.</li>
@@ -778,7 +825,7 @@
       }</style></aside>
 </section>
 <section id="mini-batches-and-epochs" class="slide level2">
-<h2>2.14 Mini-batches and epochs</h2>
+<h2>2.16 Mini-batches and epochs</h2>
 <ul>
 <li>Each step uses a <strong>batch</strong> of 256 sequences; an <strong>epoch</strong> is one pass over all 92,346 (360 steps)</li>
 </ul>
@@ -806,14 +853,40 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="from-logistic-regression-to-a-neural-network" class="slide level2">
-<h2>2.15 From logistic regression to a neural network</h2>
+<section id="relu-the-bend-between-layers" class="slide level2">
+<h2>2.17 ReLU: the bend between layers</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/relu.png" class="quarto-figure quarto-figure-center" height="680"></p>
+</figure>
+</div>
+<aside class="notes">
 <ul>
-<li>A <strong>neural network</strong> stacks layers of units, with <strong>ReLU</strong>, <span class="math inline">\(\max(0, z)\)</span>, between them</li>
+<li>ReLU (rectified linear unit) keeps positive values and sets negative ones to 0.</li>
+<li>Inside a network it sits after each layer’s weighted sums. Without it, a stack of weighted sums is just one weighted sum, a straight boundary like logistic regression. With it, the network can learn curved boundaries.</li>
+<li>In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.4).</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="from-logistic-regression-to-a-neural-network" class="slide level2">
+<h2>2.18 From logistic regression to a neural network</h2>
+<ul>
+<li>A <strong>neural network</strong> stacks layers of units, with <strong>ReLU</strong> between them</li>
+<li>A <strong>convolutional neural network (CNN)</strong>: its first layer slides small filters along the sequence (section 4)</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/nn_diagram.png" class="quarto-figure quarto-figure-center" height="629"></p>
+<p><img data-src="assets/custom/nn_diagram.png" class="quarto-figure quarto-figure-center" height="540"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -821,7 +894,7 @@
 <li>Left: logistic regression is one unit, a weighted sum of the inputs plus a bias, then the sigmoid.</li>
 <li>Right: a hidden layer of units, each a weighted sum followed by ReLU, feeds the output unit.</li>
 <li>Without the nonlinearity, stacked weighted sums add up to a single weighted sum, which is no more expressive than logistic regression.</li>
-<li>Training is the same as on slide 2.12. <code>loss.backward()</code> computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.</li>
+<li>Training is the same as on slide 2.14. <code>loss.backward()</code> computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.</li>
 <li>The CNN of section 4 is a network of this kind in which each first-layer unit looks at a 10-letter window.</li>
 </ul>
 <style type="text/css">
@@ -892,10 +965,11 @@
 </section>
 <section id="drawing-the-roc-curve" class="slide level2">
 <h2>3.3 Drawing the ROC curve</h2>
+<p>The scores of our convolutional neural network (CNN, section 4) on the 1,000 held-out sequences</p>
 <div class="r-stack">
-<p><img data-src="assets/custom/roc_frame_0.png" height="640"></p>
-<p><img data-src="assets/custom/roc_frame_1.png" class="fragment" height="640"></p>
-<p><img data-src="assets/custom/roc_frame_2.png" class="fragment" height="640"></p>
+<p><img data-src="assets/custom/roc_frame_0.png" height="600"></p>
+<p><img data-src="assets/custom/roc_frame_1.png" class="fragment" height="600"></p>
+<p><img data-src="assets/custom/roc_frame_2.png" class="fragment" height="600"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -922,8 +996,8 @@
 <div class="columns">
 <div class="column" style="width:38%;">
 <ul>
-<li class="fragment">All thresholds together give the <strong>ROC curve</strong></li>
-<li class="fragment"><strong>AUROC</strong>: the area under it, the probability that a random bound sequence scores higher than a random unbound one</li>
+<li class="fragment">All thresholds together give the <strong>ROC curve</strong> (receiver operating characteristic)</li>
+<li class="fragment"><strong>AUROC</strong> (area under the ROC curve): the probability that a random bound sequence scores higher than a random unbound one</li>
 <li class="fragment">0.5 is chance, 1.0 is perfect</li>
 <li class="fragment">It scores the ranking we care about, on sequences the model has not seen</li>
 </ul>
@@ -953,10 +1027,11 @@
 <h2>3.5 Overfitting</h2>
 <ul>
 <li>A model that scores much higher on its training data than on held-out data has <strong>overfit</strong>: it memorised its training examples. Report the held-out score</li>
+<li>Below: logistic regression on how often each 5-letter word occurs in a sequence (1,024 features; more in part 3). <strong>Regularised</strong>: large weights are penalised, which limits memorising</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/probe_trap.png" class="quarto-figure quarto-figure-center" height="596"></p>
+<p><img data-src="assets/custom/probe_trap.png" class="quarto-figure quarto-figure-center" height="440"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -1084,7 +1159,7 @@
 <aside class="notes">
 <ul>
 <li>The same filter (filter 7): its output at every position of one bound sequence, after ReLU. x: position; y: output.</li>
-<li>ReLU (slide 2.15) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.</li>
+<li>ReLU (slide 2.17) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1164,7 +1239,7 @@
 <ul>
 <li>Filter 0 at epochs 0, 1, 3 and 10 of one training run, one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.</li>
 <li>Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.</li>
-<li>Each step is the update of slide 2.12, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.</li>
+<li>Each step is the update of slide 2.14, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1235,6 +1310,7 @@
 </section>
 <section id="from-hits-to-a-logo" class="slide level2">
 <h2>5.2 From hits to a logo</h2>
+<p>PWM: position weight matrix, the frequency of each letter at each position</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/toy_pwm.png" class="quarto-figure quarto-figure-center" height="700"></p>

@@ -389,7 +389,7 @@
 <section id="k-mers" class="slide level2">
 <h2>2.2 k-mers</h2>
 <ul>
-<li>Fixed words of 6 letters, a vocabulary of <span class="math inline">\(4^6 = 4{,}096\)</span> (Nucleotide Transformer)</li>
+<li>Fixed words of 6 letters, a vocabulary of <span class="math inline">\(4^6 = 4{,}096\)</span> (Nucleotide Transformer, NT)</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -586,10 +586,11 @@
 
 <section id="prediction-heads-1" class="slide level2">
 <h2>5.1 Prediction heads</h2>
+<p><strong>Softmax</strong>: the sigmoid for many classes; one score per token in, probabilities that sum to 1 out</p>
 <div class="r-stack">
-<p><img data-src="assets/custom/heads_0.png" height="645"></p>
-<p><img data-src="assets/custom/heads_1.png" class="fragment" height="645"></p>
-<p><img data-src="assets/custom/heads_2.png" class="fragment" height="645"></p>
+<p><img data-src="assets/custom/heads_0.png" height="610"></p>
+<p><img data-src="assets/custom/heads_1.png" class="fragment" height="610"></p>
+<p><img data-src="assets/custom/heads_2.png" class="fragment" height="610"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -615,16 +616,17 @@
 <h2>5.2 The linear probe</h2>
 <ul>
 <li>Logistic regression on the 256 numbers of each sequence embedding; the language model stays frozen</li>
+<li><strong>Standardised</strong>: each of the 256 numbers shifted and scaled to mean 0, standard deviation 1</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/probe_pipeline.png" class="quarto-figure quarto-figure-center" height="545"></p>
+<p><img data-src="assets/custom/probe_pipeline.png" class="quarto-figure quarto-figure-center" height="490"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>Left: the standardised embeddings of 40 of the 12,000 training sequences, one row each. Right: the probe, and the held-out AUROC you will compute in TODO-2.</li>
-<li>The same model as part 1 slide 2.12, with 256 inputs instead of 2: 256 weights and one bias.</li>
+<li>The same model as part 1 slide 2.14, with 256 inputs instead of 2: 256 weights and one bias.</li>
 <li>Standardising shifts and scales each of the 256 numbers to mean 0 and standard deviation 1, using the training sequences only; the same shift and scale are applied to the test sequences.</li>
 <li>Regularisation (part 1 slide 3.5) keeps the 256 weights small: <code>C = 0.1</code> in scikit-learn, where smaller <code>C</code> means stronger regularisation.</li>
 <li>Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.</li>
