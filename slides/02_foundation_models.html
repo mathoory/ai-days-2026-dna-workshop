@@ -179,17 +179,9 @@
 </section>
 <section id="two-pretraining-objectives" class="slide level2">
 <h2>1.4 Two pretraining objectives</h2>
-<ul>
-<li><strong>Next token</strong> (Mistral-DNA): <span class="math inline">\(\;\mathcal{L} = -\log p_\theta(x_t \mid x_{&lt;t})\)</span></li>
-</ul>
-<div class="fragment" data-fragment-index="1">
-<ul>
-<li><strong>Masked token</strong> (Nucleotide Transformer): <span class="math inline">\(\;\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})\)</span></li>
-</ul>
-</div>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_obj_0.png" height="544"></p>
-<p><img data-src="assets/custom/d2_obj_1.png" class="fragment" data-fragment-index="1" height="544"></p>
+<p><img data-src="assets/custom/d2_obj_0.png" height="700"></p>
+<p><img data-src="assets/custom/d2_obj_1.png" class="fragment" height="700"></p>
 </div>
 
 </section>
@@ -197,7 +189,7 @@
 <h2>1.5 What the model predicts</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/next_token.png" class="quarto-figure quarto-figure-center" height="755"></p>
+<p><img data-src="assets/custom/d2_next.png" class="quarto-figure quarto-figure-center" height="755"></p>
 </figure>
 </div>
 
@@ -244,9 +236,6 @@
 </section>
 <section id="byte-pair-encoding-bpe" class="slide level2">
 <h2>2.3 Byte-pair encoding (BPE)</h2>
-<ul>
-<li>Start from single letters; merge the most frequent neighbouring pair into a new token, and repeat</li>
-</ul>
 <div class="r-stack">
 <p><img data-src="assets/custom/d2_bpe_0.png" height="594"></p>
 <p><img data-src="assets/custom/d2_bpe_1.png" class="fragment" height="594"></p>
