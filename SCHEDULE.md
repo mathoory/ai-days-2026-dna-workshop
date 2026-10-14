@@ -4,14 +4,12 @@
 |---|---|---|---|---|
 | 10:00–10:50 | Roee | Opening lecture (biology) | Roee's | none |
 | 10:50–11:00 | | Break | | |
-| 11:00–11:40 | Mattan | 1. Machine learning and CNNs: talk | `01_cnn` | |
+| 11:00–11:40 | Mattan | 1. Machine learning and CNNs (talk) | `01_cnn` | |
 | 11:40–11:50 | | Break | | |
-| 11:50–12:15 | Mattan | 1. Notebook | | `01_cnn.ipynb` |
-| 12:15–12:45 | Mattan | 2. DNA foundation models: talk | `02_foundation_models` | |
-| 12:45–13:05 | Mattan | 2. Notebook | | `02_foundation_models.ipynb` |
+| 11:50–12:15 | Mattan | 1. Machine learning and CNNs, continued (notebook) | | `01_cnn.ipynb` |
+| 12:15–13:05 | Mattan | 2. DNA foundation models (30 min talk, 20 min notebook) | `02_foundation_models` | `02_foundation_models.ipynb` |
 | 13:05–13:15 | | Break | | |
-| 13:15–13:30 | Mattan | 3. Shortcuts, controls and fine-tuning: talk (wrap-up slides at the end) | `03_shortcuts_and_controls` | |
-| 13:30–13:50 | Mattan | 3. Notebook, then feedback | | `03_shortcuts_and_controls.ipynb` |
+| 13:15–13:50 | Mattan | 3. Shortcuts, controls and fine-tuning (15 min talk, 20 min notebook, feedback) | `03_shortcuts_and_controls` | `03_shortcuts_and_controls.ipynb` |
 | 13:50–14:00 | | Break (end) | | |
 
 ## Projected minutes, before any cuts
