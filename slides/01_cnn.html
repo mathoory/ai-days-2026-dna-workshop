@@ -675,7 +675,7 @@
 <li>Each column is one letter; the four rows are A, C, G, U, and the dark cell holds the 1. A sequence becomes a 4 × length matrix. The longest sequence is 375 letters.</li>
 <li>A padding column of 0.25 means “unknown letter”: each base equally likely. 501 is the input width used by Pan and Shen, whose CNN this one follows.</li>
 <li>If asked why not A=1, C=2, G=3, U=4: that would impose an order (G “greater than” C) with no biological meaning. One-hot keeps the four letters equally far apart.</li>
-<li>TODO-1 encodes one sequence and checks its first columns against its letters.</li>
+<li>TODO-1 writes the conversion: <code>one_hot</code> for one sequence (TODO-1a), then <code>encode_batch</code> for a list of sequences (TODO-1b). A test cell checks 201 sequences, including padding and an unknown letter. The rest of the notebook then uses a faster version with identical output.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -931,6 +931,12 @@
 <h2>4.3 Your turn</h2>
 <p>Open <strong><code>01_cnn.ipynb</code></strong> in Colab, select the T4 GPU, run from the top.</p>
 <table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Step</th>
@@ -942,8 +948,8 @@
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">TODO-1</td>
-<td style="text-align: left;">one-hot encode a sequence</td>
-<td style="text-align: left;">first 8 columns match</td>
+<td style="text-align: left;">write <code>one_hot</code> and <code>encode_batch</code></td>
+<td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">3 min</td>
 </tr>
 <tr class="even">
@@ -977,7 +983,7 @@
 <li>Given cells (setup, data, motif toolkit, take-aways): about 12 min. Projected hands-on total: about 46 min, 51 with the optional sections.</li>
 <li>TODO-3 check: about 0.79 after epoch 1 and 0.86 after epoch 10. Encoding and 10 epochs take about a minute on a T4 (2 to 8 seconds per epoch).</li>
 <li>Helpers for TODO-4: <code>acts[:, f, :]</code>, <code>cutoff_for</code>, <code>windows_above</code>, <code>pwm_of</code>; then set <code>MY_FILTER</code> and <code>MY_MOTIF</code>. TODO-4 ends with choosing a motif. TODO-5 uses <code>plant</code>.</li>
-<li>TODO-2 to TODO-5 each have a “Stuck?” cell below them that loads our version. TODO-1 has none: no later cell uses its result.</li>
+<li>Each TODO has a “Stuck?” cell below it that loads our version.</li>
 <li>Section 5, right after training, downloads <code>my_cnn.pt</code>, which part 3 can load.</li>
 </ul>
 <style type="text/css">

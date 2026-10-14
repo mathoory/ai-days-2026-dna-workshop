@@ -75,20 +75,103 @@ print("\na bound sequence:\n", train_seqs[0][:90], "...")
 # Every input has the same width, 501 columns, the input size used by Pan & Shen. Our sequences are
 # 137 to 375 letters long, so the remaining columns are padding: columns of 0.25 (equal weight on all
 # four letters).
+#
+# You will write this conversion in two steps: first for one sequence, then for a batch of sequences.
 
 # %%
-# TODO-1: one-hot encode the FIRST training sequence with `encode_batch` and print
-#         its first 8 columns. Check them against the first 8 letters printed above.
-#         `encode_batch` takes a list of strings and returns shape (N, 1, 4, 501).
-#         Indexing hint: X[0, 0, :, :8] = sequence 0, its only channel, all 4 rows, columns 0-7.
-#         Expected: shape (1, 1, 4, 501), and in each of the 8 columns a single 1, in the row
-#         of that column's letter.
-# === Your code here ===
-X_one = encode_batch([train_seqs[0]])
-print("shape:", tuple(X_one.shape))
+#@title One sequence and the alphabet - run this cell, nothing to change { display-mode: "form" }
+s = train_seqs[0]
+print("first 10 letters:", s[:10], "| length:", len(s))
+print("ALPHABET =", repr(ALPHABET), "| the row of each letter:", {b: ALPHABET.index(b) for b in ALPHABET})
+print("MAX_LEN  =", MAX_LEN, "columns per sequence")
+
+# %%
+# TODO-1a: write one_hot(seq): ONE sequence -> a numpy array of shape (4, MAX_LEN).
+#          1. start from an array of shape (4, MAX_LEN) full of 0.25 (np.full, dtype np.float32);
+#             every column you do not touch stays a padding column
+#          2. for each position i and letter b of seq: set column i to 0, then put a 1 in the
+#             row of that letter, ALPHABET.index(b)
+#          A letter that is not in ALPHABET keeps its column of 0.25.
+def one_hot(seq):
+    # === Your code here ===
+    M = np.full((4, MAX_LEN), 0.25, dtype=np.float32)
+    for i, b in enumerate(seq[:MAX_LEN]):
+        if b in ALPHABET:
+            M[:, i] = 0.0
+            M[ALPHABET.index(b), i] = 1.0
+    return M
+    # === End of your code ===
+
+
+M = one_hot(train_seqs[0])
+L = len(train_seqs[0])
+print("shape:", M.shape, "(want (4, 501))")
 print("letters:", "  ".join(train_seqs[0][:8]))
-print(X_one[0, 0, :, :8].numpy())
-# === End of your code ===
+print(M[:, :8])
+print(f"columns {L - 1} and {L} (the last letter, then the first padding column):")
+print(M[:, L - 1:L + 1])
+
+# %%
+# TODO-1b: write encode_batch(seqs): a list of N sequences -> a float tensor of shape (N, 1, 4, MAX_LEN),
+#          the input the CNN expects (N sequences, 1 channel, 4 rows, MAX_LEN columns).
+#          1. one_hot each sequence and stack the results into one array (np.stack): shape (N, 4, MAX_LEN)
+#          2. add the channel axis: shape (N, 1, 4, MAX_LEN), for example with X[:, None]
+#          3. return it as a tensor: torch.from_numpy(X)
+def encode_batch(seqs):
+    # === Your code here ===
+    X = np.stack([one_hot(s) for s in seqs])[:, None]
+    return torch.from_numpy(X)
+    # === End of your code ===
+
+
+X3 = encode_batch(train_seqs[:3])
+print("shape:", tuple(X3.shape), "(want (3, 1, 4, 501)) | dtype:", X3.dtype, "(want torch.float32)")
+
+# %%
+#@title Test your encoding - run this cell, nothing to change { display-mode: "form" }
+def test_encoding():
+    rng = np.random.default_rng(0)
+    seqs = [train_seqs[i] for i in rng.choice(len(train_seqs), 200, replace=False)] + ["ACGUN"]
+    X = encode_batch(seqs)
+    assert tuple(X.shape) == (len(seqs), 1, 4, MAX_LEN), f"shape {tuple(X.shape)}, want {(len(seqs), 1, 4, MAX_LEN)}"
+    assert X.dtype == torch.float32, f"dtype {X.dtype}, want torch.float32"
+    X = X.numpy()
+    for n, s in enumerate(seqs):
+        L = min(len(s), MAX_LEN)
+        for i, b in enumerate(s[:L]):
+            want = np.eye(4)[ALPHABET.index(b)] if b in ALPHABET else np.full(4, 0.25)
+            assert np.allclose(X[n, 0, :, i], want), f"sequence {n!r}, column {i} (letter {b}): {X[n, 0, :, i]}, want {want}"
+        assert np.allclose(X[n, 0, :, L:], 0.25), f"sequence {n}: the padding columns after letter {L} should all be 0.25"
+    print(f"TODO-1 passed: {len(seqs)} sequences encoded correctly (including a letter N, which stays 0.25)")
+
+
+test_encoding()
+
+# %%
+#@title Stuck? Run this only if the test failed: it defines our one_hot and encode_batch { display-mode: "form" }
+def one_hot(seq):
+    M = np.full((4, MAX_LEN), 0.25, dtype=np.float32)
+    for i, b in enumerate(seq[:MAX_LEN]):
+        if b in ALPHABET:
+            M[:, i] = 0.0
+            M[ALPHABET.index(b), i] = 1.0
+    return M
+
+
+def encode_batch(seqs):
+    return torch.from_numpy(np.stack([one_hot(s) for s in seqs])[:, None])
+
+
+test_encoding()
+
+# %%
+#@title A faster encode_batch for the rest of the notebook - run this cell, nothing to change { display-mode: "form" }
+# It gives the same matrices as yours, but looks up all letters of a sequence at once instead of one by
+# one, which matters for the 92,346 training sequences.
+your_encode_batch = encode_batch
+# %include h_encode.py
+assert torch.equal(your_encode_batch(train_seqs[:100]), encode_batch(train_seqs[:100])), "the fast version differs from yours"
+print("the fast encode_batch gives the same matrices as yours on 100 sequences")
 
 # %% [markdown]
 # ## 3. The model (TODO-2)
