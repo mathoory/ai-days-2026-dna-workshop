@@ -303,63 +303,8 @@
 <li>One column per method, one per click: the head at the top, the 8 layers below; blue trained, grey frozen. The bottom line gives the typical training time.</li>
 <li>These are the body and the heads of part 2: what changes is how much of the body is trained for the new task.</li>
 <li>Linear probe: a new output layer only, after one pass to compute embeddings. Partial fine-tuning: the head and the top layers. Full fine-tuning: all weights. LoRA: small low-rank matrices added to each layer.</li>
-<li>“Fine-tuning” usually refers to the last three; the first is called probing. Part 2 used a probe; this part uses LoRA.</li>
+<li>“Fine-tuning” usually refers to the last three; the first is called probing. Part 2 used a probe; the offline results at the end use LoRA, which trains small corrections to the weights instead of the weights themselves.</li>
 <li>Full fine-tuning with few labels overfits easily.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="lora" class="slide level2" data-todo="TODO-4">
-<h2>3.2 LoRA</h2>
-<p><strong>Low-Rank Adaptation</strong>: train a small correction to each weight matrix, keep the matrix itself</p>
-<p><span class="math display">\[W x \;\rightarrow\; (W + BA)\,x, \qquad B \in \mathbb{R}^{256 \times r},\; A \in \mathbb{R}^{r \times 256},\; r = 16\]</span></p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/lora.png" class="quarto-figure quarto-figure-center" height="565"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>Projected: 2 min.</li>
-<li>LoRA keeps each large weight matrix W fixed and learns a low-rank correction BA. Here W is one real 256 × 256 matrix from Mistral-DNA: 65,536 frozen weights against 2 × 256 × 16 = 8,192 trained ones. r is the rank of the correction.</li>
-<li>B starts at zero, so training begins exactly from the pretrained model.</li>
-<li>Across the models in our tests, LoRA trained between about 1% and 9% of the parameters; in the notebook, about 1.6% of Mistral-DNA’s, including the new output layer.</li>
-<li>A 16M-parameter model could be fully fine-tuned on a laptop GPU; LoRA is how 500M-parameter models are adapted on modest hardware. Part 3 uses it on Mistral-DNA so you practise the method.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="the-lora-training-step" class="slide level2">
-<h2>3.3 The LoRA training step</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/lora_loop.png" class="quarto-figure quarto-figure-center" height="680"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>The same loop as part 1 slide 4.8. Only the LoRA matrices B and A and the new output layer are trainable; the pretrained weights W stay fixed.</li>
-<li>The loss is the binary cross-entropy of part 1 slide 2.11.</li>
-<li>Batches of 32 sequences, 2 epochs over 20,000 matched sequences: 625 steps per epoch.</li>
-<li>In the notebook, TODO-4a counts the numbers LoRA trains from the shapes of W and r, and TODO-4b is a written prediction of the result before training.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -384,10 +329,9 @@
 
 <img data-src="assets/custom/your_turn_d3.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"><aside class="notes">
 <ul>
-<li>Helpers: TODO-1 <code>probe_auc</code> (<code>gc_u</code> is written by the students); TODO-2 <code>Counter</code>, <code>kmer_counts(seqs, k=5)</code>; TODO-3 <code>dinuc_shuffle</code>; TODO-4 the shapes of W printed above it.</li>
+<li>Helpers: TODO-1 <code>probe_auc</code> (<code>gc_u</code> is written by the students); TODO-2 <code>Counter</code>, <code>kmer_counts(seqs, k=5)</code>; TODO-3 <code>dinuc_shuffle</code>.</li>
 <li>TODO-3: score the shuffled sequences with the probe already fitted on real sequences.</li>
 <li><code>shortcut_scores</code> is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.</li>
-<li>TODO-4: count LoRA’s numbers (4a) and write a prediction (4b), then start the training cell and read on while it trains. Expected after training: about 0.81, between the frozen probe (0.77) and the CNN (0.84).</li>
 <li>The label curve (optional, 2 min) is precomputed. Each TODO has a test cell; the solutions are published on the workshop site during the workshop.</li>
 </ul>
 <style type="text/css">
@@ -445,7 +389,6 @@
 <li>20,000 labels: CNN 0.84, frozen probe 0.78, fine-tuned 0.87.</li>
 <li>500 labels: CNN 0.66, frozen 0.73, fine-tuned 0.75.</li>
 <li>CNN and LoRA have three runs each, from different random starting weights; the frozen probe has one run. The CNN and LoRA runs do not overlap at either label count.</li>
-<li>In the notebook you fine-tuned the smaller Mistral-DNA (about 0.81), which improved on its frozen probe but stayed below the CNN (0.84). The 500M model needs more GPU memory than free Colab offers.</li>
 <li>These fine-tuned models have not been put through the shuffle test yet.</li>
 </ul>
 <style type="text/css">
@@ -503,7 +446,7 @@
 <aside class="notes">
 <ul>
 <li>Each row is a measured held-out AUROC from today; open circle to filled circle is the same model before and after a control.</li>
-<li>Green: the CNN; blue: frozen pretrained models; purple: fine-tuned; grey: two composition numbers.</li>
+<li>Green: the CNN; blue: frozen pretrained models; grey: two composition numbers.</li>
 <li>The shuffle and the matched data separate what each model uses: the composition model falls to chance on matched data, the CNN keeps its score there, and the frozen probe barely notices the shuffle.</li>
 </ul>
 <style type="text/css">
@@ -529,7 +472,7 @@
 <ul>
 <li>Ten pretrained models from 3M to 2.5B parameters on the matched data, run offline. x: parameters, log scale; y: AUROC. All values on the 3,000-sequence matched test set.</li>
 <li>Frozen with a probe (blue): all between 0.72 and 0.79, below the CNN. Size makes little difference.</li>
-<li>Fine-tuned with one shared LoRA recipe (purple, one run each; the arrow goes from frozen to fine-tuned): NT-500M and DNABERT-2 reach 0.87, Mistral-DNA 0.79 (the notebook’s own recipe gives 0.81), and HyenaDNA drops from 0.78 to 0.72.</li>
+<li>Fine-tuned with one shared LoRA recipe (purple, one run each; the arrow goes from frozen to fine-tuned): NT-500M and DNABERT-2 reach 0.87, Mistral-DNA 0.79, and HyenaDNA drops from 0.78 to 0.72.</li>
 <li>The green dashed line is the CNN trained on the whole matched training set (0.84); the probes used 12,000 labels and LoRA 20,000.</li>
 <li>NT-2.5B was not fine-tuned: our recipe undertrained it at that size.</li>
 </ul>

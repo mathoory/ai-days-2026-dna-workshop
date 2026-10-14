@@ -16,7 +16,7 @@
 #    and 5-letter word counts (TODO-2);
 # 2. run the shuffle test on the CNN and on the probe (TODO-3);
 # 3. select bound and unbound sequences with the same composition, then train and test every model
-#    again on them, including a fine-tuned language model (TODO-4: its size, and your prediction).
+#    again on them.
 #
 #
 # | cell | what you do |
@@ -395,7 +395,7 @@ _ = (DATA_DIR / "my_part3_shuffle_results.json").write_text(json.dumps(results, 
 # From section 4 on, we change the data and leave the models as they are.
 
 # %% [markdown]
-# # Fix the data, then test again (sections 4 to 8)
+# # Fix the data, then test again (sections 4 to 7)
 #
 # In sections 1 to 3, two numbers (the G+C and U fractions of a sequence) already separated bound from
 # unbound RNA (AUROC ≈ 0.66). Each unbound sequence is a binding site moved to a random position in
@@ -534,138 +534,7 @@ for name in BENCH:
     print(f"CNN, {name:8s}: {scores[name]['CNN (part 1 architecture)']:.3f}  ({time.time() - t0:.0f}s)")
 
 # %% [markdown]
-# ## 6. Fine-tuning with LoRA (TODO-4)
-#
-# So far the language model was **frozen**: we only trained a linear probe on top. **Fine-tuning**
-# also updates the model's own weights for the AGO2 task. Large models are usually adapted with **LoRA**
-# (low-rank adaptation), so we practise it here on Mistral-DNA. LoRA keeps every adapted weight matrix
-# $W$ fixed and learns a small correction added to it: $W x$ becomes $(W + BA)\,x$. $B$ and $A$ are thin
-# matrices with a small inner size $r$ (the *rank*); only they, and a new output layer, are trained.
-#
-# We train on the **matched** benchmark, 2 epochs over 20,000 labelled sequences (the frozen probe used
-# 12,000), and test on the matched test set. The training step is the one of part 1, and it is given.
-# Before training, you work out how small LoRA's correction is (TODO-4a) and predict the result (TODO-4b).
-
-# %%
-#@title ▶ Set up LoRA { display-mode: "form" }
-!pip -q install peft==0.21.2   # pinned version
-# remove a package that this peft version cannot load (not used here)
-!pip -q uninstall -y torchao
-from peft import LoraConfig, get_peft_model
-from transformers import AutoModelForSequenceClassification
-
-
-def make_lora():
-    """A fresh Mistral-DNA (16M) with LoRA add-ons, its optimizer, and a gradient scaler."""
-    torch.manual_seed(SEED)
-    model = AutoModelForSequenceClassification.from_pretrained(FM_REPO, num_labels=1, trust_remote_code=True)
-    model = model.float()
-    model.config.pad_token_id = tok.pad_token_id
-    model = get_peft_model(model, LoraConfig(r=16, lora_alpha=16, lora_dropout=0.05, bias="none", task_type="SEQ_CLS",
-                                             target_modules=["q_proj", "k_proj", "v_proj", "o_proj"])).to(DEVICE)
-    optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=5e-4)
-    scaler = torch.amp.GradScaler(enabled=DEVICE.type == "cuda" and AMP_DTYPE == torch.float16)
-    return model, optimizer, scaler
-
-
-clf, opt, scaler = make_lora()
-crit = nn.BCEWithLogitsLoss()
-LORA_EPOCHS, LORA_N = 2, 20000
-M_tr, my_tr, M_te, my_te = BENCH["matched"]
-D_tr, ytr, D_te = [to_dna(s) for s in M_tr[:LORA_N]], my_tr[:LORA_N], [to_dna(s) for s in M_te]
-
-
-def batch_logits(seqs):
-    enc = tok(seqs, return_tensors="pt", padding=True, truncation=True, max_length=256)
-    with torch.autocast(DEVICE.type, dtype=AMP_DTYPE, enabled=DEVICE.type == "cuda"):
-        return clf(input_ids=enc["input_ids"].to(DEVICE), attention_mask=enc["attention_mask"].to(DEVICE)).logits.float().squeeze(-1)
-
-
-@torch.no_grad()
-def lora_auc():
-    clf.eval()
-    s = np.concatenate([batch_logits(D_te[i:i + 256]).cpu().numpy() for i in range(0, len(D_te), 256)])
-    clf.train()
-    return roc_auc_score(my_te, s)
-
-
-def lora_step(seqs, y):
-    """One training step of clf on one batch (the training step of part 1). Returns the loss."""
-    loss = crit(batch_logits(seqs), y)
-    opt.zero_grad()
-    scaler.scale(loss).backward()
-    scaler.step(opt)
-    scaler.update()
-    return loss
-
-
-R = 16                                   # the rank r of B and A
-W = {n.split(".")[-3]: tuple(p.shape) for n, p in clf.named_parameters()
-     if ".layers.0." in n and n.endswith("base_layer.weight")}
-n_layers = len({n.split(".layers.")[1].split(".")[0] for n, _ in clf.named_parameters() if ".layers." in n})
-print(f"LoRA adapts {len(W)} matrices W in each of the {n_layers} layers; rank r = {R}")
-for name, shape in W.items():
-    print(f"  {name}: W has {shape[0]} rows and {shape[1]} columns")
-
-# %%
-# TODO-4a: LoRA adds B·A to each of these matrices W. B has as many rows as W and r columns; A has r
-#          rows and as many columns as W. Compute n_lora, the number of trainable numbers in all B and A
-#          matrices of the model, and n_W, the number of numbers in the same matrices W, which stay fixed.
-# === Your code here ===
-n_lora = n_layers * sum(R * (rows + cols) for rows, cols in W.values())
-n_W = n_layers * sum(rows * cols for rows, cols in W.values())
-# === End of your code ===
-print(f"LoRA trains {n_lora:,} numbers to adapt {n_W:,} fixed ones ({n_lora / n_W:.1%})")
-
-# %%
-#@title ▶ Test TODO-4a { display-mode: "form" }
-def test_lora_count():
-    real = sum(p.numel() for n, p in clf.named_parameters() if "lora_" in n)
-    real_W = sum(p.numel() for n, p in clf.named_parameters() if n.endswith("base_layer.weight"))
-    assert n_W == real_W, f"❌ n_W = {n_W:,}, want {real_W:,}: the numbers in all adapted matrices W (rows x columns), in every layer"
-    assert n_lora == real, \
-        (f"❌ n_lora = {n_lora:,}, the model has {real:,}: for a W with m rows and n columns, B has m x r numbers "
-         f"and A has r x n, in every adapted matrix of every layer")
-    n_all = sum(p.numel() for p in clf.parameters())
-    print(f"✅ TODO-4a test passed: {real:,} LoRA numbers; with the new output layer the model trains "
-          f"{sum(p.numel() for p in clf.parameters() if p.requires_grad):,} of its {n_all:,} parameters")
-
-
-test_lora_count()
-
-# %%
-#@title ▶ The models so far on the matched test set { display-mode: "form" }
-for k in ("Mistral-DNA + probe (frozen)", "CNN (part 1 architecture)"):
-    print(f"{k:32s} matched test AUROC {scores['matched'][k]:.3f}")
-
-# %%
-# TODO-4b: before training, write your prediction: will the fine-tuned Mistral-DNA score higher or lower
-#          than the frozen probe and than the CNN on the matched test set, and why? (Free text; the
-#          training cell prints it next to the result.)
-MY_PREDICTION = ""
-
-# %%
-#@title ▶ Train with LoRA { display-mode: "form" }
-clf, opt, scaler = make_lora()   # a fresh model every time this cell runs
-t0 = time.time()
-clf.train()
-for epoch in range(LORA_EPOCHS):
-    order = np.random.default_rng(epoch).permutation(len(D_tr))
-    for step, i in enumerate(range(0, len(order), 32)):
-        b = order[i:i + 32]
-        y = torch.tensor(ytr[b], dtype=torch.float32, device=DEVICE)
-        loss = lora_step([D_tr[j] for j in b], y)
-        if step % 200 == 0:
-            print(f"epoch {epoch + 1} step {step:4d} | loss {loss.item():.3f} | {time.time() - t0:.0f}s")
-    print(f"--> after epoch {epoch + 1}: matched test AUROC {lora_auc():.3f}")
-scores["matched"]["Mistral-DNA, LoRA fine-tuned"] = lora_auc()
-print()
-print(f"LoRA fine-tuned: {scores['matched']['Mistral-DNA, LoRA fine-tuned']:.3f} | frozen + probe: "
-      f"{scores['matched']['Mistral-DNA + probe (frozen)']:.3f} | CNN: {scores['matched']['CNN (part 1 architecture)']:.3f}")
-print("your prediction:", MY_PREDICTION or "(none written)")
-
-# %% [markdown]
-# ## 7. Before and after the control
+# ## 6. Before and after the control
 
 # %%
 #@title ▶ The before/after table { display-mode: "form" }
@@ -676,19 +545,16 @@ for k in scores["original"]:
         continue
     o, m = scores["original"][k], scores["matched"][k]
     print(f"{k:40s} {o:9.3f} {m:9.3f}   {'█' * int(round(max(o - m, 0) * 200))} {o - m:+.3f}")
-k = "Mistral-DNA, LoRA fine-tuned"
-if k in scores["matched"]:
-    print(f"{k:40s} {'':9s} {scores['matched'][k]:9.3f}")
 print()
 print("(each █ = 0.005 AUROC lost once single-letter composition is matched)")
-print("(labelled training sequences: CNN about 65,000; LoRA 20,000; the other three 12,000)")
+print("(labelled training sequences: CNN about 65,000; the other three 12,000)")
 _ = (DATA_DIR / "my_part3_matched_results.json").write_text(json.dumps(scores, indent=1))
 
 # %% [markdown]
-# ## 8. Pretraining and the number of labels (optional)
+# ## 7. Pretraining and the number of labels (optional)
 #
-# The table above compares models trained on different numbers of labels: about 65,000 for the CNN,
-# 20,000 for LoRA and 12,000 for the others. A lab studying a new question often has fewer labels.
+# The table above compares models trained on different numbers of labels: about 65,000 for the CNN
+# and 12,000 for the others. A lab studying a new question often has fewer labels.
 #
 # The next cell compares both approaches trained on 100 to 12,000 labelled sequences (matched
 # benchmark, matched test set). The light grey dashed line is the same language model with **random
@@ -696,8 +562,8 @@ _ = (DATA_DIR / "my_part3_matched_results.json").write_text(json.dumps(scores, i
 # score depends on pretraining.
 #
 # **This cell is optional and precomputed.** By default it plots our offline results (3 random draws
-# of the labels per size: points are means, bars are standard deviations) and prints our offline
-# NT-500M head-to-head. Set `RUN_LIVE = True` to rerun one draw at 4 sizes yourself.
+# of the labels per size: points are means, bars are standard deviations). Set `RUN_LIVE = True` to
+# rerun one draw at 4 sizes yourself.
 
 # %%
 #@title ▶ Learn from fewer labels (optional; precomputed by default) { display-mode: "form" }
@@ -713,10 +579,6 @@ PRECOMPUTED = {
     "Random-weight Mistral-DNA (16M) + probe": {"mean": [0.497, 0.498, 0.501, 0.528, 0.531, 0.538, 0.554],
                                                 "sd":   [0.009, 0.008, 0.008, 0.006, 0.003, 0.009, 0.004]},
 }
-# Our offline head-to-head with NT-500M on the same matched test set (CNN and LoRA: mean of 3 seeds;
-# frozen probe: one run).
-HEAD_TO_HEAD = {500: {"CNN from scratch": 0.655, "NT-500M + probe (frozen)": 0.733, "NT-500M, LoRA fine-tuned": 0.750},
-                20000: {"CNN from scratch": 0.835, "NT-500M + probe (frozen)": 0.783, "NT-500M, LoRA fine-tuned": 0.869}}
 
 if RUN_LIVE:
     from transformers import AutoConfig, AutoModel
@@ -787,10 +649,6 @@ plt.xlabel("Labelled training sequences"); plt.ylabel("Test AUROC (matched data)
 plt.title("Test AUROC vs number of labels" + ("" if RUN_LIVE else " (precomputed, 3 draws)"))
 plt.legend(); plt.grid(axis="y"); plt.tight_layout(); plt.show()
 
-print("Offline head-to-head with NT-500M on the matched test set:")
-for n, row in HEAD_TO_HEAD.items():
-    print(f"{n:6,} labels | " + " | ".join(f"{k} {v:.3f}" for k, v in row.items()))
-
 # %% [markdown]
 # ### What to take away
 #
@@ -799,10 +657,6 @@ for n, row in HEAD_TO_HEAD.items():
 #   the matching leaves in place, and little on single letters.
 # * **CNN.** It lost almost nothing to the matched control (0.84 → 0.84), so it uses more than
 #   single-letter composition.
-# * **Fine-tuning.** Your fine-tuned Mistral-DNA (≈ 0.81) improved on the frozen probe (≈ 0.77) but
-#   stayed below the CNN (≈ 0.84). In our offline runs a 30× larger model, NT-500M with LoRA, reached
-#   0.87 against the CNN's 0.84 with 20,000 labels, and 0.75 against 0.66 with 500 labels (3 seeds each
-#   for the CNN and LoRA). Those fine-tuned models have not yet been put through the shuffle test.
 # * **Labels.** With few labels the frozen probe does better than the CNN, and with 100 labels the CNN
 #   is close to a coin flip. The random-weight line stays close to 0.5 (at most about 0.55), so the
 #   probe's advantage comes from pretraining on the genome.

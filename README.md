@@ -7,7 +7,7 @@ to 13:30, then a wrap-up until 13:40. All parts use the AGO2 CLIP-seq data of th
 |---|---|---|---|
 | 1 Machine learning and CNNs (11:00) | `notebooks/01_cnn.ipynb` | `slides/01_cnn.qmd` | one-hot encoding, the CNN layers, held-out AUROC, a logo for every filter, motif insertion against a shuffled copy |
 | 2 DNA foundation models (12:00) | `notebooks/02_foundation_models.ipynb` | `slides/02_foundation_models.qmd` | `embed()`, `probe_auc()` |
-| 3 Shortcuts, controls and fine-tuning (12:50) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks, the LoRA training step |
+| 3 Shortcuts, controls and fine-tuning (12:50) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks |
 
 Open a notebook in Colab, choose *Runtime → Change runtime type → T4 GPU*, and run from the top. Every
 notebook runs on its own: the data and our reference files download from
@@ -47,11 +47,11 @@ quarto render slides/01_cnn.qmd          # one deck
 |---|---|---|
 | `01_cnn` | 32 s | 10-epoch CNN training: 19 s |
 | `02_foundation_models` | 5 min (fresh download, NT-500M recomputed) | live pretraining: 3.4 min |
-| `03_shortcuts_and_controls` | 4.3 min | LoRA, 2 epochs × 20,000 sequences: 1.5 min (3 min with float16 forced); `shortcut_scores()`: 43 s |
+| `03_shortcuts_and_controls` | about 2.8 min (measured with LoRA, since removed) | `shortcut_scores()`: 43 s |
 
 Colab, Tesla T4 (13.10, all three notebooks in one session, no errors): `01_cnn` 1.8 min (training 69 s),
 `02_foundation_models` 4.1 min (live pretraining 3.7 min, 1,178 steps), `03_shortcuts_and_controls` 4.7 min
-without the "Stuck?" cells (LoRA 3.2 min, `shortcut_scores()` 32 s). Peak GPU memory 2.2 GB; the 18 MB data
+without the "Stuck?" cells (it then included LoRA, 3.2 min, since removed; `shortcut_scores()` 32 s). Peak GPU memory 2.2 GB; the 18 MB data
 file downloads in 1.5 s. Torch reports bfloat16 support on the T4, so the float16 + GradScaler branch was
 not used there; it runs without errors when forced (tested on the A30).
 
@@ -65,4 +65,3 @@ not used there; it runs without errors when forced (tested on the A30).
   - 5-letter words: 0.762 → 0.725
   - frozen probe: 0.806 → 0.770
   - CNN: 0.844 → 0.838
-  - Mistral-DNA fine-tuned with LoRA, matched only: 0.809

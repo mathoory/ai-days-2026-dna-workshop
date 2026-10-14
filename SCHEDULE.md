@@ -26,10 +26,10 @@ the "about N min" section headings (reading, typing and T4 compute). Both are es
 | **Total** | **140** | | | | **210** | **+70 (+50 after the buffer)** |
 
 Measured on a Colab T4 (13.10, no errors): compute is 1.8, 4.1 and 4.7 min for the three notebooks
-(excluding the "Stuck?" cells). The longest waits are live pretraining (3.7 min) and LoRA training (3.2 min);
+(excluding the "Stuck?" cells). The longest wait is live pretraining (3.7 min); LoRA training (3.2 min) has since been removed;
 everything else in the minutes above is reading and typing.
 
-Largest items: part 1 notebook sections 7 and 8 (logos 9, insertion 8); part 3 LoRA (7, of which 3 training)
+Largest items: part 1 notebook sections 7 and 8 (logos 9, insertion 8); part 3 LoRA (removed)
 and `shortcut_scores` (8); part 2 TODO-1 embeddings (9) and live pretraining (6, of which 4 computing).
 
 Notebooks for students: https://github.com/mathoory/ai-days-2026-dna-workshop (Open in Colab links in the README).

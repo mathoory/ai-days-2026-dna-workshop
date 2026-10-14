@@ -41,7 +41,7 @@ def lora_loop():
 # ------------------------------------------------------------------ 4.1 your turn
 def your_turn_d3():
     fig, ax = canvas(16, 6.4, ylim=(0, 64))
-    xs = [20, 60, 100, 140]
+    xs = [30, 80, 130]
     # 1: two numbers per sequence
     for i, (v, c) in enumerate(((0.41, BASE["G"]), (0.29, BASE["U"]))):
         ax.add_patch(Rectangle((xs[0] - 9 + i * 10, 30), 7, v * 50, color=c))
@@ -59,15 +59,9 @@ def your_turn_d3():
     for r, s in enumerate((orig, shuf)):
         seq(ax, xs[2] - 11, 48 - r * 10, s, fs=20, dx=2.4)
     label(ax, xs[2], 31, "same letter pairs", fs=16, color=MUTED)
-    # 4: W + B A
-    ax.add_patch(Rectangle((xs[3] - 14, 30), 14, 20, color=LIGHT))
-    label(ax, xs[3] - 7, 40, "W", fs=20, color=INK, bold=True)
-    label(ax, xs[3] + 2, 40, "+", fs=24, color=MUTED)
-    ax.add_patch(Rectangle((xs[3] + 5, 30), 3, 20, color=TUNED_C))
-    ax.add_patch(Rectangle((xs[3] + 9, 47), 10, 3, color=TUNED_C))
-    for x, todo, what in zip(xs, ["TODO-1", "TODO-2", "TODO-3", "TODO-4"],
+    for x, todo, what in zip(xs, ["TODO-1", "TODO-2", "TODO-3"],
                              ["two numbers per sequence:\nG+C and U", "counts of all\n5-letter words",
-                              "the shuffle test", "count what LoRA trains,\nthen predict the result"]):
+                              "the shuffle test"]):
         label(ax, x, 18, todo, fs=26, color=ACCENT, bold=True)
         label(ax, x, 11, what, fs=19, color=INK, va="top")
     save(fig, "your_turn_d3")
@@ -83,8 +77,7 @@ def day_numbers():
         ("3", "Dinucleotide shuffle: CNN", (0.86, 0.66), CNN_C),
         ("3", "Dinucleotide shuffle: frozen probe", (0.78, 0.77), FROZEN_C),
         ("3", "Composition-matched data: G+C and U", (0.64, 0.51), MID),
-        ("3", "Composition-matched data: CNN", (0.84, 0.84), CNN_C),
-        ("3", "Mistral-DNA, frozen → fine-tuned (LoRA)", (0.77, 0.81), TUNED_C)]
+        ("3", "Composition-matched data: CNN", (0.84, 0.84), CNN_C)]
     fig = newfig()
     ax = fig.add_axes([0.42, 0.1, 0.54, 0.8])
     for i, (part, name, v, c) in enumerate(rows):

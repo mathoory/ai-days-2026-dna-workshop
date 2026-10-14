@@ -254,7 +254,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 - Next token: the last token's vector goes through a linear layer to 4,096 scores, one per vocabulary token; softmax turns them into probabilities that sum to 1. Masked token: the same, at the hidden position.
 - These two are the pretraining heads (slides 1.5 and 1.6). After pretraining they are discarded and a new task head is attached; the body (and the embedding table) transfers.
 - Our task: average the token vectors (the sequence embedding), then one linear layer to one number, then the sigmoid: P(bound). Before the logistic regression each of the 256 dimensions is standardised.
-- Frozen body, new linear head: a **linear probe** (this part's notebook), which is logistic regression. Body adapted too: fine-tuning (part 3, LoRA).
+- Frozen body, new linear head: a **linear probe** (this part's notebook), which is logistic regression. Body adapted too: fine-tuning (part 3).
 :::
 
 ## 5.2 The linear probe {data-todo="TODO-2"}
