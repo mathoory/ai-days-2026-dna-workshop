@@ -74,30 +74,6 @@ def fetch(name):
     return path
 
 
-def download_outputs(*names):
-    """End of a notebook: save your results to your laptop so the next notebook can use them."""
-    for n in names:
-        p = DATA_DIR / n
-        if not p.exists():
-            print(f"{n}: not found (did the cell that makes it run?)")
-        elif IN_COLAB and os.environ.get("AIDAYS_NO_DOWNLOAD") != "1":   # AIDAYS_NO_DOWNLOAD=1: automated test runs
-            _colab_files.download(str(p))
-        else:
-            print(f"{n}: saved at {p}")
-
-
-def upload_yours():
-    """Start of a notebook: upload the files you downloaded at the end of an earlier notebook."""
-    if not IN_COLAB:
-        print(f"not in Colab: copy your files into {DATA_DIR}")
-        return
-    import re
-    for n, b in _colab_files.upload().items():
-        clean = re.sub(r" \(\d+\)(?=\.[^.]+$)", "", n)   # "my_cnn (1).pt" -> "my_cnn.pt" (browser renames)
-        (DATA_DIR / clean).write_bytes(b)
-        print("uploaded", n, "->", clean)
-
-
 def _aidays_timing():
     """Optional cell timer for testing the notebooks. It does nothing unless the environment variable
     AIDAYS_TIMING=1 is set. Then every executed cell appends {first_line, seconds, raised, error_type,
