@@ -74,9 +74,7 @@ def _token_rows(rows, name, w, site):
     top = h * 10 - 10
     dx, x0 = 3.6, 36
     for i, ch in enumerate(w):
-        label(ax, x0 + i * dx, top, ch, fs=24, color=INK, family=MONO)
-    ax.plot([x0 + site * dx - 1.8, x0 + (site + 6) * dx + 1.8], [top - 4.5, top - 4.5], color=ACCENT, lw=2.5)
-    label(ax, x0 + (site + 3) * dx, top - 8, "miR-19 site", fs=18, color=ACCENT)
+        label(ax, x0 + i * dx, top, ch, fs=24, color=BASE[ch], family=MONO, bold=True)
     label(ax, 4, top, "Sequence", fs=20, color=MUTED, ha="left")
     for r, (rname, repo, s_) in enumerate(rows):
         t = list(s_) if repo is None else None
@@ -90,9 +88,9 @@ def _token_rows(rows, name, w, site):
             tk = tk.replace("▁", "").replace("Ġ", "")
             if not tk or tk[0] in "<[":
                 continue
-            box(ax, x0 + p * dx - 1.85, y - 4.5, len(tk) * dx - 0.45, 9, fc=[FAINT, HAIR][j % 2], r=0.6)
+            box(ax, x0 + p * dx - 1.85, y - 4.5, len(tk) * dx - 0.45, 9, fc=[ACCENT_L, FAINT][j % 2], r=0.6)
             for q, ch in enumerate(tk):
-                label(ax, x0 + (p + q) * dx, y, ch, fs=21, color=INK, family=MONO)
+                label(ax, x0 + (p + q) * dx, y, ch, fs=21, color=BASE.get(ch, INK), family=MONO, bold=True)
             p += len(tk)
         label(ax, x0 + len(w) * dx + 3, y, f"{sum(1 for x in t if x.replace('▁', '') and x[0] not in '<[')} tokens",
               fs=18, color=MUTED, ha="left")
@@ -390,7 +388,7 @@ def pad_mask(pos):
         label(ax, 4, y, f"Sequence {r + 1}", fs=20, color=MUTED, ha="left")
         for j, (tk, mj) in enumerate(zip(toks, m)):
             pad = mj == 0
-            box(ax, x0 + j * cw, y - 4.5, cw - 0.5, 9, fc=FAINT if not pad else "#FFFFFF",
+            box(ax, x0 + j * cw, y - 4.5, cw - 0.5, 9, fc=ACCENT_L if not pad else "#FFFFFF",
                 ec=HAIR if pad else "none", lw=1 if pad else 0, r=0.5)
             t = "pad" if pad else tk.replace("▁", "")
             label(ax, x0 + j * cw + cw / 2, y + 1.6, t, fs=12 if len(t) > 5 else 14, color=LIGHT if pad else INK, family=MONO)
@@ -422,8 +420,8 @@ def probe_pipeline():
     label(a2, 34, 28, "256 weights + 1 bias", fs=20, color=MUTED)
     arrow(a2, 56, 33, 66, 33, lw=2, ms=22)
     label(a2, 82, 37, "Held-out AUROC", fs=22)
-    label(a2, 82, 28, "0.78", fs=30, color=ACCENT, bold=True)
-    label(a2, 34, 52, "Logistic regression (part 1, slide 2.3)", fs=20, color=MUTED)
+    label(a2, 82, 28, "?", fs=30, color=ACCENT, bold=True)
+    label(a2, 34, 52, "Logistic regression (part 1, slide 2.12)", fs=20, color=MUTED)
     save(fig, "probe_pipeline")
 
 

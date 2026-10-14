@@ -135,3 +135,19 @@ def save(fig, name):
     plt.close(fig)
     trim(path)
     print("wrote", name)
+
+
+def trim_group(names, pad=24):
+    """Crop the frames of one click-through to the union of their ink, so they still stack exactly."""
+    import numpy as np
+    from PIL import Image
+    ims = [Image.open(OUT / f"{n}.png").convert("RGB") for n in names]
+    boxes = []
+    for im in ims:
+        a = np.asarray(im)
+        ys, xs = np.where((a < 246).any(axis=2))
+        boxes.append((xs.min(), ys.min(), xs.max(), ys.max()))
+    x0 = max(0, min(b[0] for b in boxes) - pad); y0 = max(0, min(b[1] for b in boxes) - pad)
+    x1 = min(ims[0].width, max(b[2] for b in boxes) + 1 + pad); y1 = min(ims[0].height, max(b[3] for b in boxes) + 1 + pad)
+    for n, im in zip(names, ims):
+        im.crop((x0, y0, x1, y1)).save(OUT / f"{n}.png")

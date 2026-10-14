@@ -637,7 +637,7 @@ def next_token(pos):
     prefix = "".join(tok.convert_ids_to_tokens(ids[:cut]))
     fig = newfig()
     ax = fig.add_axes([0.22, 0.12, 0.7, 0.62])
-    ax.barh(range(len(items)), [v for _, v, _ in items], color=[INK if t else LIGHT for *_, t in items], height=0.7)
+    ax.barh(range(len(items)), [v for _, v, _ in items], color=[HELD_C if t else TRAIN_L for *_, t in items], height=0.7)
     ax.set_yticks(range(len(items))); ax.set_yticklabels([n + ("  (true)" if t else "") for n, _, t in items], family=MONO)
     ax.invert_yaxis(); ax.tick_params(axis="y", length=0); ax.spines["left"].set_visible(False)
     ax.set_xlabel("Predicted probability of the next token"); xgrid(ax)
@@ -654,21 +654,21 @@ def landscape():
     ax = fig.add_axes([0.1, 0.13, 0.86, 0.75])
     ax.plot([2023.0, 2023.0], [50e6, 2.5e9], color=LIGHT, lw=2)
     for n, x, p, kind in pts:
-        ax.scatter(x, p, s=200, zorder=3, color=INK if kind == "M" else "white", edgecolor=INK, lw=2.5)
+        ax.scatter(x, p, s=200, zorder=3, color=ACCENT if kind == "M" else HELD_C, edgecolor="white", lw=1.5)
         ax.text(x + 0.07, p * 1.3, n, fontsize=17)
     ax.set_yscale("log"); ax.set_xlim(2020.6, 2025.9); ax.set_xticks([2021, 2022, 2023, 2024, 2025])
     ax.set_ylabel("Parameters"); ygrid(ax)
-    ax.legend(handles=[Line2D([], [], marker="o", ls="", ms=12, color=INK, label="Masked (fill in the blank)"),
-                       Line2D([], [], marker="o", ls="", ms=12, mfc="white", mec=INK, mew=2.5, label="Autoregressive (predict next)")],
+    ax.legend(handles=[Line2D([], [], marker="o", ls="", ms=12, color=ACCENT, label="Masked (fill in the blank)"),
+                       Line2D([], [], marker="o", ls="", ms=12, color=HELD_C, label="Autoregressive (predict next)")],
               loc="upper left")
     save(fig, "landscape")
 
 
 # ============================================================================ deck 05
 def results_part2():
-    rows = [("105M model, random weights", 0.554, LIGHT), ("105M model, 3 min pretraining", 0.717, MID),
-            ("Mistral-DNA (16M), probe", 0.782, MID), ("NT-500M (human reference), probe", 0.788, MID),
-            ("CNN, part 1", 0.861, INK)]
+    rows = [("105M model, random weights", 0.554, LIGHT), ("105M model, 3 min pretraining", 0.717, ACCENT_L),
+            ("Mistral-DNA (16M), probe", 0.782, ACCENT), ("NT-500M (human reference), probe", 0.788, ACCENT),
+            ("CNN, part 1", 0.861, GOOD_C)]
     fig = newfig()
     ax = fig.add_axes([0.34, 0.14, 0.6, 0.74])
     for i, (n, v, c) in enumerate(rows):
