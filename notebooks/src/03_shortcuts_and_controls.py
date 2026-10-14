@@ -145,8 +145,8 @@ def test_gc_u():
             raise AssertionError(f"❌ sequence {i}: column 0 is {C[i, 0]:.4f}, want the G+C fraction {gc:.4f}{hint}")
         assert np.isclose(C[i, 1], u), f"❌ sequence {i}: column 1 is {C[i, 1]:.4f}, want the U fraction {u:.4f}"
     assert 0.63 <= auc_gc <= 0.69, \
-        f"🤔 auc_gc = {auc_gc:.3f}, want 0.63 to 0.69: train on the two numbers of the training sequences, measure on the test sequences"
-    print(f"✅ Nice work! TODO-1 passed: gc_u matches the reference on 500 sequences; auc_gc = {auc_gc:.3f}")
+        f"❌ auc_gc = {auc_gc:.3f}, want 0.63 to 0.69: train on the two numbers of the training sequences, measure on the test sequences"
+    print(f"✅ TODO-1 test passed: gc_u matches the reference on 500 sequences; auc_gc = {auc_gc:.3f}")
 
 
 test_gc_u()
@@ -241,8 +241,8 @@ def test_words():
                 (f"❌ sequence {n}, word {w}: your count is {c.get(w, 0)}, kmer_counts gives "
                  f"{K[n, j]:.4f} of {total} windows = {K[n, j] * total:.0f}")
     assert 0.71 <= auc_k5 <= 0.77, \
-        f"🤔 auc_k5 = {auc_k5:.3f}, want 0.71 to 0.77: train on the word counts of the training sequences, measure on the test sequences"
-    print(f"🧬 Well counted! TODO-2 passed: your word counts match kmer_counts on 50 sequences; auc_k5 = {auc_k5:.3f}")
+        f"❌ auc_k5 = {auc_k5:.3f}, want 0.71 to 0.77: train on the word counts of the training sequences, measure on the test sequences"
+    print(f"✅ TODO-2 test passed: your word counts match kmer_counts on 50 sequences; auc_k5 = {auc_k5:.3f}")
 
 
 test_words()
@@ -345,13 +345,13 @@ def test_shuffle_test():
     assert len(shuffled) == len(bound), f"❌ shuffled has {len(shuffled)} sequences, want {len(bound)}, one per bound sequence"
     ref = roc_auc_score(y_shuf, score_sequences(cnn, shuffled + unbound))
     assert abs(auc_shuf_cnn - ref) < 1e-6, \
-        (f"🤔 auc_shuf_cnn = {auc_shuf_cnn:.3f}, but the CNN scores {ref:.3f} on shuffled + unbound against y_shuf. "
+        (f"❌ auc_shuf_cnn = {auc_shuf_cnn:.3f}, but the CNN scores {ref:.3f} on shuffled + unbound against y_shuf. "
          "Score the list shuffled + unbound in this order, and keep the unbound sequences unshuffled")
     ref_fm = roc_auc_score(y_shuf, probe.predict_proba(embed(tok, fm, [to_dna(q) for q in shuffled + unbound]))[:, 1])
     assert abs(auc_shuf_fm - ref_fm) < 2e-3, \
-        (f"🤔 auc_shuf_fm = {auc_shuf_fm:.3f}, but the probe of part 2 scores {ref_fm:.3f} on shuffled + unbound "
+        (f"❌ auc_shuf_fm = {auc_shuf_fm:.3f}, but the probe of part 2 scores {ref_fm:.3f} on shuffled + unbound "
          "against y_shuf. Use the embeddings of these sequences as DNA and the probe already trained on real sequences")
-    print(f"🔬 Well done! TODO-3 passed: the shuffle keeps the letter pairs; CNN {auc_shuf_cnn:.3f}, "
+    print(f"✅ TODO-3 test passed: the shuffle keeps the letter pairs; CNN {auc_shuf_cnn:.3f}, "
           f"Mistral-DNA + probe {auc_shuf_fm:.3f}, with the unbound sequences unshuffled")
 
 
@@ -627,7 +627,7 @@ def test_lora_count():
         (f"❌ n_lora = {n_lora:,}, the model has {real:,}: for a W with m rows and n columns, B has m x r numbers "
          f"and A has r x n, in every adapted matrix of every layer")
     n_all = sum(p.numel() for p in clf.parameters())
-    print(f"💪 Right on! TODO-4a passed: {real:,} LoRA numbers; with the new output layer the model trains "
+    print(f"✅ TODO-4a test passed: {real:,} LoRA numbers; with the new output layer the model trains "
           f"{sum(p.numel() for p in clf.parameters() if p.requires_grad):,} of its {n_all:,} parameters")
 
 

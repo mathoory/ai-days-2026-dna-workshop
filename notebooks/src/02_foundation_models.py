@@ -153,14 +153,14 @@ def test_embed():
     short, long_ = min(S_train[:50], key=len), max(S_train[:50], key=len)
     alone, padded = embed(tok, fm, [short]), embed(tok, fm, [short, long_])[:1]
     assert np.allclose(alone, padded, atol=2e-2), \
-        (f"🤔 a sequence gives a different vector alone and next to a longer one (largest difference "
+        (f"❌ a sequence gives a different vector alone and next to a longer one (largest difference "
          f"{np.abs(alone - padded).max():.3f}), so the padding changes the average: average over the real tokens only")
     E5, E5_in_2s = embed(tok, fm, S_train[:5]), embed(tok, fm, S_train[:5], batch=2)
     assert E5_in_2s.shape == (5, 256), \
         f"❌ embed of 5 sequences with batch=2 has shape {E5_in_2s.shape}, want (5, 256): keep the vectors of every batch"
     assert np.allclose(E5, E5_in_2s, atol=5e-2), \
         f"❌ embed gives different vectors with batch=2 and with batch=128 (largest difference {np.abs(E5 - E5_in_2s).max():.3f})"
-    print("✅ Nice work! TODO-1 passed: embed gives shape (3, 256), the same vector alone "
+    print("✅ TODO-1 test passed: embed gives shape (3, 256), the same vector alone "
           "or next to longer sequences, and the same vectors in batches of 2")
 
 
@@ -245,14 +245,14 @@ def test_probe():
     test_auc = roc_auc_score(y_test, probe.predict_proba(E_test)[:, 1])
     train_auc = roc_auc_score(y_train, probe.predict_proba(E_train)[:, 1])
     assert abs(auc - train_auc) > 1e-6, \
-        (f"🤔 auc = {auc:.3f} is the AUROC on the training vectors, the ones the probe was fitted on. "
+        (f"❌ auc = {auc:.3f} is the AUROC on the training vectors, the ones the probe was fitted on. "
          "Measure it on the test vectors")
     assert abs(auc - test_auc) < 1e-6, \
         (f"❌ auc = {auc:.3f}, but the returned probe scores {test_auc:.3f} on the test vectors: auc must be the AUROC "
          "of the probe's probability of 'bound' on the test vectors against y_test")
     assert 0.75 <= auc <= 0.81, \
-        f"🤔 test AUROC {auc:.3f}, want 0.75 to 0.81: check the standardisation and the regularisation strength C = 0.1"
-    print(f"🎉 Great, your probe works! TODO-2 passed: test AUROC {auc:.3f} (on the training vectors the same probe scores {train_auc:.3f})")
+        f"❌ test AUROC {auc:.3f}, want 0.75 to 0.81: check the standardisation and the regularisation strength C = 0.1"
+    print(f"✅ TODO-2 test passed: test AUROC {auc:.3f} (on the training vectors the same probe scores {train_auc:.3f})")
 
 
 test_probe()
