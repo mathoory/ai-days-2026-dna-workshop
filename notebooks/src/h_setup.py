@@ -11,7 +11,7 @@ SEED = 42
 torch.manual_seed(SEED)
 np.random.seed(SEED)
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("device:", DEVICE, "|", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "no GPU - Runtime > Change runtime type > T4 GPU")
+print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "none found. Runtime > Change runtime type > T4 GPU")
 
 FORCE_FP16 = os.environ.get("AIDAYS_FORCE_FP16") == "1"
 AMP_DTYPE = (torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() and not FORCE_FP16

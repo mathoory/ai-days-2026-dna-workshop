@@ -41,17 +41,14 @@
 # %% [markdown]
 # ## 0. Setup
 #
-# Run the three setup cells and the data cell below.
+# Run the setup cell and the data cell below.
 
 # %%
-# %include h_setup.py
-
-# %%
-# %include h_data.py
-# %include h_encode.py
-
-# %%
-# %include h_fm.py
+#@title ▶ Setup and helpers { display-mode: "form" }
+# %include-body h_setup.py
+# %include-body h_data.py
+# %include-body h_encode.py
+# %include-body h_fm.py
 
 # %% [markdown]
 # The language models were trained on DNA, so we write the RNA letter U as T before giving them a
@@ -80,7 +77,7 @@ print("example:", S_train[0][:70], "...")
 t0 = time.time()
 tok, fm = load_fm(FM_REPO)
 print(f"loaded {FM_REPO} in {time.time() - t0:.1f}s | "
-      f"{sum(p.numel() for p in fm.parameters()) / 1e6:.0f}M parameters | hidden size {fm.config.hidden_size}")
+      f"{sum(p.numel() for p in fm.parameters()) / 1e6:.0f}M parameters | {fm.config.hidden_size} numbers per token")
 ids = tok(S_train[0][:60])["input_ids"]
 print("\nfirst 60 letters :", S_train[0][:60])
 print("as tokens        :", " | ".join(tok.convert_ids_to_tokens(ids)))
@@ -102,7 +99,7 @@ for i in range(2):
 with torch.no_grad():
     h = fm(input_ids=enc["input_ids"].to(DEVICE), attention_mask=enc["attention_mask"].to(DEVICE),
            output_hidden_states=True).hidden_states[-1]
-print("\nthe last layer for this batch:", tuple(h.shape), "= (sequences, tokens, numbers per token)")
+print("\nthe last layer for these 2 sequences:", tuple(h.shape), "= (sequences, tokens, numbers per token)")
 
 # %% [markdown]
 # **Look at the printout.** How many letters does one token hold? The sequences of our data have about
@@ -110,7 +107,7 @@ print("\nthe last layer for this batch:", tuple(h.shape), "= (sequences, tokens,
 # length of the second: the extra tokens are not DNA, and the **attention mask** marks which tokens are
 # real (1) and which are padding (0).
 #
-# **Build** `embed(tok, model, seqs, batch=128)`: a list of DNA strings in, a numpy array out, with one
+# **Build** `embed(tok, model, seqs, batch=128)`: a list of DNA sequences in, a numpy array out, with one
 # row of 256 numbers per sequence. It handles `batch` sequences at a time:
 #
 # | step | what it means | API |
@@ -118,7 +115,7 @@ print("\nthe last layer for this batch:", tuple(h.shape), "= (sequences, tokens,
 # | tokenize | the batch's token numbers and attention masks; short sequences padded, long ones cut to 512 tokens | call the tokenizer on the list: `tok(seqs, ...)` with `padding`, `truncation`, `max_length`, `return_tensors="pt"` ([tokenizer](https://huggingface.co/docs/transformers/main_classes/tokenizer#transformers.PreTrainedTokenizer.__call__)) |
 # | run the model | without learning, on the GPU | [`torch.no_grad`](https://pytorch.org/docs/stable/generated/torch.no_grad.html), `.to(DEVICE)`, `model(input_ids=..., attention_mask=..., output_hidden_states=True)` |
 # | last layer | one vector of 256 numbers per token | the output's `.hidden_states`, one entry per layer ([model outputs](https://huggingface.co/docs/transformers/main_classes/output)); `.float()` for 32-bit numbers |
-# | average | per sequence, the mean of its token vectors over the **real** tokens only | tensor `*`, `/` and [`.sum(dim)`](https://pytorch.org/docs/stable/generated/torch.sum.html); the mask needs a third axis of size 1 to multiply the vectors ([`unsqueeze`](https://pytorch.org/docs/stable/generated/torch.unsqueeze.html)) |
+# | average | per sequence, the mean of its token vectors over the **real** tokens only | `*`, `/` and [`.sum(dim)`](https://pytorch.org/docs/stable/generated/torch.sum.html); the mask has one number per token and needs an extra axis of size 1 to multiply each token's 256 numbers ([`unsqueeze`](https://pytorch.org/docs/stable/generated/torch.unsqueeze.html)) |
 # | collect | one row per sequence, in the order of `seqs`, as a numpy array | `.cpu().numpy()`, [`np.concatenate`](https://numpy.org/doc/stable/reference/generated/numpy.concatenate.html) |
 #
 # **The rule that matters:** a sequence must get the same embedding whether it is alone or in a batch
@@ -150,36 +147,31 @@ print("the first sequence alone and next to the longer one, largest difference:"
 #@title ▶ Test TODO-1 { display-mode: "form" }
 def test_embed():
     E = embed(tok, fm, S_train[:3])
-    assert isinstance(E, np.ndarray), f"embed returned a {type(E).__name__}, want a numpy array"
-    assert E.shape == (3, 256), f"embed of 3 sequences has shape {E.shape}, want (3, 256)"
-    assert np.isfinite(E).all(), "the vectors contain NaN or infinite values"
+    assert isinstance(E, np.ndarray), f"❌ embed returned a {type(E).__name__}, want a numpy array"
+    assert E.shape == (3, 256), f"❌ embed of 3 sequences has shape {E.shape}, want (3, 256)"
+    assert np.isfinite(E).all(), "❌ the vectors contain NaN or infinite values"
     short, long_ = min(S_train[:50], key=len), max(S_train[:50], key=len)
     alone, padded = embed(tok, fm, [short]), embed(tok, fm, [short, long_])[:1]
     assert np.allclose(alone, padded, atol=2e-2), \
-        (f"a sequence gives a different vector alone and next to a longer one (largest difference "
+        (f"🤔 a sequence gives a different vector alone and next to a longer one (largest difference "
          f"{np.abs(alone - padded).max():.3f}), so the padding changes the average: average over the real tokens only")
     E5, E5_in_2s = embed(tok, fm, S_train[:5]), embed(tok, fm, S_train[:5], batch=2)
     assert E5_in_2s.shape == (5, 256), \
-        f"embed of 5 sequences with batch=2 has shape {E5_in_2s.shape}, want (5, 256): keep the vectors of every batch"
+        f"❌ embed of 5 sequences with batch=2 has shape {E5_in_2s.shape}, want (5, 256): keep the vectors of every batch"
     assert np.allclose(E5, E5_in_2s, atol=5e-2), \
-        f"embed gives different vectors with batch=2 and with batch=128 (largest difference {np.abs(E5 - E5_in_2s).max():.3f})"
-    print("TODO-1 passed: embed gives shape (3, 256), the same vector alone "
-          "or in a batch, and the same vectors in batches of 2")
+        f"❌ embed gives different vectors with batch=2 and with batch=128 (largest difference {np.abs(E5 - E5_in_2s).max():.3f})"
+    print("✅ Nice work! TODO-1 passed: embed gives shape (3, 256), the same vector alone "
+          "or next to longer sequences, and the same vectors in batches of 2")
 
 
 test_embed()
 
 # %%
-#@title ▶ Embed all sequences { display-mode: "form" }
+#@title ▶ Embed all sequences and draw a 2-D map of the vectors { display-mode: "form" }
 t0 = time.time()
 E_train, E_test = embed(tok, fm, S_train), embed(tok, fm, S_test)
 print(f"embedded {len(S_train) + len(S_test):,} sequences in {time.time() - t0:.1f}s -> {E_train.shape[1]} numbers each")
 
-# %% [markdown]
-# ### A 2-D map of the vectors
-
-# %%
-#@title ▶ A 2-D map of the vectors { display-mode: "form" }
 # PCA finds the 2 directions along which the 12,000 vectors vary most, so we can look at them.
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
@@ -246,21 +238,21 @@ print(f"Mistral-DNA + linear probe: test AUROC = {auc_fm:.3f}")
 def test_probe():
     res = probe_auc(E_train, y_train, E_test, y_test)
     assert isinstance(res, tuple) and len(res) == 2, \
-        f"probe_auc returned a {type(res).__name__}, want a tuple of two values: (auc, probe)"
+        f"❌ probe_auc returned a {type(res).__name__}, want two values: (auc, probe)"
     auc, probe = res
     assert hasattr(probe, "predict_proba"), \
-        f"the second value is a {type(probe).__name__}, want the fitted probe (the pipeline), which has predict_proba"
+        f"❌ the second value is a {type(probe).__name__}, want the fitted probe (the pipeline), which has predict_proba"
     test_auc = roc_auc_score(y_test, probe.predict_proba(E_test)[:, 1])
     train_auc = roc_auc_score(y_train, probe.predict_proba(E_train)[:, 1])
     assert abs(auc - train_auc) > 1e-6, \
-        (f"auc = {auc:.3f} is the AUROC on the training vectors, the ones the probe was fitted on. "
+        (f"🤔 auc = {auc:.3f} is the AUROC on the training vectors, the ones the probe was fitted on. "
          "Measure it on the test vectors")
     assert abs(auc - test_auc) < 1e-6, \
-        (f"auc = {auc:.3f}, but the returned probe scores {test_auc:.3f} on the test vectors: auc must be the AUROC "
+        (f"❌ auc = {auc:.3f}, but the returned probe scores {test_auc:.3f} on the test vectors: auc must be the AUROC "
          "of the probe's probability of 'bound' on the test vectors against y_test")
     assert 0.75 <= auc <= 0.81, \
-        f"test AUROC {auc:.3f}, want 0.75 to 0.81: check the standardisation and the regularisation strength C = 0.1"
-    print(f"TODO-2 passed: test AUROC {auc:.3f} (on the training vectors the same probe scores {train_auc:.3f})")
+        f"🤔 test AUROC {auc:.3f}, want 0.75 to 0.81: check the standardisation and the regularisation strength C = 0.1"
+    print(f"🎉 Great, your probe works! TODO-2 passed: test AUROC {auc:.3f} (on the training vectors the same probe scores {train_auc:.3f})")
 
 
 test_probe()
@@ -306,10 +298,10 @@ print(f"NT-500M + probe: {auc_nt:.3f}   vs   Mistral-DNA (16M): {auc_fm:.3f}")
 # give before it has learned anything? Discuss with your neighbour, then run the cell and compare its
 # result with your answer.
 #
-# Start the cell, then read **What to take away** below the Summary cell while the loss goes down.
+# Start the cell, then read **What to take away** below it while the loss goes down.
 
 # %%
-#@title ▶ Pretrain from scratch for a few minutes { display-mode: "form" }
+#@title ▶ Pretrain from scratch for a few minutes, then the summary { display-mode: "form" }
 import pandas as pd
 from transformers import AutoConfig, AutoModelForCausalLM
 
@@ -377,8 +369,6 @@ plt.grid(axis="y"); plt.tight_layout(); plt.show()
 del scratch
 torch.cuda.empty_cache()
 
-# %%
-#@title ▶ Summary { display-mode: "form" }
 import json
 print("test AUROC, bars start at 0.5 (a coin flip)")
 for k, v in sorted(results.items(), key=lambda kv: kv[1]):

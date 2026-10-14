@@ -1,6 +1,6 @@
 #@title ▶ The CNN from part 1 { display-mode: "form" }
 class GlobalCNN(nn.Module):
-    """The part 1 network: one-hot (N,1,4,501) -> one binding score (logit) per sequence."""
+    """The part 1 network: one-hot matrices (N, 1, 4, 501) -> one binding score (logit) per sequence."""
 
     def __init__(self):
         super().__init__()
@@ -19,7 +19,7 @@ class GlobalCNN(nn.Module):
 
 @torch.no_grad()
 def score_sequences(model, seqs, batch=1024):
-    """The model's binding probability for each sequence (list of RNA strings)."""
+    """The model's binding probability for each sequence of a list of RNA sequences."""
     model.eval()
     out = []
     for i in range(0, len(seqs), batch):

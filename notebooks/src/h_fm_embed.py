@@ -1,7 +1,7 @@
 #@title ▶ Embedding helper (written in part 2) { display-mode: "form" }
 @torch.no_grad()
 def embed(tok, model, seqs, batch=128):
-    """List of DNA strings -> (N, hidden) numpy array: the mean of the last layer over all
+    """List of DNA sequences -> one row of numbers per sequence: the mean of the last layer over all
     non-padding tokens ([CLS] and [SEP] included)."""
     model.eval()
     out = []

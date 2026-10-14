@@ -37,15 +37,13 @@
 # %% [markdown]
 # ## 0. Setup
 #
-# Run the next two cells. The first one also installs `logomaker`, which draws the sequence logos in
-# section 6.
+# Run the next cell. It also installs `logomaker`, which draws the sequence logos in section 6.
 
 # %%
-# %include h_setup.py
+#@title ▶ Setup and data helpers { display-mode: "form" }
+# %include-body h_setup.py
 !pip -q install logomaker==0.8.7
-
-# %%
-# %include h_data.py
+# %include-body h_data.py
 
 # %% [markdown]
 # # Build a CNN (sections 1 to 4)
@@ -76,9 +74,9 @@ print("\na bound sequence:\n", train_seqs[0][:90], "...")
 # 137 to 375 letters long, so the remaining columns are padding: columns of 0.25 (equal weight on all
 # four letters).
 #
-# You will write this conversion in two steps: first for one sequence, then for a batch of sequences.
+# You will write this conversion in two steps: first for one sequence, then for a list of sequences.
 #
-# **Tools:** numpy arrays ([`np.full`](https://numpy.org/doc/stable/reference/generated/numpy.full.html), [`np.stack`](https://numpy.org/doc/stable/reference/generated/numpy.stack.html)) and
+# **Tools:** [`np.full`](https://numpy.org/doc/stable/reference/generated/numpy.full.html), [`np.stack`](https://numpy.org/doc/stable/reference/generated/numpy.stack.html) and
 # [`torch.from_numpy`](https://pytorch.org/docs/stable/generated/torch.from_numpy.html).
 
 # %%
@@ -89,8 +87,8 @@ print("ALPHABET =", repr(ALPHABET), "| the row of each letter:", {b: ALPHABET.in
 print("MAX_LEN  =", MAX_LEN, "columns per sequence")
 
 # %%
-# TODO-1a: write one_hot(seq), which turns ONE sequence into its one-hot matrix, a numpy array with
-#          4 rows (A, C, G, U, in the order of ALPHABET) and MAX_LEN columns, one column per letter.
+# TODO-1a: write one_hot(seq), which turns ONE sequence into its one-hot matrix, with 4 rows
+#          (A, C, G, U, in the order of ALPHABET) and MAX_LEN columns, one column per letter.
 #          - the column of a letter has a 1 in that letter's row and 0 in the other three rows
 #          - every column after the end of the sequence is padding: 0.25 in all four rows
 #          - a letter other than A, C, G or U also gets a column of 0.25
@@ -115,9 +113,9 @@ print(M[:, L - 1:L + 1])
 
 # %%
 # TODO-1b: write encode_batch(seqs), which turns a list of N sequences into one input for the CNN:
-#          the one-hot matrices of all N sequences, stacked, as a PyTorch tensor of floats with the shape
-#          (N, 1, 4, MAX_LEN). The CNN reads each matrix like a one-colour image, and the axis of size 1
-#          is that single colour channel.
+#          the one-hot matrices of all N sequences, stacked into one PyTorch tensor of 32-bit decimal
+#          numbers (float32), with the shape (N, 1, 4, MAX_LEN). The CNN reads each matrix like a
+#          one-colour image, and the 1 is that single colour channel.
 def encode_batch(seqs):
     # === Your code here ===
     X = np.stack([one_hot(s) for s in seqs])[:, None]
@@ -126,7 +124,7 @@ def encode_batch(seqs):
 
 
 X3 = encode_batch(train_seqs[:3])
-print("shape:", tuple(X3.shape), "(sequences, channel, rows, columns) | type:", X3.dtype)
+print("shape:", tuple(X3.shape), "(sequences, channel, rows, columns) | numbers stored as:", X3.dtype)
 
 # %%
 #@title ▶ Test TODO-1 { display-mode: "form" }
@@ -134,16 +132,16 @@ def test_encoding():
     rng = np.random.default_rng(0)
     seqs = [train_seqs[i] for i in rng.choice(len(train_seqs), 200, replace=False)] + ["ACGUN"]
     X = encode_batch(seqs)
-    assert tuple(X.shape) == (len(seqs), 1, 4, MAX_LEN), f"shape {tuple(X.shape)}, want {(len(seqs), 1, 4, MAX_LEN)}"
-    assert X.dtype == torch.float32, f"dtype {X.dtype}, want torch.float32"
+    assert tuple(X.shape) == (len(seqs), 1, 4, MAX_LEN), f"❌ shape {tuple(X.shape)}, want {(len(seqs), 1, 4, MAX_LEN)}"
+    assert X.dtype == torch.float32, f"❌ the numbers are stored as {X.dtype}, want torch.float32 (32-bit decimal numbers)"
     X = X.numpy()
     for n, s in enumerate(seqs):
         L = min(len(s), MAX_LEN)
         for i, b in enumerate(s[:L]):
             want = np.eye(4)[ALPHABET.index(b)] if b in ALPHABET else np.full(4, 0.25)
-            assert np.allclose(X[n, 0, :, i], want), f"sequence {n!r}, column {i} (letter {b}): {X[n, 0, :, i]}, want {want}"
-        assert np.allclose(X[n, 0, :, L:], 0.25), f"sequence {n}: the padding columns after letter {L} should all be 0.25"
-    print(f"TODO-1 passed: {len(seqs)} sequences encoded correctly (including a letter N, which stays 0.25)")
+            assert np.allclose(X[n, 0, :, i], want), f"❌ sequence {n!r}, column {i} (letter {b}): {X[n, 0, :, i]}, want {want}"
+        assert np.allclose(X[n, 0, :, L:], 0.25), f"❌ sequence {n}: the padding columns after letter {L} should all be 0.25"
+    print(f"✅ Nice work! TODO-1 passed: {len(seqs)} sequences encoded correctly (including a letter N, which stays 0.25)")
 
 
 test_encoding()
@@ -155,7 +153,7 @@ test_encoding()
 #
 # | part | in PyTorch | what it does | what you choose |
 # |---|---|---|---|
-# | **convolution** | [`nn.Conv2d`](https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html) | slides each of its filters (small weight matrices) over the input and computes a dot product at every position: a high score where the window matches the filter's pattern. Each filter gives one row of output, a **channel** | how many filters, and how wide they are |
+# | **convolution** | [`nn.Conv2d`](https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html) | slides each of its filters (small weight matrices) over the input; at every position it multiplies the window by the filter and adds up the products: a high score where the window matches the filter's pattern. Each filter gives one row of output, a **channel** | how many filters, and how wide they are |
 # | **ReLU** | [`nn.ReLU`](https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html) | sets negative values to 0 | nothing |
 # | **max pooling** | [`nn.MaxPool2d`](https://pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html) | keeps the largest value in each block of neighbouring positions, so the output gets shorter | how many positions per block |
 # | **flatten** | [`nn.Flatten`](https://pytorch.org/docs/stable/generated/torch.nn.Flatten.html) | lays all remaining numbers out in one row | nothing |
@@ -170,7 +168,7 @@ test_encoding()
 #
 # **The rules.** The input is one sequence as a one-hot matrix with one channel, `1 × 4 × 501`. The
 # first convolution's filters must cover all 4 letter rows, so each filter reads a window of whole
-# letters. The linear layer ends with **one** number per sequence, the **logit**: any real number,
+# letters. The linear layer ends with **one** number per sequence, the **logit**: any number,
 # large and positive for "bound", large and negative for "unbound" (section 4 turns it into a
 # probability). Everything else is your choice: how many blocks, how many filters, how wide.
 #
@@ -204,7 +202,7 @@ show_shapes(example, torch.zeros(1, 1, 8, 8))
 
 # %%
 class GlobalCNN(nn.Module):
-    """One-hot batch (N, 1, 4, 501) -> one raw score (logit) per sequence, shape (N,)."""
+    """One-hot matrices of N sequences, (N, 1, 4, 501) -> one score (logit) per sequence."""
 
     def __init__(self):
         super().__init__()
@@ -233,30 +231,30 @@ def test_network():
     model = GlobalCNN()
     layers = list(model.net)
     kinds = [type(l).__name__ for l in layers]
-    assert kinds and kinds[0] == "Conv2d", f"the network starts with {kinds[:1]}, want a convolution first"
+    assert kinds and kinds[0] == "Conv2d", f"❌ the network starts with {kinds[:1]}, want a convolution first"
     first = layers[0]
     assert first.in_channels == 1, \
-        f"the first convolution takes {first.in_channels} input channels, want 1: the one-hot matrix has one channel"
+        f"❌ the first convolution takes {first.in_channels} input channels, want 1: the one-hot matrix has one channel"
     assert first.kernel_size[0] == 4, \
-        f"the first convolution's filters are {first.kernel_size[0]} rows tall, want 4: one row per letter"
+        f"❌ the first convolution's filters are {first.kernel_size[0]} rows tall, want 4: one row per letter"
     for i, k in enumerate(kinds):
         if k == "Conv2d":
             assert kinds[i + 1:i + 2] == ["ReLU"], \
-                f"layer {i} is a convolution, and the template puts a ReLU right after it; layer {i + 1} is {kinds[i + 1:i + 2]}"
-    assert "MaxPool2d" in kinds, "the network has no max pooling layer (see the template)"
-    assert kinds[-2:] == ["Flatten", "Linear"], f"the network ends with {kinds[-2:]}, want flatten, then linear"
+                f"❌ layer {i} is a convolution, and the template puts a ReLU right after it; layer {i + 1} is {kinds[i + 1:i + 2]}"
+    assert "MaxPool2d" in kinds, "❌ the network has no max pooling layer (see the template)"
+    assert kinds[-2:] == ["Flatten", "Linear"], f"❌ the network ends with {kinds[-2:]}, want flatten, then linear"
     assert layers[-1].out_features == 1, \
-        f"the linear layer gives {layers[-1].out_features} numbers, want 1: one logit per sequence"
+        f"❌ the linear layer gives {layers[-1].out_features} numbers, want 1: one logit per sequence"
     X = encode_batch(train_seqs[:5])
     try:
         out = model(X)
     except Exception as e:
-        raise AssertionError(f"the network fails on 5 sequences: {e}. Run show_shapes(GlobalCNN().net) to "
+        raise AssertionError(f"🤔 the network fails on 5 sequences: {e}. Run show_shapes(GlobalCNN().net) to "
                              "see where; the linear layer needs as many inputs as flatten gives") from None
     assert tuple(out.shape) == (5,), \
-        f"the model's output for 5 sequences has shape {tuple(out.shape)}, want (5,): one logit per sequence"
+        f"❌ the model's output for 5 sequences has shape {tuple(out.shape)}, want (5,): one logit per sequence"
     n = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"TODO-2 passed: {kinds.count('Conv2d')} convolution block(s), one logit per sequence, "
+    print(f"🧬 Your network is built! TODO-2 passed: {kinds.count('Conv2d')} convolution block(s), one logit per sequence, "
           f"{n:,} trainable parameters")
 
 
@@ -359,7 +357,7 @@ def evaluate(model, X_test, test_y):
 print(f"held-out test AUROC of the model above, after 5 steps on one batch: {evaluate(model, encode_batch(test_seqs), test_y):.3f}")
 
 # %%
-#@title ▶ train(): your train_step and evaluate, for every batch and epoch { display-mode: "form" }
+#@title ▶ Test TODO-3 (also defines train()) { display-mode: "form" }
 def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
     """Trains with your train_step. Measures with your evaluate before training, four times during the
     first epoch and after every epoch: on the held-out test set and on 1,000 training sequences."""
@@ -397,8 +395,7 @@ def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
               f"held-out test AUROC = {curve['test_auc'][-1]:.4f} | {time.time() - t:.1f}s")
     return curve
 
-# %%
-#@title ▶ Test TODO-3 { display-mode: "form" }
+
 def test_train():
     """train_step on one batch, then evaluate during 1 epoch on 5,000 training sequences."""
     global roc_auc_score
@@ -412,12 +409,12 @@ def test_train():
         q.grad = torch.full_like(q, 1e6)     # left-over gradients of an earlier step: they must be cleared
     before = [q.detach().clone() for q in m.parameters()]
     l = train_step(m, o, c, Xb, yb)
-    assert isinstance(l, float), f"train_step returned a {type(l).__name__}, want the loss as a number"
-    assert np.isfinite(l), f"train_step returned the loss {l}, want a finite number"
+    assert isinstance(l, float), f"❌ train_step returned a {type(l).__name__}, want the loss as a plain number"
+    assert np.isfinite(l), f"❌ train_step returned the loss {l}, want a finite number"
     assert any(not torch.equal(b0, q.detach()) for b0, q in zip(before, m.parameters())), \
-        "the weights did not change in train_step: it must compute the gradients and take the optimizer step"
+        "❌ the weights did not change in train_step: it must compute the gradients and take the optimizer step"
     assert all(q.grad.abs().max().item() < 1e5 for q in m.parameters()), \
-        "the gradients of an earlier step were still there: train_step must clear the gradients first"
+        "❌ the gradients of an earlier step were still there: train_step must clear the gradients first"
     idx = torch.from_numpy(np.random.default_rng(0).choice(len(X_train), 5000, replace=False))
     small_loader = DataLoader(TensorDataset(X_train[idx], y_train[idx]), batch_size=256, shuffle=True, drop_last=True)
     seen, real_roc_auc_score = [], roc_auc_score
@@ -432,31 +429,29 @@ def test_train():
         curve = train(GlobalCNN(), small_loader, test_seqs, test_y, epochs=1)
     finally:
         roc_auc_score = real_roc_auc_score
-    assert seen, "evaluate never called roc_auc_score"
+    assert seen, "❌ evaluate never called roc_auc_score"
     for pr in seen:
         assert pr.shape == (len(test_seqs),), \
-            f"evaluate scored {pr.shape} values, want ({len(test_seqs)},): one per sequence it was given"
-        assert np.isfinite(pr).all(), "the probabilities contain NaN or infinite values"
+            f"❌ evaluate gave scores of shape {pr.shape}, want ({len(test_seqs)},): one score per sequence it was given"
+        assert np.isfinite(pr).all(), "❌ the probabilities contain NaN or infinite values"
         assert pr.min() >= 0 and pr.max() <= 1, \
-            (f"the evaluated scores range from {pr.min():.2f} to {pr.max():.2f}, so they are logits. "
+            (f"🤔 the evaluated scores range from {pr.min():.2f} to {pr.max():.2f}, so they are logits. "
              "Turn them into probabilities between 0 and 1 with the sigmoid")
     auc = curve["test_auc"][-1]
-    assert 0.5 < auc <= 1, f"the held-out AUROC after 1 epoch on 5,000 sequences is {auc:.3f}, want between 0.5 and 1"
-    print(f"TODO-3 passed: train_step clears the gradients and moves the weights; evaluate turns the scores "
-          f"into probabilities (held-out AUROC {auc:.3f} after 1 epoch on 5,000 sequences)")
+    assert 0.5 < auc <= 1, f"❌ the held-out AUROC after 1 epoch on 5,000 sequences is {auc:.3f}, want between 0.5 and 1"
+    print(f"🚀 Training works! TODO-3 passed: train_step clears the gradients and moves the weights; evaluate turns "
+          f"the scores into probabilities (held-out AUROC {auc:.3f} after 1 epoch on 5,000 sequences)")
 
 
 test_train()
 
 # %%
-#@title ▶ Train { display-mode: "form" }
+#@title ▶ Train, then plot the learning curves { display-mode: "form" }
 EPOCHS = 10
 torch.manual_seed(SEED)
 model = GlobalCNN()
 curve = train(model, train_loader, test_seqs, test_y, epochs=EPOCHS)
 
-# %%
-#@title ▶ Plot the learning curves { display-mode: "form" }
 import matplotlib.pyplot as plt
 fig, ax = plt.subplots(1, 2, figsize=(10, 3.4))
 ax[0].plot(curve["epoch"], curve["train_auc"], marker="o", ms=4, c=MIDGREY, label="Training sequences (1,000)")
@@ -519,12 +514,12 @@ plt.tight_layout(); plt.show()
 #@title ▶ Test TODO-3c { display-mode: "form" }
 def test_roc():
     f, r = np.asarray(fpr), np.asarray(tpr)
-    assert f.shape == r.shape and len(f) > 2, "fpr and tpr should be two lists of the same length, one point per threshold"
-    assert f[0] == 0 and r[0] == 0 and np.isclose(f[-1], 1) and np.isclose(r[-1], 1),         "the ROC curve should run from (0, 0) to (1, 1)"
+    assert f.shape == r.shape and len(f) > 2, "❌ fpr and tpr should be two lists of the same length, one point per threshold"
+    assert f[0] == 0 and r[0] == 0 and np.isclose(f[-1], 1) and np.isclose(r[-1], 1),         "❌ the ROC curve should run from (0, 0) to (1, 1)"
     area = float(np.trapz(r, f)) if hasattr(np, "trapz") else float(np.trapezoid(r, f))
     want = roc_auc_score(test_y, score_test)
-    assert abs(area - want) < 1e-6,         f"the area under your curve is {area:.4f}, but the held-out AUROC is {want:.4f}: use score_test against test_y"
-    print(f"TODO-3c passed: the area under your ROC curve equals the held-out AUROC, {want:.3f}")
+    assert abs(area - want) < 1e-6,         f"🤔 the area under your curve is {area:.4f}, but the held-out AUROC is {want:.4f}: use score_test against test_y"
+    print(f"🎉 Great plots! TODO-3c passed: the area under your ROC curve equals the held-out AUROC, {want:.3f}")
 
 
 test_roc()
@@ -549,7 +544,7 @@ test_roc()
 #
 # | function | what it does |
 # |---|---|
-# | `filter_activations(model, seqs)` | run only the first conv layer → `(n_seqs, n_filters, n_positions)` |
+# | `filter_activations(model, seqs)` | run only the first convolution layer → one activation per (sequence, filter, position) |
 # | `cutoff_for(acts_f)` | one filter's activation threshold: `mean + 0.5 × (max − mean)` |
 # | `windows_above(acts_f, seqs, cutoff)` | the windows (as wide as the filter) where that filter's activation exceeds the threshold |
 # | `pwm_of(windows)` | the frequency of each letter at each position → a table with one row per position |
@@ -557,7 +552,7 @@ test_roc()
 # | `draw_logo(pwm, title)` | draw the table as a sequence logo |
 # | `random_rna(n, rng)` | `n` random RNA sequences of 330 letters to insert motifs into |
 # | `plant(seqs, motif, copies)` | insert `copies` copies of `motif` into each sequence (they overwrite letters) |
-# | `score_sequences(model, seqs)` | the model's probability of "bound" for each sequence (a numpy array) |
+# | `score_sequences(model, seqs)` | the model's probability of "bound" for each sequence |
 
 # %%
 #@title ▶ Motif toolkit { display-mode: "form" }
@@ -571,7 +566,7 @@ KERNEL = CONV1.kernel_size[1]          # read from the model, so a different wid
 
 @torch.no_grad()
 def filter_activations(model, seqs, batch=512):
-    """Run ONLY the first conv layer (+ReLU). Returns (n_seqs, n_filters, n_positions)."""
+    """Run only the first convolution layer and its ReLU. Returns one activation per (sequence, filter, position)."""
     conv1 = next(l for l in model.net if isinstance(l, nn.Conv2d))
     model.eval()
     out = []
@@ -636,7 +631,7 @@ def plant(seqs, motif, copies=1, spacing=45, start=40):
 
 @torch.no_grad()
 def score_sequences(model, seqs, batch=1024):
-    """The model's binding probability for each sequence (list of RNA strings)."""
+    """The model's binding probability for each sequence of a list of RNA sequences."""
     model.eval()
     out = []
     for i in range(0, len(seqs), batch):
@@ -705,21 +700,21 @@ for f in range(n_filters):
 def test_tables():
     for name, d in (("motifs", motifs), ("pwms", pwms), ("n_hits", n_hits)):
         assert sorted(d) == list(range(n_filters)), \
-            f"{name} has the keys {sorted(d)}, want one entry for every filter 0 to {n_filters - 1}"
+            f"❌ {name} has entries for the filters {sorted(d)}, want one entry for every filter 0 to {n_filters - 1}"
     for f in range(n_filters):
         a = acts[:, f, :]
         w = windows_above(a, pos_seqs, cutoff_for(a))
         ref = pwm_of(w)
         assert n_hits[f] == len(w), \
-            (f"filter {f}: n_hits[{f}] = {n_hits[f]:,}, want {len(w):,}, the number of windows above the "
+            (f"❌ filter {f}: n_hits[{f}] = {n_hits[f]:,}, want {len(w):,}, the number of windows above the "
              f"threshold of filter {f} itself (its activations are acts[:, {f}, :])")
         P = np.asarray(pwms[f])
-        assert P.shape == ref.shape, f"filter {f}: pwms[{f}] has shape {P.shape}, want {ref.shape} (positions x letters)"
+        assert P.shape == ref.shape, f"❌ filter {f}: pwms[{f}] has shape {P.shape}, want {ref.shape} (positions x letters)"
         assert np.allclose(P, ref, atol=1e-6), \
-            f"filter {f}: pwms[{f}] differs from pwm_of(its windows) by up to {np.abs(P - ref).max():.3g}"
+            f"❌ filter {f}: pwms[{f}] differs from pwm_of(its windows) by up to {np.abs(P - ref).max():.3g}"
         assert motifs[f] == consensus_of(ref), \
-            f"filter {f}: motifs[{f}] = {motifs[f]!r}, want {consensus_of(ref)!r}, the consensus of pwms[{f}]"
-    print(f"TODO-4 passed: window counts, letter tables and consensus match for all {n_filters} filters")
+            f"❌ filter {f}: motifs[{f}] = {motifs[f]!r}, want {consensus_of(ref)!r}, the consensus of pwms[{f}]"
+    print(f"🔬 Well done! TODO-4 passed: window counts, letter tables and consensus match for all {n_filters} filters")
 
 
 test_tables()
@@ -837,27 +832,27 @@ print("control:", [round(float(v), 3) for v in control_scores])
 def test_insertion():
     from collections import Counter
     assert isinstance(control_motif, str) and len(control_motif) == len(MY_MOTIF), \
-        f"control_motif should be a sequence of {len(MY_MOTIF)} letters, like your motif"
-    assert control_motif != MY_MOTIF, "control_motif is your motif itself: the comparison would show nothing"
+        f"❌ control_motif should be a sequence of {len(MY_MOTIF)} letters, like your motif"
+    assert control_motif != MY_MOTIF, "🤔 control_motif is your motif itself: the comparison would show nothing"
     assert Counter(control_motif) == Counter(MY_MOTIF), \
-        (f"your control has other letters than your motif ({dict(Counter(control_motif))} against "
+        (f"🤔 your control has other letters than your motif ({dict(Counter(control_motif))} against "
          f"{dict(Counter(MY_MOTIF))}). Then a difference between the two curves could come from the letters alone, "
          "not from the pattern. Which sequence adds exactly the same letters but breaks the pattern?")
     for name, got, motif in (("real_scores", real_scores, MY_MOTIF), ("control_scores", control_scores, control_motif)):
-        assert len(got) == len(copies), f"{name} has {len(got)} entries, want {len(copies)}: one per number of copies"
+        assert len(got) == len(copies), f"❌ {name} has {len(got)} entries, want {len(copies)}: one per number of copies"
         want = [score_sequences(model, plant(canvas, motif, c)).mean() for c in copies]
         for c, g, w in zip(copies, got, want):
             n_copies = f"{c} copy" if c == 1 else f"{c} copies"
             g = np.asarray(g)
             assert g.size == 1, \
-                f"{name}, {n_copies}: {g.size} numbers, want one, the mean score over the {len(canvas):,} sequences"
+                f"❌ {name}, {n_copies}: {g.size} numbers, want one, the mean score over the {len(canvas):,} sequences"
             g = float(g)
-            assert 0 <= g <= 1, f"{name}, {n_copies}: {g:.3f} is not a probability between 0 and 1"
+            assert 0 <= g <= 1, f"❌ {name}, {n_copies}: {g:.3f} is not a probability between 0 and 1"
             assert abs(g - w) < 1e-6, \
-                (f"{name}, {n_copies}: {g:.4f}, want {w:.4f}, the mean score over canvas with {n_copies} of "
+                (f"❌ {name}, {n_copies}: {g:.4f}, want {w:.4f}, the mean score over canvas with {n_copies} of "
                  f"{motif} inserted")
-    print("TODO-5 passed: your control has the same letters as the motif in another order, and both lists "
-          f"have {len(copies)} mean scores")
+    print("🌟 Excellent experiment! TODO-5 passed: your control has the same letters as the motif in another "
+          f"order, and both lists have {len(copies)} mean scores")
 
 
 test_insertion()

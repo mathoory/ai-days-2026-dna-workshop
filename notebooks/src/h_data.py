@@ -1,5 +1,5 @@
 #@title ▶ Data helpers { display-mode: "form" }
-MAX_LEN  = 501          # fixed global length (pad / truncate)
+MAX_LEN  = 501          # every sequence is padded or cut to this many columns
 ALPHABET = "ACGU"       # order = the 4 rows of the one-hot matrix
 FILES = {split: (f"CLIPSEQ_AGO2.{split}.positives.fa", f"CLIPSEQ_AGO2.{split}.negatives.fa")
          for split in ("train", "ls")}
@@ -22,7 +22,7 @@ def read_fasta(path, label):
 
 
 def read_split(split):
-    """'train' or 'ls' (the held-out test set) -> (sequences, labels as a numpy array)."""
+    """'train' or 'ls' (the held-out test set) -> (sequences, labels)."""
     pos, neg = FILES[split]
     p, lp = read_fasta(fetch(pos), 1)
     n, ln = read_fasta(fetch(neg), 0)
