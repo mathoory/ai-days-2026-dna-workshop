@@ -30,7 +30,8 @@
 # |---|---|
 # | `#@title ... run this cell, nothing to change` | run it (Shift+Enter) |
 # | `# TODO-N` with `# === Your code here ===` | write the code yourself (replace the `...`) |
-# | `#@title Stuck? ...` | run it only if your TODO fails: it defines our version |
+# | `#@title Test TODO-N ...` | run it: it checks your code and says what is wrong |
+# | `#@title Stuck? ...` | run it only if the test of your TODO fails: it defines our version |
 #
 # Before you start: *Runtime → Change runtime type → T4 GPU*.
 
@@ -226,7 +227,46 @@ class GlobalCNN(nn.Module):
 print(GlobalCNN()(encode_batch(train_seqs[:2])).shape, "<- should be torch.Size([2])")
 
 # %%
-#@title Stuck? Run this only if TODO-2 failed: it defines our GlobalCNN { display-mode: "form" }
+#@title Test TODO-2 - run this cell, nothing to change { display-mode: "form" }
+def test_network():
+    model = GlobalCNN()
+    X = encode_batch(train_seqs[:5])
+    rows = ["Conv2d(1, 10, (4, 10))", "MaxPool2d((1, 3))", "Conv2d(10, 20, (1, 5))", "MaxPool2d((1, 3))",
+            "Flatten", "Linear(20 * 53, 1)"]
+    want = [(10, 1, 492), (10, 1, 164), (20, 1, 160), (20, 1, 53), (1060,), (1,)]
+    # run the batch through self.net one layer at a time and keep the shape after each layer
+    # (a ReLU keeps the shape, so a shape is recorded only when it changes)
+    shapes, h = [], X
+    for i, layer in enumerate(model.net):
+        try:
+            h = layer(h)
+        except Exception as e:
+            raise AssertionError(f"layer {i} of self.net, {layer}, fails on an input of shape "
+                                 f"{tuple(h.shape)}: {e}") from None
+        if not shapes or shapes[-1] != tuple(h.shape[1:]):
+            shapes.append(tuple(h.shape[1:]))
+    for row, got, w in zip(rows, shapes, want):
+        assert got == w, f"after {row} the shape of one sequence is {got}, want {w} (see the table)"
+    assert shapes == want, f"the shapes after the layers are {shapes}, want {want}"
+    kinds = [type(l).__name__ for l in model.net]
+    for i, k in enumerate(kinds):
+        if k == "Conv2d":
+            assert kinds[i + 1:i + 2] == ["ReLU"], \
+                f"layer {i} is a Conv2d, and the table puts a ReLU right after it; layer {i + 1} is {kinds[i + 1:i + 2]}"
+    assert kinds.count("ReLU") == 2, f"self.net has {kinds.count('ReLU')} ReLU layers, want 2 (one after each Conv2d)"
+    n = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    assert n == 2491, f"{n:,} trainable parameters, want 2,491 (410 + 1,020 + 1,061)"
+    out = model(X)
+    assert tuple(out.shape) == (5,), \
+        f"the model's output for 5 sequences has shape {tuple(out.shape)}, want (5,): one logit per sequence"
+    print("TODO-2 passed: the shape after every layer matches the table, 2,491 trainable parameters, "
+          "output shape (5,) for 5 sequences")
+
+
+test_network()
+
+# %%
+#@title Stuck? Run this only if the test failed: it defines our GlobalCNN { display-mode: "form" }
 class GlobalCNN(nn.Module):
     """One-hot batch (N, 1, 4, 501) -> one raw score (logit) per sequence, shape (N,)."""
 
@@ -245,7 +285,7 @@ class GlobalCNN(nn.Module):
         return self.net(x).squeeze(1)
 
 
-print("reference GlobalCNN:", GlobalCNN()(encode_batch(train_seqs[:2])).shape, "<- should be torch.Size([2])")
+test_network()
 
 # %% [markdown]
 # ## 4. Training (TODO-3)
@@ -256,20 +296,90 @@ print("reference GlobalCNN:", GlobalCNN()(encode_batch(train_seqs[:2])).shape, "
 # assigns to the correct label, averaged over the batch. The model outputs a logit $z$; the sigmoid
 # $\sigma(z) = 1 / (1 + e^{-z})$ (`torch.sigmoid`) turns it into a probability between 0 and 1.
 #
-# One training step is always the same four lines (find them in the cell below):
-#
-# | line | what it does |
-# |---|---|
-# | `opt.zero_grad()` | reset the gradients from the previous step to zero |
-# | `loss = criterion(model(X), y)` | compute the loss on one batch |
-# | `loss.backward()` | compute the gradient of the loss for every weight (backpropagation) |
-# | `opt.step()` | update every weight using its gradient |
-#
 # After every pass over the training data (an *epoch*) we evaluate the model on the held-out test
 # set: the 1,000 `ls` sequences it never trains on. `model.eval()` puts the model in evaluation mode
 # and `torch.no_grad()` turns off gradient tracking, so scoring these sequences does not change the
 # weights. The number we report is **AUROC**: the probability that a randomly chosen bound sequence
 # gets a higher score than a randomly chosen unbound one. 0.5 is a coin flip, 1.0 is perfect.
+#
+# The whole training loop, in pseudocode:
+#
+# ```
+# for each epoch:
+#     for each batch (X, y) of the training set:
+#         clear the gradients
+#         predict: one score (logit) per sequence of X
+#         loss: compare the scores with the labels y
+#         gradients: the gradient of the loss for every weight
+#         step: move every weight against its gradient
+#     evaluate on the held-out test set:
+#         no gradients
+#         probabilities: the sigmoid of the scores
+#         AUROC of the probabilities against the true labels
+# ```
+#
+# Each line of pseudocode is one line of PyTorch:
+#
+# | pseudocode | PyTorch |
+# |---|---|
+# | for each epoch | `for ep in range(1, epochs + 1):` |
+# | for each batch | `for X, y in train_loader:` |
+# | clear the gradients | `opt.zero_grad()` |
+# | predict | `logits = model(X)` |
+# | loss | `loss = criterion(logits, y)` |
+# | gradients | `loss.backward()` |
+# | step | `opt.step()` |
+# | evaluate, no gradients | `model.eval()`, then `with torch.no_grad():` |
+# | probabilities | `probs = torch.sigmoid(model(X_test.to(DEVICE))).cpu().numpy()` |
+# | AUROC | `auc = roc_auc_score(test_y, probs)` |
+#
+# First you run one step by hand on one batch (TODO-3a). Then you write the loop inside `train()`:
+# the training step (TODO-3b) and the evaluation (TODO-3c).
+
+# %%
+#@title Encode the training set and cut it into batches - run this cell, nothing to change { display-mode: "form" }
+from torch.utils.data import DataLoader, TensorDataset
+
+t0 = time.time()
+X_train = encode_batch(train_seqs)
+y_train = torch.tensor(train_y, dtype=torch.float32)
+print(f"encoded {len(train_seqs):,} sequences in {time.time() - t0:.1f}s")
+train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=256, shuffle=True, drop_last=True)
+print(f"{len(train_loader):,} batches of 256 sequences per epoch")
+
+# %%
+X, y = next(iter(train_loader))          # one batch: 256 one-hot sequences and their 256 labels
+X, y = X.to(DEVICE), y.to(DEVICE)
+torch.manual_seed(SEED)
+model = GlobalCNN().to(DEVICE)           # a fresh model with random weights
+opt = optim.Adam(model.parameters(), lr=1e-3)
+criterion = nn.BCEWithLogitsLoss()
+print("X:", tuple(X.shape), "| y:", tuple(y.shape), "| the first 8 labels:", y[:8].tolist())
+
+# TODO-3a: one training step on this one batch, by hand.
+#          1. logits = the model's output on X: one score per sequence, shape (256,)
+#          2. loss = criterion(logits, y): one number for the whole batch
+# === Your code here ===
+logits = model(X)
+loss = criterion(logits, y)
+# === End of your code ===
+print("\nlogits of the first 4 sequences:", [round(v, 3) for v in logits[:4].tolist()])
+print("their labels                   :", y[:4].tolist())
+print(f"loss before the step: {loss.item():.4f}")
+
+#          3. clear the gradients with opt.zero_grad(), then compute them with loss.backward()
+#          4. move the weights with opt.step()
+#          5. loss_after = the loss on the same batch X, y, computed again with the moved weights
+# === Your code here ===
+opt.zero_grad()
+loss.backward()
+opt.step()
+loss_after = criterion(model(X), y)
+# === End of your code ===
+w = model.net[0].weight
+print("\nthe first layer's weights:", tuple(w.shape), "| their gradient, w.grad:", tuple(w.grad.shape),
+      "(one number per weight)")
+print(f"loss after one step: {loss_after.item():.4f} (before: {loss.item():.4f})")
 
 # %%
 def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
@@ -283,18 +393,22 @@ def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
         model.train()
         for X, y in train_loader:
             X, y = X.to(DEVICE), y.to(DEVICE)
+            # TODO-3b: one training step on the batch X, y: the lines of TODO-3a, in the order of
+            #          the table (clear the gradients, loss, backward, step)
+            # === Your code here ===
             opt.zero_grad()
             loss = criterion(model(X), y)
             loss.backward()
             opt.step()
+            # === End of your code ===
 
-        # TODO-3: measure the model on the held-out test set.
-        #         1. call model.eval(), then do steps 2 and 3 inside a `with torch.no_grad():` block
-        #         2. probs = the sigmoid of the model's output on X_test. Move X_test to DEVICE first,
-        #            and bring the result back with .cpu().numpy() (roc_auc_score needs a numpy array)
-        #         3. auc = roc_auc_score(true labels, probs)
-        #         Expected (the training cell below prints it): about 0.79 after epoch 1, about
-        #         0.86 after epoch 10.
+        # TODO-3c: measure the model on the held-out test set.
+        #          1. call model.eval(), then do steps 2 and 3 inside a `with torch.no_grad():` block
+        #          2. probs = the sigmoid of the model's output on X_test. Move X_test to DEVICE first,
+        #             and bring the result back with .cpu().numpy() (roc_auc_score needs a numpy array)
+        #          3. auc = roc_auc_score(true labels, probs)
+        #          Expected (the training cell below prints it): about 0.79 after epoch 1, about
+        #          0.86 after epoch 10.
         # === Your code here ===
         model.eval()
         with torch.no_grad():
@@ -306,7 +420,48 @@ def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
     return history
 
 # %%
-#@title Stuck? Run this only if TODO-3 failed: it defines our train() { display-mode: "form" }
+#@title Test TODO-3 - run this cell, nothing to change { display-mode: "form" }
+def test_train():
+    """Train a fresh model for 1 epoch on 5,000 training sequences and check what train() did."""
+    global roc_auc_score
+    idx = torch.from_numpy(np.random.default_rng(0).choice(len(X_train), 5000, replace=False))
+    small_loader = DataLoader(TensorDataset(X_train[idx], y_train[idx]), batch_size=256, shuffle=True, drop_last=True)
+    torch.manual_seed(SEED)
+    m = GlobalCNN()
+    before = [p.detach().clone() for p in m.parameters()]
+    seen, real_roc_auc_score = [], roc_auc_score
+
+    def spy(y_true, y_score):        # keeps what the evaluation passes to roc_auc_score
+        seen.append(y_score)
+        return real_roc_auc_score(y_true, y_score)
+
+    roc_auc_score = spy
+    try:
+        hist = train(m, small_loader, test_seqs, test_y, epochs=1)
+    finally:
+        roc_auc_score = real_roc_auc_score
+    assert any(not torch.equal(b, p.detach().cpu()) for b, p in zip(before, m.parameters())), \
+        "the weights did not change during training: TODO-3b needs loss.backward() and opt.step()"
+    assert len(seen) == 1, f"roc_auc_score was called {len(seen)} times in 1 epoch, want once per epoch (TODO-3c)"
+    p = seen[0]
+    assert isinstance(p, np.ndarray), \
+        f"roc_auc_score received a {type(p).__name__}, want a numpy array: end the line with .cpu().numpy()"
+    assert p.shape == (len(test_seqs),), \
+        f"roc_auc_score received scores of shape {p.shape}, want ({len(test_seqs)},): one per held-out test sequence (X_test)"
+    assert np.isfinite(p).all(), "the probabilities contain NaN or infinite values"
+    assert p.min() >= 0 and p.max() <= 1, \
+        (f"the evaluated scores range from {p.min():.2f} to {p.max():.2f}, so they are logits. "
+         "Apply torch.sigmoid to get probabilities between 0 and 1")
+    assert isinstance(hist, list) and len(hist) == 1, f"train() returned {hist!r}, want a list with one AUROC per epoch"
+    assert 0.5 < hist[0] <= 1, f"the AUROC after 1 epoch on 5,000 sequences is {hist[0]:.3f}, want between 0.5 and 1"
+    print(f"TODO-3 passed: 1 epoch on 5,000 sequences, held-out test AUROC {hist[0]:.3f}, "
+          f"evaluated on {len(p):,} probabilities between {p.min():.2f} and {p.max():.2f}")
+
+
+test_train()
+
+# %%
+#@title Stuck? Run this only if the test failed: it defines our train() { display-mode: "form" }
 def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
     model.to(DEVICE)
     opt = optim.Adam(model.parameters(), lr=lr, weight_decay=wd)
@@ -331,18 +486,10 @@ def train(model, train_loader, test_seqs, test_y, epochs=10, lr=1e-3, wd=1e-4):
     return history
 
 
-print("using the reference train()")
+test_train()
 
 # %%
-#@title Encode everything and train - run this cell, nothing to change { display-mode: "form" }
-from torch.utils.data import DataLoader, TensorDataset
-
-t0 = time.time()
-X_train = encode_batch(train_seqs)
-y_train = torch.tensor(train_y, dtype=torch.float32)
-print(f"encoded {len(train_seqs):,} sequences in {time.time() - t0:.1f}s")
-train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=256, shuffle=True, drop_last=True)
-
+#@title Train - run this cell, nothing to change { display-mode: "form" }
 EPOCHS = 10
 torch.manual_seed(SEED)
 model = GlobalCNN()
@@ -496,24 +643,49 @@ print(f"toolkit ready (filter width = {KERNEL})")
 # %% [markdown]
 # ## 7. Read a motif off the model (TODO-4)
 #
-# For **every** filter: compute its threshold, collect the windows above it, turn them into a letter
-# frequency table, and record its consensus (the most frequent letter at each position). Keep the
-# tables; the next cells draw them.
+# For each filter: compute its threshold, collect the windows above it, turn them into a letter
+# frequency table, and record its consensus (the most frequent letter at each position). You do this
+# first for one filter, filter 0, step by step (TODO-4a), then for every filter in a loop (TODO-4b).
+# Keep the tables; the cells after the test draw them.
 
 # %%
+#@title The activations of every filter on bound RNA - run this cell, nothing to change { display-mode: "form" }
 pos_seqs = [s for s, y in zip(test_seqs, test_y) if y == 1] + \
            [s for s, y in zip(train_seqs, train_y) if y == 1][:5000]
 acts = filter_activations(model, pos_seqs)
 n_filters = acts.shape[1]
 print("activations:", acts.shape, "-> (sequences, filters, positions) for", len(pos_seqs), "bound sequences")
 
+# %%
+# TODO-4a: filter 0, step by step, with the toolkit functions of section 6.
+#          1. acts_0 = the activations of filter 0: acts[:, 0, :], shape (sequences, positions)
+#          2. cut_0 = its threshold: cutoff_for(acts_0)
+#          3. windows_0 = the 10-letter windows above the threshold: windows_above(acts_0, pos_seqs, cut_0)
+#          4. pwm_0 = the letter frequency table of these windows: pwm_of(windows_0), shape (10, 4)
+#          5. consensus_0 = the most frequent letter at each position: consensus_of(pwm_0)
+# === Your code here ===
+acts_0 = acts[:, 0, :]
+cut_0 = cutoff_for(acts_0)
+windows_0 = windows_above(acts_0, pos_seqs, cut_0)
+pwm_0 = pwm_of(windows_0)
+consensus_0 = consensus_of(pwm_0)
+# === End of your code ===
+print("activations of filter 0:", acts_0.shape, f"| threshold {cut_0:.3f} (largest activation {acts_0.max():.3f})")
+print(f"{len(windows_0):,} windows above the threshold; the first 5:", windows_0[:5])
+print("\nletter frequency at each of the 10 positions (each row sums to 1):")
+print(pd.DataFrame(pwm_0, columns=list(ALPHABET), index=range(1, KERNEL + 1)).round(2))
+print("\nconsensus:", consensus_0)
+draw_logo(pwm_0, f"Filter 00, {len(windows_0):,} windows")
+plt.show()
+
+# %%
 motifs, pwms, n_hits = {}, {}, {}
 for f in range(n_filters):
-    # TODO-4: for filter f, take its activations with  acts_f = acts[:, f, :]  (sequences x positions).
-    #         Then cutoff_for -> windows_above (the sequences are pos_seqs) -> pwm_of -> consensus_of,
-    #         and fill motifs[f] (consensus string), pwms[f] (the table) and n_hits[f] (number of windows).
-    #         Expected: 10 lines, one per filter, each with its window count and a 10-letter
-    #         consensus; pwms[f] is a numpy array of shape (10, 4) whose rows sum to 1.
+    # TODO-4b: the steps of TODO-4a for filter f: take its activations with  acts_f = acts[:, f, :],
+    #          then cutoff_for -> windows_above (the sequences are pos_seqs) -> pwm_of -> consensus_of,
+    #          and fill motifs[f] (consensus string), pwms[f] (the table) and n_hits[f] (number of windows).
+    #          Expected: 10 lines, one per filter, each with its window count and a 10-letter
+    #          consensus; pwms[f] is a numpy array of shape (10, 4) whose rows sum to 1.
     # === Your code here ===
     acts_f = acts[:, f, :]
     windows = windows_above(acts_f, pos_seqs, cutoff_for(acts_f))
@@ -524,14 +696,38 @@ for f in range(n_filters):
     print(f"filter {f:02d}: {n_hits[f]:>7,} windows | consensus {motifs[f]}")
 
 # %%
-#@title Stuck? Run this only if TODO-4 failed: it builds the tables for you { display-mode: "form" }
+#@title Test TODO-4 - run this cell, nothing to change { display-mode: "form" }
+def test_tables():
+    for name, d in (("motifs", motifs), ("pwms", pwms), ("n_hits", n_hits)):
+        assert sorted(d) == list(range(n_filters)), \
+            f"{name} has the keys {sorted(d)}, want one entry for every filter 0 to {n_filters - 1}"
+    for f in range(n_filters):
+        a = acts[:, f, :]
+        w = windows_above(a, pos_seqs, cutoff_for(a))
+        ref = pwm_of(w)
+        assert n_hits[f] == len(w), \
+            (f"filter {f}: n_hits[{f}] = {n_hits[f]:,}, want {len(w):,}, the number of windows above the "
+             f"threshold of filter {f} itself (its activations are acts[:, {f}, :])")
+        P = np.asarray(pwms[f])
+        assert P.shape == ref.shape, f"filter {f}: pwms[{f}] has shape {P.shape}, want {ref.shape} (positions x letters)"
+        assert np.allclose(P, ref, atol=1e-6), \
+            f"filter {f}: pwms[{f}] differs from pwm_of(its windows) by up to {np.abs(P - ref).max():.3g}"
+        assert motifs[f] == consensus_of(ref), \
+            f"filter {f}: motifs[{f}] = {motifs[f]!r}, want {consensus_of(ref)!r}, the consensus of pwms[{f}]"
+    print(f"TODO-4 passed: window counts, letter tables and consensus match for all {n_filters} filters")
+
+
+test_tables()
+
+# %%
+#@title Stuck? Run this only if the test failed: it builds the tables for you { display-mode: "form" }
 motifs, pwms, n_hits = {}, {}, {}
 for f in range(n_filters):
     acts_f = acts[:, f, :]
     windows = windows_above(acts_f, pos_seqs, cutoff_for(acts_f))
     pwms[f], n_hits[f] = pwm_of(windows), len(windows)
     motifs[f] = consensus_of(pwms[f])
-print("reference tables ready:", {f: motifs[f] for f in range(3)}, "...")
+test_tables()
 
 # %%
 #@title Draw the logos - run this cell, nothing to change { display-mode: "form" }
@@ -593,31 +789,78 @@ plt.tight_layout(); plt.show()
 # *(This shuffle only reorders the motif's 10 letters. Part 3 uses a stricter shuffle that keeps
 # every letter pair of a whole sequence.)*
 #
-# **Hint for TODO-5 (and for your AI assistant):** `plant(seqs, motif, copies)` returns new strings;
-# `score_sequences(model, seqs)` returns one probability per string; you need the **mean** for each
-# number of copies, as two lists of 7 numbers.
+# **Hint for TODO-5 (and for your AI assistant):** `plant(seqs, motif, copies)` takes a list of
+# strings and returns new strings; `score_sequences(model, seqs)` returns one probability per string.
+# You first insert one copy into one sequence (TODO-5a). Then you need the **mean** score for each
+# number of copies, as two lists of 7 numbers (TODO-5b).
 
 # %%
+#@title The random sequences and the shuffled motif - run this cell, nothing to change { display-mode: "form" }
 rng = np.random.default_rng(2)          # this cell's own random numbers, so a rerun gives the same result
 canvas = random_rna(1000, rng)
 baseline = score_sequences(model, canvas).mean()
 shuffled = "".join(rng.permutation(list(MY_MOTIF)))
 copies = list(range(1, 8))              # 7 copies fit into a 330-letter sequence
+print(f"{len(canvas):,} random sequences of {len(canvas[0])} letters | mean score, nothing inserted: {baseline:.3f}")
+print(f"motif {MY_MOTIF} | shuffled control {shuffled}")
 
-# TODO-5: fill real_scores and control_scores with the MEAN model score after inserting
-#         c copies (for every c in `copies`) of MY_MOTIF and of `shuffled`, respectively.
-#         Expected: two lists of 7 numbers between 0 and 1. The motif's score usually jumps
-#         at copy 4 (letter 175); the plot below compares the two lists.
+# %%
+# TODO-5a: one copy of MY_MOTIF in one sequence.
+#          1. one = canvas[0], the first random sequence
+#          2. one_planted = the same sequence with one copy of MY_MOTIF inserted:
+#             plant([one], MY_MOTIF, 1)[0]  (plant takes a list and returns a list)
+#          3. score_before, score_after = the model's score of one and of one_planted:
+#             score_sequences(model, [one])[0], and the same for one_planted
+# === Your code here ===
+one = canvas[0]
+one_planted = plant([one], MY_MOTIF, 1)[0]
+score_before = score_sequences(model, [one])[0]
+score_after = score_sequences(model, [one_planted])[0]
+# === End of your code ===
+k = len(MY_MOTIF)
+print("letters 21 to 80; the inserted letters (copy 1 starts at letter 41) in lower case:")
+print("before:", one[20:80])
+print("after :", one_planted[20:40] + one_planted[40:40 + k].lower() + one_planted[40 + k:80])
+print(f"score before {score_before:.3f} | after {score_after:.3f}")
+
+# %%
+# TODO-5b: fill real_scores and control_scores with the MEAN model score over all of canvas after
+#          inserting c copies (for every c in `copies`) of MY_MOTIF and of `shuffled`, respectively.
+#          Expected: two lists of 7 numbers between 0 and 1. The motif's score usually jumps
+#          at copy 4 (letter 175); the plot below compares the two lists.
 # === Your code here ===
 real_scores = [score_sequences(model, plant(canvas, MY_MOTIF, c)).mean() for c in copies]
 control_scores = [score_sequences(model, plant(canvas, shuffled, c)).mean() for c in copies]
 # === End of your code ===
+print("motif   :", [round(float(v), 3) for v in real_scores])
+print("shuffled:", [round(float(v), 3) for v in control_scores])
 
 # %%
-#@title Stuck? Run this only if TODO-5 failed: it computes both lists for you { display-mode: "form" }
+#@title Test TODO-5 - run this cell, nothing to change { display-mode: "form" }
+def test_insertion():
+    for name, got, motif in (("real_scores", real_scores, MY_MOTIF), ("control_scores", control_scores, shuffled)):
+        assert len(got) == len(copies), f"{name} has {len(got)} entries, want {len(copies)}: one per number of copies"
+        want = [score_sequences(model, plant(canvas, motif, c)).mean() for c in copies]
+        for c, g, w in zip(copies, got, want):
+            n_copies = f"{c} copy" if c == 1 else f"{c} copies"
+            g = np.asarray(g)
+            assert g.size == 1, \
+                f"{name}, {n_copies}: {g.size} numbers, want one, the mean score over the {len(canvas):,} sequences"
+            g = float(g)
+            assert 0 <= g <= 1, f"{name}, {n_copies}: {g:.3f} is not a probability between 0 and 1"
+            assert abs(g - w) < 1e-6, \
+                (f"{name}, {n_copies}: {g:.4f}, want {w:.4f}, the mean score of canvas with {n_copies} of "
+                 f"{motif} inserted: plant(canvas, {motif!r}, {c})")
+    print(f"TODO-5 passed: both lists have {len(copies)} mean scores between 0 and 1, equal to the reference")
+
+
+test_insertion()
+
+# %%
+#@title Stuck? Run this only if the test failed: it computes both lists for you { display-mode: "form" }
 real_scores = [score_sequences(model, plant(canvas, MY_MOTIF, c)).mean() for c in copies]
 control_scores = [score_sequences(model, plant(canvas, shuffled, c)).mean() for c in copies]
-print("reference scores ready")
+test_insertion()
 
 # %%
 #@title Plot score vs number of copies - run this cell, nothing to change { display-mode: "form" }

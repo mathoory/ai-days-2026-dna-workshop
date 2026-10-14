@@ -21,9 +21,9 @@ the "about N min" section headings (reading, typing and T4 compute). Both are es
 |---|---|---|---|---|---|---|
 | 1. Machine learning and CNNs | 40 | 32 (task and biology 12, learning and testing 8, CNN 9, look inside 3) | 46 (+5 optional) | 8 | 86 | +46 |
 | 2. DNA foundation models | 40 | 20 (overview, tokenization, embedding, transformer, heads) | 32 | 5 | 57 | +17 |
-| 3. Shortcuts, controls and fine-tuning | 40 | 10 (shortcuts, control, fine-tuning) | 49 (+2 optional) | 8 | 67 | +27 |
+| 3. Shortcuts, controls and fine-tuning | 40 | 10 (shortcuts, control, fine-tuning) | 39 (+2 optional) | 8 | 57 | +17 |
 | Wrap-up | 10 | 10 | | | 10 | 0 |
-| **Total** | **130** | | | | **220** | **+90 (+60 after the buffer)** |
+| **Total** | **130** | | | | **210** | **+80 (+50 after the buffer)** |
 
 Measured on a Colab T4 (13.10, no errors): compute is 1.8, 4.1 and 4.7 min for the three notebooks
 (excluding the "Stuck?" cells). The longest waits are live pretraining (3.7 min) and LoRA training (3.2 min);

@@ -370,6 +370,97 @@ def channels_pool(model, pos):
     print("channels_pool seq len", len(pos[i]), "window", lo, lo + 120, "filter 7 peak at", j)
 
 
+# ------------------------------------------------------------------ parts 2 and 3, added 14.10
+def pad_mask(pos):
+    """Three real sequences of different lengths, tokenized as one batch: tokens, padding and the attention mask."""
+    from transformers import AutoTokenizer
+    tok = AutoTokenizer.from_pretrained(MISTRAL, trust_remote_code=True)
+    seqs = [pos[0][150:190], pos[1][150:172], pos[2][150:181]]
+    seqs = [s.replace("U", "T") for s in seqs]
+    enc = tok(seqs, padding=True, add_special_tokens=True)
+    rows = [tok.convert_ids_to_tokens(ids) for ids in enc["input_ids"]]
+    n = len(rows[0])
+    fig, ax = canvas(16, 6.6, ylim=(0, 66))
+    x0, cw = 26, 112 / n
+    label(ax, 4, 60, "Tokens", fs=21, color=MUTED, ha="left")
+    label(ax, x0 + n * cw + 2, 60, "Mask", fs=21, color=MUTED, ha="left")
+    for r, (toks, m) in enumerate(zip(rows, enc["attention_mask"])):
+        y = 50 - r * 15
+        label(ax, 4, y, f"Sequence {r + 1}", fs=20, color=MUTED, ha="left")
+        for j, (tk, mj) in enumerate(zip(toks, m)):
+            pad = mj == 0
+            box(ax, x0 + j * cw, y - 4.5, cw - 0.5, 9, fc=FAINT if not pad else "#FFFFFF",
+                ec=HAIR if pad else "none", lw=1 if pad else 0, r=0.5)
+            t = "pad" if pad else tk.replace("▁", "")
+            label(ax, x0 + j * cw + cw / 2, y + 1.6, t, fs=12 if len(t) > 5 else 14, color=LIGHT if pad else INK, family=MONO)
+            label(ax, x0 + j * cw + cw / 2, y - 2.6, str(mj), fs=14, color=ACCENT if mj else LIGHT, bold=bool(mj))
+        label(ax, x0 + n * cw + 2, y, f"{sum(m)} real", fs=19, color=ACCENT, ha="left")
+    label(ax, x0 + n * cw / 2, 4, "Sequence embedding = mean of the last-layer vectors where the mask is 1",
+          fs=20, color=MUTED)
+    save(fig, "pad_mask")
+    print("pad_mask", [len(s) for s in seqs], [sum(m) for m in enc["attention_mask"]], "padded to", n)
+
+
+def probe_pipeline():
+    """Real Mistral-DNA sequence embeddings (rows) into a standardiser and a logistic regression."""
+    from pathlib import Path
+    d = np.load(Path(__file__).resolve().parents[2] / "data" / "emb_mistral17m.npz")
+    E = d["train"][:40]
+    Z = (E - d["train"].mean(0)) / d["train"].std(0)
+    fig = newfig(); fig.set_size_inches(16, 6.4)
+    ax = fig.add_axes([0.04, 0.2, 0.36, 0.62])
+    ax.imshow(Z, cmap=DIVERGING, vmin=-2.5, vmax=2.5, aspect="auto", interpolation="nearest")
+    ax.set_xticks([0, 255]); ax.set_xticklabels(["1", "256"]); ax.set_yticks([])
+    ax.set_xlabel("256 numbers per sequence"); ax.set_ylabel("Sequences (40 of 12,000)")
+    ax.set_title("Sequence embeddings, standardised"); ax.tick_params(length=0)
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+    a2 = fig.add_axes([0.42, 0.0, 0.58, 1.0]); a2.axis("off"); a2.set_xlim(0, 108); a2.set_ylim(0, 64)
+    arrow(a2, 2, 33, 12, 33, lw=2, ms=22)
+    label(a2, 34, 37, r"$\hat p = \sigma(w^\top e + b)$", fs=26)
+    label(a2, 34, 28, "256 weights + 1 bias", fs=20, color=MUTED)
+    arrow(a2, 56, 33, 66, 33, lw=2, ms=22)
+    label(a2, 82, 37, "Held-out AUROC", fs=22)
+    label(a2, 82, 28, "0.78", fs=30, color=ACCENT, bold=True)
+    label(a2, 34, 52, "Logistic regression (part 1, slide 2.3)", fs=20, color=MUTED)
+    save(fig, "probe_pipeline")
+
+
+def word_counts(pos):
+    """One real sequence, its 5-letter words, and its 1,024 word counts."""
+    from collections import Counter
+    from itertools import product
+    s = pos[3]
+    words = [s[i:i + 5] for i in range(len(s) - 4)]
+    c = Counter(words)
+    vocab = ["".join(p) for p in product("ACGU", repeat=5)]
+    v = np.array([c.get(w, 0) for w in vocab])
+    fig = newfig(); fig.set_size_inches(16, 7.6)
+    ax0 = fig.add_axes([0.0, 0.62, 1.0, 0.36]); ax0.axis("off"); ax0.set_xlim(0, 160); ax0.set_ylim(0, 36)
+    show = s[:24]
+    dx, x0 = 3.6, 6
+    for i, ch in enumerate(show):
+        label(ax0, x0 + i * dx, 30, ch, fs=22, family=MONO)
+    label(ax0, x0 + 24 * dx + 2, 30, f"… ({len(s)} letters)", fs=19, color=MUTED, ha="left")
+    for k in range(4):
+        yk = 22 - k * 5.5
+        ax0.plot([x0 + k * dx - 1.4, x0 + (k + 4) * dx + 1.4], [yk, yk], color=ACCENT if k == 0 else LIGHT, lw=3)
+        label(ax0, x0 + (k + 5) * dx + 2, yk, s[k:k + 5], fs=17, family=MONO, color=ACCENT if k == 0 else MUTED, ha="left")
+    label(ax0, 120, 14, f"{len(words)} overlapping words", fs=21, color=MUTED)
+    ax = fig.add_axes([0.07, 0.12, 0.9, 0.42])
+    ax.set_ylim(0, v.max() + 1.5)
+    ax.bar(range(1024), v, width=1.0, color=INK)
+    top = np.argsort(-v)[:3]
+    for t in top:
+        ax.annotate(vocab[t], (t, v[t]), xytext=(t - 30, v[t] + 0.2), fontsize=18, family=MONO, color=INK, ha="right",
+                    arrowprops=dict(arrowstyle="-", color=MUTED, lw=1))
+    ax.set_xlim(-2, 1026); ax.set_xticks([0, 1023]); ax.set_xticklabels(["AAAAA", "UUUUU"], family=MONO)
+    ax.set_ylabel("Count"); ax.set_xlabel("All 1,024 five-letter words, in alphabetical order"); ygrid(ax)
+    save(fig, "word_counts")
+    print("word_counts len", len(s), "words", len(words), "distinct", int((v > 0).sum()), "max", int(v.max()),
+          [vocab[t] for t in top])
+
+
 if __name__ == "__main__":
     want = set(sys.argv[1:])
     run = (lambda n: not want or n in want)
@@ -379,7 +470,9 @@ if __name__ == "__main__":
     if not want or want & {"setup_examples", "channels_pool"}:
         from intuition import load_cnn
         model = load_cnn()
-    for n, job in [("setup_examples", lambda: setup_examples(model, tr, ty)), ("bce_curve", bce_curve),
+    for n, job in [("pad_mask", lambda: pad_mask(pos)), ("probe_pipeline", probe_pipeline),
+                   ("word_counts", lambda: word_counts(pos)),
+                   ("setup_examples", lambda: setup_examples(model, tr, ty)), ("bce_curve", bce_curve),
                    ("lr_rates", lambda: lr_rates(tr, ty)), ("sgd_noise", lambda: sgd_noise(tr, ty)),
                    ("nn_diagram", nn_diagram), ("channels_pool", lambda: channels_pool(model, pos)),
                    ("bio_flow", bio_flow), ("plant_scheme", plant_scheme), ("tokens_split", lambda: tokens_split(pos)),

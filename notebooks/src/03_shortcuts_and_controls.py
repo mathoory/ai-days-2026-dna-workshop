@@ -16,14 +16,15 @@
 #    and 5-letter word counts (TODO-2);
 # 2. run the shuffle test on the CNN and on the probe (TODO-3);
 # 3. select bound and unbound sequences with the same composition, then train and test every model
-#    again on them, including a fine-tuned language model (TODO-4 and TODO-5).
+#    again on them, including a fine-tuned language model (TODO-4).
 #
 #
 # | cell | what you do |
 # |---|---|
 # | `#@title ... run this cell, nothing to change` | run it |
-# | `# TODO-N` with `# === Your code here ===` | write it (yourself or with an assistant), then **check** it |
-# | `#@title Stuck? ...` | run it only if your TODO doesn't pass its check: it computes our version |
+# | `# TODO-N` with `# === Your code here ===` | write it (yourself or with an assistant) |
+# | `#@title Test TODO-N ...` | run it: it checks your code and says what is wrong |
+# | `#@title Stuck? ...` | run it only if the test of your TODO fails: it computes our version |
 #
 # Before you start: *Runtime → Change runtime type → T4 GPU*.
 
@@ -97,9 +98,103 @@ for k, v in table.items():
 #    and see how much of each model's score remains.
 
 # %% [markdown]
-# ## 1. Composition
+# ## 1. Composition (TODO-1)
 #
-# Look first: are bound and unbound sequences made of different letters?
+# Two numbers per sequence, the fraction of its letters that are G or C and the fraction that are U,
+# show whether bound and unbound sequences are made of different letters. You write the function
+# that computes them, first for one sequence (TODO-1a), then for a list of sequences (TODO-1b). Then
+# you fit a logistic regression on only these **two numbers** per sequence and report its AUROC on
+# the test set (TODO-1c), with the probe function of part 2:
+#
+# - `probe_auc(F_train, y_train, F_test, y_test)` → **returns `(auc, probe)`**; it works on any
+#   feature matrix, not only embeddings.
+#
+# **Check:** `auc_gc` ≈ **0.66**.
+
+# %%
+#@title One sequence - run this cell, nothing to change { display-mode: "form" }
+s = S_train[0]
+print("first 60 letters:", s[:60], "| length:", len(s), "| label:", y_train[0])
+print("letter counts:", {b: s.count(b) for b in "ACGU"})
+
+# %%
+# TODO-1a: write gc_u_one(seq): ONE sequence -> two numbers, (G+C fraction, U fraction).
+#          1. gc = the number of G letters plus the number of C letters, divided by the length of seq
+#             (seq.count("G") counts the G letters)
+#          2. u = the number of U letters, divided by the length of seq
+#          3. return gc, u
+def gc_u_one(seq):
+    # === Your code here ===
+    gc = (seq.count("G") + seq.count("C")) / len(seq)
+    u = seq.count("U") / len(seq)
+    return gc, u
+    # === End of your code ===
+
+
+gc, u = gc_u_one(s)
+print("first 60 letters:", s[:60], "...")
+print(f"G+C fraction {gc:.3f} | U fraction {u:.3f}")
+
+# %%
+# TODO-1b: write gc_u(seqs): a list of N sequences -> a numpy array of shape (N, 2), where row i is
+#          gc_u_one(seqs[i]): column 0 = G+C fraction, column 1 = U fraction.
+#          np.array of a list of N pairs has exactly this shape.
+def gc_u(seqs):
+    # === Your code here ===
+    return np.array([gc_u_one(s) for s in seqs])
+    # === End of your code ===
+
+
+C3 = gc_u(S_train[:3])
+print("shape:", C3.shape, "(want (3, 2))")
+for seq, row in zip(S_train[:3], C3):
+    print(seq[:40], "... ->", np.round(row, 3))
+
+# %%
+# TODO-1c: the AUROC of a model that sees only these two numbers per sequence. Use probe_auc with the
+#          features gc_u(S_train) and gc_u(S_test); keep the AUROC as auc_gc.
+# === Your code here ===
+auc_gc, _ = probe_auc(gc_u(S_train), y_train, gc_u(S_test), y_test)
+# === End of your code ===
+table["G+C and U content only (2 numbers)"] = auc_gc
+print(f"2 numbers: {auc_gc:.3f}")
+
+# %%
+#@title Test TODO-1 - run this cell, nothing to change { display-mode: "form" }
+def test_gc_u():
+    rng = np.random.default_rng(0)
+    seqs = [S_train[i] for i in rng.choice(len(S_train), 500, replace=False)]
+    C = gc_u(seqs)
+    assert isinstance(C, np.ndarray), f"gc_u returned a {type(C).__name__}, want a numpy array"
+    assert C.shape == (500, 2), f"gc_u of 500 sequences has shape {C.shape}, want (500, 2)"
+    for i, s in enumerate(seqs):
+        gc, u = (s.count("G") + s.count("C")) / len(s), s.count("U") / len(s)
+        if not np.isclose(C[i, 0], gc):
+            hint = (" (that is the U fraction, so the two columns are swapped)" if np.isclose(C[i, 0], u) else
+                    " (a fraction is between 0 and 1: divide by the length)" if C[i, 0] > 1 else "")
+            raise AssertionError(f"sequence {i}: column 0 is {C[i, 0]:.4f}, want the G+C fraction {gc:.4f}{hint}")
+        assert np.isclose(C[i, 1], u), f"sequence {i}: column 1 is {C[i, 1]:.4f}, want the U fraction {u:.4f}"
+    assert 0.63 <= auc_gc <= 0.69, \
+        f"auc_gc = {auc_gc:.3f}, want about 0.66: fit probe_auc on gc_u(S_train), y_train and score gc_u(S_test), y_test"
+    print(f"TODO-1 passed: gc_u matches the reference on 500 sequences; auc_gc = {auc_gc:.3f}")
+
+
+test_gc_u()
+
+# %%
+#@title Stuck? Run this only if the test failed: it defines our gc_u and computes auc_gc { display-mode: "form" }
+def gc_u(seqs):
+    """(N, 2): the fraction of G+C letters and the fraction of U (or T) letters in each sequence."""
+    out = np.zeros((len(seqs), 2))
+    for i, s in enumerate(seqs):
+        n = max(len(s), 1)
+        out[i] = ((s.count("G") + s.count("C")) / n, (s.count("U") + s.count("T")) / n)
+    return out
+
+
+auc_gc, _ = probe_auc(gc_u(S_train), y_train, gc_u(S_test), y_test)
+table["G+C and U content only (2 numbers)"] = auc_gc
+test_gc_u()
 
 # %%
 #@title Plot G+C and U content - run this cell { display-mode: "form" }
@@ -119,31 +214,6 @@ plt.tight_layout(); plt.show()
 # of a messenger RNA after the protein-coding part, which is rich in A and U), and part may come from
 # how the unbound positions were drawn. Sequence length is also a weak shortcut (alone it gives an AUROC
 # of about 0.54); section 4 controls for it together with composition.
-#
-# ### TODO-1: A two-number model
-#
-# Fit a logistic regression on only these **two numbers** per sequence and report its AUROC on the
-# test set. The tools are already here:
-#
-# - `gc_u(seqs)` → an array of shape `(len(seqs), 2)`: G+C fraction and U fraction per sequence;
-# - `probe_auc(F_train, y_train, F_test, y_test)` → **returns `(auc, probe)`**; it works on any
-#   feature matrix, not only embeddings.
-#
-# **Check:** `auc_gc` ≈ **0.66**.
-
-# %%
-# TODO-1: AUROC of a model that only sees G+C and U content
-# === Your code here ===
-auc_gc, _ = probe_auc(gc_u(S_train), y_train, gc_u(S_test), y_test)
-# === End of your code ===
-table["G+C and U content only (2 numbers)"] = auc_gc
-print(f"2 numbers: {auc_gc:.3f}")
-
-# %%
-#@title Stuck? Run this only if TODO-1 failed its check: it computes auc_gc for you { display-mode: "form" }
-auc_gc, _ = probe_auc(gc_u(S_train), y_train, gc_u(S_test), y_test)
-table["G+C and U content only (2 numbers)"] = auc_gc
-print(f"2 numbers (reference): {auc_gc:.3f}")
 
 # %% [markdown]
 # ## 2. Word counts (TODO-2)
@@ -153,12 +223,48 @@ print(f"2 numbers (reference): {auc_gc:.3f}")
 # Word counts can pick up short motifs too (a 7-letter site contains three 5-letter words); they lose
 # where the motif sits.
 #
+# You first count the words of one short sequence yourself and compare your counts with
+# `kmer_counts` (TODO-2a). Then you fit the model on the counts of all sequences (TODO-2b).
+#
 # **Tools:** `kmer_counts(seqs, k=5)` → array `(len(seqs), 1024)`, then `probe_auc` as above.
 #
-# **Check:** `auc_k5` ≈ **0.74**. (Counting 12,000 sequences takes ~5 s.)
+# **Check:** `auc_k5` ≈ **0.74**.
 
 # %%
-# TODO-2: AUROC of a linear model on 5-letter word counts (use kmer_counts + probe_auc)
+#@title The 1,024 words and one short sequence - run this cell, nothing to change { display-mode: "form" }
+import itertools
+WORDS5 = ["".join(w) for w in itertools.product("ACGU", repeat=5)]   # column j of kmer_counts(seqs, 5) counts WORDS5[j]
+s = min(S_train, key=len)
+print(len(WORDS5), "words:", WORDS5[:3], "...", WORDS5[-2:])
+print(f"the shortest training sequence, {len(s)} letters:\n{s}")
+
+# %%
+# TODO-2a: write count_words(seq, k=5): how often each k-letter word occurs in seq, as a Counter.
+#          1. the windows of seq are seq[i:i + k] for i = 0, 1, ..., len(seq) - k; they overlap, and a
+#             sequence of length L has L - k + 1 of them
+#          2. Counter(windows) counts how often each different word occurs
+from collections import Counter
+
+
+def count_words(seq, k=5):
+    # === Your code here ===
+    return Counter(seq[i:i + k] for i in range(len(seq) - k + 1))
+    # === End of your code ===
+
+
+counts = count_words(s)
+total = sum(counts.values())
+row = kmer_counts([s], 5)[0]            # the same sequence as 1,024 numbers
+print(f"{total} windows, {len(counts)} different words")
+print("kmer_counts gives each count as a fraction of all windows. The 6 most frequent words:")
+print("word    your count   / windows   kmer_counts")
+for w, n in counts.most_common(6):
+    print(f"{w}   {n:10d}   {n / total:9.4f}   {row[WORDS5.index(w)]:11.4f}")
+
+# %%
+# TODO-2b: the AUROC of a linear model on the 5-letter word counts of all sequences:
+#          K_train, K_test = kmer_counts(S_train, 5), kmer_counts(S_test, 5), then probe_auc as in
+#          TODO-1c. Keep the AUROC as auc_k5.
 # === Your code here ===
 K_train, K_test = kmer_counts(S_train, 5), kmer_counts(S_test, 5)
 auc_k5, _ = probe_auc(K_train, y_train, K_test, y_test)
@@ -167,13 +273,39 @@ table["5-letter word counts (1,024 numbers)"] = auc_k5
 print(f"word counts: {auc_k5:.3f}")
 
 # %%
-#@title Stuck? Run this only if TODO-2 failed its check: it computes auc_k5 for you { display-mode: "form" }
+#@title Test TODO-2 - run this cell, nothing to change { display-mode: "form" }
+def test_words():
+    rng = np.random.default_rng(0)
+    seqs = [S_train[i] for i in rng.choice(len(S_train), 50, replace=False)]
+    K = kmer_counts(seqs, 5)
+    for n, seq in enumerate(seqs):
+        c = count_words(seq)
+        total = len(seq) - 5 + 1
+        assert sum(c.values()) == total, \
+            f"sequence {n} ({len(seq)} letters): {sum(c.values())} windows counted, want {total} (length - 5 + 1)"
+        for j, w in enumerate(WORDS5):
+            assert np.isclose(c.get(w, 0) / total, K[n, j], atol=1e-6), \
+                (f"sequence {n}, word {w}: your count is {c.get(w, 0)}, kmer_counts gives "
+                 f"{K[n, j]:.4f} of {total} windows = {K[n, j] * total:.0f}")
+    assert 0.71 <= auc_k5 <= 0.77, \
+        f"auc_k5 = {auc_k5:.3f}, want about 0.74: fit probe_auc on kmer_counts(S_train, 5), y_train and score kmer_counts(S_test, 5), y_test"
+    print(f"TODO-2 passed: your word counts match kmer_counts on 50 sequences; auc_k5 = {auc_k5:.3f}")
+
+
+test_words()
+
+# %%
+#@title Stuck? Run this only if the test failed: it defines our count_words and computes auc_k5 { display-mode: "form" }
+def count_words(seq, k=5):
+    return Counter(seq[i:i + k] for i in range(len(seq) - k + 1))
+
+
 auc_k5, _ = probe_auc(kmer_counts(S_train, 5), y_train, kmer_counts(S_test, 5), y_test)
 table["5-letter word counts (1,024 numbers)"] = auc_k5
-print(f"word counts (reference): {auc_k5:.3f}")
+test_words()
 
 # %% [markdown]
-# ## 3. The shuffle test
+# ## 3. The shuffle test (TODO-3)
 #
 # Take every **bound** test sequence and shuffle it with `dinuc_shuffle`. The result has the same
 # letters, the same letter pairs and the same G+C content, but any longer motif is broken up. Then
@@ -189,6 +321,35 @@ print(f"word counts (reference): {auc_k5:.3f}")
 #   and its AUROC drops towards the composition score (≈ 0.66).
 # * The shuffle also moves a binding site out of letters 150–190. The CNN weights that region (part
 #   1), so for the CNN the drop mixes letter order and position.
+#
+# First shuffle one sequence and check what the shuffle keeps (TODO-3a).
+
+# %%
+s = next(q for q, label in zip(S_test, y_test) if label == 1)     # one bound test sequence
+s_shuf = dinuc_shuffle(s, np.random.default_rng(1))
+print("original:", s[:60], "...")
+print("shuffled:", s_shuf[:60], "...")
+
+# TODO-3a: check what the shuffle kept.
+#          1. write pair_counts(seq): a Counter of the len(seq) - 1 neighbouring letter pairs seq[i:i + 2]
+#             (the same as count_words(seq, 2) from TODO-2a)
+def pair_counts(seq):
+    # === Your code here ===
+    return Counter(seq[i:i + 2] for i in range(len(seq) - 1))
+    # === End of your code ===
+
+
+#          2. same_pairs = whether pair_counts(s) and pair_counts(s_shuf) are equal (== compares two Counters)
+#          3. same_sequence = whether s and s_shuf are equal
+# === Your code here ===
+same_pairs = pair_counts(s) == pair_counts(s_shuf)
+same_sequence = s == s_shuf
+# === End of your code ===
+pc, ps = pair_counts(s), pair_counts(s_shuf)
+print("\nthe 16 letter-pair counts, original / shuffled:")
+for a in "ACGU":
+    print("   ".join(f"{a + b}: {pc[a + b]:3d} / {ps[a + b]:3d}" for b in "ACGU"))
+print("\nsame 16 pair counts:", same_pairs, "(want True) | same sequence:", same_sequence, "(want False)")
 
 # %%
 #@title Make the shuffled sequences - run this cell { display-mode: "form" }
@@ -202,7 +363,7 @@ print("same G+C and U?", np.allclose(gc_u(bound), gc_u(shuffled)))
 y_shuf = np.array([1] * len(shuffled) + [0] * len(unbound))
 
 # %% [markdown]
-# ### TODO-3: Run the shuffle test on both models
+# ### TODO-3b: Run the shuffle test on both models
 #
 # Compute two AUROCs, both against `y_shuf` (1 for the shuffled bound sequences, 0 for the real
 # unbound ones), for the list `shuffled + unbound`:
@@ -217,7 +378,7 @@ y_shuf = np.array([1] * len(shuffled) + [0] * len(unbound))
 # **Check:** CNN ≈ **0.66**, language model ≈ **0.77**.
 
 # %%
-# TODO-3: shuffle-test AUROC for the CNN and for Mistral-DNA + probe
+# TODO-3b: shuffle-test AUROC for the CNN and for Mistral-DNA + probe
 # === Your code here ===
 auc_shuf_cnn = roc_auc_score(y_shuf, score_sequences(cnn, shuffled + unbound))
 E_shuf = embed(tok, fm, [to_dna(s) for s in shuffled + unbound])
@@ -227,11 +388,42 @@ print(f"CNN         : real {table['CNN (part 1)']:.3f}  ->  shuffled {auc_shuf_c
 print(f"Mistral-DNA : real {probe_real:.3f}  ->  shuffled {auc_shuf_fm:.3f}")
 
 # %%
-#@title Stuck? Run this only if TODO-3 failed its check: it runs the shuffle test for you { display-mode: "form" }
+#@title Test TODO-3 - run this cell, nothing to change { display-mode: "form" }
+def test_shuffle_test():
+    got = pair_counts("ACGUA")
+    assert got == Counter({"AC": 1, "CG": 1, "GU": 1, "UA": 1}), \
+        f"pair_counts('ACGUA') = {dict(got)}, want AC, CG, GU and UA once each"
+    assert same_pairs and not same_sequence, \
+        f"same_pairs = {same_pairs} (want True), same_sequence = {same_sequence} (want False)"
+    assert unbound == [q for q, label in zip(S_test, y_test) if label == 0], \
+        "unbound is no longer the list of real unbound test sequences: the test shuffles only the bound ones"
+    assert len(shuffled) == len(bound), f"shuffled has {len(shuffled)} sequences, want {len(bound)}, one per bound sequence"
+    ref = roc_auc_score(y_shuf, score_sequences(cnn, shuffled + unbound))
+    assert abs(auc_shuf_cnn - ref) < 1e-6, \
+        (f"auc_shuf_cnn = {auc_shuf_cnn:.3f}, but the CNN scores {ref:.3f} on shuffled + unbound against y_shuf. "
+         "Score the list shuffled + unbound in this order, and keep the unbound sequences unshuffled")
+    assert abs(auc_shuf_cnn - 0.66) <= 0.03, f"auc_shuf_cnn = {auc_shuf_cnn:.3f}, want about 0.66 (0.63 to 0.69)"
+    assert abs(auc_shuf_fm - 0.77) <= 0.03, \
+        (f"auc_shuf_fm = {auc_shuf_fm:.3f}, want about 0.77 (0.74 to 0.80): embed to_dna(s) for s in "
+         "shuffled + unbound, and score them with the probe fitted on the real training vectors")
+    print(f"TODO-3 passed: the shuffle keeps the letter pairs; CNN {auc_shuf_cnn:.3f}, "
+          f"Mistral-DNA + probe {auc_shuf_fm:.3f}, with the unbound sequences unshuffled")
+
+
+test_shuffle_test()
+
+# %%
+#@title Stuck? Run this only if the test failed: it runs the shuffle test for you { display-mode: "form" }
+def pair_counts(seq):
+    return Counter(seq[i:i + 2] for i in range(len(seq) - 1))
+
+
+same_pairs, same_sequence = pair_counts(s) == pair_counts(s_shuf), s == s_shuf
 auc_shuf_cnn = roc_auc_score(y_shuf, score_sequences(cnn, shuffled + unbound))
 auc_shuf_fm = roc_auc_score(y_shuf, probe.predict_proba(embed(tok, fm, [to_dna(s) for s in shuffled + unbound]))[:, 1])
 print(f"CNN         : real {table['CNN (part 1)']:.3f}  ->  shuffled {auc_shuf_cnn:.3f}")
 print(f"Mistral-DNA : real {probe_real:.3f}  ->  shuffled {auc_shuf_fm:.3f}")
+test_shuffle_test()
 
 # %%
 #@title The scoreboard - run this cell { display-mode: "form" }
@@ -352,11 +544,11 @@ plt.tight_layout(); plt.show()
 # were, `matched` uses the composition-matched subset. Every model below is trained and tested on both,
 # so the two columns of results differ only in how the sequences were selected.
 #
-# ### TODO-4: One function, two benchmarks
+# ### One function, two benchmarks
 #
-# **Build** the body of `shortcut_scores(train_seqs, train_y, test_seqs, test_y)`: it gets the first
-# 12,000 training sequences as `tr`, `ytr` and must compute three test AUROCs (numbers), as in sections 1 and 2.
-# The `return` line is already written.
+# `shortcut_scores(train_seqs, train_y, test_seqs, test_y)` repeats TODO-1, TODO-2 and the frozen
+# probe of part 2 on one benchmark. It takes the first 12,000 training sequences as `tr`, `ytr` and
+# computes three test AUROCs:
 #
 # | variable | features for `probe_auc` |
 # |---|---|
@@ -364,42 +556,24 @@ plt.tight_layout(); plt.show()
 # | `auc_k5` | `kmer_counts(tr, 5)` and `kmer_counts(test_seqs, 5)` |
 # | `auc_fm` | `embed(tok, fm, [to_dna(s) for s in tr])`, same for `test_seqs` |
 #
-# **Gotchas to tell your assistant:** `probe_auc(F_train, y_train, F_test, y_test)` returns a
-# **tuple `(auc, probe)`**: store only the `auc`. `embed(tok, model, seqs)` needs DNA letters, hence
-# `to_dna`. The function is called twice (once per benchmark), so it must use only its arguments and
-# `tok`, `fm`, not variables like `S_train` from the rejoin cell.
+# The function is called twice, once per benchmark, so it uses only its arguments and `tok`, `fm`.
 #
-# **Check:** on `matched`, the 2-number model must be close to **0.5** (≈ 0.51). If it isn't, stop and
-# find out why. Expected, in table order: 0.64, 0.76, 0.81 on `original` and 0.51, 0.73, 0.77 on
-# `matched`.
+# **Expected:** on `matched`, the 2-number model is close to **0.5** (≈ 0.51). In table order: 0.64,
+# 0.76, 0.81 on `original` and 0.51, 0.73, 0.77 on `matched`.
 
 # %%
+#@title Three simple models on both benchmarks - run this cell, nothing to change { display-mode: "form" }
 def shortcut_scores(train_seqs, train_y, test_seqs, test_y, n=12000):
     tr, ytr = train_seqs[:n], train_y[:n]
-    # TODO-4: compute auc_gc, auc_k5 and auc_fm (see the table above)
-    # === Your code here ===
     auc_gc, _ = probe_auc(gc_u(tr), ytr, gc_u(test_seqs), test_y)
     auc_k5, _ = probe_auc(kmer_counts(tr, 5), ytr, kmer_counts(test_seqs, 5), test_y)
     auc_fm, _ = probe_auc(embed(tok, fm, [to_dna(s) for s in tr]), ytr,
                           embed(tok, fm, [to_dna(s) for s in test_seqs]), test_y)
-    # === End of your code ===
     return {"G+C and U content only (2 numbers)": auc_gc,
             "5-letter word counts (1,024 numbers)": auc_k5,
             "Mistral-DNA + probe (frozen)": auc_fm}
 
 
-scores = {name: shortcut_scores(*BENCH[name]) for name in BENCH}
-for k in scores["original"]:
-    print(f"{k:38s} original {scores['original'][k]:.3f} | matched {scores['matched'][k]:.3f}")
-
-# %%
-#@title Stuck? Run this only if TODO-4 failed its check: it computes the three scores for you { display-mode: "form" }
-def shortcut_scores(train_seqs, train_y, test_seqs, test_y, n=12000):
-    tr, ytr = train_seqs[:n], train_y[:n]
-    return {"G+C and U content only (2 numbers)": probe_auc(gc_u(tr), ytr, gc_u(test_seqs), test_y)[0],
-            "5-letter word counts (1,024 numbers)": probe_auc(kmer_counts(tr, 5), ytr, kmer_counts(test_seqs, 5), test_y)[0],
-            "Mistral-DNA + probe (frozen)": probe_auc(embed(tok, fm, [to_dna(s) for s in tr]), ytr,
-                                                      embed(tok, fm, [to_dna(s) for s in test_seqs]), test_y)[0]}
 scores = {name: shortcut_scores(*BENCH[name]) for name in BENCH}
 for k in scores["original"]:
     print(f"{k:38s} original {scores['original'][k]:.3f} | matched {scores['matched'][k]:.3f}")
@@ -432,7 +606,7 @@ for name in BENCH:
     print(f"CNN, {name:8s}: {scores[name]['CNN (part 1 architecture)']:.3f}  ({time.time() - t0:.0f}s)")
 
 # %% [markdown]
-# ## 6. Fine-tuning with LoRA (TODO-5)
+# ## 6. Fine-tuning with LoRA (TODO-4)
 #
 # So far the language model was **frozen**: we only trained a linear probe on top. **Fine-tuning**
 # also updates the model's own weights for the AGO2 task. A 16M-parameter model like Mistral-DNA could
@@ -442,10 +616,10 @@ for name in BENCH:
 # are about 1.6% of the parameters.
 #
 # We train on the **matched** benchmark, 2 epochs over 20,000 labelled sequences (the frozen probe used
-# 12,000), and test on the matched test set. Start the
-# TODO-5 cell as soon as you have written it, and read on while it trains.
+# 12,000), and test on the matched test set. Write TODO-4, run its test (one batch on a fresh model),
+# then start the training cell and read on while it trains.
 #
-# The setup cell defines what TODO-5 needs: `make_lora()`, which returns a fresh model with LoRA
+# The setup cell defines what TODO-4 needs: `make_lora()`, which returns a fresh model with LoRA
 # add-ons (`clf`), its optimizer (`opt`) and a gradient scaler (`scaler`); `crit` (the loss); and
 # `batch_logits(list_of_dna_strings)` → one raw score per sequence. On a GPU without bfloat16 the model
 # runs in float16, and the `scaler` multiplies the loss before `backward()` so that small gradients do not
@@ -498,6 +672,62 @@ def lora_auc():
     return roc_auc_score(my_te, s)
 
 # %%
+def lora_step(seqs, y):
+    """One training step of clf on one batch: seqs = a list of DNA strings, y = their labels. Returns the loss."""
+    # TODO-4: one training step, the four lines of part 1's train(), with backward and step going
+    #         through `scaler` (needed when the GPU runs in float16):
+    #             loss = crit(batch_logits(seqs), y)
+    #             opt.zero_grad()
+    #             scaler.scale(loss).backward()
+    #             scaler.step(opt); scaler.update()
+    # === Your code here ===
+    loss = crit(batch_logits(seqs), y)
+    opt.zero_grad()
+    scaler.scale(loss).backward()
+    scaler.step(opt)
+    scaler.update()
+    # === End of your code ===
+    return loss
+
+# %%
+#@title Test TODO-4 - run this cell, nothing to change { display-mode: "form" }
+def test_lora_step():
+    """One batch of 32 through a fresh make_lora() model with lora_step; the model in clf is left as it was."""
+    global clf, opt, scaler
+    saved = clf, opt, scaler
+    try:
+        clf, opt, scaler = make_lora()
+        clf.train()
+        lora = {n: p for n, p in clf.named_parameters() if p.requires_grad and "lora_" in n}
+        before = {n: p.detach().clone() for n, p in lora.items()}
+        for attempt in range(5):   # in float16 the scaler may skip a first step; then try the next batch
+            for p in clf.parameters():
+                if p.requires_grad:
+                    p.grad = torch.full_like(p, 1e6)   # left-over gradients of an earlier step: they must be cleared
+            b = np.arange(32 * attempt, 32 * attempt + 32)
+            scale = scaler.get_scale()
+            loss = lora_step([D_tr[j] for j in b], torch.tensor(ytr[b], dtype=torch.float32, device=DEVICE))
+            if not scaler.is_enabled() or scaler.get_scale() >= scale:
+                break
+        assert torch.is_tensor(loss) and loss.numel() == 1, \
+            f"lora_step returned a {type(loss).__name__}, want the loss: a tensor with one number"
+        assert torch.isfinite(loss).item(), f"the loss is {loss.item()}, want a finite number"
+        changed = [n for n in lora if not torch.equal(lora[n].detach(), before[n])]
+        assert changed, ("no LoRA weight changed after one step: compute the gradients with "
+                         "scaler.scale(loss).backward() after opt.zero_grad(), then call scaler.step(opt) and scaler.update()")
+        stale = [n for n in lora if lora[n].grad is not None and lora[n].grad.abs().mean().item() > 1.0]
+        assert not stale, ("the gradients of an earlier step were still there when the weights moved: "
+                           "call opt.zero_grad() before scaler.scale(loss).backward()")
+        print(f"TODO-4 passed: one batch of 32 on a fresh LoRA model, loss {loss.item():.3f}, "
+              f"{len(changed)} of {len(lora)} LoRA weight matrices changed")
+    finally:
+        clf, opt, scaler = saved
+
+
+test_lora_step()
+
+# %%
+#@title Train with LoRA - run this cell, nothing to change { display-mode: "form" }
 clf, opt, scaler = make_lora()   # a fresh model every time this cell runs
 t0 = time.time()
 clf.train()
@@ -506,20 +736,7 @@ for epoch in range(LORA_EPOCHS):
     for step, i in enumerate(range(0, len(order), 32)):
         b = order[i:i + 32]
         y = torch.tensor(ytr[b], dtype=torch.float32, device=DEVICE)
-        # TODO-5: one training step, the four lines of part 1's train(), with backward and step going
-        #         through `scaler` (needed when the GPU runs in float16):
-        #             loss = crit(batch_logits(<the DNA strings of this batch>), y)
-        #             opt.zero_grad()
-        #             scaler.scale(loss).backward()
-        #             scaler.step(opt); scaler.update()
-        #         The batch's strings: [D_tr[j] for j in b]
-        # === Your code here ===
-        loss = crit(batch_logits([D_tr[j] for j in b]), y)
-        opt.zero_grad()
-        scaler.scale(loss).backward()
-        scaler.step(opt)
-        scaler.update()
-        # === End of your code ===
+        loss = lora_step([D_tr[j] for j in b], y)
         if step % 200 == 0:
             print(f"epoch {epoch + 1} step {step:4d} | loss {loss.item():.3f} | {time.time() - t0:.0f}s")
     print(f"--> after epoch {epoch + 1}: matched test AUROC {lora_auc():.3f}")
@@ -529,7 +746,17 @@ print(f"LoRA fine-tuned: {scores['matched']['Mistral-DNA, LoRA fine-tuned']:.3f}
       f"{scores['matched']['Mistral-DNA + probe (frozen)']:.3f}   ({time.time() - t0:.0f}s)   (want ≈ 0.81)")
 
 # %%
-#@title Stuck? Run this only if TODO-5 failed: it trains a fresh LoRA model for you { display-mode: "form" }
+#@title Stuck? Run this only if the test or the training failed: it trains a fresh LoRA model for you { display-mode: "form" }
+def lora_step(seqs, y):
+    loss = crit(batch_logits(seqs), y)
+    opt.zero_grad()
+    scaler.scale(loss).backward()
+    scaler.step(opt)
+    scaler.update()
+    return loss
+
+
+test_lora_step()
 clf, opt, scaler = make_lora()
 t0 = time.time()
 clf.train()
@@ -537,11 +764,7 @@ for epoch in range(LORA_EPOCHS):
     order = np.random.default_rng(epoch).permutation(len(D_tr))
     for i in range(0, len(order), 32):
         b = order[i:i + 32]
-        loss = crit(batch_logits([D_tr[j] for j in b]), torch.tensor(ytr[b], dtype=torch.float32, device=DEVICE))
-        opt.zero_grad()
-        scaler.scale(loss).backward()
-        scaler.step(opt)
-        scaler.update()
+        loss = lora_step([D_tr[j] for j in b], torch.tensor(ytr[b], dtype=torch.float32, device=DEVICE))
     print(f"--> after epoch {epoch + 1}: matched test AUROC {lora_auc():.3f}")
 scores["matched"]["Mistral-DNA, LoRA fine-tuned"] = lora_auc()
 print(f"LoRA fine-tuned: {scores['matched']['Mistral-DNA, LoRA fine-tuned']:.3f}  ({time.time() - t0:.0f}s)")

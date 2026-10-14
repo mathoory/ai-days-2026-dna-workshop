@@ -49,7 +49,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Projected: 1 min.
 - Inside the models: one-hot encoding and filters (part 1), embeddings (part 2), fine-tuning (part 3).
 - Every part ends with a result to interpret.
-- Most code is given. The TODOs are short and each one says what to write and what number to expect. An AI assistant can help with a TODO; check its answer against that number.
+- Most code is given. The TODOs are short and each one says what to write and what number to expect. An AI assistant can help with a TODO; the test cell after each TODO checks the answer and says what is wrong.
 - Sit next to someone with a different background: a programmer next to a biologist.
 :::
 
@@ -59,12 +59,12 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ::: {.column width="58%"}
 - A laptop and a Google account
 - Colab with a GPU: *Runtime → Change runtime type → T4 GPU*
-- The notebooks: **[github.com/mathoory/ai-days-2026-dna-workshop]{.nowrap}**
+- Notebooks and slides: **[mathoory.github.io/ai-days-2026-dna-workshop]{.nowrap}**
 - Nothing to install; the data download by themselves
 - If a cell fails, raise a hand, or run its "Stuck?" cell and continue
 :::
 ::: {.column width="42%"}
-![](assets/custom/qr_repo.png){width="80%"}
+![](assets/custom/qr_site.png){width="80%"}
 :::
 :::
 
@@ -174,7 +174,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ::: {.notes}
 - One example's contribution to the loss, against the predicted probability. Blue: a bound example, $-\log \hat p$. Grey: an unbound example, $-\log(1 - \hat p)$.
 - A confident correct prediction costs almost nothing; a confident wrong one costs a lot ($-\log 0.01 = 4.6$).
-- On slide 2.1: predicting 0.90 for a bound sequence costs 0.11; predicting 0.35 for a bound sequence costs 1.05.
+- On slide 2.1: predicting 0.90 for a bound sequence gives a loss of 0.11; predicting 0.35 gives 1.05.
 - Predicting 0.5 for everything gives $\ln 2 = 0.69$, the loss of a coin flip.
 - Tutorial 1 used the mean squared error, for predicting a number. Cross-entropy is the standard loss for a predicted probability.
 :::
@@ -219,7 +219,7 @@ $$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
 
 ::: {.notes}
 - The CNN of this part, trained as in the notebook: 10 epochs, 3,600 steps. Grey: the loss on each batch. Black: the mean over each epoch.
-- The gradient on one batch estimates the gradient on the whole training set. It is cheap, so the model takes many steps per epoch; it is noisy, so the grey line jumps (0.38 to 0.61 within the last epoch). This is mini-batch, or stochastic, gradient descent.
+- The gradient on one batch estimates the gradient on the whole training set. One batch is quick to compute, which allows many steps per epoch. The estimate changes from batch to batch, which is why the grey line jumps (0.38 to 0.61 within the last epoch). This is mini-batch, or stochastic, gradient descent.
 - The epoch means fall from 0.61 to 0.44, most of it in the first three epochs.
 - 92,346 / 256 gives 360 full batches; the notebook drops the incomplete last one (`drop_last=True`) and reshuffles the order every epoch.
 :::
@@ -233,7 +233,7 @@ $$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
 ::: {.notes}
 - Left: logistic regression is one unit, a weighted sum of the inputs plus a bias, then the sigmoid.
 - Right: a hidden layer of units, each a weighted sum followed by ReLU, feeds the output unit.
-- Without the nonlinearity, stacked weighted sums collapse into one weighted sum, which is no more expressive than logistic regression.
+- Without the nonlinearity, stacked weighted sums add up to a single weighted sum, which is no more expressive than logistic regression.
 - Training is the same as on slide 2.3. `loss.backward()` computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.
 - The CNN of section 4 is a network of this kind in which each first-layer unit looks at a 10-letter window.
 :::
@@ -404,7 +404,7 @@ auc = roc_auc_score(test_y, probs)
 ```
 
 ::: {.notes}
-- The first four lines are given in the notebook. TODO-3 is the evaluation block.
+- TODO-3a runs the first four lines by hand on one batch: the loss, one gradient's shape, one step, and the loss again on the same batch, now lower. TODO-3b puts the four lines in the loop of `train()`; TODO-3c is the evaluation block. The test cell trains one epoch on 5,000 sequences and checks that the evaluation used probabilities.
 - `.cpu().numpy()` is needed because scikit-learn cannot read a tensor that is still on the GPU. Leaving it out is a common error in this TODO.
 :::
 
@@ -421,7 +421,7 @@ auc = roc_auc_score(test_y, probs)
 
 ::: {.notes}
 - Left: filter 0's 40 weights (blue positive, grey negative). Right: its logo, built from the roughly 25,000 windows in bound sequences whose output is above the cutoff (half-way between the filter's mean and maximum output). The notebook's count differs slightly because it scans a different subset.
-- The helpers on the slide: `cutoff_for` sets that cutoff, `windows_above` collects the 10-letter windows above it, and `pwm_of` counts the letters at each position. TODO-4 builds a logo for every filter with these helpers, then `consensus_of` reads off the most frequent letter at each position.
+- The helpers on the slide: `cutoff_for` sets that cutoff, `windows_above` collects the 10-letter windows above it, and `pwm_of` counts the letters at each position. TODO-4a runs these helpers on filter 0 step by step, then `consensus_of` reads off the most frequent letter at each position; TODO-4b repeats the steps for every filter.
 - Information content at a position is 2 minus the entropy of the letter frequencies, in bits. Each letter's height is its frequency times that value.
 - A logo shows which windows activate a filter. It leaves out the letters the filter penalises (its negative weights).
 :::
@@ -448,16 +448,16 @@ Open **`01_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
 | Step | Task | Check | Time |
 |:--|:--|:--|:--|
 | TODO-1 | write `one_hot` and `encode_batch` | the test cell passes | 3 min |
-| TODO-2 | build the network | `torch.Size([2])` | 7 min |
-| TODO-3 | held-out AUROC, then train | 0.79, then 0.86 | 7 min |
-| TODO-4 | a logo for every filter | ten logos | 9 min |
-| TODO-5 | insert the motif and a shuffled copy | two curves | 8 min |
+| TODO-2 | build the network | the test cell passes; 2,491 parameters | 7 min |
+| TODO-3 | one batch by hand, then the loop in `train()` | the test cell passes; 0.79, then 0.86 | 7 min |
+| TODO-4 | filter 0 step by step, then a logo for every filter | the test cell passes; ten logos | 9 min |
+| TODO-5 | one copy in one sequence, then the motif and a shuffled copy | the test cell passes; two curves | 8 min |
 
 ::: {.notes}
 - Given cells (setup, data, motif toolkit, take-aways): about 12 min. Projected hands-on total: about 46 min, 51 with the optional sections.
 - TODO-3 check: about 0.79 after epoch 1 and 0.86 after epoch 10. Encoding and 10 epochs take about a minute on a T4 (2 to 8 seconds per epoch).
-- Helpers for TODO-4: `acts[:, f, :]`, `cutoff_for`, `windows_above`, `pwm_of`; then set `MY_FILTER` and `MY_MOTIF`. TODO-4 ends with choosing a motif. TODO-5 uses `plant`.
-- Each TODO has a "Stuck?" cell below it that loads our version.
+- Helpers for TODO-4: `acts[:, f, :]`, `cutoff_for`, `windows_above`, `pwm_of`; then set `MY_FILTER` and `MY_MOTIF`. TODO-4 ends with choosing a motif. TODO-5 uses `plant`, first on one sequence (TODO-5a), then on all 1,000 (TODO-5b).
+- Each TODO has a test cell and, below it, a "Stuck?" cell that loads our version.
 - Notebook section 5, right after training, downloads `my_cnn.pt`, which part 3 can load.
 :::
 

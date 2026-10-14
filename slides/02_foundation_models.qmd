@@ -20,7 +20,22 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - The claim to test in parts 2 and 3: what a model learns in pretraining transfers, so each task needs fewer labels.
 :::
 
-## 1.2 Four stages, in the CNN and in a language model
+## 1.2 Two pretraining objectives
+
+- **Next token** (Mistral-DNA, HyenaDNA, Evo): $\;\mathcal{L} = -\log p_\theta(x_t \mid x_{<t})$
+- **Masked tokens** (Nucleotide Transformer, DNABERT-2): $\;\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$, hidden tokens predicted from both sides
+
+![](assets/custom/next_token.png){fig-align="center" height="492px"}
+
+::: {.notes}
+- These are the losses the vocabulary heads (slide 5.1) are trained with. $x_t$ is the token at position $t$; $x_{<t}$ the tokens before it; $x_{\setminus t}$ all tokens except the hidden ones.
+- The figure: Mistral-DNA, given the first tokens of a real sequence (the end of that context is printed at the top), assigns a probability to each of its 4,096 possible next tokens. Its top choice gets about 10%; the true token is shown at the bottom with its much lower probability.
+- Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.
+- Masked models hide about 15% of the tokens and predict them from the tokens on both sides.
+- In both cases the genome supplies its own targets, so no experimental labels are needed.
+:::
+
+## 1.3 Four stages, in the CNN and in a language model
 
 | Stage | CNN (part 1) | DNA language model |
 |:--|:--|:--|
@@ -110,6 +125,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 ![](assets/custom/blackbox.png){fig-align="center" height="642px"}
 
 ::: {.notes}
+- Attention alone does not see token order. The model adds position information to the token vectors (Mistral-DNA rotates them by an angle that depends on the position).
 - Projected: 2 min.
 - The strips are real: the first 64 of the 256 numbers for each token, at the input (bottom) and after the last layer (top). The blue lines connect every input token to one output vector.
 - In: one vector per token. Out: one vector per token, the same size (256 numbers).
@@ -133,6 +149,19 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - A few dimensions are large for almost every token (the vertical stripes). That is common in transformer models and does not depend on the sequence.
 :::
 
+## 4.3 Batches: padding and the mask
+
+- Sequences in a batch are padded to the same number of tokens; the **attention mask** marks the real ones
+
+![](assets/custom/pad_mask.png){fig-align="center" height="596px"}
+
+::: {.notes}
+- Three real bound sequences (22, 31 and 40 letters, in DNA letters as the model reads them), tokenized together. Each row is one sequence; each cell one token, with its mask value below it.
+- `[CLS]` and `[SEP]` are special tokens the tokenizer adds at the start and end. Shorter sequences are filled with padding tokens up to the longest one in the batch.
+- The mask is 1 for real tokens (including `[CLS]` and `[SEP]`) and 0 for padding. The model uses it to ignore padding, and the sequence embedding averages the last-layer vectors only where it is 1.
+- Without the mask, the padding vectors enter the average, and the same sequence gets a different embedding depending on which batch it is in.
+:::
+
 ::: {.center}
 # 5 Prediction heads {data-name="Heads"}
 :::
@@ -149,26 +178,25 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 ::: {.notes}
 - Projected: 2 min.
-- The first two rows are the vocabulary heads used in pretraining (next slide); the third is ours.
+- The first two rows are the vocabulary heads used in pretraining (slide 1.2); the third is ours.
 - Softmax turns one score per vocabulary token into probabilities that sum to 1.
 - Our task's head first averages the last layer over the tokens (the sequence embedding), then applies one linear layer. Before the logistic regression each of the 256 dimensions is standardised.
 - After pretraining the vocabulary head is discarded and a new task head is attached. The body (and the embedding table) transfers to the new task.
 - Frozen body, new linear head: a linear probe (this part's notebook). Body adapted too: fine-tuning (part 3, LoRA).
 :::
 
-## 5.2 Two pretraining objectives
+## 5.2 The linear probe
 
-- **Next token** (Mistral-DNA, HyenaDNA, Evo): $\;\mathcal{L} = -\log p_\theta(x_t \mid x_{<t})$
-- **Masked tokens** (Nucleotide Transformer, DNABERT-2): $\;\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$, hidden tokens predicted from both sides
+- Logistic regression on the 256 numbers of each sequence embedding; the language model stays frozen
 
-![](assets/custom/next_token.png){fig-align="center" height="492px"}
+![](assets/custom/probe_pipeline.png){fig-align="center" height="545px"}
 
 ::: {.notes}
-- These are the losses the vocabulary heads of slide 5.1 are trained with. $x_t$ is the token at position $t$; $x_{<t}$ the tokens before it; $x_{\setminus t}$ all tokens except the hidden ones.
-- The figure: Mistral-DNA, given the first tokens of a real sequence (the end of that context is printed at the top), assigns a probability to each of its 4,096 possible next tokens. Its top choice gets about 10%; the true token is shown at the bottom with its much lower probability.
-- Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.
-- Masked models hide about 15% of the tokens and predict them from the tokens on both sides.
-- In both cases the genome supplies its own targets, so no experimental labels are needed.
+- Left: the standardised embeddings of 40 of the 12,000 training sequences, one row each. Right: the probe and its score on the 1,000 held-out sequences.
+- The same model as part 1 slide 2.3, with 256 inputs instead of 2: 256 weights and one bias.
+- Standardising shifts and scales each of the 256 numbers to mean 0 and standard deviation 1, using the training sequences only; the same shift and scale are applied to the test sequences.
+- Regularisation (part 1 slide 3.4) keeps the 256 weights small: `C = 0.1` in scikit-learn, where smaller `C` means stronger regularisation.
+- Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.
 :::
 
 ## 5.3 DNA language models, 2021 to 2025
@@ -188,7 +216,7 @@ Next: load a pretrained model and probe it.
 # 6 Hands-on {data-name="Hands-on"}
 :::
 
-## 6.1 From a sequence to a sequence embedding with Hugging Face
+## 6.1 Loading a model from Hugging Face
 
 ```python
 from transformers import AutoTokenizer, AutoModel
@@ -197,11 +225,6 @@ tok   = AutoTokenizer.from_pretrained(name, trust_remote_code=True)   # the toke
 model = AutoModel.from_pretrained(name, trust_remote_code=True)       # the weights
 
 seq = "UGAUUUAUCAAG...".replace("U", "T")            # the model reads DNA letters
-ids = tok([seq], return_tensors="pt", padding=True)
-h   = model(input_ids=ids["input_ids"], attention_mask=ids["attention_mask"],
-            output_hidden_states=True).hidden_states[-1]          # (1, tokens, 256)
-m   = ids["attention_mask"].unsqueeze(-1)            # 1 = real token, 0 = padding
-vec = (h * m).sum(1) / m.sum(1)                      # (1, 256): the sequence embedding
 ```
 
 ::: {.notes}
@@ -209,7 +232,7 @@ vec = (h * m).sum(1) / m.sum(1)                      # (1, 256): the sequence em
 - The download goes to the Colab machine. Mistral-DNA is about 60 MB, roughly 10 seconds.
 - Mistral-DNA has 16M parameters; the "17M" in its name includes an output layer we do not use.
 - The tokenizer returns more keys than the model accepts, so pass only `input_ids` and `attention_mask`.
-- The last three lines are TODO-1: average the last layer over the real tokens only. `unsqueeze(-1)` gives the mask shape (1, tokens, 1), so it multiplies all 256 numbers of each token.
+- From here TODO-1 goes in steps: tokenize the sequence, run the model and keep its last layer, then the masked mean of slide 4.3. `unsqueeze(-1)` gives the mask shape (tokens, 1), so it multiplies all 256 numbers of each token.
 :::
 
 ## 6.2 Your turn
@@ -218,18 +241,18 @@ Open **`02_foundation_models.ipynb`**.
 
 | Step | Task | Check | Time |
 |:--|:--|:--|:--|
-| TODO-1 | `embed`: one vector per sequence | shape `(N, 256)` | 9 min |
-| TODO-2 | `probe_auc`: logistic regression | about 0.78 | 5 min |
+| TODO-1 | one sequence: tokens, last layer, masked mean; then `embed` for a list | the test cell passes; shape `(N, 256)` | 9 min |
+| TODO-2 | `probe_auc`: logistic regression | the test cell passes; about 0.78 | 5 min |
 | live | pretrain a 105M model for 3 minutes | probe before and after | 6 min |
 
 ::: {.notes}
 - Given cells (setup, loading Mistral-DNA, 2-D map, NT-500M vectors, take-aways): about 12 min. Projected hands-on total: about 32 min.
 - Signatures: `embed(tok, model, seqs)` returns an `(N, 256)` array; `probe_auc(...)` returns `(auc, probe)`.
-- TODO-1 check: the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.
-- TODO-2: the probe trains on 12,000 sequences (the `C=0.1` setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set.
+- TODO-1 goes in four steps: tokenize one sequence (1a), run the model on it (1b), the masked mean (1c), then `embed` for a list in batches (1d). Its test checks the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.
+- TODO-2: the probe trains on 12,000 sequences (the `C=0.1` setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set; the test cell says so.
 - NT-500M (human reference) is a 2 GB download, so its vectors are provided. It scores about 0.79 from these precomputed vectors.
 - The live row is section 3 of the notebook (slide 7.3): start the cell and read the take-aways while it trains.
-- Each TODO has a "Stuck?" cell that loads our version.
+- Each TODO has a test cell and a "Stuck?" cell that loads our version.
 :::
 
 ::: {.center}

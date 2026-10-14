@@ -2,15 +2,6 @@
 from collections import defaultdict
 
 
-def gc_u(seqs):
-    """(N, 2): the fraction of G+C letters and the fraction of U (or T) letters in each sequence."""
-    out = np.zeros((len(seqs), 2))
-    for i, s in enumerate(seqs):
-        n = max(len(s), 1)
-        out[i] = ((s.count("G") + s.count("C")) / n, (s.count("U") + s.count("T")) / n)
-    return out
-
-
 _K = {b: i for i, b in enumerate("ACGT")}
 _K["U"] = 3
 

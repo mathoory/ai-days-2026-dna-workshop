@@ -18,13 +18,28 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 - Bound sequences have less G+C than unbound ones: mean 0.41 against 0.45. It was visible in the data raster in part 1 and in the embedding map in part 2.
 - The unbound sequences are random positions in the same genes as the bound sites. AGO2 sites are often in AU-rich 3′ UTRs (the part of an mRNA after its protein-coding letters), so part of this difference may be real biology and part may come from how the negatives were drawn. Section 2 tests that.
 - Two simple models and one stress test:
-  - TODO-1: logistic regression on two numbers per sequence, the G+C and U fractions.
-  - TODO-2: logistic regression on the counts of all 1,024 five-letter words, which ignores order and position.
-  - TODO-3: the shuffle test, next slide.
+  - TODO-1: write `gc_u`, the G+C and U fractions of a sequence, then a logistic regression on these two numbers.
+  - TODO-2: count the 5-letter words of one sequence by hand, then a logistic regression on the counts of all 1,024 five-letter words, which ignores order and position.
+  - TODO-3: the shuffle test, slide 1.3.
 - If a simple model scores well, a larger model may be using the same shortcut.
+- The G+C/U model is the logistic regression of part 1 slide 2.3, trained here on 12,000 sequences; it scores 0.66 held out (part 1 slide 3.3).
 :::
 
-## 1.2 The dinucleotide shuffle test
+## 1.2 Word counts: a model without order
+
+- Count every 5-letter word in a sequence: 1,024 numbers, one per possible word
+
+![](assets/custom/word_counts.png){fig-align="center" height="642px"}
+
+::: {.notes}
+- Top: the start of one real bound sequence and its first four overlapping 5-letter words. A sequence of 340 letters has 336 of them.
+- Bottom: how often each of the 1,024 possible words occurs in this sequence, in alphabetical order from AAAAA to UUUUU. 258 different words occur; the most frequent, UUUUU, 6 times.
+- The notebook divides the counts by the number of words, so long and short sequences are comparable, and fits a logistic regression on the 1,024 numbers (12,000 labelled sequences): 0.74 held out.
+- The counts keep which short words occur and drop everything longer than 5 letters, including their order and where in the sequence they are. A seed site of 7 letters appears only as its 5-letter pieces.
+- The next slide's shuffle keeps even less: letters and letter pairs.
+:::
+
+## 1.3 The dinucleotide shuffle test
 
 - A **dinucleotide** is a pair of neighbouring letters. The shuffle keeps every letter and dinucleotide count and scrambles everything longer, including where sites sit
 
@@ -86,6 +101,23 @@ $$W x \;\rightarrow\; (W + BA)\,x, \qquad B \in \mathbb{R}^{256 \times r},\; A \
 - A 16M-parameter model could be fully fine-tuned on a laptop GPU; LoRA is how 500M-parameter models are adapted on modest hardware. Part 3 uses it on Mistral-DNA so you practise the method.
 :::
 
+## 3.3 The LoRA training step (TODO-4)
+
+```python
+loss = crit(batch_logits(seqs), y)    # predict a batch of DNA strings, measure the error
+opt.zero_grad()                       # clear the previous step's gradients
+scaler.scale(loss).backward()         # gradients of the scaled loss
+scaler.step(opt)                      # unscale them, then move the trainable weights
+scaler.update()                       # adjust the scale for the next step
+```
+
+::: {.notes}
+- The same steps as part 1 slide 4.7. Only the LoRA matrices and the new output layer are trainable; the pretrained weights stay fixed.
+- `batch_logits` tokenizes the DNA strings and returns one raw score per sequence; `crit` is the binary cross-entropy of part 1 slide 2.2.
+- The scaler: in float16, very small gradients round to 0, so the loss is multiplied by a large factor before `backward()` and the gradients are divided by it before the step. On a GPU with bfloat16, Colab's T4 included, the scaler does nothing, and the same code runs.
+- Batches of 32 sequences, 2 epochs over 20,000 matched sequences: 625 steps per epoch.
+:::
+
 ::: {.center}
 # 4 Hands-on {data-name="Hands-on"}
 :::
@@ -96,20 +128,19 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 
 | Step | Task | Check | Time |
 |:--|:--|:--|:--|
-| TODO-1 | AUROC from G+C and U | about 0.66 | 6 min |
-| TODO-2 | AUROC from 5-letter words | about 0.74 | 4 min |
-| TODO-3 | shuffle test, CNN and probe | 0.66 and 0.77 | 10 min |
-| TODO-4 | `shortcut_scores()` on both test sets | G+C/U 0.64 → 0.51 | 12 min |
-| TODO-5 | the LoRA training step | about 0.81 | 7 min |
+| TODO-1 | write `gc_u`, then AUROC from G+C and U | the test cell passes; about 0.66 | 6 min |
+| TODO-2 | count words by hand, then AUROC from 5-letter words | the test cell passes; about 0.74 | 4 min |
+| TODO-3 | shuffle one sequence, then the shuffle test on CNN and probe | the test cell passes; 0.66 and 0.77 | 10 min |
+| TODO-4 | the LoRA training step | the test cell passes; about 0.81 | 7 min |
 
 ::: {.notes}
-- Given cells (setup, CNN retrain, before and after, take-aways): about 10 min. Projected hands-on total: about 49 min, 51 with the optional section, including LoRA training.
+- Given cells (setup, `shortcut_scores`, CNN retrain, before and after, take-aways): about 12 min. Projected hands-on total: about 39 min, 41 with the optional section, including LoRA training.
 - The rejoin cell is at the end of section 0; keep `USE_MY_FILES = False` to use our files.
-- Helpers: TODO-1 `gc_u`, `probe_auc`; TODO-2 `kmer_counts(seqs, k=5)`; TODO-3 `dinuc_shuffle`; TODO-5 `batch_logits`, `crit`, `opt`, `scaler`.
+- Helpers: TODO-1 `probe_auc` (`gc_u` is written by the students); TODO-2 `Counter`, `kmer_counts(seqs, k=5)`; TODO-3 `dinuc_shuffle`; TODO-4 `batch_logits`, `crit`, `opt`, `scaler`.
 - TODO-3: score the shuffled sequences with the probe already fitted on real sequences.
-- TODO-4 full check: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.
-- TODO-5: start the LoRA cell as soon as it is written and read on while it trains.
-- The label curve (optional, 2 min) is precomputed. Each TODO has a "Stuck?" cell.
+- `shortcut_scores` is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.
+- TODO-4: write the step, run its test (one batch on a fresh model), then start the training cell and read on while it trains.
+- The label curve (optional, 2 min) is precomputed. Each TODO has a test cell and a "Stuck?" cell.
 :::
 
 ::: {.center}
@@ -277,7 +308,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 ::: {.column width="58%"}
 - Two minutes: what should change for your background?
 - **[forms.gle/NfE6ZHj98ri3WYmG6]{.nowrap}**
-- Notebooks and slides stay online: **[github.com/mathoory/ai-days-2026-dna-workshop]{.nowrap}**
+- Notebooks and slides stay online: **[mathoory.github.io/ai-days-2026-dna-workshop]{.nowrap}**
 :::
 ::: {.column width="42%"}
 ![](assets/custom/qr_form.png){width="80%"}

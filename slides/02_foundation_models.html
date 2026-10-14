@@ -246,8 +246,39 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="two-pretraining-objectives" class="slide level2">
+<h2>1.2 Two pretraining objectives</h2>
+<ul>
+<li><strong>Next token</strong> (Mistral-DNA, HyenaDNA, Evo): <span class="math inline">\(\;\mathcal{L} = -\log p_\theta(x_t \mid x_{&lt;t})\)</span></li>
+<li><strong>Masked tokens</strong> (Nucleotide Transformer, DNABERT-2): <span class="math inline">\(\;\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})\)</span>, hidden tokens predicted from both sides</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/next_token.png" class="quarto-figure quarto-figure-center" height="492"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>These are the losses the vocabulary heads (slide 5.1) are trained with. <span class="math inline">\(x_t\)</span> is the token at position <span class="math inline">\(t\)</span>; <span class="math inline">\(x_{&lt;t}\)</span> the tokens before it; <span class="math inline">\(x_{\setminus t}\)</span> all tokens except the hidden ones.</li>
+<li>The figure: Mistral-DNA, given the first tokens of a real sequence (the end of that context is printed at the top), assigns a probability to each of its 4,096 possible next tokens. Its top choice gets about 10%; the true token is shown at the bottom with its much lower probability.</li>
+<li>Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.</li>
+<li>Masked models hide about 15% of the tokens and predict them from the tokens on both sides.</li>
+<li>In both cases the genome supplies its own targets, so no experimental labels are needed.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="four-stages-in-the-cnn-and-in-a-language-model" class="slide level2">
-<h2>1.2 Four stages, in the CNN and in a language model</h2>
+<h2>1.3 Four stages, in the CNN and in a language model</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 33%">
@@ -449,6 +480,7 @@
 </div>
 <aside class="notes">
 <ul>
+<li>Attention alone does not see token order. The model adds position information to the token vectors (Mistral-DNA rotates them by an angle that depends on the position).</li>
 <li>Projected: 2 min.</li>
 <li>The strips are real: the first 64 of the 256 numbers for each token, at the input (bottom) and after the last layer (top). The blue lines connect every input token to one output vector.</li>
 <li>In: one vector per token. Out: one vector per token, the same size (256 numbers).</li>
@@ -486,6 +518,35 @@
 <li><code>[CLS]</code> and <code>[SEP]</code> are special tokens the tokenizer adds at the start and end; they are not DNA.</li>
 <li>In a batch, shorter sequences are padded. The attention mask (1 for real tokens, 0 for padding) keeps padding out of the average.</li>
 <li>A few dimensions are large for almost every token (the vertical stripes). That is common in transformer models and does not depend on the sequence.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="batches-padding-and-the-mask" class="slide level2">
+<h2>4.3 Batches: padding and the mask</h2>
+<ul>
+<li>Sequences in a batch are padded to the same number of tokens; the <strong>attention mask</strong> marks the real ones</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/pad_mask.png" class="quarto-figure quarto-figure-center" height="596"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Three real bound sequences (22, 31 and 40 letters, in DNA letters as the model reads them), tokenized together. Each row is one sequence; each cell one token, with its mask value below it.</li>
+<li><code>[CLS]</code> and <code>[SEP]</code> are special tokens the tokenizer adds at the start and end. Shorter sequences are filled with padding tokens up to the longest one in the batch.</li>
+<li>The mask is 1 for real tokens (including <code>[CLS]</code> and <code>[SEP]</code>) and 0 for padding. The model uses it to ignore padding, and the sequence embedding averages the last-layer vectors only where it is 1.</li>
+<li>Without the mask, the padding vectors enter the average, and the same sequence gets a different embedding depending on which batch it is in.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -543,7 +604,7 @@
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
-<li>The first two rows are the vocabulary heads used in pretraining (next slide); the third is ours.</li>
+<li>The first two rows are the vocabulary heads used in pretraining (slide 1.2); the third is ours.</li>
 <li>Softmax turns one score per vocabulary token into probabilities that sum to 1.</li>
 <li>Our task’s head first averages the last layer over the tokens (the sequence embedding), then applies one linear layer. Before the logistic regression each of the 256 dimensions is standardised.</li>
 <li>After pretraining the vocabulary head is discarded and a new task head is attached. The body (and the embedding table) transfers to the new task.</li>
@@ -561,24 +622,23 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="two-pretraining-objectives" class="slide level2">
-<h2>5.2 Two pretraining objectives</h2>
+<section id="the-linear-probe" class="slide level2">
+<h2>5.2 The linear probe</h2>
 <ul>
-<li><strong>Next token</strong> (Mistral-DNA, HyenaDNA, Evo): <span class="math inline">\(\;\mathcal{L} = -\log p_\theta(x_t \mid x_{&lt;t})\)</span></li>
-<li><strong>Masked tokens</strong> (Nucleotide Transformer, DNABERT-2): <span class="math inline">\(\;\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})\)</span>, hidden tokens predicted from both sides</li>
+<li>Logistic regression on the 256 numbers of each sequence embedding; the language model stays frozen</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/next_token.png" class="quarto-figure quarto-figure-center" height="492"></p>
+<p><img data-src="assets/custom/probe_pipeline.png" class="quarto-figure quarto-figure-center" height="545"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>These are the losses the vocabulary heads of slide 5.1 are trained with. <span class="math inline">\(x_t\)</span> is the token at position <span class="math inline">\(t\)</span>; <span class="math inline">\(x_{&lt;t}\)</span> the tokens before it; <span class="math inline">\(x_{\setminus t}\)</span> all tokens except the hidden ones.</li>
-<li>The figure: Mistral-DNA, given the first tokens of a real sequence (the end of that context is printed at the top), assigns a probability to each of its 4,096 possible next tokens. Its top choice gets about 10%; the true token is shown at the bottom with its much lower probability.</li>
-<li>Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.</li>
-<li>Masked models hide about 15% of the tokens and predict them from the tokens on both sides.</li>
-<li>In both cases the genome supplies its own targets, so no experimental labels are needed.</li>
+<li>Left: the standardised embeddings of 40 of the 12,000 training sequences, one row each. Right: the probe and its score on the 1,000 held-out sequences.</li>
+<li>The same model as part 1 slide 2.3, with 256 inputs instead of 2: 256 weights and one bias.</li>
+<li>Standardising shifts and scales each of the 256 numbers to mean 0 and standard deviation 1, using the training sequences only; the same shift and scale are applied to the test sequences.</li>
+<li>Regularisation (part 1 slide 3.4) keeps the 256 weights small: <code>C = 0.1</code> in scikit-learn, where smaller <code>C</code> means stronger regularisation.</li>
+<li>Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -624,26 +684,21 @@
 
 </section>
 
-<section id="from-a-sequence-to-a-sequence-embedding-with-hugging-face" class="slide level2">
-<h2>6.1 From a sequence to a sequence embedding with Hugging Face</h2>
+<section id="loading-a-model-from-hugging-face" class="slide level2">
+<h2>6.1 Loading a model from Hugging Face</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModel</span>
 <span id="cb1-2"><a href=""></a>name  <span class="op">=</span> <span class="st">"RaphaelMourad/Mistral-DNA-v1-17M-hg38"</span></span>
 <span id="cb1-3"><a href=""></a>tok   <span class="op">=</span> AutoTokenizer.from_pretrained(name, trust_remote_code<span class="op">=</span><span class="va">True</span>)   <span class="co"># the token vocabulary</span></span>
 <span id="cb1-4"><a href=""></a>model <span class="op">=</span> AutoModel.from_pretrained(name, trust_remote_code<span class="op">=</span><span class="va">True</span>)       <span class="co"># the weights</span></span>
 <span id="cb1-5"><a href=""></a></span>
-<span id="cb1-6"><a href=""></a>seq <span class="op">=</span> <span class="st">"UGAUUUAUCAAG..."</span>.replace(<span class="st">"U"</span>, <span class="st">"T"</span>)            <span class="co"># the model reads DNA letters</span></span>
-<span id="cb1-7"><a href=""></a>ids <span class="op">=</span> tok([seq], return_tensors<span class="op">=</span><span class="st">"pt"</span>, padding<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-8"><a href=""></a>h   <span class="op">=</span> model(input_ids<span class="op">=</span>ids[<span class="st">"input_ids"</span>], attention_mask<span class="op">=</span>ids[<span class="st">"attention_mask"</span>],</span>
-<span id="cb1-9"><a href=""></a>            output_hidden_states<span class="op">=</span><span class="va">True</span>).hidden_states[<span class="op">-</span><span class="dv">1</span>]          <span class="co"># (1, tokens, 256)</span></span>
-<span id="cb1-10"><a href=""></a>m   <span class="op">=</span> ids[<span class="st">"attention_mask"</span>].unsqueeze(<span class="op">-</span><span class="dv">1</span>)            <span class="co"># 1 = real token, 0 = padding</span></span>
-<span id="cb1-11"><a href=""></a>vec <span class="op">=</span> (h <span class="op">*</span> m).<span class="bu">sum</span>(<span class="dv">1</span>) <span class="op">/</span> m.<span class="bu">sum</span>(<span class="dv">1</span>)                      <span class="co"># (1, 256): the sequence embedding</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-6"><a href=""></a>seq <span class="op">=</span> <span class="st">"UGAUUUAUCAAG..."</span>.replace(<span class="st">"U"</span>, <span class="st">"T"</span>)            <span class="co"># the model reads DNA letters</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <aside class="notes">
 <ul>
 <li>The same calls load any model on the Hugging Face Hub. Each model has a page with a model card: what it was trained on, how, and its known limits.</li>
 <li>The download goes to the Colab machine. Mistral-DNA is about 60 MB, roughly 10 seconds.</li>
 <li>Mistral-DNA has 16M parameters; the “17M” in its name includes an output layer we do not use.</li>
 <li>The tokenizer returns more keys than the model accepts, so pass only <code>input_ids</code> and <code>attention_mask</code>.</li>
-<li>The last three lines are TODO-1: average the last layer over the real tokens only. <code>unsqueeze(-1)</code> gives the mask shape (1, tokens, 1), so it multiplies all 256 numbers of each token.</li>
+<li>From here TODO-1 goes in steps: tokenize the sequence, run the model and keep its last layer, then the masked mean of slide 4.3. <code>unsqueeze(-1)</code> gives the mask shape (tokens, 1), so it multiplies all 256 numbers of each token.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -678,14 +733,14 @@
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">TODO-1</td>
-<td style="text-align: left;"><code>embed</code>: one vector per sequence</td>
-<td style="text-align: left;">shape <code>(N, 256)</code></td>
+<td style="text-align: left;">one sequence: tokens, last layer, masked mean; then <code>embed</code> for a list</td>
+<td style="text-align: left;">the test cell passes; shape <code>(N, 256)</code></td>
 <td style="text-align: left;">9 min</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">TODO-2</td>
 <td style="text-align: left;"><code>probe_auc</code>: logistic regression</td>
-<td style="text-align: left;">about 0.78</td>
+<td style="text-align: left;">the test cell passes; about 0.78</td>
 <td style="text-align: left;">5 min</td>
 </tr>
 <tr class="odd">
@@ -700,11 +755,11 @@
 <ul>
 <li>Given cells (setup, loading Mistral-DNA, 2-D map, NT-500M vectors, take-aways): about 12 min. Projected hands-on total: about 32 min.</li>
 <li>Signatures: <code>embed(tok, model, seqs)</code> returns an <code>(N, 256)</code> array; <code>probe_auc(...)</code> returns <code>(auc, probe)</code>.</li>
-<li>TODO-1 check: the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
-<li>TODO-2: the probe trains on 12,000 sequences (the <code>C=0.1</code> setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set.</li>
+<li>TODO-1 goes in four steps: tokenize one sequence (1a), run the model on it (1b), the masked mean (1c), then <code>embed</code> for a list in batches (1d). Its test checks the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
+<li>TODO-2: the probe trains on 12,000 sequences (the <code>C=0.1</code> setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set; the test cell says so.</li>
 <li>NT-500M (human reference) is a 2 GB download, so its vectors are provided. It scores about 0.79 from these precomputed vectors.</li>
 <li>The live row is section 3 of the notebook (slide 7.3): start the cell and read the take-aways while it trains.</li>
-<li>Each TODO has a “Stuck?” cell that loads our version.</li>
+<li>Each TODO has a test cell and a “Stuck?” cell that loads our version.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
