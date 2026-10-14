@@ -181,7 +181,7 @@
 <section id="pretraining-a-model" class="slide level2">
 <h2>1.2 Pretraining a model</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_adapt_0.png" height="729"></p>
+<p><img data-src="assets/custom/d2_adapt_0.png" height="742"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -205,9 +205,9 @@
 <section id="one-model-many-tasks" class="slide level2">
 <h2>1.3 One model, many tasks</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_adapt_1.png" height="729"></p>
-<p><img data-src="assets/custom/d2_adapt_2.png" class="fragment" height="729"></p>
-<p><img data-src="assets/custom/d2_adapt_3.png" class="fragment" height="729"></p>
+<p><img data-src="assets/custom/d2_adapt_1.png" height="742"></p>
+<p><img data-src="assets/custom/d2_adapt_2.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/d2_adapt_3.png" class="fragment" height="742"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -232,12 +232,12 @@
 <section id="two-pretraining-objectives" class="slide level2">
 <h2>1.4 Two pretraining objectives</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_obj_0.png" height="700"></p>
-<p><img data-src="assets/custom/d2_obj_1.png" class="fragment" height="700"></p>
+<p><img data-src="assets/custom/d2_obj_0.png" height="723"></p>
+<p><img data-src="assets/custom/d2_obj_1.png" class="fragment" height="723"></p>
 </div>
 <aside class="notes">
 <ul>
-<li>Top: the end of a real sequence from our data, cut into Mistral-DNA’s tokens, with the next one hidden. Next-token models (Mistral-DNA, HyenaDNA, Evo) predict each token from the tokens before it. <span class="math inline">\(x_t\)</span> is the token at position <span class="math inline">\(t\)</span>; <span class="math inline">\(x_{&lt;t}\)</span> the tokens before it.</li>
+<li>Top: the end of a real sequence from our data, cut into Mistral-DNA’s tokens, with the next one hidden; the equation is the loss. Next-token models (Mistral-DNA, HyenaDNA, Evo) predict each token from the tokens before it. <span class="math inline">\(x_t\)</span> is the token at position <span class="math inline">\(t\)</span>; <span class="math inline">\(x_{&lt;t}\)</span> the tokens before it.</li>
 <li>Click: masked models (Nucleotide Transformer, DNABERT-2) hide about 15% of the tokens and predict each from the tokens on both sides. <span class="math inline">\(x_{\setminus t}\)</span> is all tokens except the hidden ones.</li>
 <li>Both losses are the cross-entropy of part 1: minus the log of the probability the model gives the true token.</li>
 <li>In both, the genome supplies its own targets, so no experimental labels are needed.</li>
@@ -258,13 +258,14 @@
 <h2>1.5 What the model predicts</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/d2_next.png" class="quarto-figure quarto-figure-center" height="755"></p>
+<p><img data-src="assets/custom/d2_next.png" class="quarto-figure quarto-figure-center" height="766"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>Mistral-DNA, given the real context of the last slide, gives a probability to each of its 4,096 possible next tokens. Light blue: its top 8; orange: the true token, with a much lower probability.</li>
-<li>Its top choice gets about 10%. Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.</li>
+<li>Mistral-DNA, given the real context of the last slide, gives a probability to each of its 4,096 possible next tokens. Blue: its six most likely tokens, with their probabilities. Orange: the token that actually comes next, AAATA.</li>
+<li>Its top choice gets 0.10. The true token gets less than 0.0001 and ranks 2,362 of 4,096: the model was wrong here.</li>
+<li>Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.</li>
 <li>The head turns one score per vocabulary token into these probabilities with the softmax (section 5).</li>
 </ul>
 <style type="text/css">
@@ -375,11 +376,11 @@
 <section id="byte-pair-encoding-bpe" class="slide level2">
 <h2>2.3 Byte-pair encoding (BPE)</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_bpe_0.png" height="594"></p>
-<p><img data-src="assets/custom/d2_bpe_1.png" class="fragment" height="594"></p>
-<p><img data-src="assets/custom/d2_bpe_2.png" class="fragment" height="594"></p>
-<p><img data-src="assets/custom/d2_bpe_3.png" class="fragment" height="594"></p>
-<p><img data-src="assets/custom/d2_bpe_4.png" class="fragment" height="594"></p>
+<p><img data-src="assets/custom/d2_bpe_0.png" height="742"></p>
+<p><img data-src="assets/custom/d2_bpe_1.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/d2_bpe_2.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/d2_bpe_3.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/d2_bpe_4.png" class="fragment" height="742"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -408,7 +409,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/pad_mask.png" class="quarto-figure quarto-figure-center" height="606"></p>
+<p><img data-src="assets/custom/pad_mask.png" class="quarto-figure quarto-figure-center" height="591"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -441,14 +442,15 @@
 <li>Token <span class="math inline">\(i\)</span> becomes row <span class="math inline">\(i\)</span> of a learned table <span class="math inline">\(E\)</span>: <span class="math inline">\(\;e_i = x_i^\top E\)</span></li>
 </ul>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_emb_0.png" height="643"></p>
-<p><img data-src="assets/custom/d2_emb_1.png" class="fragment" height="643"></p>
+<p><img data-src="assets/custom/d2_emb_0.png" height="640"></p>
+<p><img data-src="assets/custom/d2_emb_1.png" class="fragment" height="640"></p>
+<p><img data-src="assets/custom/d2_emb_2.png" class="fragment" height="640"></p>
 </div>
 <aside class="notes">
 <ul>
-<li><span class="math inline">\(x_i\)</span> is the one-hot vector of token <span class="math inline">\(i\)</span>: 4,096 numbers, all 0 except a 1 at position <span class="math inline">\(i\)</span>. Each entry is drawn next to the row of <span class="math inline">\(E\)</span> it multiplies.</li>
-<li><span class="math inline">\(E\)</span> is Mistral-DNA’s real table: 4,096 rows, one per token, of 256 numbers each (first 48 shown); blue positive, orange negative.</li>
-<li>Click: the product keeps only the row where <span class="math inline">\(x_i\)</span> is 1. Token AAA, row 18, becomes its <strong>token embedding</strong> <span class="math inline">\(e_i\)</span>.</li>
+<li>Where <span class="math inline">\(x_i\)</span> comes from: the tokenizer gives each token its ID, its position in the 4,096-token vocabulary. AAA is ID 18. These IDs are the <code>input_ids</code> the tokenizer returns in the notebook.</li>
+<li>Click: <span class="math inline">\(x_i\)</span> is the one-hot vector of that ID: 4,096 numbers, all 0 except a 1 at position 18. It is drawn as a column, each entry next to the row of <span class="math inline">\(E\)</span> it multiplies.</li>
+<li>Click: <span class="math inline">\(E\)</span> is Mistral-DNA’s real table, 4,096 rows of 256 numbers (rows 15 to 21 and the first 32 numbers shown; blue positive, orange negative). Multiplying by the one-hot vector keeps only row 18: the <strong>token embedding</strong> <span class="math inline">\(e_i\)</span> of AAA.</li>
 <li>So an embedding layer is a table lookup. The CNN’s one-hot encoding is the same lookup with a fixed 4 × 4 identity table: nothing learned.</li>
 <li>The table is learned during pretraining, so tokens that occur in similar contexts end up with similar rows.</li>
 </ul>
@@ -475,8 +477,8 @@
 <li>One row in per token, one row out; each row out depends on all the tokens</li>
 </ul>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_body_0.png" height="646"></p>
-<p><img data-src="assets/custom/d2_body_1.png" class="fragment" height="646"></p>
+<p><img data-src="assets/custom/d2_body_0.png" height="631"></p>
+<p><img data-src="assets/custom/d2_body_1.png" class="fragment" height="631"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -675,9 +677,9 @@
 <section id="loading-a-model-from-hugging-face" class="slide level2">
 <h2>6.1 Loading a model from Hugging Face</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_hf_0.png" height="671"></p>
-<p><img data-src="assets/custom/d2_hf_1.png" class="fragment" height="671"></p>
-<p><img data-src="assets/custom/d2_hf_2.png" class="fragment" height="671"></p>
+<p><img data-src="assets/custom/d2_hf_0.png" height="658"></p>
+<p><img data-src="assets/custom/d2_hf_1.png" class="fragment" height="658"></p>
+<p><img data-src="assets/custom/d2_hf_2.png" class="fragment" height="658"></p>
 </div>
 <aside class="notes">
 <ul>

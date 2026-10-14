@@ -188,7 +188,8 @@ def walkthrough(tok, fm, pos):
     v0, v = np.percentile(np.abs(H0), 97), np.percentile(np.abs(H), 97)
     steps = ["Sequence", "1  Tokenization", "2  Embedding", "3  Body", "4  Prediction head"]
     for k in range(5):
-        fig = plt.figure(figsize=(16, 9), dpi=120)
+        fig = plt.figure(figsize=(11, 6.19), dpi=120)
+        fig._canvas = True
         side = fig.add_axes([0, 0, 0.2, 1]); side.set_xlim(0, 20); side.set_ylim(0, 90); side.axis("off")
         cur = {0: 1, 1: 2, 2: 3, 3: 4, 4: 4}[k]
         for j, st in enumerate(steps):
@@ -197,7 +198,7 @@ def walkthrough(tok, fm, pos):
             done = j < cur
             side.add_patch(plt.Circle((2.2, y), 0.9, color=ACCENT if on else (MID if done else HAIR),
                                       transform=side.transData))
-            side.text(4, y, st, fontsize=21, va="center", color=ACCENT if on else (INK if done else LIGHT),
+            side.text(4, y, st, fontsize=19, va="center", color=ACCENT if on else (INK if done else LIGHT),
                       fontweight="bold" if on else "normal")
             if j < 4:
                 side.plot([2.2, 2.2], [y - 2, y - 12], color=HAIR, lw=2)
@@ -209,11 +210,11 @@ def walkthrough(tok, fm, pos):
         main.text(4 + 46 * 2.55, 84, "…", fontsize=17, color=MUTED, va="center")
         if k == 0:
             xs = token_row(main, 2, 66, toks[:9], fs=17)
-            main.text(xs[-1][0] + xs[-1][1] + 2, 66, f"… {len(toks)} tokens in all, with [CLS] and [SEP]",
+            main.text(xs[-1][0] + xs[-1][1] + 2, 66, f"… {len(toks)} tokens",
                       fontsize=18, color=MUTED, va="center")
         if k in (1, 2):
             M, vm = (H0, v0) if k == 1 else (H, v)
-            a = fig.add_axes([0.32, 0.1, 0.62, 0.72])
+            a = fig.add_axes([0.32, 0.14, 0.62, 0.6])
             a.imshow(M, cmap=DIVERGING, vmin=-vm, vmax=vm, aspect="auto", interpolation="nearest")
             a.set_yticks(range(len(toks))); a.set_yticklabels(toks, fontsize=15, family=MONO)
             a.set_xticks([0, 64, 128, 192, 255]); a.set_xlabel("256 numbers per token"); a.tick_params(length=0)
@@ -238,7 +239,7 @@ def walkthrough(tok, fm, pos):
             fig.text(0.32, 0.38, "The sequence embedding: 256 numbers", fontsize=20, color=INK)
             if k == 4:
                 fig.text(0.63, 0.17, "↓", ha="center", fontsize=30, color=MUTED)
-                fig.text(0.63, 0.08, "a prediction head: the probability that AGO2 binds (section 5)", ha="center",
+                fig.text(0.63, 0.08, "a prediction head gives P(bound)", ha="center",
                          fontsize=24, color=GOOD_C)
         fig.savefig(OUT / f"walk_{k}.png", dpi=120, facecolor="white"); plt.close(fig); print("wrote", f"walk_{k}")
 

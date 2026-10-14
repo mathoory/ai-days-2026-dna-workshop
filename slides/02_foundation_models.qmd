@@ -25,7 +25,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 ## 1.2 Pretraining a model
 
 ::: {.r-stack}
-![](assets/custom/d2_adapt_0.png){height="729px"}
+![](assets/custom/d2_adapt_0.png){height="742px"}
 :::
 
 ::: {.notes}
@@ -38,11 +38,11 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 ## 1.3 One model, many tasks
 
 ::: {.r-stack}
-![](assets/custom/d2_adapt_1.png){height="729px"}
+![](assets/custom/d2_adapt_1.png){height="742px"}
 
-![](assets/custom/d2_adapt_2.png){.fragment height="729px"}
+![](assets/custom/d2_adapt_2.png){.fragment height="742px"}
 
-![](assets/custom/d2_adapt_3.png){.fragment height="729px"}
+![](assets/custom/d2_adapt_3.png){.fragment height="742px"}
 :::
 
 ::: {.notes}
@@ -56,13 +56,13 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 ## 1.4 Two pretraining objectives
 
 ::: {.r-stack}
-![](assets/custom/d2_obj_0.png){height="700px"}
+![](assets/custom/d2_obj_0.png){height="723px"}
 
-![](assets/custom/d2_obj_1.png){.fragment height="700px"}
+![](assets/custom/d2_obj_1.png){.fragment height="723px"}
 :::
 
 ::: {.notes}
-- Top: the end of a real sequence from our data, cut into Mistral-DNA's tokens, with the next one hidden. Next-token models (Mistral-DNA, HyenaDNA, Evo) predict each token from the tokens before it. $x_t$ is the token at position $t$; $x_{<t}$ the tokens before it.
+- Top: the end of a real sequence from our data, cut into Mistral-DNA's tokens, with the next one hidden; the equation is the loss. Next-token models (Mistral-DNA, HyenaDNA, Evo) predict each token from the tokens before it. $x_t$ is the token at position $t$; $x_{<t}$ the tokens before it.
 - Click: masked models (Nucleotide Transformer, DNABERT-2) hide about 15% of the tokens and predict each from the tokens on both sides. $x_{\setminus t}$ is all tokens except the hidden ones.
 - Both losses are the cross-entropy of part 1: minus the log of the probability the model gives the true token.
 - In both, the genome supplies its own targets, so no experimental labels are needed.
@@ -70,11 +70,12 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 ## 1.5 What the model predicts
 
-![](assets/custom/d2_next.png){fig-align="center" height="755px"}
+![](assets/custom/d2_next.png){fig-align="center" height="766px"}
 
 ::: {.notes}
-- Mistral-DNA, given the real context of the last slide, gives a probability to each of its 4,096 possible next tokens. Light blue: its top 8; orange: the true token, with a much lower probability.
-- Its top choice gets about 10%. Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.
+- Mistral-DNA, given the real context of the last slide, gives a probability to each of its 4,096 possible next tokens. Blue: its six most likely tokens, with their probabilities. Orange: the token that actually comes next, AAATA.
+- Its top choice gets 0.10. The true token gets less than 0.0001 and ranks 2,362 of 4,096: the model was wrong here.
+- Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.
 - The head turns one score per vocabulary token into these probabilities with the softmax (section 5).
 :::
 
@@ -136,15 +137,15 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 ## 2.3 Byte-pair encoding (BPE)
 
 ::: {.r-stack}
-![](assets/custom/d2_bpe_0.png){height="594px"}
+![](assets/custom/d2_bpe_0.png){height="742px"}
 
-![](assets/custom/d2_bpe_1.png){.fragment height="594px"}
+![](assets/custom/d2_bpe_1.png){.fragment height="742px"}
 
-![](assets/custom/d2_bpe_2.png){.fragment height="594px"}
+![](assets/custom/d2_bpe_2.png){.fragment height="742px"}
 
-![](assets/custom/d2_bpe_3.png){.fragment height="594px"}
+![](assets/custom/d2_bpe_3.png){.fragment height="742px"}
 
-![](assets/custom/d2_bpe_4.png){.fragment height="594px"}
+![](assets/custom/d2_bpe_4.png){.fragment height="742px"}
 :::
 
 ::: {.notes}
@@ -159,7 +160,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 - Sequences in a batch are padded to the same number of tokens; the **attention mask** marks the real ones
 
-![](assets/custom/pad_mask.png){fig-align="center" height="606px"}
+![](assets/custom/pad_mask.png){fig-align="center" height="591px"}
 
 ::: {.notes}
 - Three real bound sequences (22, 31 and 40 letters, in DNA letters as the model reads them), tokenized together. Each row is one sequence; each cell one token, with its mask value below it.
@@ -179,15 +180,17 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - Token $i$ becomes row $i$ of a learned table $E$: $\;e_i = x_i^\top E$
 
 ::: {.r-stack}
-![](assets/custom/d2_emb_0.png){height="643px"}
+![](assets/custom/d2_emb_0.png){height="640px"}
 
-![](assets/custom/d2_emb_1.png){.fragment height="643px"}
+![](assets/custom/d2_emb_1.png){.fragment height="640px"}
+
+![](assets/custom/d2_emb_2.png){.fragment height="640px"}
 :::
 
 ::: {.notes}
-- $x_i$ is the one-hot vector of token $i$: 4,096 numbers, all 0 except a 1 at position $i$. Each entry is drawn next to the row of $E$ it multiplies.
-- $E$ is Mistral-DNA's real table: 4,096 rows, one per token, of 256 numbers each (first 48 shown); blue positive, orange negative.
-- Click: the product keeps only the row where $x_i$ is 1. Token AAA, row 18, becomes its **token embedding** $e_i$.
+- Where $x_i$ comes from: the tokenizer gives each token its ID, its position in the 4,096-token vocabulary. AAA is ID 18. These IDs are the `input_ids` the tokenizer returns in the notebook.
+- Click: $x_i$ is the one-hot vector of that ID: 4,096 numbers, all 0 except a 1 at position 18. It is drawn as a column, each entry next to the row of $E$ it multiplies.
+- Click: $E$ is Mistral-DNA's real table, 4,096 rows of 256 numbers (rows 15 to 21 and the first 32 numbers shown; blue positive, orange negative). Multiplying by the one-hot vector keeps only row 18: the **token embedding** $e_i$ of AAA.
 - So an embedding layer is a table lookup. The CNN's one-hot encoding is the same lookup with a fixed 4 × 4 identity table: nothing learned.
 - The table is learned during pretraining, so tokens that occur in similar contexts end up with similar rows.
 :::
@@ -203,9 +206,9 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - One row in per token, one row out; each row out depends on all the tokens
 
 ::: {.r-stack}
-![](assets/custom/d2_body_0.png){height="646px"}
+![](assets/custom/d2_body_0.png){height="631px"}
 
-![](assets/custom/d2_body_1.png){.fragment height="646px"}
+![](assets/custom/d2_body_1.png){.fragment height="631px"}
 :::
 
 ::: {.notes}
@@ -333,11 +336,11 @@ Next: load a pretrained model and probe it.
 ## 6.1 Loading a model from Hugging Face
 
 ::: {.r-stack}
-![](assets/custom/d2_hf_0.png){height="671px"}
+![](assets/custom/d2_hf_0.png){height="658px"}
 
-![](assets/custom/d2_hf_1.png){.fragment height="671px"}
+![](assets/custom/d2_hf_1.png){.fragment height="658px"}
 
-![](assets/custom/d2_hf_2.png){.fragment height="671px"}
+![](assets/custom/d2_hf_2.png){.fragment height="658px"}
 :::
 
 ::: {.notes}

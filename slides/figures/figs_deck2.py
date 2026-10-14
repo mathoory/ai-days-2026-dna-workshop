@@ -1,43 +1,68 @@
-"""Part 2 deck, rework of 15.10 (Mattan's feedback): one geometry for every pipeline figure, real data throughout.
+"""Part 2 deck figures (rework of 15.10): drawn at each slide's shape, on a 10-inch canvas, so text reads at slide size.
 
     HF_HUB_OFFLINE=1 python figs_deck2.py [name ...]   (hw1-00660121 env; writes ../assets/custom/d2_*.png)
 
-Frames of one click-through, and figures on neighbouring slides that must not move, are cropped as one group.
+Scale: 160 units across 10 inches. A label of size fs is about 0.22 * fs units tall; a monospace letter is about
+0.135 * fs units wide. Frames of one click-through, and figures on neighbouring slides that must not move, are
+cropped as one group.
 """
 import json
 import sys
+from pathlib import Path
 
 import numpy as np
 import torch
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
 from deckstyle import *  # noqa: F401,F403
-from figs_d2 import MISTRAL, STAGES, block, real_context, save_raw, token_row
+from figs_d2 import MISTRAL, STAGES, real_context, save_raw
 from figs_parts import bound_window
 from intuition import split
 
-W, H = 160, 84                        # every canvas here: 16 x 8.4 inches, about the shape a slide leaves
-XS = [8 + k * 38 for k in range(4)]   # the four stage blocks, as on the section dividers
-BW = 30
+W = 160
+ASPECT = json.loads((Path(__file__).resolve().parent / "aspects.json").read_text(encoding="utf-8"))
 
 
-def canvas2():
-    return canvas(16, 8.4, ylim=(0, H))
+def canvas3(name, default=1.94):
+    """A 10-inch-wide canvas at the shape of the slide space for `name` (from aspects.json)."""
+    asp = ASPECT.get(name) or ASPECT.get(f"{name}_0") or default
+    h = W / asp
+    fig, ax = canvas(10, 10 / asp, ylim=(0, h))
+    return fig, ax, h
 
 
-def stage_row(ax, y, h=10, fs=21, colors=None, texts=None, tcolors=None):
-    """The four stage blocks with arrows, at height y. colors/texts override per block."""
-    for k, x in enumerate(XS):
-        fc = colors[k] if colors else ACCENT
-        tc = tcolors[k] if tcolors else "white"
-        block(ax, x, y, BW, h, texts[k] if texts else STAGES[k], fc=fc, tc=tc, fs=fs)
-        if k < 3:
-            arrow(ax, x + BW + 1, y + h / 2, x + 37, y + h / 2, color=MUTED, lw=2, ms=20)
+def blk(ax, x, y, w, h, text, fc=ACCENT, tc="white", fs=22, bold=True):
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0,rounding_size=1.4", fc=fc, ec="none"))
+    label(ax, x + w / 2, y + h / 2, text, fs=fs, color=tc, bold=bold)
+
+
+def letters_w(n, fs):
+    return 0.135 * fs * n
+
+
+def tok_row(ax, x, y, toks, fs=22, h=None, hide=None, hide_text="?", gap=1.0, pad=2.0):
+    """Tokens in boxes; returns [(x, w)] per box."""
+    h = h or 0.33 * fs
+    out = []
+    for j, t in enumerate(toks):
+        w = max(letters_w(max(len(t), 2), fs) + pad, letters_w(len(hide_text), fs) + pad if j == hide else 0)
+        if j == hide:
+            box(ax, x, y - h / 2, w, h, fc="white", ec=HELD_C, lw=2.5, r=0.8)
+            label(ax, x + w / 2, y, hide_text, fs=fs, color=HELD_C, bold=True)
+        else:
+            box(ax, x, y - h / 2, w, h, fc=[ACCENT_L, FAINT][j % 2], r=0.8)
+            dx = 0.135 * fs
+            for q, ch in enumerate(t):
+                label(ax, x + w / 2 + (q - (len(t) - 1) / 2) * dx, y, ch, fs=fs, color=BASE.get(ch, INK),
+                      family=MONO, bold=True)
+        out.append((x, w))
+        x += w + gap
+    return out
 
 
 def strip(ax, x, y, w, h, vec, vm, vertical=False):
-    """A vector drawn as a row (or column) of coloured cells."""
-    M = np.asarray(vec, dtype=float).reshape(-1, 1) if vertical else np.asarray(vec, dtype=float).reshape(1, -1)
+    v = np.asarray(vec, dtype=float)
+    M = v.reshape(-1, 1) if vertical else v.reshape(1, -1)
     ax.imshow(M, cmap=DIVERGING, vmin=-vm, vmax=vm, extent=(x, x + w, y, y + h), aspect="auto",
               interpolation="nearest", zorder=2)
     ax.add_patch(Rectangle((x, y), w, h, fill=False, ec=HAIR, lw=1, zorder=3))
@@ -48,10 +73,22 @@ def heat(ax, x, y, w, h, M, vm):
               interpolation="nearest", zorder=2)
 
 
-def model_and_tokenizer(need_model=True):
+def stage_row(ax, y, xs, bw, h=13, fs=21, colors=None, texts=None, tcolors=None):
+    for k, x in enumerate(xs):
+        blk(ax, x, y, bw, h, (texts or STAGES_2L)[k], fc=colors[k] if colors else ACCENT,
+            tc=tcolors[k] if tcolors else "white", fs=fs)
+        if k < 3:
+            arrow(ax, x + bw + 0.8, y + h / 2, xs[k + 1] - 0.8, y + h / 2, color=MUTED, lw=2.5, ms=22)
+
+
+STAGES_2L = ["Tokenization", "Embedding", "Body", "Prediction\nhead"]
+XS, BW = [2 + k * 40.5 + 0 for k in range(4)], 34      # the four stage blocks, used on every pipeline figure
+
+
+def model_and_tokenizer():
     from transformers import AutoModel, AutoTokenizer
     tok = AutoTokenizer.from_pretrained(MISTRAL, trust_remote_code=True)
-    fm = AutoModel.from_pretrained(MISTRAL, trust_remote_code=True).eval() if need_model else None
+    fm = AutoModel.from_pretrained(MISTRAL, trust_remote_code=True).eval()
     return tok, fm
 
 
@@ -63,141 +100,164 @@ def run_model(tok, fm, s, special=True):
     return toks, hs[0][0].numpy(), hs[-1][0].numpy(), enc["input_ids"][0].tolist()
 
 
-# ------------------------------------------------------------------ 1.2 and 1.3: one body, an embedding, many heads
+# ------------------------------------------------------------------ 1.2 and 1.3: body, embedding, heads
 def adapt(tok, fm, pos):
-    """Input tokens on top, the body, its output embedding, then one head per task. One geometry for all frames."""
-    ctx, nxt = real_context(tok, pos, n_show=5)
-    dna_in = " ".join([t for t in ctx])
+    ctx, nxt = real_context(tok, pos, n_show=4)
     _, _, Hd, _ = run_model(tok, fm, "".join(ctx), special=False)
-    e_dna = Hd[-1][:12]
-    e_lang = np.sin(np.arange(12) * 1.9) * 1.2                 # a drawn vector: the language model is not real here
-    lang_heads = [("next-word head", "mat", HELD_C), ("sentiment head", "neutral", GOOD_C),
-                  ("translation head", "Le chat s'est assis sur le …", GOOD_C)]
-    dna_heads = [("next-token head", nxt, HELD_C), ("AGO2 head", "P(bound)", GOOD_C),
-                 ("expression head", "a number", GOOD_C)]
-    frames = [("Model", ["The", "cat", "sat", "on", "the"], e_lang, lang_heads[:1]),
-              ("Model", ["The", "cat", "sat", "on", "the"], e_lang, lang_heads),
-              ("Mistral-DNA", ctx, e_dna, dna_heads[:1]),
-              ("Mistral-DNA", ctx, e_dna, dna_heads)]
+    e_dna, e_lang = Hd[-1][:10], np.sin(np.arange(10) * 1.9) * 1.2
+    lang = [("next-word head", "mat", HELD_C), ("sentiment head", "neutral", GOOD_C), ("translation head", "Le chat …", GOOD_C)]
+    dna = [("next-token head", nxt, HELD_C), ("AGO2 head", "P(bound)", GOOD_C), ("expression head", "a number", GOOD_C)]
+    frames = [("Model", ["The", "cat", "sat", "on", "the"], e_lang, lang[:1]), ("Model", ["The", "cat", "sat", "on", "the"], e_lang, lang),
+              ("Mistral-DNA", ctx, e_dna, dna[:1]), ("Mistral-DNA", ctx, e_dna, dna)]
     names = []
     for k, (body, toks, e, heads) in enumerate(frames):
-        fig, ax = canvas2()
-        cw = 12 if body == "Model" else None
-        row = token_row(ax, 4, 77, toks + [""], hide=len(toks), cw=cw, fs=22)
-        rx = (row[0][0] + row[-1][0] + row[-1][1]) / 2
-        label(ax, 4, 68.5, "Input", fs=19, color=MUTED, ha="left")
-        arrow(ax, 33, 71.5, 33, 63.5, color=MUTED, lw=2.5, ms=24)
-        block(ax, 18, 14, 30, 48, body, fc=ACCENT, fs=26)
-        label(ax, 33, 8.5, "Body: learned once, kept", fs=20, color=ACCENT)
-        arrow(ax, 49, 38, 56, 38, color=MUTED, lw=2.5, ms=24)
-        strip(ax, 57, 20, 4.5, 36, e, np.abs(e).max(), vertical=True)
-        label(ax, 59.25, 14, "Embedding", fs=20, color=INK, bold=True)
-        n = len(heads)
-        ys = [38] if n == 1 else list(np.linspace(56, 20, n))
+        fig, ax, H = canvas3("d2_adapt_0")
+        top = H - 6
+        if body == "Model":
+            x = 2
+            for j, t in enumerate(toks + ["?"]):
+                w = 15
+                if t == "?":
+                    box(ax, x, top - 4.5, w, 9, fc="white", ec=HELD_C, lw=2.5, r=0.8)
+                    label(ax, x + w / 2, top, "?", fs=24, color=HELD_C, bold=True)
+                else:
+                    box(ax, x, top - 4.5, w, 9, fc=[ACCENT_L, FAINT][j % 2], r=0.8)
+                    label(ax, x + w / 2, top, t, fs=24)
+                x += w + 1
+        else:
+            tok_row(ax, 2, top, toks + [""], fs=22, hide=len(toks))
+        arrow(ax, 22, top - 6, 22, top - 13, color=MUTED, lw=2.5, ms=24)
+        blk(ax, 4, 12, 36, top - 26, body, fs=28)
+        label(ax, 22, 5, "Body", fs=24, color=ACCENT, bold=True)
+        arrow(ax, 41, (top - 14) / 2 + 12, 47, (top - 14) / 2 + 12, color=MUTED, lw=2.5, ms=24)
+        mid = (top - 14) / 2 + 12
+        strip(ax, 48, mid - 16, 6, 32, e, np.abs(e).max(), vertical=True)
+        label(ax, 51, 5, "Embedding", fs=22, color=INK, bold=True)
+        ys = [mid] if len(heads) == 1 else [mid + 20, mid, mid - 20]
         for y, (head, out, c) in zip(ys, heads):
-            arrow(ax, 62.5, 38 + (y - 38) * 0.3, 71.5, y, color=MUTED, lw=2.5, ms=22)
-            block(ax, 73, y - 6, 36, 12, head, fc=c, fs=22)
-            arrow(ax, 110, y, 116, y, color=MUTED, lw=2.5, ms=20)
-            if set(out) <= set("ACGT") and out:
+            arrow(ax, 55, mid + (y - mid) * 0.3, 63, y, color=MUTED, lw=2.5, ms=22)
+            blk(ax, 64, y - 7, 46, 14, head, fc=c, fs=24)
+            arrow(ax, 111, y, 117, y, color=MUTED, lw=2.5, ms=22)
+            if out and set(out) <= set("ACGT"):
                 for q, ch in enumerate(out):
-                    label(ax, 118 + q * 2.6, y, ch, fs=24, color=BASE[ch], family=MONO, bold=True, ha="left")
+                    label(ax, 119 + q * 3.4, y, ch, fs=26, color=BASE[ch], family=MONO, bold=True, ha="left")
             else:
-                label(ax, 118, y, out, fs=22, color=INK, ha="left")
-        label(ax, 91, 8.5, "Head: one per task", fs=20, color=MUTED)
-        name = f"d2_adapt_{k}"
-        save_raw(fig, name); names.append(name)
+                label(ax, 119, y, out, fs=26, ha="left")
+        label(ax, 92, 5, "Head: one per task", fs=22, color=MUTED, bold=True)
+        nm = f"d2_adapt_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
-    print("adapt: DNA context", ctx, "next", nxt)
 
 
-# ------------------------------------------------------------------ 1.4 two objectives on one slide
+# ------------------------------------------------------------------ 1.4 two objectives
 def objectives(tok, pos):
-    ctx, nxt = real_context(tok, pos, n_show=7)
+    ctx, nxt = real_context(tok, pos, n_show=6)
     names = []
     for k in (0, 1):
-        fig, ax = canvas2()
-        label(ax, 4, 74, "Next token", fs=24, color=INK, bold=True, ha="left")
-        label(ax, 4, 67, "hide the last token, predict it from the ones before", fs=20, color=MUTED, ha="left")
-        row = token_row(ax, 4, 55, ctx + [""], hide=len(ctx), fs=24)
-        x0, x1 = row[0][0], row[-2][0] + row[-2][1]
-        ax.annotate("", (row[-1][0] + row[-1][1] / 2, 48.5), (x0 + 2, 48.5),
-                    arrowprops=dict(arrowstyle="-|>", color=ACCENT, lw=2.5, mutation_scale=24))
+        fig, ax, H = canvas3("d2_obj_0")
+        y0 = H - 6
+        label(ax, 2, y0, "Next token (Mistral-DNA)", fs=26, bold=True, ha="left")
+        label(ax, 2, y0 - 8, r"$\mathcal{L} = -\log\, p_\theta(x_t \mid x_{<t})$", fs=26, color=MUTED, ha="left")
+        row = tok_row(ax, 2, y0 - 22, ctx + [""], fs=26, hide=len(ctx))
+        ax.annotate("", (row[-1][0] + row[-1][1] / 2, y0 - 30), (row[0][0] + 2, y0 - 30),
+                    arrowprops=dict(arrowstyle="-|>", color=ACCENT, lw=3, mutation_scale=28))
         if k == 1:
+            y1 = y0 - 42
             m = 3
             toks = ctx[:m] + ["[MASK]"] + ctx[m + 1:] + [nxt]
-            label(ax, 4, 34, "Masked token", fs=24, color=INK, bold=True, ha="left")
-            label(ax, 4, 27, "hide a token in the middle, predict it from both sides", fs=20, color=MUTED, ha="left")
-            row = token_row(ax, 4, 15, toks, hide=m, hide_text="[MASK]", fs=24)
+            label(ax, 2, y1, "Masked token (Nucleotide Transformer)", fs=26, bold=True, ha="left")
+            label(ax, 2, y1 - 8, r"$\mathcal{L} = -\log\, p_\theta(x_t \mid x_{\backslash t})$", fs=26, color=MUTED, ha="left")
+            row = tok_row(ax, 2, y1 - 22, toks, fs=26, hide=m, hide_text="[MASK]")
             cx = row[m][0] + row[m][1] / 2
-            ax.annotate("", (cx - 3, 8.5), (row[0][0] + 2, 8.5),
-                        arrowprops=dict(arrowstyle="-|>", color=ACCENT, lw=2.5, mutation_scale=24))
-            ax.annotate("", (cx + 3, 8.5), (row[-1][0] + row[-1][1] - 2, 8.5),
-                        arrowprops=dict(arrowstyle="-|>", color=ACCENT, lw=2.5, mutation_scale=24))
-        name = f"d2_obj_{k}"
-        save_raw(fig, name); names.append(name)
+            for a, b in ((row[0][0] + 2, cx - 4), (row[-1][0] + row[-1][1] - 2, cx + 4)):
+                ax.annotate("", (b, y1 - 30), (a, y1 - 30), arrowprops=dict(arrowstyle="-|>", color=ACCENT, lw=3, mutation_scale=28))
+        nm = f"d2_obj_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
 
 
-# ------------------------------------------------------------------ 1.6 the four stages, with a worked example
-def stage_example(tok, fm, pos):
+# ------------------------------------------------------------------ 1.5 the next-token probabilities, with the true token's rank
+def next_probs(tok, pos):
+    from transformers import AutoModelForCausalLM
+    lm = AutoModelForCausalLM.from_pretrained(MISTRAL, trust_remote_code=True).eval()
+    ids = tok(pos[7].replace("U", "T"), return_tensors="pt", add_special_tokens=False)["input_ids"][0]
+    cut = 14
+    with torch.no_grad():
+        p = torch.softmax(lm(input_ids=ids[None, :cut]).logits[0, -1], -1)
+    true = int(ids[cut])
+    rank = int((p > p[true]).sum()) + 1
+    top = torch.topk(p, 6)
+    items = [(tok.convert_ids_to_tokens(int(i)).replace("▁", ""), float(v), False) for v, i in zip(top.values, top.indices)]
+    items.append((tok.convert_ids_to_tokens(true).replace("▁", ""), float(p[true]), True))
+    fig = plt.figure(figsize=(10, 10 / (ASPECT.get("d2_next") or 1.88)), dpi=120)
+    fig._canvas = True
+    ax = fig.add_axes([0.2, 0.14, 0.62, 0.8])
+    ys = list(range(len(items) - 1)) + [len(items)]
+    ax.barh(ys, [v for _, v, _ in items], color=[HELD_C if t else TRAIN_L for *_, t in items], height=0.72)
+    for y, (n, v, t) in zip(ys, items):
+        txt = f"{v:.3f}" if not t else (f"{v:.4f}" if v >= 1e-4 else "below 0.0001") + f", rank {rank:,} of 4,096"
+        ax.text(v + 0.0015, y, txt, va="center", fontsize=22, color=HELD_C if t else INK)
+    ax.set_yticks(ys); ax.set_yticklabels([n + ("  true" if t else "") for n, _, t in items], family=MONO, fontsize=22)
+    for lab, (_, _, t) in zip(ax.get_yticklabels(), items):
+        lab.set_color(HELD_C if t else INK)
+    ax.invert_yaxis(); ax.tick_params(axis="y", length=0); ax.spines["left"].set_visible(False)
+    ax.set_xlim(0, top.values[0].item() * 1.35)
+    ax.set_xlabel("Predicted probability of the next token", fontsize=22); ax.tick_params(axis="x", labelsize=20)
+    ax.text(-0.02 * top.values[0].item(), len(items) - 1, "…", fontsize=26, color=MUTED, ha="right", va="center")
+    fig.savefig(OUT / "d2_next.png", dpi=200, facecolor="white"); plt.close(fig); trim(OUT / "d2_next.png")
+    print("next_probs true", items[-1][0], round(items[-1][1], 5), "rank", rank, "top", items[0][0], round(items[0][1], 3))
+
+
+# ------------------------------------------------------------------ 1.6 four stages with a worked example, and 4.3 the comparison
+def stage_frames(tok, fm, pos):
     s = pos[3][:40].replace("U", "T")
     toks, H0, Hc, _ = run_model(tok, fm, s, special=False)
-    toks, H0, Hc = toks[:6], H0[:6, :40], Hc[:6, :40]
-    defs = ["cut the sequence\ninto tokens", "turn each token\ninto numbers", "mix the tokens:\nlayers of the model",
-            "turn the numbers\ninto an answer"]
+    toks, H0, Hc = toks[:5], H0[:5, :32], Hc[:5, :32]
+    defs = ["cut the sequence\ninto tokens", "turn each token\ninto numbers", "mix the tokens", "give the answer"]
     names = []
     for k in range(5):
-        fig, ax = canvas2()
-        for i, ch in enumerate(s[:30]):
-            label(ax, 8 + i * 2.6, 80, ch, fs=18, color=BASE[ch], family=MONO, bold=True)
-        label(ax, 8 + 30 * 2.6, 80, "…", fs=18, color=MUTED)
-        stage_row(ax, 62, h=10)
+        fig, ax, H = canvas3("d2_stages_0")
+        for i, ch in enumerate(s[:36]):
+            label(ax, 3 + i * 3.4, H - 4, ch, fs=22, color=BASE[ch], family=MONO, bold=True)
+        label(ax, 3 + 36 * 3.4, H - 4, "…", fs=22, color=MUTED)
+        yb = H - 24
+        stage_row(ax, yb, XS, BW)
         for x, d in zip(XS, defs):
-            label(ax, x + BW / 2, 55, d, fs=18, color=MUTED, va="top")
-        rows_y = [38 - j * 5 for j in range(6)]                        # one row per token, same rows everywhere
+            label(ax, x + BW / 2, yb - 3, d, fs=20, color=MUTED, va="top")
+        rows = [yb - 19 - j * 6 for j in range(5)]
         if k >= 1:
             for j, t in enumerate(toks):
-                w = 2.2 + 1.9 * len(t)
+                w = letters_w(len(t), 20) + 2
                 bx = XS[0] + BW / 2 - w / 2
-                box(ax, bx, rows_y[j] - 2.3, w, 4.6, fc=[ACCENT_L, FAINT][j % 2], r=0.5)
+                box(ax, bx, rows[j] - 3, w, 6, fc=[ACCENT_L, FAINT][j % 2], r=0.6)
                 for q, ch in enumerate(t):
-                    label(ax, bx + w / 2 + (q - (len(t) - 1) / 2) * 1.9, rows_y[j], ch, fs=17, color=BASE[ch],
-                          family=MONO, bold=True)
-            label(ax, XS[0] + BW / 2, 7, "tokens", fs=18, color=INK)
+                    label(ax, bx + w / 2 + (q - (len(t) - 1) / 2) * 2.7, rows[j], ch, fs=20, color=BASE[ch], family=MONO, bold=True)
         if k >= 2:
-            heat(ax, XS[1], rows_y[-1] - 2.2, BW, 30, H0, np.percentile(np.abs(H0), 97))
-            label(ax, XS[1] + BW / 2, 7, "token embeddings\n(from a table)", fs=18, color=INK, va="center")
+            heat(ax, XS[1], rows[-1] - 3, BW, rows[0] - rows[-1] + 6, H0, np.percentile(np.abs(H0), 97))
+            label(ax, XS[1] + BW / 2, rows[-1] - 9, "token\nembeddings", fs=20, color=INK, bold=True)
         if k >= 3:
-            heat(ax, XS[2], rows_y[-1] - 2.2, BW, 30, Hc, np.percentile(np.abs(Hc), 97))
-            label(ax, XS[2] + BW / 2, 7, "contextual embeddings\n(each row sees all tokens)", fs=18, color=INK)
+            heat(ax, XS[2], rows[-1] - 3, BW, rows[0] - rows[-1] + 6, Hc, np.percentile(np.abs(Hc), 97))
+            label(ax, XS[2] + BW / 2, rows[-1] - 9, "contextual\nembeddings", fs=20, color=INK, bold=True)
         if k >= 4:
-            label(ax, XS[3] + BW / 2, 30, "pretraining:\nthe next token", fs=19, color=HELD_C)
-            label(ax, XS[3] + BW / 2, 16, "our task:\nP(bound)", fs=19, color=GOOD_C)
-        name = f"d2_stages_{k}"
-        save_raw(fig, name); names.append(name)
-    return names
-
-
-def compare():
-    cnn = ["single letters", "one-hot, 4 numbers\n(fixed)", "2 convolution\nlayers", "linear → 1 logit"]
-    lm = ["BPE tokens", "a learned table,\n256 numbers", "transformer,\n8 layers", "next token, or\nyour task"]
-    names = []
+            label(ax, XS[3] + BW / 2, rows[1], "the next token", fs=22, color=HELD_C, bold=True)
+            label(ax, XS[3] + BW / 2, rows[3], "or P(bound)", fs=22, color=GOOD_C, bold=True)
+        nm = f"d2_stages_{k}"; save_raw(fig, nm); names.append(nm)
+    cnn = ["single letters", "one-hot,\nfixed", "2 convolution\nlayers", "linear,\n1 number"]
+    lm = ["BPE tokens", "learned table,\n256 numbers", "transformer,\n8 layers", "next token,\nor your task"]
     for k in (0, 1):
-        fig, ax = canvas2()
-        stage_row(ax, 62, h=10)
-        label(ax, 8, 46, "CNN (part 1)", fs=21, color=GOOD_C, ha="left", bold=True)
+        fig, ax, H = canvas3("d2_stages_0")
+        yb = H - 24
+        stage_row(ax, yb, XS, BW)
+        label(ax, 2, yb - 7, "CNN (part 1)", fs=24, color=GOOD_C, ha="left", bold=True)
         for x, d in zip(XS, cnn):
-            label(ax, x + BW / 2, 38, d, fs=20, color=INK, va="top")
+            label(ax, x + BW / 2, yb - 12, d, fs=22, va="top")
         if k == 1:
-            label(ax, 8, 22, "DNA language model (Mistral-DNA)", fs=21, color=ACCENT, ha="left", bold=True)
+            label(ax, 2, yb - 33, "DNA language model (Mistral-DNA)", fs=24, color=ACCENT, ha="left", bold=True)
             for x, d in zip(XS, lm):
-                label(ax, x + BW / 2, 14, d, fs=20, color=INK, va="top")
-        name = f"d2_compare_{k}"
-        save_raw(fig, name); names.append(name)
-    return names
+                label(ax, x + BW / 2, yb - 38, d, fs=22, va="top")
+        nm = f"d2_compare_{k}"; save_raw(fig, nm); names.append(nm)
+    trim_group(names)
 
 
-# ------------------------------------------------------------------ 2.3 BPE, built with Mistral-DNA's own merge rules
+# ------------------------------------------------------------------ 2.3 BPE with Mistral-DNA's merge rules
 def bpe_steps(tok, pos):
     w, _ = bound_window(pos)
     merges = json.loads(tok.backend_tokenizer.to_str())["model"]["merges"]
@@ -207,7 +267,7 @@ def bpe_steps(tok, pos):
         pairs = [(rank[(cur[i], cur[i + 1])], i) for i in range(len(cur) - 1) if (cur[i], cur[i + 1]) in rank]
         if not pairs:
             break
-        r, _ = min(pairs)
+        r = min(pairs)[0]
         a, b = merges[r]
         out, i, hit = [], 0, []
         while i < len(cur):
@@ -217,291 +277,264 @@ def bpe_steps(tok, pos):
                 out.append(cur[i]); i += 1
         cur = out
         states.append((list(cur), (a, b, r, hit)))
-    real = [t.replace("▁", "") for t in tok.tokenize(w)]
-    assert cur == real, (cur, real)
+    assert cur == [t.replace("▁", "") for t in tok.tokenize(w)]
     show = [0, 1, 2, 3, len(states) - 1]
     names = []
     for k in range(len(show)):
-        fig, ax = canvas2()
+        fig, ax, H = canvas3("d2_bpe_0")
+        step = (H - 2) / 5
         for j, si in enumerate(show[:k + 1]):
             toks, info = states[si]
-            y = 76 - j * 16
+            y = H - 4 - j * step
             if info is None:
-                head = f"Start: single letters, {len(toks)} tokens"
+                head = "Start: single letters, 30 tokens"
             elif si == len(states) - 1:
-                head = f"After all {si} merges ({si - 3} not shown): {len(toks)} tokens, as Mistral-DNA's tokenizer cuts it"
+                head = f"After all {si} merges: {len(toks)} tokens, as Mistral-DNA cuts it"
             else:
                 a, b, r, _ = info
-                head = f"Merge {si}: {a} + {b} → {a + b}   (rule {r + 1:,} of {len(merges):,})"
-            label(ax, 4, y + 6.5, head, fs=20, color=INK if si else MUTED, ha="left")
+                head = f"Merge {si}: {a} + {b} → {a + b}   (rule {r + 1} of {len(merges):,})"
+            label(ax, 2, y, head, fs=22, color=INK, ha="left", bold=si > 0)
             hit = set(info[3]) if info and si != len(states) - 1 else set()
-            x, dx = 4, 3.3
+            x, dx = 2, 4.85
             for q, t in enumerate(toks):
                 wq = dx * len(t)
-                box(ax, x, y - 3.2, wq - 0.5, 6.4, fc=ACCENT_L if q in hit else FAINT, ec=ACCENT if q in hit else "none",
-                    lw=1.5 if q in hit else 0, r=0.5)
+                yy = y - step * 0.5
+                box(ax, x, yy - 3.6, wq - 0.6, 7.2, fc=ACCENT_L if q in hit else FAINT, ec=ACCENT if q in hit else "none",
+                    lw=2 if q in hit else 0, r=0.6)
                 for c, ch in enumerate(t):
-                    label(ax, x + dx / 2 + c * dx - 0.25, y, ch, fs=19, color=BASE[ch], family=MONO, bold=True)
-                x += wq + 0.4
-        name = f"d2_bpe_{k}"
-        save_raw(fig, name); names.append(name)
+                    label(ax, x + dx / 2 + c * dx - 0.3, yy, ch, fs=24, color=BASE[ch], family=MONO, bold=True)
+                x += wq + 0.2
+        nm = f"d2_bpe_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
-    print("bpe:", len(states) - 1, "merges apply;", [(states[i][1][0], states[i][1][1], states[i][1][2]) for i in (1, 2, 3)],
-          "final", cur)
 
 
-# ------------------------------------------------------------------ 3.1 the embedding as a matrix product
+# ------------------------------------------------------------------ 3.1 token -> ID -> one-hot -> row of E
 def emb_matmul(tok, fm, pos):
     w, _ = bound_window(pos)
     tid = tok(w, add_special_tokens=False)["input_ids"][0]
     ttxt = tok.convert_ids_to_tokens(tid).replace("▁", "")
     E = fm.get_input_embeddings().weight.detach().float().numpy()
-    lo = max(0, tid - 5)
-    rows = list(range(lo, lo + 11))
-    Mx = E[rows, :48]
-    vm = np.percentile(np.abs(E[:, :48]), 98)
-    i_sel = rows.index(tid)
+    rows = list(range(tid - 3, tid + 4))
+    vm = np.percentile(np.abs(E[:, :32]), 98)
+    sel = rows.index(tid)
     names = []
-    for k in (0, 1):
-        fig, ax = canvas2()
-        top, rh = 70, 5
-        ys = [top - j * rh for j in range(len(rows))]
-        # x_i: one entry beside each row of E
-        label(ax, 18, 80, r"$x_i$", fs=28)
-        label(ax, 18, 75.5, "one-hot", fs=17, color=MUTED)
-        for j, yy in enumerate(ys):
-            one = j == i_sel
-            box(ax, 15, yy - rh + 0.4, 6, rh - 0.8, fc=ACCENT_L if (one and k) else "white", ec=HAIR, lw=1, r=0.3)
-            label(ax, 18, yy - rh / 2, "1" if one else "0", fs=18, color=ACCENT if one else LIGHT, bold=one)
-        label(ax, 18, ys[0] + 2, "⋮", fs=18, color=MUTED); label(ax, 18, ys[-1] - rh - 2.5, "⋮", fs=18, color=MUTED)
-        label(ax, 27, 45, "×", fs=34, color=MUTED)
-        X0 = 46
-        # E: real rows
-        heat(ax, X0, ys[-1] - rh, 60, rh * len(rows), Mx, vm)
-        if k == 1:
+    for k in range(3):
+        fig, ax, H = canvas3("d2_emb_0")
+        rh = (H - 22) / len(rows)
+        ys = [H - 12 - j * rh for j in range(len(rows))]              # top of each row
+        mid = (ys[0] + ys[-1] - rh) / 2
+        # 1 the token and its ID
+        tok_row(ax, 2, mid, [ttxt], fs=26)
+        label(ax, 9, mid + 7.5, "token", fs=20, color=MUTED)
+        arrow(ax, 17, mid, 23, mid, color=MUTED, lw=2.5, ms=22)
+        label(ax, 33, mid + 7.5, "its ID", fs=20, color=MUTED)
+        label(ax, 33, mid, f"{tid}", fs=30, color=ACCENT, bold=True)
+        if k >= 1:                                                  # 2 the one-hot vector x_i
+            arrow(ax, 39, mid, 45, mid, color=MUTED, lw=2.5, ms=22)
+            label(ax, 50, H - 4, r"$x_i$", fs=28)
             for j, yy in enumerate(ys):
-                if j != i_sel:
-                    ax.add_patch(Rectangle((X0, yy - rh), 60, rh, fc="white", alpha=0.7, ec="none", zorder=3))
-            ax.add_patch(Rectangle((X0, ys[i_sel] - rh), 60, rh, fill=False, ec=ACCENT, lw=3, zorder=4))
-        for j, (yy, r) in enumerate(zip(ys, rows)):
-            if not (j == i_sel and k):
-                label(ax, X0 - 1.5, yy - rh / 2, f"row {r:,}", fs=14, color=MUTED, ha="right")
-        label(ax, X0 + 30, 80, r"$E$", fs=28)
-        label(ax, X0 + 30, 75.5, f"learned table: {E.shape[0]:,} rows × {E.shape[1]} numbers (first 48 shown)", fs=17,
-              color=MUTED)
-        if k == 1:
-            label(ax, 112, 45, "=", fs=34, color=MUTED)
-            strip(ax, 118, 42.5, 38, rh, E[tid, :48], vm)
-            label(ax, 137, 52, r"$e_i$", fs=28)
-            label(ax, 137, 36, f"the token embedding of {ttxt}\n(row {tid:,} of E)", fs=17, color=INK, va="top")
-            label(ax, X0 - 1.5, ys[i_sel] - rh / 2, f"row {tid:,}: {ttxt}", fs=14, color=ACCENT, ha="right", bold=True)
-        name = f"d2_emb_{k}"
-        save_raw(fig, name); names.append(name)
+                one = j == sel
+                box(ax, 47, yy - rh + 0.5, 6.5, rh - 1, fc=ACCENT_L if one else "white", ec=HAIR, lw=1, r=0.3)
+                label(ax, 50.25, yy - rh / 2, "1" if one else "0", fs=22, color=ACCENT if one else LIGHT, bold=one)
+            label(ax, 50.25, ys[-1] - rh - 3, "⋮", fs=20, color=MUTED)
+            label(ax, 50.25, 3, "4,096 numbers", fs=18, color=MUTED)
+        if k >= 2:                                                  # 3 x_i^T E selects one row
+            label(ax, 58, mid, "×", fs=32, color=MUTED)
+            for j, (yy, r) in enumerate(zip(ys, rows)):
+                label(ax, 76, yy - rh / 2, f"{r}", fs=18, color=ACCENT if j == sel else MUTED, ha="right", bold=j == sel)
+            heat(ax, 78, ys[-1] - rh, 44, rh * len(rows), E[rows, :32], vm)
+            for j, yy in enumerate(ys):
+                if j != sel:
+                    ax.add_patch(Rectangle((78, yy - rh), 44, rh, fc="white", alpha=0.65, ec="none", zorder=3))
+            ax.add_patch(Rectangle((78, ys[sel] - rh), 44, rh, fill=False, ec=ACCENT, lw=3, zorder=4))
+            label(ax, 100, H - 4, r"$E$", fs=28)
+            label(ax, 100, 3, "4,096 rows × 256, learned", fs=18, color=MUTED)
+            label(ax, 127, mid, "=", fs=32, color=MUTED)
+            strip(ax, 132, mid - rh / 2, 26, rh, E[tid, :32], vm)
+            label(ax, 145, H - 4, r"$e_i$", fs=28)
+            label(ax, 145, mid - 8, f"row {tid}", fs=20, color=ACCENT, bold=True)
+        nm = f"d2_emb_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
-    print("emb_matmul token", ttxt, "id", tid)
+    print("emb token", ttxt, "id", tid)
 
 
-# ------------------------------------------------------------------ 4.1 the body, on one token in two contexts
+# ------------------------------------------------------------------ 4.1 one token, two contexts
 def body_context(tok, fm, pos):
-    """Find one token that occurs in two real bound sequences; same input row, different output rows."""
-    found = None
     cache = []
     for s in pos[:400]:
-        s = s[100:160].replace("U", "T")
-        ids = tok(s, add_special_tokens=False)["input_ids"]
-        cache.append((s, ids))
+        s = s[100:150].replace("U", "T")
+        cache.append((s, tok(s, add_special_tokens=False)["input_ids"]))
+    found = None
     for a in range(len(cache)):
         for t in cache[a][1][2:-2]:
-            txt = tok.convert_ids_to_tokens(t).replace("▁", "")
-            if len(txt) < 4:
+            if len(tok.convert_ids_to_tokens(t)) < 5:
                 continue
             for b in range(a + 1, len(cache)):
                 if t in cache[b][1][2:-2]:
-                    found = (a, b, t, txt)
-                    break
+                    found = (a, b, t); break
             if found:
                 break
         if found:
             break
-    a, b, t, txt = found
+    a, b, t = found
+    txt = tok.convert_ids_to_tokens(t).replace("▁", "")
     rows = []
     for idx in (a, b):
-        s, ids = cache[idx]
-        toks, H0, Hc, ids2 = run_model(tok, fm, s, special=False)
-        j = ids2.index(t)
-        rows.append((toks[max(0, j - 2):j + 3], min(2, j), H0[j, :32], Hc[j, :32]))
+        s, _ = cache[idx]
+        toks, H0, Hc, ids = run_model(tok, fm, s, special=False)
+        j = ids.index(t)
+        lo = max(0, j - 1)
+        rows.append((toks[lo:j + 2], j - lo, H0[j, :24], Hc[j, :24]))
     vin = np.abs(np.r_[rows[0][2], rows[1][2]]).max()
     vout = np.abs(np.r_[rows[0][3], rows[1][3]]).max()
     cos = float(np.dot(rows[0][3], rows[1][3]) / np.linalg.norm(rows[0][3]) / np.linalg.norm(rows[1][3]))
     names = []
     for k in (0, 1):
-        fig, ax = canvas2()
-        label(ax, 52, 80, f"token embedding of {txt}", fs=18, color=MUTED)
-        label(ax, 132, 80, f"contextual embedding of {txt}", fs=18, color=MUTED)
-        block(ax, 84, 12, 24, 62, "Body\n8 layers", fc=ACCENT, fs=24)
-        for r_i, (ctx, j, vin_r, vout_r) in enumerate(rows[:k + 1]):
-            y = 60 - r_i * 34
-            label(ax, 4, y + 9, f"Sequence {r_i + 1}", fs=18, color=MUTED, ha="left")
-            x = 4
-            for q, tq in enumerate(ctx):
-                wq = 2.4 + 2.1 * len(tq)
-                hit = q == j
-                box(ax, x, y - 3.5, wq, 7, fc=ACCENT_L if hit else FAINT, ec=ACCENT if hit else "none",
-                    lw=2 if hit else 0, r=0.5)
-                for c, ch in enumerate(tq):
-                    label(ax, x + wq / 2 + (c - (len(tq) - 1) / 2) * 2.1, y, ch, fs=16, color=BASE.get(ch, INK),
-                          family=MONO, bold=True)
-                x += wq + 0.6
-            strip(ax, 38, y - 14, 30, 6, vin_r, vin)
-            arrow(ax, 69, y - 11, 83, y - 11, color=MUTED, lw=2, ms=20)
-            arrow(ax, 109, y - 11, 115, y - 11, color=MUTED, lw=2, ms=20)
-            strip(ax, 116, y - 14, 32, 6, vout_r, vout)
-        if k == 1:
-            label(ax, 53, 7, "the same row in both", fs=19, color=ACCENT, bold=True)
-            label(ax, 132, 7, "different rows", fs=19, color=ACCENT, bold=True)
-        name = f"d2_body_{k}"
-        save_raw(fig, name); names.append(name)
+        fig, ax, H = canvas3("d2_body_0")
+        blk(ax, 66, 12, 26, H - 16, "Body", fs=28)
+        for r_i, (ctx, j, vi, vo) in enumerate(rows[:k + 1]):
+            y = H - 8 - r_i * (H - 20) / 2
+            label(ax, 2, y, f"Sequence {r_i + 1}", fs=20, color=MUTED, ha="left")
+            boxes = tok_row(ax, 2, y - 9, ctx, fs=20)
+            bx, bw = boxes[j]
+            ax.add_patch(Rectangle((bx, y - 12.3), bw, 6.6, fill=False, ec=ACCENT, lw=3, zorder=4))
+            strip(ax, 2, y - 22, 54, 6, vi, vin)
+            arrow(ax, 57, y - 19, 65, y - 19, color=MUTED, lw=2.5, ms=22)
+            arrow(ax, 93, y - 19, 100, y - 19, color=MUTED, lw=2.5, ms=22)
+            strip(ax, 101, y - 22, 56, 6, vo, vout)
+        left = "the same row in both" if k == 1 else f"token embedding of {txt}"
+        right = "different rows" if k == 1 else f"contextual embedding"
+        label(ax, 29, 4, left, fs=22, color=ACCENT, bold=True)
+        label(ax, 129, 4, right, fs=22, color=ACCENT, bold=True)
+        nm = f"d2_body_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
-    print("body_context token", txt, "cosine of the two outputs", round(cos, 3),
-          "inputs equal", bool(np.allclose(rows[0][2], rows[1][2])))
+    print("body token", txt, "cos", round(cos, 3), "inputs equal", bool(np.allclose(rows[0][2], rows[1][2])))
 
 
-# ------------------------------------------------------------------ 5.1 heads on the walk-through sequence
+# ------------------------------------------------------------------ 5.1 heads, 5.2 probe: the walk-through sequence
 def walk_tensors(tok, fm, pos):
-    s = pos[3][:60].replace("U", "T")
-    return run_model(tok, fm, s, special=True)
+    return run_model(tok, fm, pos[3][:60].replace("U", "T"), special=True)
 
 
 def heads(tok, fm, pos):
     toks, _, Hc, _ = walk_tensors(tok, fm, pos)
     v = np.percentile(np.abs(Hc), 97)
     n = len(toks)
-    rh = 3.2
-    top = 74
+    rows = [("Next token", n - 2, "256 → 4,096\nsoftmax", "4,096\nprobabilities", HELD_C),
+            ("Masked token", 6, "256 → 4,096\nsoftmax", "4,096\nprobabilities", HELD_C),
+            ("Our task", None, "256 → 1\nsigmoid", "P(bound)", GOOD_C)]
     names = []
-    rows = [("Next token (pretraining)", n - 2, "256 → 4,096, softmax", "a probability for each\nof 4,096 tokens", HELD_C),
-            ("Masked token (pretraining)", 6, "256 → 4,096, softmax", "a probability for each\nof 4,096 tokens", HELD_C),
-            ("Our task", None, "256 → 1, sigmoid", "P(bound)", GOOD_C)]
     for k in range(3):
-        fig, ax = canvas2()
-        heat(ax, 12, top - n * rh, 32, n * rh, Hc, v)
-        for j, t in enumerate(toks):
-            label(ax, 11, top - (j + 0.5) * rh, t, fs=11, color=MUTED, ha="right", family=MONO)
-        label(ax, 28, top + 4, "Body output: one row per token", fs=18, color=INK)
-        label(ax, 28, top - n * rh - 4, "contextual embeddings", fs=17, color=MUTED)
+        fig, ax, H = canvas3("d2_heads_0")
+        top, bot = H - 9, 9
+        heat(ax, 2, bot, 30, top - bot, Hc, v)
+        rh = (top - bot) / n
+        label(ax, 17, H - 3.5, "Body output", fs=22, bold=True)
+        label(ax, 17, 3, f"{n} tokens", fs=20, color=MUTED)
+        step = (H - 6) / 3
         for j, (name, ri, head, out, c) in enumerate(rows[:k + 1]):
-            y = 66 - j * 24
+            y = H - 10 - j * step
             if ri is not None:
-                ax.add_patch(Rectangle((12, top - (ri + 1) * rh), 32, rh, fill=False, ec=c, lw=3, zorder=4))
-                strip(ax, 52, y - 2, 30, 4, Hc[ri], v)
-                arrow(ax, 45, top - (ri + 0.5) * rh, 51, y, color=c, lw=2, ms=18)
-                label(ax, 67, y + 6, f"the row of {toks[ri]}", fs=16, color=MUTED)
+                ax.add_patch(Rectangle((2, top - (ri + 1) * rh), 30, rh, fill=False, ec=c, lw=3, zorder=4))
+                src = top - (ri + 0.5) * rh
+                vec = Hc[ri]
             else:
-                strip(ax, 52, y - 2, 30, 4, Hc.mean(0), v)
-                arrow(ax, 45, top - n * rh / 2, 51, y, color=c, lw=2, ms=18)
-                label(ax, 67, y + 6, "the average of all rows: the sequence embedding", fs=16, color=MUTED)
-            label(ax, 52, y + 11.5, name, fs=19, color=c, ha="left", bold=True)
-            arrow(ax, 83, y, 88, y, color=MUTED, lw=2, ms=18)
-            block(ax, 89, y - 5, 33, 10, head, fc=c, fs=18)
-            arrow(ax, 123, y, 128, y, color=MUTED, lw=2, ms=18)
-            label(ax, 130, y, out, fs=18, color=INK, ha="left")
-        nm = f"d2_heads_{k}"
-        save_raw(fig, nm); names.append(nm)
+                src, vec = (top + bot) / 2, Hc.mean(0)
+            arrow(ax, 33, src, 40, y - 6, color=c, lw=2.5, ms=20)
+            label(ax, 41, y + 1, name, fs=21, color=c, ha="left", bold=True)
+            strip(ax, 41, y - 9, 34, 6, vec, v)
+            arrow(ax, 76, y - 6, 82, y - 6, color=MUTED, lw=2.5, ms=20)
+            blk(ax, 83, y - 12, 34, 12, head, fc=c, fs=20)
+            arrow(ax, 118, y - 6, 124, y - 6, color=MUTED, lw=2.5, ms=20)
+            label(ax, 125, y - 6, out, fs=22, ha="left")
+        nm = f"d2_heads_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
 
 
-# ------------------------------------------------------------------ 5.2 the linear probe, written out
 def probe(tok, fm, pos):
     toks, _, Hc, _ = walk_tensors(tok, fm, pos)
     v = np.percentile(np.abs(Hc), 97)
     e = Hc.mean(0)
-    from pathlib import Path
     d = np.load(Path(__file__).resolve().parents[2] / "data" / "emb_mistral17m.npz")
     _, ty = split("train")
+    Etr = d["train"]
+    y_sub = ty[np.random.default_rng(0).permutation(len(ty))[:len(Etr)]]       # as workshop_data() in the notebook
+    b = [i for i in range(len(Etr)) if y_sub[i] == 1][:2]
+    u = [i for i in range(len(Etr)) if y_sub[i] == 0][:1]
+    pick = [b[0], u[0], b[1]]
     names = []
     for k in (0, 1):
-        fig, ax = canvas2()
-        label(ax, 4, 80, "Body output (frozen)", fs=18, color=MUTED, ha="left")
-        heat(ax, 4, 52, 30, 24, Hc, v)
-        arrow(ax, 35, 64, 41, 64, color=MUTED, lw=2, ms=18)
-        label(ax, 38, 69, "average", fs=16, color=MUTED)
-        strip(ax, 42, 61, 48, 6, e, v)
-        label(ax, 66, 73, "the sequence embedding", fs=18, color=INK)
-        label(ax, 43.5, 57, r"$e_1$", fs=18); label(ax, 47, 57, r"$e_2$", fs=18)
-        label(ax, 66, 57, "…", fs=18, color=MUTED); label(ax, 87.5, 57, r"$e_{256}$", fs=18)
-        arrow(ax, 91, 64, 97, 64, color=MUTED, lw=2, ms=18)
-        label(ax, 98, 64, "P(bound)", fs=24, color=GOOD_C, bold=True, ha="left")
-        label(ax, 80, 40, r"$\hat p = \sigma\,(\,w_1 e_1 + w_2 e_2 + \dots + w_{256}\, e_{256} + b\,)$", fs=30)
-        label(ax, 80, 30, r"$\sigma$: the sigmoid of part 1, turns the sum into a probability between 0 and 1",
-              fs=18, color=MUTED)
+        fig, ax, H = canvas3("d2_probe_0")
+        top = H - 3
+        label(ax, 14, top, "Body output", fs=20, color=MUTED)
+        heat(ax, 2, top - 24, 24, 20, Hc, v)
+        arrow(ax, 27, top - 14, 34, top - 14, color=MUTED, lw=2.5, ms=20)
+        strip(ax, 35, top - 18, 70, 8, e, v)
+        label(ax, 70, top - 4, "the sequence embedding (average)", fs=20, color=INK)
+        label(ax, 37, top - 23, r"$e_1$", fs=22); label(ax, 44, top - 23, r"$e_2$", fs=22)
+        label(ax, 70, top - 23, "…", fs=22, color=MUTED); label(ax, 102, top - 23, r"$e_{256}$", fs=22)
+        arrow(ax, 106, top - 14, 112, top - 14, color=MUTED, lw=2.5, ms=20)
+        label(ax, 113, top - 14, "P(bound)", fs=28, color=GOOD_C, bold=True, ha="left")
+        label(ax, 80, top - 33, r"$\hat p = \sigma\,(\,w_1 e_1 + w_2 e_2 + \dots + w_{256}\, e_{256} + b\,)$", fs=32)
+        label(ax, 80, top - 42, r"$\sigma$: the sigmoid of part 1", fs=22, color=MUTED)
         if k == 1:
-            label(ax, 4, 19, "Trained on labelled sequences: only the 256 weights $w$ and the bias $b$ are learned",
-                  fs=19, color=INK, ha="left")
-            E = d["train"]
-            y_sub = ty[np.random.default_rng(0).permutation(len(ty))[:len(E)]]   # as workshop_data() in the notebook
-            b = [i for i in range(len(E)) if y_sub[i] == 1][:2]
-            u = [i for i in range(len(E)) if y_sub[i] == 0][:1]
-            pick = [b[0], u[0], b[1]]
-            vm = np.percentile(np.abs(E[pick]), 97)
+            label(ax, 2, top - 52, "Trained on 12,000 labelled sequences: only $w$ and $b$ are learned", fs=22, ha="left")
+            vm = np.percentile(np.abs(Etr[pick]), 97)
             for j, i in enumerate(pick):
-                x = 4 + j * 52
-                strip(ax, x, 6, 30, 5, E[i], vm)
+                x = 2 + j * 54
+                strip(ax, x, top - 64, 18, 6, Etr[i], vm)
                 yy = int(y_sub[i])
-                label(ax, x + 32, 8.5, "bound, y = 1" if yy == 1 else "unbound, y = 0", fs=17,
-                      color=GOOD_C if yy == 1 else MUTED, ha="left")
-        nm = f"d2_probe_{k}"
-        save_raw(fig, nm); names.append(nm)
+                label(ax, x + 20, top - 61, "bound, y = 1" if yy else "unbound, y = 0", fs=20,
+                      color=GOOD_C if yy else MUTED, ha="left")
+        nm = f"d2_probe_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
 
 
-# ------------------------------------------------------------------ 5.3 summary: pretraining, then adapting
+# ------------------------------------------------------------------ 5.3 summary, 6.1 Hugging Face
 def summary():
     names = []
     for k in (0, 1):
-        fig, ax = canvas2()
-        label(ax, 4, 80, "1  Pretraining: billions of DNA letters, no labels, every stage trained", fs=21, color=INK,
-              ha="left", bold=True)
-        stage_row(ax, 62, h=11, fs=20, colors=[ACCENT, ACCENT, ACCENT, HELD_C],
-                  texts=["Tokenization", "Embedding", "Body", "Next-token head"])
+        fig, ax, H = canvas3("d2_summary_0")
+        label(ax, 2, H - 4, "1  Pretraining: billions of DNA letters, no labels", fs=24, ha="left", bold=True)
+        yb1 = H - 22
+        stage_row(ax, yb1, XS, BW, colors=[ACCENT, ACCENT, ACCENT, HELD_C],
+                  texts=["Tokenization", "Embedding", "Body", "Next-token\nhead"])
         if k == 1:
             for x in XS[:3]:
-                arrow(ax, x + BW / 2, 60.5, x + BW / 2, 51.5, color=MUTED, lw=2, ms=20)
-            label(ax, XS[2] + BW / 2 + 2, 56, "kept", fs=18, color=MUTED, ha="left")
-            label(ax, 4, 45, "2  Adapting: 12,000 labelled AGO2 sequences, only the new head trained", fs=21, color=INK,
-                  ha="left", bold=True)
-            stage_row(ax, 28, h=11, fs=20, colors=[FAINT, FAINT, FAINT, GOOD_C],
+                arrow(ax, x + BW / 2, yb1 - 1.5, x + BW / 2, yb1 - 9, color=MUTED, lw=2.5, ms=22)
+            label(ax, XS[2] + BW / 2 + 3, yb1 - 5.5, "kept", fs=20, color=MUTED, ha="left")
+            label(ax, 2, yb1 - 15, "2  Adapting: 12,000 labelled AGO2 sequences", fs=24, ha="left", bold=True)
+            yb2 = yb1 - 33
+            stage_row(ax, yb2, XS, BW, colors=[FAINT, FAINT, FAINT, GOOD_C],
                       texts=["Tokenization", "Embedding", "Body", "AGO2 head"], tcolors=[MUTED, MUTED, MUTED, "white"])
-            label(ax, XS[1] + BW / 2, 22, "frozen", fs=18, color=MUTED)
-            label(ax, XS[3] + BW / 2, 22, "P(bound)", fs=18, color=GOOD_C)
-            label(ax, 4, 9, "Train only the new head: a linear probe (today). Also update the body: fine-tuning (part 3).",
-                  fs=19, color=INK, ha="left")
-        nm = f"d2_summary_{k}"
-        save_raw(fig, nm); names.append(nm)
+            label(ax, XS[1] + BW / 2 + 20, yb2 - 5, "frozen", fs=22, color=MUTED, bold=True)
+            label(ax, XS[3] + BW / 2, yb2 - 5, "trained", fs=22, color=GOOD_C, bold=True)
+            label(ax, 2, yb2 - 15, "Train only the new head: a linear probe (today)", fs=22, ha="left")
+            label(ax, 2, yb2 - 22, "Also update the body: fine-tuning (part 3)", fs=22, ha="left")
+        nm = f"d2_summary_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
 
 
-# ------------------------------------------------------------------ 6.1 what comes from Hugging Face
 def hf():
     names = []
     for k in range(3):
-        fig, ax = canvas2()
-        stage_row(ax, 52, h=11, fs=20, colors=[ACCENT, ACCENT, ACCENT, GOOD_C])
-        # bracket over the three pretrained stages
+        fig, ax, H = canvas3("d2_hf_0")
+        yb = H - 34
+        stage_row(ax, yb, XS, BW, colors=[ACCENT, ACCENT, ACCENT, GOOD_C])
         x0, x1 = XS[0], XS[2] + BW
-        ax.plot([x0, x0, x1, x1], [66, 69, 69, 66], color=INK, lw=2)
-        label(ax, (x0 + x1) / 2, 74, "Pretrained, from the Hugging Face Hub", fs=21, color=INK, bold=True)
-        label(ax, (x0 + x1) / 2, 79.5, "RaphaelMourad/Mistral-DNA-v1-17M-hg38", fs=17, color=MUTED, family=MONO)
-        label(ax, XS[3] + BW / 2, 74, "Yours: TODO-2", fs=21, color=GOOD_C, bold=True)
+        ax.plot([x0, x0, x1, x1], [yb + 15, yb + 18, yb + 18, yb + 15], color=INK, lw=2.5)
+        label(ax, (x0 + x1) / 2, yb + 23, "Pretrained, from the Hugging Face Hub", fs=24, bold=True)
+        label(ax, (x0 + x1) / 2, yb + 30, "RaphaelMourad/Mistral-DNA-v1-17M-hg38", fs=20, color=MUTED, family=MONO)
+        label(ax, XS[3] + BW / 2, yb + 23, "Yours: TODO-2", fs=24, color=GOOD_C, bold=True)
         if k >= 1:
-            ax.plot([XS[0], XS[0], XS[0] + BW, XS[0] + BW], [49, 46, 46, 49], color=ACCENT, lw=2)
-            label(ax, XS[0], 39, "AutoTokenizer.from_pretrained(name)", fs=19, color=ACCENT, family=MONO, ha="left")
-            label(ax, XS[0], 33, "the tokenizer: its 4,096-token vocabulary", fs=19, color=INK, ha="left")
+            ax.plot([XS[0], XS[0], XS[0] + BW, XS[0] + BW], [yb - 2, yb - 5, yb - 5, yb - 2], color=ACCENT, lw=2.5)
+            label(ax, 2, yb - 11, "AutoTokenizer.from_pretrained(name)", fs=21, color=ACCENT, family=MONO, ha="left")
+            label(ax, 2, yb - 18, "the tokenizer and its 4,096-token vocabulary", fs=21, ha="left")
         if k >= 2:
-            ax.plot([XS[1], XS[1], XS[2] + BW, XS[2] + BW], [49, 46, 46, 49], color=ACCENT, lw=2)
-            label(ax, XS[1], 22, "AutoModel.from_pretrained(name)", fs=19, color=ACCENT, family=MONO, ha="left")
-            label(ax, XS[1], 16, "the model: the embedding table and the body, 16M weights", fs=19, color=INK, ha="left")
-        nm = f"d2_hf_{k}"
-        save_raw(fig, nm); names.append(nm)
+            ax.plot([XS[1], XS[1], XS[2] + BW, XS[2] + BW], [yb - 2, yb - 5, yb - 5, yb - 2], color=ACCENT, lw=2.5)
+            label(ax, XS[1], yb - 28, "AutoModel.from_pretrained(name)", fs=21, color=ACCENT, family=MONO, ha="left")
+            label(ax, XS[1], yb - 35, "the embedding table and the body", fs=21, ha="left")
+        nm = f"d2_hf_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
 
 
@@ -511,23 +544,10 @@ if __name__ == "__main__":
     tr, ty = split("train")
     pos = [s for s, l in zip(tr, ty) if l == 1]
     tok, fm = model_and_tokenizer()
-    if run("adapt"):
-        adapt(tok, fm, pos)
-    if run("objectives"):
-        objectives(tok, pos)
-    if run("stages"):
-        trim_group(stage_example(tok, fm, pos) + compare())      # the CNN comparison keeps the same block positions
-    if run("bpe"):
-        bpe_steps(tok, pos)
-    if run("emb"):
-        emb_matmul(tok, fm, pos)
-    if run("body"):
-        body_context(tok, fm, pos)
-    if run("heads"):
-        heads(tok, fm, pos)
-    if run("probe"):
-        probe(tok, fm, pos)
-    if run("summary"):
-        summary()
-    if run("hf"):
-        hf()
+    for n, job in [("adapt", lambda: adapt(tok, fm, pos)), ("objectives", lambda: objectives(tok, pos)),
+                   ("next", lambda: next_probs(tok, pos)), ("stages", lambda: stage_frames(tok, fm, pos)),
+                   ("bpe", lambda: bpe_steps(tok, pos)), ("emb", lambda: emb_matmul(tok, fm, pos)),
+                   ("body", lambda: body_context(tok, fm, pos)), ("heads", lambda: heads(tok, fm, pos)),
+                   ("probe", lambda: probe(tok, fm, pos)), ("summary", summary), ("hf", hf)]:
+        if run(n):
+            job()

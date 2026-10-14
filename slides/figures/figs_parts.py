@@ -439,8 +439,8 @@ def pad_mask(pos):
     enc = tok(seqs, padding=True, add_special_tokens=True)
     rows = [tok.convert_ids_to_tokens(ids) for ids in enc["input_ids"]]
     n = len(rows[0])
-    fig, ax = canvas(16, 6.6, ylim=(0, 66))
-    x0, cw = 26, 112 / n
+    fig, ax = canvas(10, 4.125, ylim=(0, 66))
+    x0, cw = 31, 111 / n
     label(ax, 4, 60, "Tokens", fs=21, color=MUTED, ha="left")
     label(ax, x0 + n * cw + 2, 60, "Mask", fs=21, color=MUTED, ha="left")
     for r, (toks, m) in enumerate(zip(rows, enc["attention_mask"])):
@@ -451,10 +451,10 @@ def pad_mask(pos):
             box(ax, x0 + j * cw, y - 4.5, cw - 0.5, 9, fc=ACCENT_L if not pad else "#FFFFFF",
                 ec=HAIR if pad else "none", lw=1 if pad else 0, r=0.5)
             t = "pad" if pad else tk.replace("▁", "")
-            label(ax, x0 + j * cw + cw / 2, y + 1.6, t, fs=12 if len(t) > 5 else 14, color=LIGHT if pad else INK, family=MONO)
+            label(ax, x0 + j * cw + cw / 2, y + 1.6, t, fs=11 if len(t) > 5 else 13, color=LIGHT if pad else INK, family=MONO)
             label(ax, x0 + j * cw + cw / 2, y - 2.6, str(mj), fs=14, color=ACCENT if mj else LIGHT, bold=bool(mj))
         label(ax, x0 + n * cw + 2, y, f"{sum(m)} real", fs=19, color=ACCENT, ha="left")
-    label(ax, x0 + n * cw / 2, 4, "Sequence embedding = mean of the last-layer vectors where the mask is 1",
+    label(ax, x0 + n * cw / 2, 4, "Sequence embedding: the mean over the tokens with mask 1",
           fs=20, color=MUTED)
     save(fig, "pad_mask")
     print("pad_mask", [len(s) for s in seqs], [sum(m) for m in enc["attention_mask"]], "padded to", n)
