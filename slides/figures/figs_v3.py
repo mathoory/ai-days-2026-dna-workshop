@@ -30,7 +30,7 @@ def timeline():
             ("2020 to 2024", "B.Sc. Computer Science, Technion", "Bioinformatics track",
              [("Exchange semester, National Taiwan University (2023)", "Machine learning with Prof. Hsuan-Tien Lin")]),
             ("2024 to 2026", "M.Sc. Data Science, Technion", "Research in Prof. Roee Amit's lab",
-             [("Teaching assistant", "Medical Diagnostics (Intro to Deep Learning for Biotechnology)")])]
+             [("Teaching assistant", "00660121 Medical Diagnostics (Intro to Deep Learning for Biotechnology)")])]
     fig, ax = canvas(10, 8.6, xlim=(0, 100), ylim=(0, 86))
     y, ys_all = 78, []
     for yr, title, detail, subs in rows:
