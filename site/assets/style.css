@@ -84,14 +84,7 @@ main h2 {
 .lab h3 { font-size: 32px; line-height: 1.15; }
 .lab-sub { margin: 8px 0 0; color: var(--muted); }
 .lab-in p:not(.lab-sub) { margin: 16px 0 0; max-width: 640px; }
-.lab-link {
-  flex: none; display: inline-flex; align-items: center; gap: 14px; padding: 20px 28px;
-  background: var(--ink); color: #fff; text-decoration: none; font-size: 19px; font-weight: 500;
-  border-bottom: 4px solid var(--accent);
-}
-.lab-link span { font-size: 22px; transition: transform .15s; }
-.lab-link:hover { background: var(--accent); border-bottom-color: var(--accent-dark); }
-.lab-link:hover span { transform: translateX(4px); }
+.lab-in a { font-weight: 500; }
 
 /* feedback */
 .feedback { display: flex; align-items: center; justify-content: space-between; gap: 40px; }

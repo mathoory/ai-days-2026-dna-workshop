@@ -127,8 +127,8 @@ def page():
         <p>The lab studies the regulatory codes in the genome beyond the genetic code. It designs libraries of
           tens of thousands of synthetic DNA sequences, measures them in bacteria, yeast and mammalian cells,
           and fits models of the encoding rules to the results.</p>
+        <p><a href="{LAB}" target="_blank" rel="noopener">Visit the lab website</a></p>
       </div>
-      <a class="lab-link" href="{LAB}" target="_blank" rel="noopener">roee-amit.technion.ac.il<span>→</span></a>
     </div>
   </section>
   <section class="feedback">
