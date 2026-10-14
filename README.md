@@ -9,8 +9,8 @@ Open a notebook in Colab, then *Runtime → Change runtime type → T4 GPU*, and
 | Time | Part | | |
 |---|---|---|---|
 | 11:00 | 1. Machine learning and CNNs | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/01_cnn.ipynb) | [Slides](https://mathoory.github.io/ai-days-2026-dna-workshop/slides/01_cnn.html) |
-| 11:50 | 2. DNA foundation models | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/02_foundation_models.ipynb) | [Slides](https://mathoory.github.io/ai-days-2026-dna-workshop/slides/02_foundation_models.html) |
-| 12:40 | 3. Shortcuts, controls and fine-tuning | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/03_shortcuts_and_controls.ipynb) | [Slides](https://mathoory.github.io/ai-days-2026-dna-workshop/slides/03_shortcuts_and_controls.html) |
+| 12:00 | 2. DNA foundation models | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/02_foundation_models.ipynb) | [Slides](https://mathoory.github.io/ai-days-2026-dna-workshop/slides/02_foundation_models.html) |
+| 12:50 | 3. Shortcuts, controls and fine-tuning | [Open in Colab](https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/03_shortcuts_and_controls.ipynb) | [Slides](https://mathoory.github.io/ai-days-2026-dna-workshop/slides/03_shortcuts_and_controls.html) |
 
 Data: [huggingface.co/datasets/yup8/ai-days-2026-ago2](https://huggingface.co/datasets/yup8/ai-days-2026-ago2) (AGO2 CLIP-seq from the GraphProt benchmark, Maticzka et al. 2014, as used by Pan and Shen 2018, *iDeepE*).
 

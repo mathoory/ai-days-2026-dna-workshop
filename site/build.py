@@ -22,12 +22,12 @@ TITLE = "Applications of AI in Biotechnology and Genomics"
 SCHEDULE = [
     ("10:00", "10:50", "talk", "Opening lecture", "Prof. Roee Amit", None),
     ("10:50", "11:00", "break", "Break", "", None),
-    ("11:00", "11:40", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn"),
-    ("11:40", "11:50", "break", "Break", "", None),
-    ("11:50", "12:30", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models"),
-    ("12:30", "12:40", "break", "Break", "", None),
-    ("12:40", "13:20", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
-    ("13:20", "13:30", "talk", "Wrap-up and feedback", "Mattan Hoory", None),
+    ("11:00", "11:50", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn"),
+    ("11:50", "12:00", "break", "Break", "", None),
+    ("12:00", "12:40", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models"),
+    ("12:40", "12:50", "break", "Break", "", None),
+    ("12:50", "13:30", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
+    ("13:30", "13:40", "talk", "Wrap-up and feedback", "Mattan Hoory", None),
 ]
 SUMMARY = {
     "01_cnn": "Build a CNN that predicts AGO2 binding from RNA sequence, then read motifs off its filters and test them.",
