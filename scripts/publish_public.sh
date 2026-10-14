@@ -3,11 +3,12 @@
 #
 # This repo (branch main) is local only: it holds the solutions. The `public` branch is checked out
 # as a git worktree (default ../ai-days-public) and is the only thing pushed. This script:
-#   1. builds the notebooks (scripts/build.py)
+#   1. builds the notebooks (scripts/build.py) and renders the three decks (quarto)
 #   2. checks the student notebooks for solution code (every "Your code here" region must be `...`)
 #   3. copies ONLY notebooks/01_cnn.ipynb, 02_foundation_models.ipynb, 03_shortcuts_and_controls.ipynb
-#   4. commits them, rebases on origin/public (keeps other people's commits, e.g. the landing page), pushes
-# Nothing else in the public branch is touched (README, landing-page files).
+#   4. copies the rendered decks into slides/ without speaker notes (scripts/publish_decks.py --no-commit)
+#   5. commits notebooks/ and slides/, rebases on origin/public (keeps other people's commits), pushes
+# Nothing else in the public branch is touched (README, site/, the Pages workflow).
 #
 #   bash scripts/publish_public.sh "commit message"          # publish
 #   bash scripts/publish_public.sh --dry-run                  # build, check and show the diff only
@@ -25,8 +26,13 @@ done
 
 [ "$(git -C "$PUB" rev-parse --abbrev-ref HEAD)" = "public" ] || { echo "$PUB is not on branch public"; exit 1; }
 
-echo "== build"
+echo "== build notebooks"
 (cd "$ROOT" && python scripts/build.py)
+
+echo "== render decks"
+for s in $STEMS; do
+  (cd "$ROOT/slides" && quarto render "$s.qmd" 2>&1 | grep -E "Output created|ERROR" ) || { echo "render failed: $s"; exit 1; }
+done
 
 echo "== solution-leak check"
 PYTHONIOENCODING=utf-8 python - "$ROOT" $STEMS <<'EOF'
@@ -61,13 +67,18 @@ EOF
 echo "== copy into $PUB/notebooks"
 mkdir -p "$PUB/notebooks"
 for s in $STEMS; do cp "$ROOT/notebooks/$s.ipynb" "$PUB/notebooks/$s.ipynb"; done
-FILES=$(for s in $STEMS; do printf "notebooks/%s.ipynb " "$s"; done)
+
+echo "== copy decks into $PUB/slides (speaker notes removed)"
+(cd "$ROOT" && python scripts/publish_decks.py --no-commit --public "$PUB")
+
+FILES="$(for s in $STEMS; do printf "notebooks/%s.ipynb " "$s"; done) slides"
 git -C "$PUB" --no-pager diff --stat -- $FILES
 
 if [ $DRY = 1 ]; then
-  echo "== dry run: nothing committed (restore with: git -C \"$PUB\" checkout -- notebooks)"
+  echo "== dry run: nothing committed (restore with: git -C \"$PUB\" checkout -- notebooks slides; git -C \"$PUB\" clean -fd slides)"
   exit 0
 fi
+git -C "$PUB" add -N -- $FILES
 if git -C "$PUB" diff --quiet -- $FILES; then
   echo "== no changes to publish"
   exit 0
