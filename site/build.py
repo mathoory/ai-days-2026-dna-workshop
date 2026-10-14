@@ -27,7 +27,7 @@ SCHEDULE = [
     ("11:50", "12:30", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models"),
     ("12:30", "12:40", "break", "Break", "", None),
     ("12:40", "13:20", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
-    ("13:20", "13:30*", "talk", "Wrap-up and feedback", "Mattan Hoory", None),
+    ("13:20", "13:30", "talk", "Wrap-up and feedback", "Mattan Hoory", None),
 ]
 SUMMARY = {
     "01_cnn": "Build a CNN that predicts AGO2 binding from RNA sequence, then read motifs off its filters and test them.",
@@ -42,28 +42,30 @@ GITHUB_MARK = ('<svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="tru
                '.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>')
 
 
-def link(href, text, cls="btn", download=False):
+def link(href, text, cls="btn", download=False, label=None):
     d = " download" if download else ""
     ext = "" if href.startswith(("notebooks/", "slides/")) else ' target="_blank" rel="noopener"'
-    return f'<a class="{cls}" href="{html.escape(href)}"{d}{ext}>{html.escape(text)}</a>'
+    aria = f' aria-label="{html.escape(label)}"' if label else ""
+    return f'<a class="{cls}" href="{html.escape(href)}"{d}{ext}{aria}>{html.escape(text)}</a>'
 
 
 def row(start, end, kind, title, who, stem):
-    t = f'<div class="time">{start}<span>{end.rstrip("*")}</span></div>'
-    if end.endswith("*"):
-        t = f'<div class="time">{start}<span>{end.rstrip("*")}, at the latest 14:00</span></div>'
+    t = f'<div class="time">{start}<span>{end}</span></div>'
     if kind == "break":
         return f'<li class="slot break">{t}<div class="what">{title}</div></li>'
     acts = ""
     if stem:
         nb, deck = ROOT / "notebooks" / f"{stem}.ipynb", ROOT / "slides" / f"{stem}.html"
+        part = title.split(".")[0]
         a = []
-        a.append(link(COLAB.format(stem), "Open in Colab", "btn primary") if nb.exists() else '<span class="btn off">Notebook not yet available</span>')
+        a.append(link(COLAB.format(stem), "Open in Colab", "btn primary", label=f"{part}: open in Colab") if nb.exists()
+                 else '<span class="btn off">Notebook not yet available</span>')
         if nb.exists():
-            a.append(link(f"notebooks/{stem}.ipynb", "Download notebook", download=True))
-        a.append(link(f"slides/{stem}.html", "Slides") if deck.exists() else '<span class="btn off">Slides not yet available</span>')
+            a.append(link(f"notebooks/{stem}.ipynb", "Download notebook", download=True, label=f"{part}: download notebook"))
+        a.append(link(f"slides/{stem}.html", "Slides", label=f"{part}: slides") if deck.exists()
+                 else '<span class="btn off">Slides not yet available</span>')
         acts = f'<div class="actions">{"".join(a)}</div>'
-    desc = f'<p class="desc">{html.escape(SUMMARY[stem])}</p>' if stem else ""
+    desc = f'<p class="desc">{html.escape(SUMMARY[stem])}</p>' if SUMMARY.get(stem) else ""
     who = f'<div class="who">{html.escape(who)}</div>' if who else ""
     return f'<li class="slot {kind}">{t}<div class="what"><h3>{html.escape(title)}</h3>{who}{desc}{acts}</div></li>'
 
@@ -82,13 +84,18 @@ def logos():
 def page():
     built = datetime.now(timezone.utc).strftime("%d.%m.%Y %H:%M UTC")
     slots = "\n".join(row(*s) for s in SCHEDULE)
+    qr = ('<img class="qr" src="assets/qr_feedback.svg" alt="QR code for the feedback form">'
+          if (ROOT / "site" / "assets" / "qr_feedback.svg").exists() else "")
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{TITLE} | Technion AI Days 2026</title>
-<meta name="description" content="Notebooks and slides of the AI Days 2026 workshop at the Technion.">
+<meta name="description" content="Notebooks and slides of the AI Days 2026 workshop at the Technion, Thursday 15 October 2026, Ullmann 803.">
+<meta property="og:title" content="{TITLE}">
+<meta property="og:description" content="Technion AI Days 2026 workshop: notebooks and slides.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
@@ -102,10 +109,10 @@ def page():
 </header>
 <section class="hero">
   <div class="wrap">
-    <p class="kicker">Technion AI Days 2026 &nbsp;/&nbsp; Workshop</p>
+    <p class="kicker">Technion AI Days 2026 / Workshop</p>
     <h1>{TITLE}</h1>
-    <p class="meta">Thursday 15 October 2026, 10:00 to 14:00 &nbsp;/&nbsp; Ullmann 803, Technion</p>
-    <p class="meta">Prof. Roee Amit &nbsp;and&nbsp; Mattan Hoory</p>
+    <p class="meta">Thursday 15 October 2026, 10:00 to 14:00 / Ullmann 803, Technion</p>
+    <p class="meta">Prof. Roee Amit and Mattan Hoory</p>
     <p class="host">Hosted by the <a href="{LAB}" target="_blank" rel="noopener">Roee Amit Lab</a></p>
   </div>
 </section>
@@ -120,7 +127,6 @@ def page():
   <section class="lab">
     <h2>The host lab</h2>
     <div class="lab-in">
-      <div>
         <h3>Roee Amit Lab</h3>
         <p class="lab-sub">The Synthetic Biology Laboratory for the Decipherment of Genomic Codes,
           Faculty of Biotechnology and Food Engineering, Technion</p>
@@ -128,15 +134,14 @@ def page():
           tens of thousands of synthetic DNA sequences, measures them in bacteria, yeast and mammalian cells,
           and fits models of the encoding rules to the results.</p>
         <p><a href="{LAB}" target="_blank" rel="noopener">Visit the lab website</a></p>
-      </div>
     </div>
   </section>
   <section class="feedback">
-    <div>
-      <h2>Feedback</h2>
-      <p>{link(FORM, "Open the feedback form", "btn primary")}</p>
+    <h2>Feedback</h2>
+    <div class="feedback-in">
+      {link(FORM, "Open the feedback form", "btn primary")}
+      {qr}
     </div>
-    <img class="qr" src="assets/qr_feedback.svg" alt="QR code for the feedback form">
   </section>
 </main>
 <footer class="foot">
