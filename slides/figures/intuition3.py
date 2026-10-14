@@ -99,7 +99,7 @@ def probe_trap_fix():
 def recap():
     tiles = [("seed_pairing", "the seed rule"), ("filter_dot", "a filter is a dot product"),
              ("planting_bars", "the CNN found miR-16"), ("position_scan", "…and learned where"),
-             ("emb_pca", "embeddings track G+C"), ("shuffle_scores", "the shuffle test"),
+             ("emb_pca", "embeddings track GC"), ("shuffle_scores", "the shuffle test"),
              ("dumbbell", "matched negatives"), ("headtohead", "fine-tuning wins")]
     fig, axes = plt.subplots(2, 4, figsize=(16, 9), dpi=120)
     for ax, (n, t) in zip(axes.flat, tiles):

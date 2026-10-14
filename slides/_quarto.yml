@@ -1,5 +1,6 @@
 project:
   type: default
+  post-render: python ../scripts/bust_cache.py
 
 title: "Applications of AI in Biotechnology and Genomics"
 format:

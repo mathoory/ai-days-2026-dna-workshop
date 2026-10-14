@@ -291,14 +291,15 @@ def learning_flow():
              ("Train", "the algorithm picks the\nbest model in the set"),
              ("Evaluate", "on held-out data\nthe model never saw"),
              ("Use", "predict for new inputs\nnobody has measured")]
-    fig, ax = canvas(16, 7.6, ylim=(0, 76))
-    col_x, row_y, r = [3, 56, 109], [62, 24], 5.2
+    fig, ax = canvas(16, 8.5, ylim=(0, 85))          # the slide's shape (aspects.json: 1.88)
+    col_x, row_top, r = [1, 55, 109], [84.5, 41], 6.6
     for k, (head, sub) in enumerate(steps):
-        x, y = col_x[k % 3], row_y[k // 3]
-        ax.add_patch(plt.Circle((x + r, y), r, color=ACCENT if k < 5 else GOOD_C))
-        ax.text(x + r, y, str(k + 1), ha="center", va="center_baseline", fontsize=30, color="white", fontweight="bold")
-        ax.text(x + 2 * r + 2.5, y, head, ha="left", va="center_baseline", fontsize=23, color=INK, fontweight="bold")
-        ax.text(x + 2 * r + 2.5, y - 6.5, sub, ha="left", va="top", fontsize=21, color=MUTED, linespacing=1.3)
+        x, yt = col_x[k % 3], row_top[k // 3]
+        cy = yt - r
+        ax.add_patch(plt.Circle((x + r, cy), r, color=ACCENT if k < 5 else GOOD_C))
+        ax.text(x + r, cy, str(k + 1), ha="center", va="center_baseline", fontsize=34, color="white", fontweight="bold")
+        ax.text(x, yt - 2 * r - 5.5, head, ha="left", va="center_baseline", fontsize=28, color=INK, fontweight="bold")
+        ax.text(x, yt - 2 * r - 10.5, sub, ha="left", va="top", fontsize=26, color=MUTED, linespacing=1.25)
     save(fig, "learning_flow")
 
 
@@ -504,10 +505,10 @@ def features(tr, ty):
             label(ax, 4 + 18 * 2.3, y, "…", fs=20, color=MUTED, ha="left")
             arrow(ax, 50, y, 58, y, color=MUTED, lw=2, ms=20)
         label(ax, 4, 82, "Classic machine learning: we choose the features", fs=23, color=INK, ha="left", bold=True)
-        box(ax, 60, 70, 30, 8, f"G+C fraction  {gcf:.2f}", fc=ACCENT_L, fs=19)
-        box(ax, 60, 56, 30, 8, f"U fraction  {uf:.2f}", fc=ACCENT_L, fs=19)
+        box(ax, 57, 70, 35, 8, f"$x_1$ = share of G and C:  {gcf:.2f}", fc=ACCENT_L, fs=18)
+        box(ax, 57, 56, 35, 8, f"$x_2$ = share of U:  {uf:.2f}", fc=ACCENT_L, fs=18)
         label(ax, 75, 50, "2 numbers, chosen by us", fs=17, color=MUTED)
-        arrow(ax, 92, 66, 100, 66, color=MUTED, lw=2, ms=20)
+        arrow(ax, 93, 66, 100, 66, color=MUTED, lw=2, ms=20)
         label(ax, 116, 66, "logistic\nregression", fs=20, color=INK)
         arrow(ax, 132, 66, 140, 66, color=MUTED, lw=2, ms=20)
         label(ax, 147, 66, r"$\hat p$", fs=26, color=INK)
@@ -534,7 +535,7 @@ def features(tr, ty):
         save_raw(fig, f"features_{k}")
         frames_.append(f"features_{k}")
     trim_group(frames_)
-    print("features G+C", round(gcf, 3), "U", round(uf, 3))
+    print("features GC", round(gcf, 3), "U", round(uf, 3))
 
 
 def activation(kind):

@@ -171,7 +171,7 @@ def labels_raster(tr, ty):
                                                                    axesB=a1, color=MUTED, lw=1.2, ls="--"))
         else:
             axes[0].add_patch(Rectangle((-0.5, r0 - 0.9), 330, 1.8, fill=False, ec=INK, lw=2.5))
-            axes[0].set_ylabel("150 of them, sorted by G+C")
+            axes[0].set_ylabel("150 of them, sorted by GC")
         fig.legend(handles=[Patch(color=BASE[b], label=b) for b in ALPH], loc="upper right", ncol=4,
                    bbox_to_anchor=(0.98, 0.98), handlelength=1, columnspacing=1.2)
         fig.subplots_adjust(left=0.05, right=0.98, top=0.82, bottom=0.1, wspace=0.06)
@@ -232,9 +232,9 @@ def lr_training(tr, ty):
                         bbox=dict(fc="white", ec="none", alpha=0.85, pad=2))
         w_r, b_r = raw(ws, bs)
         ax.set_title(f"Step {step}\n$w_1$ = {w_r[0]:.1f}\n$w_2$ = {w_r[1]:.1f}\n$b$ = {b_r:.1f}", fontsize=19)
-        ax.set_xlabel("G+C fraction")
+        ax.set_xlabel(r"$x_1$", fontsize=24)
         if k == 0:
-            ax.set_ylabel("U fraction")
+            ax.set_ylabel(r"$x_2$", fontsize=24, rotation=0, labelpad=18)
         else:
             ax.set_yticklabels([])
     ax = fig.add_axes([0.59, 0.09, 0.135, 0.6]); panels.append(ax)      # this run's loss, all 300 steps
@@ -259,9 +259,9 @@ def lr_training(tr, ty):
     fig.legend(handles=[Line2D([], [], marker="o", ls="", ms=10, color=BOUND, label="Bound"),
                         Line2D([], [], marker="o", ls="", ms=10, color=MID, label="Unbound"),
                         Line2D([], [], color=HELD_C, lw=3, label=r"$\hat p$ = 0.5: undecided")],
-               loc="upper right", ncol=3, bbox_to_anchor=(0.995, 1.0))
+               loc="upper right", ncol=3, bbox_to_anchor=(0.995, 0.945))
     # the model and the update, in the band above the panels (the slide carries no text)
-    fig.text(0.02, 0.985, r"Model:  $\hat p = \sigma\,(\,w_1 \cdot \mathrm{G{+}C\ fraction} + w_2 \cdot \mathrm{U\ fraction} + b\,)$",
+    fig.text(0.02, 0.985, r"Model:  $\hat p = \sigma\,(w_1 x_1 + w_2 x_2 + b)$,    $x_1$ = share of G and C,  $x_2$ = share of U",
              fontsize=25, va="top", color=INK)
     fig.text(0.02, 0.925, r"Each step:  $(w_1, w_2, b) \leftarrow (w_1, w_2, b) - \eta\, \nabla \mathcal{L}$",
              fontsize=25, va="top", color=INK)
@@ -307,7 +307,7 @@ def auroc_ci(model, tr, ty, ls, ly):
     idx = np.random.default_rng(0).permutation(len(tr))[:12000]          # same 12,000 as the part 3 notebook
     lr5 = make_pipeline(StandardScaler(), LogisticRegression(max_iter=3000, C=0.1)).fit(
         _kmer_matrix([tr[i] for i in idx]), ty[idx])
-    rows = [("G+C and U only", lr2.predict_proba(gcu(ls))[:, 1], SHORTCUT_C),
+    rows = [("GC and U only", lr2.predict_proba(gcu(ls))[:, 1], SHORTCUT_C),
             ("5-letter word counts", lr5.predict_proba(_kmer_matrix(ls))[:, 1], SHORTCUT_C),
             ("CNN", cnn_scores(model, ls), CNN_C)]
     fig = newfig()
@@ -818,11 +818,11 @@ def emb_pca(tr, ty):
     a1 = fig.add_axes([0.05, 0.1, 0.38, 0.74]); a2 = fig.add_axes([0.6, 0.1, 0.38, 0.74])
     o = np.random.default_rng(1).permutation(len(y))
     sc = a1.scatter(P[o, 0], P[o, 1], c=g[o], cmap=greys, s=5, alpha=.8, lw=0)
-    cb = fig.colorbar(sc, cax=fig.add_axes([0.45, 0.2, 0.01, 0.5])); cb.outline.set_visible(False); cb.set_label("G+C fraction")
+    cb = fig.colorbar(sc, cax=fig.add_axes([0.45, 0.2, 0.01, 0.5])); cb.outline.set_visible(False); cb.set_label("GC fraction")
     a2.scatter(P[o, 0], P[o, 1], c=np.where(y[o] == 1, BOUND, UNB), s=4, alpha=.45, lw=0)
     a2.legend(handles=[Line2D([], [], marker="o", ls="", ms=10, color=BOUND, label="Bound"),
                        Line2D([], [], marker="o", ls="", ms=10, color=UNB, label="Unbound")], loc="upper right")
-    a1.set_title("Coloured by G+C"); a2.set_title("Coloured by label")
+    a1.set_title("Coloured by GC"); a2.set_title("Coloured by label")
     for a in (a1, a2):
         a.set_xticks([]); a.set_yticks([]); a.set_xlabel("PCA direction 1"); a.set_ylabel("PCA direction 2")
     save(fig, "emb_pca")
@@ -841,7 +841,7 @@ def gc_hist():
     ax.axvline(g[y == 1].mean(), color=BOUND, lw=1.8, ls="--"); ax.axvline(g[y == 0].mean(), color=MID, lw=1.8, ls="--")
     ax.legend(handles=[Patch(color=BOUND, alpha=.45, label=f"Bound (mean {g[y == 1].mean():.2f})"),
                        Line2D([], [], color=MID, lw=2.5, label=f"Unbound (mean {g[y == 0].mean():.2f})")], loc="upper right")
-    ax.set_xlabel("G+C fraction"); ax.set_ylabel("Density"); ax.set_yticks([])
+    ax.set_xlabel("GC fraction"); ax.set_ylabel("Density"); ax.set_yticks([])
     save(fig, "gc_hist")
 
 
@@ -926,7 +926,7 @@ def shuffle_scoreboard():
         ax.text(xi + 0.17, s + 0.006, f"{s:.2f}", ha="center")
         ax.text(xi - 0.17, 0.515, "Real", ha="center", fontsize=18, color="white")
         ax.text(xi + 0.17, 0.515, "Bound\nshuffled", ha="center", fontsize=18, color=INK)
-    ax.axhline(0.660, ls="--", color=MID, lw=2); ax.text(1.42, 0.660, "G+C and U only  0.66", color=MUTED, va="center")
+    ax.axhline(0.660, ls="--", color=MID, lw=2); ax.text(1.42, 0.660, "GC and U only  0.66", color=MUTED, va="center")
     ax.axhline(0.738, ls=":", color=MID, lw=2); ax.text(1.42, 0.738, "5-letter word counts  0.74", color=MUTED, va="center")
     ax.set_xlim(-0.45, 1.4); ax.set_xticks(x); ax.set_xticklabels(["CNN", "Mistral-DNA + probe"])
     ax.tick_params(axis="x", length=0); ax.set_ylim(0.5, 0.92); ax.set_ylabel("Held-out AUROC (axis starts at 0.5)"); ygrid(ax)
@@ -943,7 +943,7 @@ def matched_hist():
     for ax, (gg, yy, t) in zip(axes, ((g, y, f"Original ({len(S):,} sequences)"), (g[idx], y[idx], f"Matched ({len(idx):,} sequences)"))):
         ax.hist(gg[yy == 0], bins, color=UNB, alpha=.9, density=True, label="Unbound")
         ax.hist(gg[yy == 1], bins, color=BOUND, alpha=.55, density=True, label="Bound")
-        ax.set_title(t); ax.set_xlabel("G+C fraction"); ax.set_yticks([]); ax.spines["left"].set_visible(False)
+        ax.set_title(t); ax.set_xlabel("GC fraction"); ax.set_yticks([]); ax.spines["left"].set_visible(False)
     axes[1].legend(loc="upper right")
     fig.subplots_adjust(left=0.03, right=0.98, top=0.86, bottom=0.12, wspace=0.08)
     save(fig, "matched_hist")
@@ -977,7 +977,7 @@ def lora():
 
 
 def dumbbell():
-    rows = [("G+C and U only", 0.637, 0.510, MID, "0.64", "0.51"), ("5-letter word counts", 0.762, 0.725, MID, "0.76", "0.73"),
+    rows = [("GC and U only", 0.637, 0.510, MID, "0.64", "0.51"), ("5-letter word counts", 0.762, 0.725, MID, "0.76", "0.73"),
             ("Mistral-DNA + probe", 0.806, 0.770, MID, "0.81", "0.77"), ("CNN", 0.843, 0.838, INK, "0.84", "0.84")]
     fig = newfig()
     ax = fig.add_axes([0.26, 0.16, 0.68, 0.7])
@@ -1081,7 +1081,7 @@ def label_curve():
 def recap():
     tiles = [("seed_pairing", "The seed rule"), ("filter_dot", "A filter computes a dot product"),
              ("planting_bars", "The CNN responds to miR-16"), ("position_scan", "The CNN weighs position"),
-             ("emb_pca", "Embeddings vary with G+C"), ("shuffle_scores", "The shuffle test"),
+             ("emb_pca", "Embeddings vary with GC"), ("shuffle_scores", "The shuffle test"),
              ("dumbbell", "Matched negatives"), ("headtohead", "Fine-tuning against the CNN")]
     fig, axes = plt.subplots(2, 4, figsize=(16, 9), dpi=120)
     for ax, (n, t) in zip(axes.flat, tiles):
@@ -1108,7 +1108,7 @@ if __name__ == "__main__":
         ("logo_grid", lambda: logo_grid(model, pos)),
         ("tokens", lambda: tokens(pos)), ("pipeline_real", lambda: pipeline_real(pos)), ("next_token", lambda: next_token(pos)),
         ("landscape", landscape), ("results_part2", results_part2), ("pretrain_loss", pretrain_loss),
-        ("emb_pca", lambda: print("PC1, PC2 vs G+C", emb_pca(tr, ty))), ("gc_hist", gc_hist),
+        ("emb_pca", lambda: print("PC1, PC2 vs GC", emb_pca(tr, ty))), ("gc_hist", gc_hist),
         ("shuffle_demo", lambda: shuffle_demo(pos)),
         ("shuffle_scores", lambda: shuffle_scores(model, tr, ty, ls, ly)), ("shuffle_scoreboard", shuffle_scoreboard),
         ("matched_hist", matched_hist), ("lora", lora), ("dumbbell", dumbbell), ("headtohead", headtohead),

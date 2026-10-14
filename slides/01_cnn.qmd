@@ -161,12 +161,12 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Projected: 2 min.
 - First one bound sequence: each letter is one coloured cell; its measured site written out on the right. Click: 150 bound and 150 unbound sequences, the same row outlined.
 - CLIP-seq: an experiment that captures the RNA a protein binds. The 40-letter measured site sits at letters 150 to 190 (the black lines).
-- Each row is one sequence, one colour per letter (A green, C blue, G yellow, U red); 150 of each class, sorted by G+C, first 330 letters. The white stripes on the right are sequence ends.
+- Each row is one sequence, one colour per letter (A green, C blue, G yellow, U red); 150 of each class, sorted by GC, first 330 letters. The white stripes on the right are sequence ends.
 - Counts are the training file; 1,000 more sequences (500 of each) are held out as the test set.
 - CLIP-seq: UV light crosslinks proteins to the RNA they touch, an antibody pulls down AGO2, and the attached RNA fragments are sequenced.
 - The data set is the GraphProt CLIP benchmark (Maticzka et al. 2014), used by Pan and Shen (2018), whose CNN we follow. The unbound sequences are the bound sites moved to random positions in the same genes.
 - 99% of sequences have the measured site starting exactly at letter 150. Sequences are 137 to 375 letters long.
-- The bound half is slightly richer in A and U: mean G+C 0.41 vs 0.45 over all sequences. AGO2 sites are often in AU-rich 3′ UTRs (the part of an mRNA after its protein-coding letters), so part of this may be biology and part may come from how the unbound positions were drawn. Part 3 tests that.
+- The bound half is slightly richer in A and U: mean GC 0.41 vs 0.45 over all sequences. AGO2 sites are often in AU-rich 3′ UTRs (the part of an mRNA after its protein-coding letters), so part of this may be biology and part may come from how the unbound positions were drawn. Part 3 tests that.
 :::
 
 ::: {.center}
@@ -257,7 +257,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 2.7 The learning flow
 
-![](assets/custom/learning_flow.png){fig-align="center" height="559px"}
+![](assets/custom/learning_flow.png){fig-align="center" height="754px"}
 
 ::: {.notes}
 - The six steps of any supervised learning project.
@@ -304,9 +304,9 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 
 ::: {.notes}
 - A model needs numbers. Classic machine learning: we decide which numbers describe a sequence, its **features**, and the model learns how to weigh them.
-- Our first model uses two features of one real bound sequence: its G+C fraction (0.40) and its U fraction (0.28). Why these two: slide 1.2 showed that bound sequences are richer in A and U than unbound ones (mean G+C 0.41 against 0.45), so they are the obvious first guess, and two numbers can be drawn on a slide.
+- Our first model uses two features of one real bound sequence: its GC fraction (0.40) and its U fraction (0.28). Why these two: slide 1.2 showed that bound sequences are richer in A and U than unbound ones (mean GC 0.41 against 0.45), so they are the obvious first guess, and two numbers can be drawn on a slide.
 - Click: deep learning gives the model the raw letters (one-hot, section 4) and lets it learn its own features during training. In a CNN these are the filters: real filters of our trained network are shown, blue positive and orange negative weights.
-- Nobody told the CNN to look at G+C. Part 3 checks how much of what it learned is composition anyway.
+- Nobody told the CNN to look at GC. Part 3 checks how much of what it learned is composition anyway.
 :::
 
 ## 2.10 The sigmoid: from a score to a probability
@@ -335,7 +335,7 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 
 ::: {.notes}
 - The update: $\theta$ are all the parameters, $\mathcal{L}$ the loss, $\eta$ the learning rate. Start from some $\theta$, compute the gradient of the loss with respect to every parameter, move each parameter against its gradient, scaled by $\eta$, and repeat.
-- Left and middle: 3,000 training sequences, one point each, placed by their two features, G+C fraction and U fraction (previous slides); blue bound, grey unbound. The orange line is where the predicted probability equals 0.5: at step 0 (a deliberately bad start), after one step, and after 300 steps. Each title gives that step's $w_1$, $w_2$ and $b$. Right: the loss at each step.
+- Left and middle: 3,000 training sequences, one point each, placed by their two features, GC fraction and U fraction (previous slides); blue bound, grey unbound. The orange line is where the predicted probability equals 0.5: at step 0 (a deliberately bad start), after one step, and after 300 steps. Each title gives that step's $w_1$, $w_2$ and $b$. Right: the loss at each step.
 - The smallest possible model on our data: two features per sequence and three parameters (two weights and a bias).
 - The loss (slide 2.8) falls from 0.77 at the bad start to 0.67.
 - How well these two numbers separate the classes on held-out data: AUROC 0.66 (part 3).

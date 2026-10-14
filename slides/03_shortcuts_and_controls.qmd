@@ -9,21 +9,21 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 
 ## 1.1 The two classes differ in composition {data-todo="TODO-1"}
 
-- A **shortcut** is a simple property that differs between the classes in this data set, such as G+C
+- A **shortcut** is a simple property that differs between the classes in this data set, such as GC
 - Before crediting a model with biology, measure what much simpler features achieve
 
 ![](assets/custom/gc_hist.png){fig-align="center" height="484px"}
 
 ::: {.notes}
-- G+C fraction of all 92,346 training sequences: bound filled blue, unbound grey outline, dashed lines at the class means.
-- Bound sequences have less G+C than unbound ones: mean 0.41 against 0.45. It was visible in the data raster in part 1 and in the embedding map in part 2.
+- GC fraction of all 92,346 training sequences: bound filled blue, unbound grey outline, dashed lines at the class means.
+- Bound sequences have less GC than unbound ones: mean 0.41 against 0.45. It was visible in the data raster in part 1 and in the embedding map in part 2.
 - The unbound sequences are random positions in the same genes as the bound sites. AGO2 sites are often in AU-rich 3′ UTRs (the part of an mRNA after its protein-coding letters), so part of this difference may be real biology and part may come from how the negatives were drawn. Section 2 tests that.
 - Two simple models and one stress test:
-  - TODO-1: write `gc_u`, the G+C and U fractions of a sequence, then a logistic regression on these two numbers.
+  - TODO-1: write `gc_u`, the GC and U fractions of a sequence, then a logistic regression on these two numbers.
   - TODO-2: count the 5-letter words of one sequence by hand, then a logistic regression on the counts of all 1,024 five-letter words, which ignores order and position.
   - TODO-3: the shuffle test, slide 1.3.
 - If a simple model scores well, a larger model may be using the same shortcut.
-- The G+C/U model is the logistic regression of part 1 slide 2.11, trained here on 12,000 sequences; it scores 0.66 held out.
+- The GC/U model is the logistic regression of part 1 slide 2.11, trained here on 12,000 sequences; it scores 0.66 held out.
 :::
 
 ## 1.2 Word counts: a model without order {data-todo="TODO-2"}
@@ -48,7 +48,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 
 ::: {.notes}
 - Top: part of a real bound sequence and of its dinucleotide shuffle (Altschul and Erickson 1985). Bottom: the counts of the 16 letter pairs in the whole sequence, blue original, orange shuffled.
-- All 16 letter-pair counts are identical, so G+C is identical too; every longer word is scrambled.
+- All 16 letter-pair counts are identical, so GC is identical too; every longer word is scrambled.
 - Shuffle the 500 bound test sequences, keep the 500 unbound ones, and ask the trained model, without retraining, to separate them.
 - A model that uses only letter and letter-pair composition keeps its score. A model that also uses longer patterns loses that part and drops towards the composition model's 0.66. The shuffled sequences keep their composition, so the score has no reason to fall to 0.5.
 - For our CNN the shuffle also moves the site away from letters 150 to 190, so its drop mixes letter order and position.
@@ -60,15 +60,15 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 
 ## 2.1 Composition-matched data
 
-- Bin every sequence by G+C, U and length; in each bin keep **as many unbound as bound**
+- Bin every sequence by GC, U and length; in each bin keep **as many unbound as bound**
 - Bound and unbound then have the same single-letter composition and length; letter pairs and longer words can still differ
 
 ![](assets/custom/matched_hist.png){fig-align="center" height="507px"}
 
 ::: {.notes}
-- G+C fraction before (left, all 92,346 training sequences) and after matching (right); blue bound, grey unbound.
+- GC fraction before (left, all 92,346 training sequences) and after matching (right); blue bound, grey unbound.
 - 67,764 of the 92,346 sequences remain, from both classes. About 30% of the bound sequences are dropped because no unbound sequence matches them; the bound sequences that remain are the ones that look most like the negatives. No new experiment is needed.
-- In the matched set, G+C, U and length carry no information about the label. Letter pairs and five-letter words still can.
+- In the matched set, GC, U and length carry no information about the label. Letter pairs and five-letter words still can.
 - From the same file we build two test sets of 3,000 sequences each: one with the original negatives and one matched. A difference between them comes from how the sequences were selected.
 :::
 
@@ -110,7 +110,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 ::: {.notes}
 - Helpers: TODO-1 `probe_auc` (`gc_u` is written by the students); TODO-2 `Counter`, `kmer_counts(seqs, k=5)`; TODO-3 `dinuc_shuffle`.
 - TODO-3: score the shuffled sequences with the probe already fitted on real sequences.
-- `shortcut_scores` is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.
+- `shortcut_scores` is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: GC/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.
 - The label curve (optional, 2 min) is precomputed. Each TODO has a test cell; the solutions are published on the workshop site during the workshop.
 :::
 
@@ -122,7 +122,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 
 1. How much of each score do two composition numbers explain?
 2. Which model barely changed after the shuffle, and what does that say about what it uses?
-3. Which part of the G+C difference could be AGO2 biology (3′ UTRs, the end of an mRNA after its protein-coding part, are A/U-rich), and which part could come from how the unbound positions were drawn?
+3. Which part of the GC difference could be AGO2 biology (3′ UTRs, the end of an mRNA after its protein-coding part, are A/U-rich), and which part could come from how the unbound positions were drawn?
 
 ::: {.notes}
 - Two minutes with your neighbour.
@@ -192,10 +192,10 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 :::
 
 ::: {.notes}
-- Point 1: the negatives were random positions in the same genes; on the 1,000 held-out sequences G+C and U alone reached 0.66.
+- Point 1: the negatives were random positions in the same genes; on the 1,000 held-out sequences GC and U alone reached 0.66.
 - Point 2: one-hot letters keep order and position, 5-letter word counts drop both, and each tokenizer splits the same stretch of sequence differently.
 - Point 3: two composition numbers reached 0.66 and 5-letter word counts 0.74 (12,000 labels each), against 0.86 for the CNN (92,346 labels).
-- Point 4: the motif insertion against a control of the same letters, the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (G+C/U 0.64 to 0.51).
+- Point 4: the motif insertion against a control of the same letters, the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (GC/U 0.64 to 0.51).
 - Point 5: frozen Mistral-DNA with a probe scored 0.77 against 0.78 under the shuffle and 0.77 on the 3,000-sequence matched test set. In one offline benchmark, NT-500M fine-tuned with LoRA reached 0.87 against the CNN's 0.84 (20,000 labels, 3 runs each); it has not been shuffle-tested.
 :::
 

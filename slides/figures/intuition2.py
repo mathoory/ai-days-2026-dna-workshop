@@ -113,9 +113,9 @@ def labels_raster(tr, ty):
     for ax, S, t in ((axes[0], P, "150 bound"), (axes[1], N, "150 unbound")):
         ax.imshow(img(S), aspect="auto", interpolation="nearest")
         m = np.mean([gc(s) for s in S])
-        ax.set_title(f"{t} · mean G+C {m:.2f}", fontsize=24, color=NAVY)
+        ax.set_title(f"{t} · mean GC {m:.2f}", fontsize=24, color=NAVY)
         ax.set_xlabel("position (letters)", fontsize=18); ax.set_yticks([]); ax.tick_params(labelsize=14)
-    axes[0].set_ylabel("one row per sequence, sorted by G+C", fontsize=18)
+    axes[0].set_ylabel("one row per sequence, sorted by GC", fontsize=18)
     for b in ALPH:
         fig.text(0.40 + "ACGU".index(b) * 0.06, 0.035, b, color=BASE[b], fontsize=26, fontweight="bold")
     fig.subplots_adjust(left=0.04, right=0.98, top=0.9, bottom=0.12, wspace=0.06)

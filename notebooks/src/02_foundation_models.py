@@ -180,23 +180,23 @@ gc_frac = np.array([(s.count("G") + s.count("C")) / len(s) for s in S_train])
 order = np.random.default_rng(0).permutation(len(P))    # random drawing order: neither class hides the other
 fig, ax = plt.subplots(1, 2, figsize=(9, 4))
 sc = ax[0].scatter(*P[order].T, c=gc_frac[order], s=3, cmap="viridis")
-plt.colorbar(sc, ax=ax[0], label="G+C fraction")
+plt.colorbar(sc, ax=ax[0], label="GC fraction")
 ax[1].scatter(*P[order].T, c=[BOUND if y else UNBOUND for y in y_train[order]], s=3, alpha=.6)
 for col, name in ((UNBOUND, "Unbound"), (BOUND, "Bound")):
     ax[1].scatter([], [], color=col, s=12, label=name)
 ax[1].legend()
-ax[0].set_title("Coloured by G+C fraction"); ax[1].set_title("Coloured by label")
+ax[0].set_title("Coloured by GC fraction"); ax[1].set_title("Coloured by label")
 for a in ax:
     a.set_xticks([]); a.set_yticks([]); a.set_xlabel("PCA direction 1"); a.set_ylabel("PCA direction 2")
 plt.tight_layout(); plt.show()
 for j in (0, 1):
-    print(f"correlation of PCA direction {j + 1} with G+C: {np.corrcoef(P[:, j], gc_frac)[0, 1]:+.2f}")
+    print(f"correlation of PCA direction {j + 1} with GC: {np.corrcoef(P[:, j], gc_frac)[0, 1]:+.2f}")
 
 # %% [markdown]
 # **Reading the map.** If one colouring changes smoothly across the cloud, that property accounts for
-# much of the variation between the vectors. Here it is the G+C fraction. It changes mostly along PCA
+# much of the variation between the vectors. Here it is the GC fraction. It changes mostly along PCA
 # direction 2, the vertical axis (correlation about 0.81), and less along direction 1 (about 0.52).
-# Bound sequences concentrate at the low-G+C end of the map. Part 3 tests whether the probe uses this.
+# Bound sequences concentrate at the low-GC end of the map. Part 3 tests whether the probe uses this.
 #
 # ### TODO-2: A linear probe
 #

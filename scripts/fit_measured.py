@@ -47,7 +47,7 @@ MEASURE_JS = r"""
       });
       var imgs = [].map.call(sl.querySelectorAll('img'), function (im) {
         var b = im.getBoundingClientRect(), col = im.closest('.column');
-        return {src: im.getAttribute('src'), h: b.height / s, w: b.width / s,
+        return {src: (im.getAttribute('src') || '').split('?')[0], h: b.height / s, w: b.width / s,
                 col: col ? col.getBoundingClientRect().width / s : null, stack: !!im.closest('.r-stack')};
       }).filter(function (o) { return o.src && o.src.indexOf('logo') < 0 && o.h > 0; });
       out.push({i: i, title: (sl.querySelector('h1,h2') || {}).textContent || '', bottom: bottom, imgs: imgs});

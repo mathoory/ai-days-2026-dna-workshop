@@ -27,7 +27,7 @@ def kmer_counts(seqs, k=5):
 def dinuc_shuffle(seq, rng):
     """Shuffle a sequence but keep every letter-pair count (Altschul-Erickson / Eulerian walk).
 
-    The result has exactly the same letters, the same G+C, the same letter pairs. Any longer
+    The result has exactly the same letters, the same GC, the same letter pairs. Any longer
     pattern (a motif) is broken up.
     """
     if len(seq) < 3:

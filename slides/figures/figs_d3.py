@@ -45,7 +45,7 @@ def your_turn_d3():
     # 1: two numbers per sequence
     for i, (v, c) in enumerate(((0.41, BASE["G"]), (0.29, BASE["U"]))):
         ax.add_patch(Rectangle((xs[0] - 9 + i * 10, 30), 7, v * 50, color=c))
-    label(ax, xs[0] - 5.5, 27, "G+C", fs=16, color=MUTED); label(ax, xs[0] + 4.5, 27, "U", fs=16, color=MUTED)
+    label(ax, xs[0] - 5.5, 27, "GC", fs=16, color=MUTED); label(ax, xs[0] + 4.5, 27, "U", fs=16, color=MUTED)
     # 2: word counts
     rng = np.random.default_rng(2)
     for i, h in enumerate(rng.integers(1, 7, 24)):
@@ -60,7 +60,7 @@ def your_turn_d3():
         seq(ax, xs[2] - 11, 48 - r * 10, s, fs=20, dx=2.4)
     label(ax, xs[2], 31, "same letter pairs", fs=16, color=MUTED)
     for x, todo, what in zip(xs, ["TODO-1", "TODO-2", "TODO-3"],
-                             ["two numbers per sequence:\nG+C and U", "counts of all\n5-letter words",
+                             ["two numbers per sequence:\nGC and U", "counts of all\n5-letter words",
                               "the shuffle test"]):
         label(ax, x, 18, todo, fs=26, color=ACCENT, bold=True)
         label(ax, x, 11, what, fs=19, color=INK, va="top")
@@ -73,10 +73,10 @@ def day_numbers():
     rows = [  # part, label, (from, to) or value, colour
         ("1", "CNN, 92,346 labels", (0.86,), CNN_C),
         ("2", "Frozen pretrained models + probe", (0.78, 0.79), FROZEN_C),
-        ("3", "Two composition numbers: G+C and U", (0.66,), MID),
+        ("3", "Two composition numbers: GC and U", (0.66,), MID),
         ("3", "Dinucleotide shuffle: CNN", (0.86, 0.66), CNN_C),
         ("3", "Dinucleotide shuffle: frozen probe", (0.78, 0.77), FROZEN_C),
-        ("3", "Composition-matched data: G+C and U", (0.64, 0.51), MID),
+        ("3", "Composition-matched data: GC and U", (0.64, 0.51), MID),
         ("3", "Composition-matched data: CNN", (0.84, 0.84), CNN_C)]
     fig = newfig()
     ax = fig.add_axes([0.42, 0.1, 0.54, 0.8])

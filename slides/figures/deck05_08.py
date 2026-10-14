@@ -101,7 +101,7 @@ def results_05():
 # ---------------------------------------------------------------- slot 6
 def three_attacks():
     fig, ax = canvas()
-    tiles = [("2 numbers", "how much G+C?\nhow much U?", "composition"),
+    tiles = [("2 numbers", "how much GC?\nhow much U?", "composition"),
              ("word counts", "how often is each\n5-letter word there?", "no order, no position"),
              ("shuffle", "same letters,\norder destroyed", "does the model notice?")]
     for i, (big, mid, small) in enumerate(tiles):
@@ -139,7 +139,7 @@ def shuffle_demo():
     label(ax, 34 + 6.5 * 4.6, 77, "motif", fs=20, color=PURPLE, bold=True)
     label(ax, 6, 42, "shuffled", fs=22, color=GREY, ha="left")
     seq(ax, 34, 42, shuf, fs=30, dx=4.6)
-    label(ax, 80, 26, "same letters · same letter pairs · same G+C", fs=25, color=GREEN, bold=True)
+    label(ax, 80, 26, "same letters · same letter pairs · same GC", fs=25, color=GREEN, bold=True)
     label(ax, 80, 15, "motif gone", fs=25, color=RED, bold=True)
     label(ax, 80, 86, "can the model tell a real bound site from its scrambled copy?", fs=26, bold=True)
     save(fig, "shuffle_demo")
@@ -176,7 +176,7 @@ def matched_hist():
         ax.hist(gg[yy == 1], bins, color=GREEN, alpha=.65, density=True, label="bound")
         ax.set_title(t, fontsize=26, color=NAVY); ax.set_xlabel("fraction of G + C", fontsize=22)
         ax.set_yticks([]); ax.tick_params(labelsize=18); ax.legend(fontsize=20, frameon=False)
-    fig.text(0.5, 0.02, f"keep, in every G+C × U × length bin, as many unbound as bound · {len(idx):,} of {len(S):,} kept",
+    fig.text(0.5, 0.02, f"keep, in every GC × U × length bin, as many unbound as bound · {len(idx):,} of {len(S):,} kept",
              ha="center", fontsize=21, color=NAVY)
     fig.subplots_adjust(left=0.04, right=0.98, top=0.88, bottom=0.18, wspace=0.08)
     save(fig, "matched_hist")
@@ -201,7 +201,7 @@ def lora_fig():
 def dumbbell():
     fig = plt.figure(figsize=(16, 9), dpi=120)
     ax = fig.add_axes([0.32, 0.14, 0.64, 0.74])
-    rows = [("G+C and U only", 0.637, 0.510, RED), ("5-letter word counts", 0.762, 0.725, GREY),
+    rows = [("GC and U only", 0.637, 0.510, RED), ("5-letter word counts", 0.762, 0.725, GREY),
             ("Mistral-DNA + probe (frozen)", 0.806, 0.770, PURPLE), ("CNN", 0.843, 0.838, BLUE)]
     for i, (n, o, m, c) in enumerate(rows):
         ax.plot([m, o], [i, i], color=c, lw=5, alpha=.5)
@@ -395,7 +395,7 @@ if __name__ == "__main__":
                           ("TODO-2", "probe_auc(): the linear probe", "5 min"),
                           ("given", "the 30× bigger model, precomputed", "1 min"),
                           ("live", "watch pretraining start", "4 min")], "05_pretrained_model.ipynb")
-    todo_card("todo_06", [("TODO-1", "AUROC from 2 numbers (G+C, U)", "5 min"),
+    todo_card("todo_06", [("TODO-1", "AUROC from 2 numbers (GC, U)", "5 min"),
                           ("TODO-2", "AUROC from 5-letter word counts", "5 min"),
                           ("TODO-3", "shuffle test, CNN and language model", "10 min")], "06_break_it.ipynb")
     todo_card("todo_07", [("TODO-1", "three AUROCs, on both benchmarks", "8 min"),

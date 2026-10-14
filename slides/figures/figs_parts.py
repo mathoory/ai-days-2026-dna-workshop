@@ -255,7 +255,7 @@ def bce_curve():
 
 
 def lr_rates(tr, ty):
-    """Loss per step of the G+C/U logistic regression (same 3,000 sequences and start as lr_training), three learning rates."""
+    """Loss per step of the GC/U logistic regression (same 3,000 sequences and start as lr_training), three learning rates."""
     from intuition2 import gc
     rng = np.random.default_rng(1)
     idx = rng.choice(len(tr), 3000, replace=False)
@@ -326,7 +326,7 @@ def nn_diagram():
 
     label(ax, 30, 69, "Logistic regression: one unit", fs=24)
     ins = [(14, 46), (14, 26)]
-    for (x, y), n in zip(ins, ["G+C", "U"]):
+    for (x, y), n in zip(ins, [r"$x_1$", r"$x_2$"]):
         node(x, y); label(ax, x - 5, y, n, fs=20, color=MUTED, ha="right")
     out = (40, 36)
     for a in ins:

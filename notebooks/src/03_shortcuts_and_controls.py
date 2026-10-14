@@ -12,7 +12,7 @@
 #
 # In this notebook you will:
 #
-# 1. measure what two simple sets of features reach on their own: the G+C and U fractions (TODO-1)
+# 1. measure what two simple sets of features reach on their own: the GC and U fractions (TODO-1)
 #    and 5-letter word counts (TODO-2);
 # 2. run the shuffle test on the CNN and on the probe (TODO-3);
 # 3. select bound and unbound sequences with the same composition, then train and test every model
@@ -65,7 +65,7 @@ for k, v in table.items():
 # using it without detecting binding sites. Before concluding that either model detects binding
 # sites, we check three simpler explanations:
 #
-# 1. **Composition:** the fractions of G+C and of U letters in a sequence (2 numbers).
+# 1. **Composition:** the fractions of GC and of U letters in a sequence (2 numbers).
 # 2. **Word counts:** how often each 5-letter word appears, ignoring order and position.
 # 3. **The shuffle test:** shuffle each bound sequence so that it keeps its letters and letter pairs,
 #    and see how much of each model's score remains.
@@ -104,11 +104,11 @@ def gc_u_one(seq):
 
 gc, u = gc_u_one(s)
 print("first 60 letters:", s[:60], "...")
-print(f"G+C fraction {gc:.3f} | U fraction {u:.3f}")
+print(f"GC fraction {gc:.3f} | U fraction {u:.3f}")
 
 # %%
 # TODO-1b: write gc_u(seqs): the two numbers for every sequence of a list, as a numpy array with one
-#          row per sequence and two columns (G+C fraction, U fraction).
+#          row per sequence and two columns (GC fraction, U fraction).
 def gc_u(seqs):
     # === Your code here ===
     return np.array([gc_u_one(s) for s in seqs])
@@ -126,7 +126,7 @@ for seq, row in zip(S_train[:3], C3):
 # === Your code here ===
 auc_gc, _ = probe_auc(gc_u(S_train), y_train, gc_u(S_test), y_test)
 # === End of your code ===
-table["G+C and U content only (2 numbers)"] = auc_gc
+table["GC and U content only (2 numbers)"] = auc_gc
 print(f"2 numbers: {auc_gc:.3f}")
 
 # %%
@@ -142,7 +142,7 @@ def test_gc_u():
         if not np.isclose(C[i, 0], gc):
             hint = (" (that is the U fraction, so the two columns are swapped)" if np.isclose(C[i, 0], u) else
                     " (a fraction is between 0 and 1: divide by the length)" if C[i, 0] > 1 else "")
-            raise AssertionError(f"❌ sequence {i}: column 0 is {C[i, 0]:.4f}, want the G+C fraction {gc:.4f}{hint}")
+            raise AssertionError(f"❌ sequence {i}: column 0 is {C[i, 0]:.4f}, want the GC fraction {gc:.4f}{hint}")
         assert np.isclose(C[i, 1], u), f"❌ sequence {i}: column 1 is {C[i, 1]:.4f}, want the U fraction {u:.4f}"
     assert 0.63 <= auc_gc <= 0.69, \
         f"❌ auc_gc = {auc_gc:.3f}, want 0.63 to 0.69: train on the two numbers of the training sequences, measure on the test sequences"
@@ -152,11 +152,11 @@ def test_gc_u():
 test_gc_u()
 
 # %%
-#@title ▶ Plot G+C and U content { display-mode: "form" }
+#@title ▶ Plot GC and U content { display-mode: "form" }
 import matplotlib.pyplot as plt
 C = gc_u(S_train)
 fig, ax = plt.subplots(1, 2, figsize=(8, 2.8))
-for j, name in enumerate(("G+C fraction", "U fraction")):
+for j, name in enumerate(("GC fraction", "U fraction")):
     for lab, c, lbl in ((0, UNBOUND, "Unbound"), (1, BOUND, "Bound")):
         ax[j].hist(C[y_train == lab, j], bins=40, alpha=.7, color=c, label=lbl, density=True)
     ax[j].set_xlabel(name); ax[j].set_ylabel("Density"); ax[j].legend()
@@ -251,7 +251,7 @@ test_words()
 # ## 3. The shuffle test (TODO-3)
 #
 # Take every **bound** test sequence and shuffle it with `dinuc_shuffle`. The result has the same
-# letters, the same letter pairs and the same G+C content, but any longer motif is broken up. Then
+# letters, the same letter pairs and the same GC content, but any longer motif is broken up. Then
 # score these shuffled "bound" sequences against the real unbound ones.
 #
 # The shuffled sequences keep their composition, so they still differ from the unbound ones in the
@@ -299,7 +299,7 @@ unbound = [s for s, y in zip(S_test, y_test) if y == 0]
 shuffled = [dinuc_shuffle(s, rng) for s in bound]
 print("original:", bound[0][:60])
 print("shuffled:", shuffled[0][:60])
-print("same G+C and U?", np.allclose(gc_u(bound), gc_u(shuffled)))
+print("same GC and U?", np.allclose(gc_u(bound), gc_u(shuffled)))
 y_shuf = np.array([1] * len(shuffled) + [0] * len(unbound))
 
 # %% [markdown]
@@ -366,7 +366,7 @@ results["Mistral-DNA + probe on shuffled bound sequences"] = auc_shuf_fm
 # CNN = ink, frozen language model = mid grey, shortcut baselines = dashed grey outline, shuffled = hatched
 styles = {"CNN (part 1)": dict(color=CNN_C),
           "Mistral-DNA + probe (part 2)": dict(color=FROZEN_C),
-          "G+C and U content only (2 numbers)": dict(color="white", edgecolor=BASELINE_C, linestyle="--"),
+          "GC and U content only (2 numbers)": dict(color="white", edgecolor=BASELINE_C, linestyle="--"),
           "5-letter word counts (1,024 numbers)": dict(color="white", edgecolor=BASELINE_C, linestyle="--"),
           "CNN on shuffled bound sequences": dict(color="white", edgecolor=CNN_C, hatch="///"),
           "Mistral-DNA + probe on shuffled bound sequences": dict(color="white", edgecolor=FROZEN_C, hatch="///")}
@@ -387,7 +387,7 @@ _ = (DATA_DIR / "my_part3_shuffle_results.json").write_text(json.dumps(results, 
 # 1. How much of each model's score can two numbers reproduce?
 # 2. Which model was least affected by the shuffle? Compare its shuffled score with the composition
 #    score `auc_gc`. What does that suggest it relies on?
-# 3. Two numbers (G+C and U) already separate the classes. The unbound sequences are random positions in
+# 3. Two numbers (GC and U) already separate the classes. The unbound sequences are random positions in
 #    the same genes as the binding sites. Which part of the composition difference could be biology
 #    (AGO2 binds mostly in A/U-rich 3′UTRs), and which part could come from how the unbound positions
 #    were drawn?
@@ -397,7 +397,7 @@ _ = (DATA_DIR / "my_part3_shuffle_results.json").write_text(json.dumps(results, 
 # %% [markdown]
 # # Fix the data, then test again (sections 4 to 7)
 #
-# In sections 1 to 3, two numbers (the G+C and U fractions of a sequence) already separated bound from
+# In sections 1 to 3, two numbers (the GC and U fractions of a sequence) already separated bound from
 # unbound RNA (AUROC ≈ 0.66). Each unbound sequence is a binding site moved to a random position in
 # the same gene (part 1), so this compares binding sites with random positions in the same genes. Part
 # of the difference may be real biology of where AGO2 binds (mostly in A/U-rich 3′UTRs), and part may
@@ -405,14 +405,14 @@ _ = (DATA_DIR / "my_part3_shuffle_results.json").write_text(json.dumps(results, 
 # well by reading single-letter composition, and the score alone would not show it.
 #
 # A **control** removes that signal. We select bound and unbound sequences so that both classes have
-# the same G+C fraction, U fraction and length, bin by bin. On the selected data, single-letter
+# the same GC fraction, U fraction and length, bin by bin. On the selected data, single-letter
 # composition carries no information about the label. Letter-pair and 5-letter-word composition still
 # differ between the classes, so a score above 0.5 can still come from them.
 
 # %% [markdown]
 # ## 4. A composition-matched benchmark
 #
-# We sort every training sequence into a bin by its G+C fraction, U fraction and length. In each bin
+# We sort every training sequence into a bin by its GC fraction, U fraction and length. In each bin
 # we keep the **same number of bound and unbound sequences** (the smaller of the two counts) and drop
 # the rest. This selects a subset of **both** classes: about 30% of the bound sequences have no
 # unbound match in their bin and are dropped. Afterwards the two classes have the same single-letter
@@ -466,7 +466,7 @@ for a, name in zip(ax, BENCH):
     g = gc_u(S)[:, 0]
     for lab, c, lbl in ((0, UNBOUND, "Unbound"), (1, BOUND, "Bound")):
         a.hist(g[y == lab], bins=40, alpha=.7, color=c, density=True, label=lbl)
-    a.set_title("Original negatives" if name == "original" else "Matched"); a.set_xlabel("G+C fraction"); a.legend()
+    a.set_title("Original negatives" if name == "original" else "Matched"); a.set_xlabel("GC fraction"); a.legend()
 ax[0].set_ylabel("Density")
 plt.tight_layout(); plt.show()
 
@@ -497,7 +497,7 @@ def shortcut_scores(train_seqs, train_y, test_seqs, test_y, n=12000):
     auc_k5, _ = probe_auc(kmer_counts(tr, 5), ytr, kmer_counts(test_seqs, 5), test_y)
     auc_fm, _ = probe_auc(embed(tok, fm, [to_dna(s) for s in tr]), ytr,
                           embed(tok, fm, [to_dna(s) for s in test_seqs]), test_y)
-    return {"G+C and U content only (2 numbers)": auc_gc,
+    return {"GC and U content only (2 numbers)": auc_gc,
             "5-letter word counts (1,024 numbers)": auc_k5,
             "Mistral-DNA + probe (frozen)": auc_fm}
 

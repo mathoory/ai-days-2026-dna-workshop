@@ -29,7 +29,7 @@
     }
   </style>
   <link rel="stylesheet" href="03_shortcuts_and_controls_files/libs/revealjs/dist/theme/quarto-00ac2f6af1389919a18f42df5b7c0002.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=cd94bf8b">
   <link href="03_shortcuts_and_controls_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="03_shortcuts_and_controls_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="03_shortcuts_and_controls_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -155,27 +155,27 @@
 <section id="the-two-classes-differ-in-composition" class="slide level2" data-todo="TODO-1">
 <h2>1.1 The two classes differ in composition</h2>
 <ul>
-<li>A <strong>shortcut</strong> is a simple property that differs between the classes in this data set, such as G+C</li>
+<li>A <strong>shortcut</strong> is a simple property that differs between the classes in this data set, such as GC</li>
 <li>Before crediting a model with biology, measure what much simpler features achieve</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/gc_hist.png" class="quarto-figure quarto-figure-center" height="484"></p>
+<p><img data-src="assets/custom/gc_hist.png?v=8856d275" class="quarto-figure quarto-figure-center" height="484"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>G+C fraction of all 92,346 training sequences: bound filled blue, unbound grey outline, dashed lines at the class means.</li>
-<li>Bound sequences have less G+C than unbound ones: mean 0.41 against 0.45. It was visible in the data raster in part 1 and in the embedding map in part 2.</li>
+<li>GC fraction of all 92,346 training sequences: bound filled blue, unbound grey outline, dashed lines at the class means.</li>
+<li>Bound sequences have less GC than unbound ones: mean 0.41 against 0.45. It was visible in the data raster in part 1 and in the embedding map in part 2.</li>
 <li>The unbound sequences are random positions in the same genes as the bound sites. AGO2 sites are often in AU-rich 3′ UTRs (the part of an mRNA after its protein-coding letters), so part of this difference may be real biology and part may come from how the negatives were drawn. Section 2 tests that.</li>
 <li>Two simple models and one stress test:
 <ul>
-<li>TODO-1: write <code>gc_u</code>, the G+C and U fractions of a sequence, then a logistic regression on these two numbers.</li>
+<li>TODO-1: write <code>gc_u</code>, the GC and U fractions of a sequence, then a logistic regression on these two numbers.</li>
 <li>TODO-2: count the 5-letter words of one sequence by hand, then a logistic regression on the counts of all 1,024 five-letter words, which ignores order and position.</li>
 <li>TODO-3: the shuffle test, slide 1.3.</li>
 </ul></li>
 <li>If a simple model scores well, a larger model may be using the same shortcut.</li>
-<li>The G+C/U model is the logistic regression of part 1 slide 2.11, trained here on 12,000 sequences; it scores 0.66 held out.</li>
+<li>The GC/U model is the logistic regression of part 1 slide 2.11, trained here on 12,000 sequences; it scores 0.66 held out.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -196,7 +196,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/word_counts.png" class="quarto-figure quarto-figure-center" height="641"></p>
+<p><img data-src="assets/custom/word_counts.png?v=5bb2177d" class="quarto-figure quarto-figure-center" height="641"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -226,13 +226,13 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/shuffle_demo.png" class="quarto-figure quarto-figure-center" height="513"></p>
+<p><img data-src="assets/custom/shuffle_demo.png?v=d81b8eed" class="quarto-figure quarto-figure-center" height="513"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>Top: part of a real bound sequence and of its dinucleotide shuffle (Altschul and Erickson 1985). Bottom: the counts of the 16 letter pairs in the whole sequence, blue original, orange shuffled.</li>
-<li>All 16 letter-pair counts are identical, so G+C is identical too; every longer word is scrambled.</li>
+<li>All 16 letter-pair counts are identical, so GC is identical too; every longer word is scrambled.</li>
 <li>Shuffle the 500 bound test sequences, keep the 500 unbound ones, and ask the trained model, without retraining, to separate them.</li>
 <li>A model that uses only letter and letter-pair composition keeps its score. A model that also uses longer patterns loses that part and drops towards the composition model’s 0.66. The shuffled sequences keep their composition, so the score has no reason to fall to 0.5.</li>
 <li>For our CNN the shuffle also moves the site away from letters 150 to 190, so its drop mixes letter order and position.</li>
@@ -257,19 +257,19 @@
 <section id="composition-matched-data" class="slide level2">
 <h2>2.1 Composition-matched data</h2>
 <ul>
-<li>Bin every sequence by G+C, U and length; in each bin keep <strong>as many unbound as bound</strong></li>
+<li>Bin every sequence by GC, U and length; in each bin keep <strong>as many unbound as bound</strong></li>
 <li>Bound and unbound then have the same single-letter composition and length; letter pairs and longer words can still differ</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/matched_hist.png" class="quarto-figure quarto-figure-center" height="507"></p>
+<p><img data-src="assets/custom/matched_hist.png?v=ff469948" class="quarto-figure quarto-figure-center" height="507"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>G+C fraction before (left, all 92,346 training sequences) and after matching (right); blue bound, grey unbound.</li>
+<li>GC fraction before (left, all 92,346 training sequences) and after matching (right); blue bound, grey unbound.</li>
 <li>67,764 of the 92,346 sequences remain, from both classes. About 30% of the bound sequences are dropped because no unbound sequence matches them; the bound sequences that remain are the ones that look most like the negatives. No new experiment is needed.</li>
-<li>In the matched set, G+C, U and length carry no information about the label. Letter pairs and five-letter words still can.</li>
+<li>In the matched set, GC, U and length carry no information about the label. Letter pairs and five-letter words still can.</li>
 <li>From the same file we build two test sets of 3,000 sequences each: one with the original negatives and one matched. A difference between them comes from how the sequences were selected.</li>
 </ul>
 <style type="text/css">
@@ -292,10 +292,10 @@
 <section id="four-ways-to-adapt-a-pretrained-model" class="slide level2">
 <h2>3.1 Four ways to adapt a pretrained model</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/adapt_layers_0.png" height="742"></p>
-<p><img data-src="assets/custom/adapt_layers_1.png" class="fragment" height="742"></p>
-<p><img data-src="assets/custom/adapt_layers_2.png" class="fragment" height="742"></p>
-<p><img data-src="assets/custom/adapt_layers_3.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/adapt_layers_0.png?v=bc0ce964" height="742"></p>
+<p><img data-src="assets/custom/adapt_layers_1.png?v=bbc435bb" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/adapt_layers_2.png?v=f26e2513" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/adapt_layers_3.png?v=d94c1092" class="fragment" height="742"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -328,14 +328,14 @@
 <p>Open <strong><code>03_shortcuts_and_controls.ipynb</code></strong>; it starts from our CNN and our embeddings.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/your_turn_d3.png" class="quarto-figure quarto-figure-center" height="511"></p>
+<p><img data-src="assets/custom/your_turn_d3.png?v=5a63025c" class="quarto-figure quarto-figure-center" height="511"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>Helpers: TODO-1 <code>probe_auc</code> (<code>gc_u</code> is written by the students); TODO-2 <code>Counter</code>, <code>kmer_counts(seqs, k=5)</code>; TODO-3 <code>dinuc_shuffle</code>.</li>
 <li>TODO-3: score the shuffled sequences with the probe already fitted on real sequences.</li>
-<li><code>shortcut_scores</code> is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.</li>
+<li><code>shortcut_scores</code> is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: GC/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.</li>
 <li>The label curve (optional, 2 min) is precomputed. Each TODO has a test cell; the solutions are published on the workshop site during the workshop.</li>
 </ul>
 <style type="text/css">
@@ -360,7 +360,7 @@
 <ol type="1">
 <li>How much of each score do two composition numbers explain?</li>
 <li>Which model barely changed after the shuffle, and what does that say about what it uses?</li>
-<li>Which part of the G+C difference could be AGO2 biology (3′ UTRs, the end of an mRNA after its protein-coding part, are A/U-rich), and which part could come from how the unbound positions were drawn?</li>
+<li>Which part of the GC difference could be AGO2 biology (3′ UTRs, the end of an mRNA after its protein-coding part, are A/U-rich), and which part could come from how the unbound positions were drawn?</li>
 </ol>
 <aside class="notes">
 <ul>
@@ -383,7 +383,7 @@
 <h2>5.2 Fine-tuning against the CNN</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/headtohead.png" class="quarto-figure quarto-figure-center" height="649"></p>
+<p><img data-src="assets/custom/headtohead.png?v=f671f2ab" class="quarto-figure quarto-figure-center" height="649"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -411,7 +411,7 @@
 <h2>5.3 Test AUROC against the number of labels</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/label_curve2.png" class="quarto-figure quarto-figure-center" height="684"></p>
+<p><img data-src="assets/custom/label_curve2.png?v=5ec4b277" class="quarto-figure quarto-figure-center" height="684"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -444,7 +444,7 @@
 <h2>6.1 The day in numbers</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/day_numbers.png" class="quarto-figure quarto-figure-center" height="766"></p>
+<p><img data-src="assets/custom/day_numbers.png?v=bef2de47" class="quarto-figure quarto-figure-center" height="766"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -469,7 +469,7 @@
 <h2>6.2 Ten pretrained models on matched data</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/model_scan.png" class="quarto-figure quarto-figure-center" height="695"></p>
+<p><img data-src="assets/custom/model_scan.png?v=3bbbaa70" class="quarto-figure quarto-figure-center" height="695"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -503,10 +503,10 @@
 </ol>
 <aside class="notes">
 <ul>
-<li>Point 1: the negatives were random positions in the same genes; on the 1,000 held-out sequences G+C and U alone reached 0.66.</li>
+<li>Point 1: the negatives were random positions in the same genes; on the 1,000 held-out sequences GC and U alone reached 0.66.</li>
 <li>Point 2: one-hot letters keep order and position, 5-letter word counts drop both, and each tokenizer splits the same stretch of sequence differently.</li>
 <li>Point 3: two composition numbers reached 0.66 and 5-letter word counts 0.74 (12,000 labels each), against 0.86 for the CNN (92,346 labels).</li>
-<li>Point 4: the motif insertion against a control of the same letters, the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (G+C/U 0.64 to 0.51).</li>
+<li>Point 4: the motif insertion against a control of the same letters, the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (GC/U 0.64 to 0.51).</li>
 <li>Point 5: frozen Mistral-DNA with a probe scored 0.77 against 0.78 under the shuffle and 0.77 on the 3,000-sequence matched test set. In one offline benchmark, NT-500M fine-tuned with LoRA reached 0.87 against the CNN’s 0.84 (20,000 labels, 3 runs each); it has not been shuffle-tested.</li>
 </ul>
 <style type="text/css">
@@ -585,7 +585,7 @@
 <li>Notebooks and slides stay online: <strong><span class="nowrap">mathoory.github.io/ai-days-2026-dna-workshop</span></strong></li>
 </ul>
 </div><div class="column" style="width:42%;">
-<p><img data-src="assets/custom/qr_form.png" height="671"></p>
+<p><img data-src="assets/custom/qr_form.png?v=9acaf17a" height="671"></p>
 </div></div>
 <aside class="notes">
 <ul>
@@ -634,7 +634,7 @@
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
-<p><img src="assets/logo.png" class="slide-logo"></p>
+<p><img src="assets/logo.png?v=440542c4" class="slide-logo"></p>
 <div class="footer footer-default">
 
 </div>

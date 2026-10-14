@@ -4,7 +4,7 @@ Writes to slides/assets/custom/:
   filter_dot        a learned 4x10 filter, a real one-hot window, their product and the sum
   filter_learning   one filter at epochs 0, 1, 3, 10 of a fresh training run
   activation_track  one bound sequence: a filter's output at every position
-  emb_pca           13k real Mistral-DNA embeddings, PCA, coloured by G+C and by label
+  emb_pca           13k real Mistral-DNA embeddings, PCA, coloured by GC and by label
   shuffle_scores    model scores for real bound / shuffled bound / unbound (CNN and probe)
   token_split       the real Mistral-DNA tokenizer on a sequence holding a miR-16 site
 Run in an env with torch + transformers (hw1-00660121 locally).
