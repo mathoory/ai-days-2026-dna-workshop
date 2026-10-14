@@ -152,7 +152,7 @@
 
 </section>
 
-<section id="the-two-classes-differ-in-composition" class="slide level2">
+<section id="the-two-classes-differ-in-composition" class="slide level2" data-todo="TODO-1">
 <h2>1.1 The two classes differ in composition</h2>
 <ul>
 <li>A <strong>shortcut</strong> is a simple property that differs between the classes in this data set, such as G+C</li>
@@ -165,7 +165,7 @@
 </div>
 
 </section>
-<section id="word-counts-a-model-without-order" class="slide level2">
+<section id="word-counts-a-model-without-order" class="slide level2" data-todo="TODO-2">
 <h2>1.2 Word counts: a model without order</h2>
 <ul>
 <li>Count every 5-letter word in a sequence: 1,024 numbers, one per possible word</li>
@@ -177,7 +177,7 @@
 </div>
 
 </section>
-<section id="the-dinucleotide-shuffle-test" class="slide level2">
+<section id="the-dinucleotide-shuffle-test" class="slide level2" data-todo="TODO-3">
 <h2>1.3 The dinucleotide shuffle test</h2>
 <ul>
 <li>A <strong>dinucleotide</strong> is a pair of neighbouring letters. The shuffle keeps every letter and dinucleotide count and scrambles everything longer, including where sites sit</li>
@@ -222,7 +222,7 @@
 </div>
 
 </section>
-<section id="lora" class="slide level2">
+<section id="lora" class="slide level2" data-todo="TODO-4">
 <h2>3.2 LoRA</h2>
 <p><strong>Low-Rank Adaptation</strong>: train a small correction to each weight matrix, keep the matrix itself</p>
 <p><span class="math display">\[W x \;\rightarrow\; (W + BA)\,x, \qquad B \in \mathbb{R}^{256 \times r},\; A \in \mathbb{R}^{r \times 256},\; r = 16\]</span></p>
@@ -585,6 +585,57 @@
           RevealZoom
         ]
       });
+    </script>
+    <!-- A second menu row under the section menu: one link per TODO slide (slides tagged data-todo). -->
+    <style>
+      .todo-bar { position: fixed; left: 0; right: 0; z-index: 40; display: flex; justify-content: center; gap: 10px;
+                  pointer-events: none; font-family: Roboto, sans-serif; }
+      .todo-bar a { pointer-events: auto; font-size: 12px; line-height: 1; padding: 3px 9px; border-radius: 10px;
+                    color: #1A73E8; background: #E8F0FE; text-decoration: none; }
+      .todo-bar a.active { color: #fff; background: #1A73E8; }
+      .todo-bar a:hover { background: #D2E3FC; }
+      .todo-bar a.active:hover { background: #1A73E8; }
+      .reveal[data-state~="hide-menubar"] ~ .todo-bar, body.hide-todo .todo-bar { display: none; }
+    </style>
+    <script>
+    (function () {
+      function build() {
+        var slides = Reveal.getSlides(), todos = [];
+        slides.forEach(function (s, i) {
+          var t = s.getAttribute("data-todo");
+          if (t) todos.push({ name: t, index: i });
+        });
+        if (!todos.length) return;
+        var bar = document.createElement("div");
+        bar.className = "todo-bar";
+        todos.forEach(function (t) {
+          var a = document.createElement("a");
+          a.href = "#"; a.textContent = t.name;
+          a.addEventListener("click", function (e) { e.preventDefault(); Reveal.slide(t.index); });
+          t.el = a; bar.appendChild(a);
+        });
+        document.body.appendChild(bar);
+        function place() {
+          var mb = document.querySelector(".menubar");
+          var r = mb ? mb.getBoundingClientRect() : null;
+          bar.style.top = ((r && r.height) ? r.bottom + 4 : 30) + "px";
+        }
+        function update() {
+          var cur = Reveal.getIndices().h;
+          var title = Reveal.getCurrentSlide().id === "title-slide";
+          document.body.classList.toggle("hide-todo", title);
+          todos.forEach(function (t) { t.el.classList.toggle("active", t.index === cur); });
+          place();
+        }
+        Reveal.on("slidechanged", update);
+        Reveal.on("resize", place);
+        update();
+      }
+      if (window.Reveal && Reveal.isReady && Reveal.isReady()) build();
+      else window.addEventListener("load", function () {
+        if (Reveal.isReady()) build(); else Reveal.on("ready", build);
+      });
+    })();
     </script>
     <script id="quarto-html-after-body" type="application/javascript">
       window.document.addEventListener("DOMContentLoaded", function (event) {

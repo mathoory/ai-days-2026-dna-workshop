@@ -138,6 +138,7 @@
 <nav role="doc-toc"> 
 <h2 id="toc-title">Table of contents</h2>
 <ul>
+<li><a href="#/welcome" id="/toc-welcome">0 Welcome</a></li>
 <li><a href="#/the-task" id="/toc-the-task">1 The task</a></li>
 <li><a href="#/learning-from-examples" id="/toc-learning-from-examples">2 Learning from examples</a></li>
 <li><a href="#/testing-a-model" id="/toc-testing-a-model">3 Testing a model</a></li>
@@ -146,13 +147,13 @@
 </ul>
 </nav>
 </section>
-<section id="the-task" class="title-slide slide level1 center" data-name="Task">
-<h1>1 The task</h1>
+<section id="welcome" class="title-slide slide level1 center" data-name="Welcome">
+<h1>0 Welcome</h1>
 
 </section>
 
 <section id="about-me" class="slide level2">
-<h2>1.1 About me</h2>
+<h2>0.1 About me</h2>
 <div class="columns">
 <div class="column" style="width:58%;">
 <p><img data-src="assets/custom/timeline.png" height="680"></p>
@@ -163,7 +164,7 @@
 
 </section>
 <section id="my-research" class="slide level2">
-<h2>1.2 My research</h2>
+<h2>0.2 My research</h2>
 <p><strong>Machine learning for molecular design</strong>: from a sequence to how it binds</p>
 <div class="columns">
 <div class="column" style="width:42%;">
@@ -176,7 +177,7 @@
 
 </section>
 <section id="goals" class="slide level2">
-<h2>1.3 Goals</h2>
+<h2>0.3 Goals</h2>
 <div class="goals">
 <div class="columns">
 <div class="column" style="width:50%;">
@@ -200,7 +201,7 @@
 
 </section>
 <section id="what-you-need" class="slide level2">
-<h2>1.4 What you need</h2>
+<h2>0.4 What you need</h2>
 <div class="columns">
 <div class="column" style="width:58%;">
 <ul>
@@ -214,7 +215,7 @@
 
 </section>
 <section id="today" class="slide level2">
-<h2>1.5 Today</h2>
+<h2>0.5 Today</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 33%">
@@ -263,8 +264,13 @@
 </table>
 
 </section>
+<section id="the-task" class="title-slide slide level1 center" data-name="Task">
+<h1>1 The task</h1>
+
+</section>
+
 <section id="rna-and-ago2" class="slide level2">
-<h2>1.6 RNA and AGO2</h2>
+<h2>1.1 RNA and AGO2</h2>
 <div class="r-stack">
 <p><img data-src="assets/custom/bio_flow_base.png" height="509"></p>
 <p><img data-src="assets/custom/bio_flow_ago2.png" class="fragment" height="509"></p>
@@ -272,7 +278,7 @@
 
 </section>
 <section id="the-data" class="slide level2">
-<h2>1.7 The data</h2>
+<h2>1.2 The data</h2>
 <ul>
 <li><strong>Bound</strong>: 48,095 sites measured by CLIP-seq, an experiment that captures the RNA a protein binds. <strong>Unbound</strong>: 44,251 random positions in the same genes</li>
 <li>The 40-letter measured site sits at letters 150 to 190</li>
@@ -574,7 +580,7 @@
 
 </section>
 
-<section id="one-hot-encoding-todo-1" class="slide level2">
+<section id="one-hot-encoding-todo-1" class="slide level2" data-todo="TODO-1">
 <h2>4.1 One-hot encoding (TODO-1)</h2>
 <ul>
 <li>One column per letter, with a 1 in its row; padding columns of 0.25 up to 501</li>
@@ -630,7 +636,7 @@
 </div>
 
 </section>
-<section id="build-your-network-todo-2" class="slide level2">
+<section id="build-your-network-todo-2" class="slide level2" data-todo="TODO-2">
 <h2>4.6 Build your network (TODO-2)</h2>
 
 <img data-src="assets/custom/cnn_template.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
@@ -645,7 +651,7 @@
 </div>
 
 </section>
-<section id="the-training-step-and-the-evaluation-todo-3" class="slide level2">
+<section id="the-training-step-and-the-evaluation-todo-3" class="slide level2" data-todo="TODO-3">
 <h2>4.8 The training step and the evaluation (TODO-3)</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -677,7 +683,7 @@
 </div>
 
 </section>
-<section id="filter-0-of-our-cnn-todo-4" class="slide level2">
+<section id="filter-0-of-our-cnn-todo-4" class="slide level2" data-todo="TODO-4">
 <h2>5.3 Filter 0 of our CNN (TODO-4)</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -686,7 +692,7 @@
 </div>
 
 </section>
-<section id="test-a-logo-insert-it-into-random-rna-todo-5" class="slide level2">
+<section id="test-a-logo-insert-it-into-random-rna-todo-5" class="slide level2" data-todo="TODO-5">
 <h2>5.4 Test a logo: insert it into random RNA (TODO-5)</h2>
 <ul>
 <li>Insert one filter’s consensus 1 to 7 times. Which control shows that its pattern matters?</li>
@@ -922,6 +928,57 @@
           RevealZoom
         ]
       });
+    </script>
+    <!-- A second menu row under the section menu: one link per TODO slide (slides tagged data-todo). -->
+    <style>
+      .todo-bar { position: fixed; left: 0; right: 0; z-index: 40; display: flex; justify-content: center; gap: 10px;
+                  pointer-events: none; font-family: Roboto, sans-serif; }
+      .todo-bar a { pointer-events: auto; font-size: 12px; line-height: 1; padding: 3px 9px; border-radius: 10px;
+                    color: #1A73E8; background: #E8F0FE; text-decoration: none; }
+      .todo-bar a.active { color: #fff; background: #1A73E8; }
+      .todo-bar a:hover { background: #D2E3FC; }
+      .todo-bar a.active:hover { background: #1A73E8; }
+      .reveal[data-state~="hide-menubar"] ~ .todo-bar, body.hide-todo .todo-bar { display: none; }
+    </style>
+    <script>
+    (function () {
+      function build() {
+        var slides = Reveal.getSlides(), todos = [];
+        slides.forEach(function (s, i) {
+          var t = s.getAttribute("data-todo");
+          if (t) todos.push({ name: t, index: i });
+        });
+        if (!todos.length) return;
+        var bar = document.createElement("div");
+        bar.className = "todo-bar";
+        todos.forEach(function (t) {
+          var a = document.createElement("a");
+          a.href = "#"; a.textContent = t.name;
+          a.addEventListener("click", function (e) { e.preventDefault(); Reveal.slide(t.index); });
+          t.el = a; bar.appendChild(a);
+        });
+        document.body.appendChild(bar);
+        function place() {
+          var mb = document.querySelector(".menubar");
+          var r = mb ? mb.getBoundingClientRect() : null;
+          bar.style.top = ((r && r.height) ? r.bottom + 4 : 30) + "px";
+        }
+        function update() {
+          var cur = Reveal.getIndices().h;
+          var title = Reveal.getCurrentSlide().id === "title-slide";
+          document.body.classList.toggle("hide-todo", title);
+          todos.forEach(function (t) { t.el.classList.toggle("active", t.index === cur); });
+          place();
+        }
+        Reveal.on("slidechanged", update);
+        Reveal.on("resize", place);
+        update();
+      }
+      if (window.Reveal && Reveal.isReady && Reveal.isReady()) build();
+      else window.addEventListener("load", function () {
+        if (Reveal.isReady()) build(); else Reveal.on("ready", build);
+      });
+    })();
     </script>
     <script id="quarto-html-after-body" type="application/javascript">
       window.document.addEventListener("DOMContentLoaded", function (event) {
