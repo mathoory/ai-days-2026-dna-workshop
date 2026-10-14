@@ -194,7 +194,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 - For the exercise we need only its last layer's output: the token-by-256 matrix on the next slide, averaged into one vector.
 :::
 
-## 4.2 The whole pipeline on one sequence
+## 4.2 The whole pipeline on one sequence {data-todo="TODO-1"}
 
 ::: {.r-stack}
 ![](assets/custom/walk_0.png){height="720px"}
@@ -257,7 +257,7 @@ $\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})$: hide a token in the mi
 - Frozen body, new linear head: a **linear probe** (this part's notebook), which is logistic regression. Body adapted too: fine-tuning (part 3, LoRA).
 :::
 
-## 5.2 The linear probe
+## 5.2 The linear probe {data-todo="TODO-2"}
 
 - Logistic regression on the 256 numbers of each sequence embedding; the language model stays frozen
 - **Standardised**: each of the 256 numbers shifted and scaled to mean 0, standard deviation 1

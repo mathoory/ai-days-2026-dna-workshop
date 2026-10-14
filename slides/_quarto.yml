@@ -17,6 +17,7 @@ format:
     progress: false
     preview-links: auto
     css: style.css
+    include-after-body: todo_menu.html
     logo: assets/logo.png
     toc: true
     toc-depth: 1

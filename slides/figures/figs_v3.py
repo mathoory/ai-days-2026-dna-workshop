@@ -25,25 +25,31 @@ def save_raw(fig, name):
 # ------------------------------------------------------------------ about me
 def timeline():
     """CV as a vertical timeline (oldest at the top)."""
-    rows = [("2015 to 2020", "Unit 81", "Embedded Linux lead developer"),
-            ("2020 to 2024", "B.Sc. Computer Science, Technion", "Bioinformatics track"),
-            ("2023", "Exchange semester, National Taiwan University", "Machine learning with Prof. Hsuan-Tien Lin"),
-            ("2024 to 2026", "M.Sc. Data Science, Technion", "Research in Prof. Roee Amit's lab")]
+    # (years, title, detail, sub-entries); a sub-entry is drawn smaller, indented, with a grey dot
+    rows = [("2015 to 2020", "Unit 81", "Embedded Linux developer", []),
+            ("2020 to 2024", "B.Sc. Computer Science, Technion", "Bioinformatics track",
+             [("Exchange semester, National Taiwan University (2023)", "Machine learning with Prof. Hsuan-Tien Lin")]),
+            ("2024 to 2026", "M.Sc. Data Science, Technion", "Research in Prof. Roee Amit's lab",
+             [("Teaching assistant", "Medical Diagnostics (Intro to Deep Learning for Biotechnology)")])]
     fig, ax = canvas(10, 8.6, xlim=(0, 100), ylim=(0, 86))
-    ys = [76, 57, 38, 19]
-    y_ta = 4                                 # a sub-entry of the M.Sc.: smaller, indented, grey dot
-    ax.plot([6, 6], [y_ta, ys[0]], color=HAIR, lw=4, zorder=1, solid_capstyle="round")
-    for y, (yr, title, sub) in zip(ys, rows):
+    y, ys_all = 78, []
+    for yr, title, detail, subs in rows:
         ax.add_patch(plt.Circle((6, y), 1.9, color=ACCENT, zorder=2))
         ax.add_patch(plt.Circle((6, y), 0.8, color="white", zorder=3))
         label(ax, 13, y + 5.2, yr, fs=19, color=ACCENT, ha="left", bold=True)
         label(ax, 13, y, title, fs=23, ha="left")
-        label(ax, 13, y - 5.0, sub, fs=19, color=MUTED, ha="left")
-    ax.add_patch(plt.Circle((6, y_ta + 2), 1.1, color=MID, zorder=2))
-    ax.plot([8, 15], [y_ta + 2, y_ta + 2], color=HAIR, lw=2, zorder=1)
-    label(ax, 17, y_ta + 2, "Teaching assistant", fs=20, ha="left")
-    label(ax, 17, y_ta - 2.6, "Medical Diagnostics (Intro to Deep Learning for Biotechnology)", fs=16, color=MUTED,
-          ha="left")
+        label(ax, 13, y - 5.0, detail, fs=19, color=MUTED, ha="left")
+        ys_all.append(y)
+        y -= 14
+        for s_title, s_detail in subs:
+            ax.add_patch(plt.Circle((6, y), 1.1, color=MID, zorder=2))
+            ax.plot([8, 15], [y, y], color=HAIR, lw=2, zorder=1)
+            label(ax, 17, y, s_title, fs=20, ha="left")
+            label(ax, 17, y - 4.6, s_detail, fs=16, color=MUTED, ha="left")
+            ys_all.append(y)
+            y -= 14
+        y -= 3
+    ax.plot([6, 6], [min(ys_all), max(ys_all)], color=HAIR, lw=4, zorder=1, solid_capstyle="round")
     save(fig, "timeline")
 
 

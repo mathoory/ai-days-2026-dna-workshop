@@ -7,7 +7,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 # 1 Simpler explanations {data-name="Shortcuts"}
 :::
 
-## 1.1 The two classes differ in composition
+## 1.1 The two classes differ in composition {data-todo="TODO-1"}
 
 - A **shortcut** is a simple property that differs between the classes in this data set, such as G+C
 - Before crediting a model with biology, measure what much simpler features achieve
@@ -26,7 +26,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 - The G+C/U model is the logistic regression of part 1 slide 2.14, trained here on 12,000 sequences; it scores 0.66 held out.
 :::
 
-## 1.2 Word counts: a model without order
+## 1.2 Word counts: a model without order {data-todo="TODO-2"}
 
 - Count every 5-letter word in a sequence: 1,024 numbers, one per possible word
 
@@ -40,7 +40,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 - The next slide's shuffle keeps even less: letters and letter pairs.
 :::
 
-## 1.3 The dinucleotide shuffle test
+## 1.3 The dinucleotide shuffle test {data-todo="TODO-3"}
 
 - A **dinucleotide** is a pair of neighbouring letters. The shuffle keeps every letter and dinucleotide count and scrambles everything longer, including where sites sit
 
@@ -97,7 +97,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 - Full fine-tuning with few labels overfits easily.
 :::
 
-## 3.2 LoRA
+## 3.2 LoRA {data-todo="TODO-4"}
 
 **Low-Rank Adaptation**: train a small correction to each weight matrix, keep the matrix itself
 

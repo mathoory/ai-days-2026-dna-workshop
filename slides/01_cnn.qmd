@@ -4,10 +4,10 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ---
 
 ::: {.center}
-# 1 The task {data-name="Task"}
+# 0 Welcome {data-name="Welcome"}
 :::
 
-## 1.1 About me
+## 0.1 About me
 
 ::: columns
 ::: {.column width="58%"}
@@ -23,10 +23,10 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ::: {.notes}
 - B.Sc. in Computer Science, bioinformatics track, Technion (2020 to 2024). An exchange semester at National Taiwan University (spring 2023), where I took Machine Learning with Prof. Hsuan-Tien Lin: co-author of *Learning from Data*, known for his online machine learning courses, and co-leader of NTU teams that won the KDD Cup several times. The photo: Wenwu Temple, Sun Moon Lake.
 - M.Sc. in Data Science, Faculty of Data and Decision Sciences, Technion (2024 to 2026), with my research in Prof. Roee Amit's Synthetic Biology Laboratory. TA of 00660121 Medical Diagnostics; these three parts are a compressed version of that course's machine learning part.
-- Before that, Unit 81 (2015 to 2020): embedded Linux lead developer, video streaming products and Linux drivers.
+- Before that, Unit 81 (2015 to 2020): embedded Linux developer, video streaming products and Linux drivers.
 :::
 
-## 1.2 My research
+## 0.2 My research
 
 **Machine learning for molecular design**: from a sequence to how it binds
 
@@ -49,7 +49,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Peptides: structure-guided pre-screening of peptide inhibitors against influenza A neuraminidase. AlphaFold 3 co-folds a sample of variants, and a model trained on those folds ranks about 14 million variants without folding them. The picture: a predicted peptide pose in the enzyme's pocket, with the drugs zanamivir and oseltamivir superposed.
 :::
 
-## 1.3 Goals
+## 0.3 Goals
 
 :::: {.goals}
 ::: columns
@@ -84,7 +84,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Sit next to someone with a different background: a programmer next to a biologist.
 :::
 
-## 1.4 What you need
+## 0.4 What you need
 
 ::: columns
 ::: {.column width="58%"}
@@ -103,7 +103,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Every notebook runs on its own. Part 3 starts from our CNN and our embeddings, so everyone has the same models there.
 :::
 
-## 1.5 Today
+## 0.5 Today
 
 | Time | Part | Notebook |
 |:--|:--|:--|
@@ -120,7 +120,11 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - One data set all day: 92,346 training sequences plus 1,000 held out, each a stretch of RNA where AGO2 did or did not bind.
 :::
 
-## 1.6 RNA and AGO2
+::: {.center}
+# 1 The task {data-name="Task"}
+:::
+
+## 1.1 RNA and AGO2
 
 ::: {.r-stack}
 ![](assets/custom/bio_flow_base.png){height="509px"}
@@ -136,7 +140,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Our sequences are RNA, so the notebooks use U; the DNA models of part 2 read T.
 :::
 
-## 1.7 The data
+## 1.2 The data
 
 - **Bound**: 48,095 sites measured by CLIP-seq, an experiment that captures the RNA a protein binds. **Unbound**: 44,251 random positions in the same genes
 - The 40-letter measured site sits at letters 150 to 190
@@ -305,7 +309,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ::: {.notes}
 - A model needs numbers. Classic machine learning: we decide which numbers describe a sequence, its **features**, and the model learns how to weigh them.
-- Our first model uses two features of one real bound sequence: its G+C fraction (0.40) and its U fraction (0.28). Why these two: slide 1.7 showed that bound sequences are richer in A and U than unbound ones (mean G+C 0.41 against 0.45), so they are the obvious first guess, and two numbers can be drawn on a slide.
+- Our first model uses two features of one real bound sequence: its G+C fraction (0.40) and its U fraction (0.28). Why these two: slide 1.2 showed that bound sequences are richer in A and U than unbound ones (mean G+C 0.41 against 0.45), so they are the obvious first guess, and two numbers can be drawn on a slide.
 - Click: deep learning gives the model the raw letters (one-hot, section 4) and lets it learn its own features during training. In a CNN these are the filters: real filters of our trained network are shown, blue positive and orange negative weights.
 - Nobody told the CNN to look at G+C. Part 3 checks how much of what it learned is composition anyway.
 :::
@@ -479,7 +483,7 @@ Next: build the CNN.
 # 4 The CNN {data-name="CNN"}
 :::
 
-## 4.1 One-hot encoding (TODO-1)
+## 4.1 One-hot encoding (TODO-1) {data-todo="TODO-1"}
 
 - One column per letter, with a 1 in its row; padding columns of 0.25 up to 501
 
@@ -551,7 +555,7 @@ Next: build the CNN.
 - The second convolution reads all 10 channels at once: each of its 20 filters is 10 × 5, one weight per channel and pooled position.
 :::
 
-## 4.6 Build your network (TODO-2)
+## 4.6 Build your network (TODO-2) {data-todo="TODO-2"}
 
 ![](assets/custom/cnn_template.png){fig-align="center" width="100%"}
 
@@ -582,7 +586,7 @@ Next: build the CNN.
 - Each step is the update of slide 2.14, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
 :::
 
-## 4.8 The training step and the evaluation (TODO-3)
+## 4.8 The training step and the evaluation (TODO-3) {data-todo="TODO-3"}
 
 ![](assets/custom/train_loop.png){fig-align="center" height="720px"}
 
@@ -624,7 +628,7 @@ PWM: position weight matrix, the frequency of each letter at each position
 - With a real filter there are thousands of hits instead of two.
 :::
 
-## 5.3 Filter 0 of our CNN (TODO-4)
+## 5.3 Filter 0 of our CNN (TODO-4) {data-todo="TODO-4"}
 
 ![](assets/custom/filter_logo.png){fig-align="center" height="640px"}
 
@@ -634,7 +638,7 @@ PWM: position weight matrix, the frequency of each letter at each position
 - A logo shows which windows activate a filter. It leaves out the letters the filter penalises (its negative weights).
 :::
 
-## 5.4 Test a logo: insert it into random RNA (TODO-5)
+## 5.4 Test a logo: insert it into random RNA (TODO-5) {data-todo="TODO-5"}
 
 - Insert one filter's consensus 1 to 7 times. Which control shows that its pattern matters?
 
