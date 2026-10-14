@@ -528,7 +528,7 @@ print(f"LoRA fine-tuned: {scores['matched']['Mistral-DNA, LoRA fine-tuned']:.3f}
       f"{scores['matched']['Mistral-DNA + probe (frozen)']:.3f}   ({time.time() - t0:.0f}s)   (want ≈ 0.81)")
 
 # %%
-#@title Stuck? Run this only if TODO-5 failed: it trains a fresh LoRA model for you { display-mode: "form" }
+#@title Stuck? Run this only if TODO-5 failed: it trains a fresh LoRA model for you (3 more minutes) { display-mode: "form" }
 clf, opt, scaler = make_lora()
 t0 = time.time()
 clf.train()

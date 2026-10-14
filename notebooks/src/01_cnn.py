@@ -90,13 +90,6 @@ print("letters:", "  ".join(train_seqs[0][:8]))
 print(X_one[0, 0, :, :8].numpy())
 # === End of your code ===
 
-# %%
-#@title Stuck? Run this only if TODO-1 failed: it prints the first 8 columns for you { display-mode: "form" }
-X_one = encode_batch([train_seqs[0]])
-print("shape:", tuple(X_one.shape))
-print("letters:", "  ".join(train_seqs[0][:8]))
-print(X_one[0, 0, :, :8].numpy())
-
 # %% [markdown]
 # ## 3. The model (TODO-2)
 #
