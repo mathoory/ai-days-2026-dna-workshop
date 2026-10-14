@@ -22,12 +22,13 @@ a { color: var(--accent); }
 h1, h2, h3 { font-weight: 700; letter-spacing: -0.01em; margin: 0; }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
 
-/* top bar: logos on white */
-.top { border-bottom: 1px solid var(--hair); background: var(--page); }
+/* top bar: white logos on the dark band */
+.top { background: var(--ink); border-bottom: 1px solid #3C4043; }
 .top-in { display: flex; align-items: center; justify-content: space-between; min-height: 76px; gap: 24px; }
 .logos { display: flex; align-items: center; gap: 28px; }
-.logos img { display: block; height: 44px; width: auto; }
-.gh { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; font-weight: 500; }
+.logos img { display: block; height: 48px; width: auto; }
+.logos a + a { padding-left: 28px; border-left: 1px solid #5F6368; }
+.gh { display: inline-flex; align-items: center; gap: 8px; color: #fff; text-decoration: none; font-weight: 500; }
 .gh:hover { color: var(--accent); }
 
 /* hero: dark band, accent rule */
@@ -91,7 +92,8 @@ main h2 {
   .wrap { padding: 0 16px; }
   .top-in { min-height: 64px; }
   .logos { gap: 16px; }
-  .logos img { height: 34px; }
+  .logos img { height: 30px; }
+  .logos a + a { padding-left: 16px; }
   .gh span { display: none; }
   .foot .gh span { display: inline; }
   .hero { padding: 48px 0 40px; }
