@@ -25,12 +25,12 @@ SCHEDULE = [
     ("11:00", "11:40", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn"),
     ("11:40", "11:50", "break", "Break", "", None),
     ("11:50", "12:15", "talk", "Part 1. Hands-on: the notebook", "", None),
-    ("12:15", "12:25", "break", "Break", "", None),
-    ("12:25", "12:55", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models"),
-    ("12:55", "13:15", "talk", "Part 2. Hands-on: the notebook", "", None),
-    ("13:15", "13:25", "break", "Break", "", None),
-    ("13:25", "13:40", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
-    ("13:40", "14:00", "talk", "Part 3. Hands-on: the notebook, then feedback", "", None),
+    ("12:15", "12:45", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models"),
+    ("12:45", "13:05", "talk", "Part 2. Hands-on: the notebook", "", None),
+    ("13:05", "13:15", "break", "Break", "", None),
+    ("13:15", "13:30", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
+    ("13:30", "13:50", "talk", "Part 3. Hands-on: the notebook, then feedback", "", None),
+    ("13:50", "14:00", "break", "Break", "", None),
 ]
 SUMMARY = {
     "01_cnn": "Build a CNN that predicts AGO2 binding from RNA sequence, then read motifs off its filters and test them.",
