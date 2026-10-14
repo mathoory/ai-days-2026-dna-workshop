@@ -18,16 +18,18 @@ FORM = "https://forms.gle/NfE6ZHj98ri3WYmG6"
 LAB = "https://roee-amit.technion.ac.il/"
 TITLE = "Applications of AI in Biotechnology and Genomics"
 
-# (start, end, kind, title, who, stem); kind: talk, part, break
+# (start, end, kind, title, who, stem[, split]); kind: talk, part, break; split: [(label, start, end), ...]
 SCHEDULE = [
     ("10:00", "10:50", "talk", "Opening lecture", "Prof. Roee Amit", None),
     ("10:50", "11:00", "break", "Break", "", None),
-    ("11:00", "11:40", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn"),
+    ("11:00", "11:40", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn", [("Tutorial", "11:00", "11:40")]),
     ("11:40", "11:50", "break", "Break", "", None),
-    ("11:50", "12:15", "talk", "Part 1, continued", "", None),
-    ("12:15", "13:05", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models"),
+    ("11:50", "12:15", "talk", "Part 1, continued", "", None, [("Hands-on", "11:50", "12:15")]),
+    ("12:15", "13:05", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models",
+     [("Tutorial", "12:15", "12:45"), ("Hands-on", "12:45", "13:05")]),
     ("13:05", "13:15", "break", "Break", "", None),
-    ("13:15", "13:50", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
+    ("13:15", "13:50", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls",
+     [("Tutorial", "13:15", "13:30"), ("Hands-on", "13:30", "13:50")]),
     ("13:50", "14:00", "break", "Break", "", None),
 ]
 SUMMARY = {
@@ -50,7 +52,7 @@ def link(href, text, cls="btn", download=False, label=None):
     return f'<a class="{cls}" href="{html.escape(href)}"{d}{ext}{aria}>{html.escape(text)}</a>'
 
 
-def row(start, end, kind, title, who, stem):
+def row(start, end, kind, title, who, stem, split=()):
     t = f'<div class="time">{start}<span>{end}</span></div>'
     if kind == "break":
         return f'<li class="slot break">{t}<div class="what">{title}</div></li>'
@@ -68,6 +70,8 @@ def row(start, end, kind, title, who, stem):
         acts = f'<div class="actions">{"".join(a)}</div>'
     desc = f'<p class="desc">{html.escape(SUMMARY[stem])}</p>' if SUMMARY.get(stem) else ""
     who = f'<div class="who">{html.escape(who)}</div>' if who else ""
+    if split:
+        who += ('<p class="split">' + ", ".join(f"<b>{html.escape(l)}</b> {a}–{b}" for l, a, b in split) + "</p>")
     return f'<li class="slot {kind}">{t}<div class="what"><h3>{html.escape(title)}</h3>{who}{desc}{acts}</div></li>'
 
 
