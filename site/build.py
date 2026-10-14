@@ -15,6 +15,7 @@ OUT = ROOT / "_site"
 REPO = "https://github.com/mathoory/ai-days-2026-dna-workshop"
 COLAB = "https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/{}.ipynb"
 FORM = "https://forms.gle/NfE6ZHj98ri3WYmG6"
+LAB = "https://roee-amit.technion.ac.il/"
 TITLE = "Applications of AI in Biotechnology and Genomics"
 
 # (start, end, kind, title, who, stem); kind: talk, part, break
@@ -103,6 +104,7 @@ def page():
     <h1>{TITLE}</h1>
     <p class="meta">Thursday 15 October 2026, 10:00 to 13:30 &nbsp;/&nbsp; Faculty of Biotechnology and Food Engineering, Technion</p>
     <p class="meta">Prof. Roee Amit &nbsp;and&nbsp; Mattan Hoory</p>
+    <p class="host">Hosted by the <a href="{LAB}" target="_blank" rel="noopener">Roee Amit Lab</a></p>
   </div>
 </section>
 <main class="wrap">
@@ -111,6 +113,20 @@ def page():
     <ol class="schedule">
 {slots}
     </ol>
+  </section>
+  <section class="lab">
+    <h2>The host lab</h2>
+    <div class="lab-in">
+      <div>
+        <h3>Roee Amit Lab</h3>
+        <p class="lab-sub">The Synthetic Biology Laboratory for the Decipherment of Genomic Codes,
+          Faculty of Biotechnology and Food Engineering, Technion</p>
+        <p>The lab studies the regulatory codes in the genome beyond the genetic code. It designs libraries of
+          tens of thousands of synthetic DNA sequences, measures them in bacteria, yeast and mammalian cells,
+          and fits models of the encoding rules to the results.</p>
+      </div>
+      <a class="lab-link" href="{LAB}" target="_blank" rel="noopener">roee-amit.technion.ac.il<span>→</span></a>
+    </div>
   </section>
   <section class="feedback">
     <div>

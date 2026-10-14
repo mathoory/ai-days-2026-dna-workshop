@@ -75,6 +75,23 @@ main h2 {
 .btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
 .btn.off { border-color: var(--hair); color: var(--mid); }
 
+/* host lab */
+.host { margin: 28px 0 0; font-size: 18px; color: #fff; }
+.host a { color: #fff; text-decoration: none; border-bottom: 2px solid var(--accent); padding-bottom: 2px; font-weight: 500; }
+.host a:hover { color: var(--accent); }
+.lab-in { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; padding-top: 24px; }
+.lab h3 { font-size: 32px; line-height: 1.15; }
+.lab-sub { margin: 8px 0 0; color: var(--muted); }
+.lab-in p:not(.lab-sub) { margin: 16px 0 0; max-width: 640px; }
+.lab-link {
+  flex: none; display: inline-flex; align-items: center; gap: 14px; padding: 20px 28px;
+  background: var(--ink); color: #fff; text-decoration: none; font-size: 19px; font-weight: 500;
+  border-bottom: 4px solid var(--accent);
+}
+.lab-link span { font-size: 22px; transition: transform .15s; }
+.lab-link:hover { background: var(--accent); border-bottom-color: var(--accent-dark); }
+.lab-link:hover span { transform: translateX(4px); }
+
 /* feedback */
 .feedback { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
 .feedback > div { flex: 1; }
@@ -102,4 +119,6 @@ main h2 {
   .slot.part { margin-left: -16px; padding-left: 12px; }
   .feedback { flex-direction: column; align-items: flex-start; }
   .qr { margin-top: 0; }
+  .lab-in { flex-direction: column; align-items: flex-start; }
+  .lab h3 { font-size: 26px; }
 }
