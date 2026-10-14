@@ -142,7 +142,7 @@
 <li><a href="#/a-control" id="/toc-a-control">2 A control</a></li>
 <li><a href="#/fine-tuning" id="/toc-fine-tuning">3 Fine-tuning</a></li>
 <li><a href="#/hands-on" id="/toc-hands-on">4 Hands-on</a></li>
-<li><a href="#/results-of-the-controls" id="/toc-results-of-the-controls">5 Results of the controls</a></li>
+<li><a href="#/beyond-the-notebook" id="/toc-beyond-the-notebook">5 Beyond the notebook</a></li>
 <li><a href="#/wrap-up" id="/toc-wrap-up">6 Wrap-up</a></li>
 </ul>
 </nav>
@@ -214,10 +214,11 @@
 
 <section id="four-ways-to-adapt-a-pretrained-model" class="slide level2">
 <h2>3.1 Four ways to adapt a pretrained model</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/adapt_layers.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
+<div class="r-stack">
+<p><img data-src="assets/custom/adapt_layers_0.png" height="680"></p>
+<p><img data-src="assets/custom/adapt_layers_1.png" class="fragment" height="680"></p>
+<p><img data-src="assets/custom/adapt_layers_2.png" class="fragment" height="680"></p>
+<p><img data-src="assets/custom/adapt_layers_3.png" class="fragment" height="680"></p>
 </div>
 
 </section>
@@ -233,12 +234,11 @@
 </section>
 <section id="the-lora-training-step" class="slide level2">
 <h2>3.3 The LoRA training step</h2>
-<pre><code>for each batch (DNA strings, labels):
-    clear the gradients
-    predict: one score per sequence
-    loss: the scores against the labels
-    gradients: only for B, A and the new output layer
-    step: move B, A and the output layer; W stays fixed</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/lora_loop.png" class="quarto-figure quarto-figure-center" height="680"></p>
+</figure>
+</div>
 
 </section>
 <section id="hands-on" class="title-slide slide level1 center" data-name="Hands-on">
@@ -249,75 +249,16 @@
 <section id="your-turn" class="slide level2">
 <h2>4.1 Your turn</h2>
 <p>Open <strong><code>03_shortcuts_and_controls.ipynb</code></strong>; it starts from our CNN and our embeddings.</p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Step</th>
-<th style="text-align: left;">Task</th>
-<th style="text-align: left;">Check</th>
-<th style="text-align: left;">Time</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">TODO-1</td>
-<td style="text-align: left;">write <code>gc_u</code>, then AUROC from G+C and U</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">6 min</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">TODO-2</td>
-<td style="text-align: left;">count words by hand, then AUROC from 5-letter words</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">4 min</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">TODO-3</td>
-<td style="text-align: left;">check what one shuffle keeps (with <code>count_words</code>), then the shuffle test</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">10 min</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">TODO-4</td>
-<td style="text-align: left;">count the numbers LoRA trains, then predict the result</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">7 min</td>
-</tr>
-</tbody>
-</table>
 
+<img data-src="assets/custom/your_turn_d3.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
 </section>
-<section id="results-of-the-controls" class="title-slide slide level1 center" data-name="Results">
-<h1>5 Results of the controls</h1>
+<section id="beyond-the-notebook" class="title-slide slide level1 center" data-name="Results">
+<h1>5 Beyond the notebook</h1>
 
 </section>
 
-<section id="scores-before-and-after-shuffling" class="slide level2">
-<h2>5.1 Scores before and after shuffling</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/shuffle_scores.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
-</div>
-
-</section>
-<section id="shuffling-lowers-the-cnns-score-and-barely-changes-the-probes" class="slide level2">
-<h2>5.2 Shuffling lowers the CNN’s score and barely changes the probe’s</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/shuffle_scoreboard.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
-</div>
-
-</section>
 <section id="discussion" class="slide level2">
-<h2>5.3 Discussion</h2>
+<h2>5.1 Discussion</h2>
 <ol type="1">
 <li>How much of each score do two composition numbers explain?</li>
 <li>Which model barely changed after the shuffle, and what does that say about what it uses?</li>
@@ -325,17 +266,8 @@
 </ol>
 
 </section>
-<section id="before-and-after-matching" class="slide level2">
-<h2>5.4 Before and after matching</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/dumbbell.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
-</div>
-
-</section>
 <section id="fine-tuning-against-the-cnn" class="slide level2">
-<h2>5.5 Fine-tuning against the CNN</h2>
+<h2>5.2 Fine-tuning against the CNN</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/headtohead.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -344,7 +276,7 @@
 
 </section>
 <section id="test-auroc-against-the-number-of-labels" class="slide level2">
-<h2>5.6 Test AUROC against the number of labels</h2>
+<h2>5.3 Test AUROC against the number of labels</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/label_curve2.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -357,64 +289,13 @@
 
 </section>
 
-<section id="the-day-in-eight-results" class="slide level2">
-<h2>6.1 The day in eight results</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Part</th>
-<th style="text-align: left;">Finding</th>
-<th style="text-align: left;">Number</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">seed-site words enriched in bound sites</td>
-<td style="text-align: left;">miR-19 site enriched 6×</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">CNN, 92,346 training sequences</td>
-<td style="text-align: left;">AUROC 0.86</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">it weighs position</td>
-<td style="text-align: left;">effect only at letters ~140–190</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2</td>
-<td style="text-align: left;">frozen pretrained models + probe</td>
-<td style="text-align: left;">0.78–0.79</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">two composition numbers alone</td>
-<td style="text-align: left;">0.66</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">dinucleotide shuffle</td>
-<td style="text-align: left;">CNN 0.86 → 0.66, probe 0.78 → 0.77</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">composition-matched data</td>
-<td style="text-align: left;">G+C/U 0.64 → 0.51, CNN 0.84 → 0.84</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">Mistral-DNA + LoRA, 20,000 labels</td>
-<td style="text-align: left;">0.81 matched (frozen 0.77)</td>
-</tr>
-</tbody>
-</table>
+<section id="the-day-in-numbers" class="slide level2">
+<h2>6.1 The day in numbers</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/day_numbers.png" class="quarto-figure quarto-figure-center" height="720"></p>
+</figure>
+</div>
 
 </section>
 <section id="ten-pretrained-models-on-matched-data" class="slide level2">
@@ -429,31 +310,31 @@
 <section id="five-points-to-take-home" class="slide level2">
 <h2>6.3 Five points to take home</h2>
 <ol type="1">
-<li>Two composition numbers separated bound from unbound (AUROC 0.66)</li>
-<li>The encoding limits what a model can use</li>
-<li>Check simple baselines first</li>
-<li>Test what a model uses with insertions, shuffles and matched data</li>
-<li>Frozen pretrained models relied mostly on short-range composition</li>
+<li class="fragment">Two composition numbers separated bound from unbound (AUROC 0.66)</li>
+<li class="fragment">The encoding limits what a model can use</li>
+<li class="fragment">Check simple baselines first</li>
+<li class="fragment">Test what a model uses with insertions, shuffles and matched data</li>
+<li class="fragment">Frozen pretrained models relied mostly on short-range composition</li>
 </ol>
 
 </section>
 <section id="when-to-use-a-pretrained-model" class="slide level2">
 <h2>6.4 When to use a pretrained model</h2>
 <ul>
-<li><strong>Below about 2,500 labels</strong>: a frozen pretrained model with a probe</li>
-<li><strong>About 20,000 labels</strong>: fine-tuning a large pretrained model</li>
-<li><strong>Always</strong>: a small task model as the baseline</li>
+<li class="fragment"><strong>Below about 2,500 labels</strong>: a frozen pretrained model with a probe</li>
+<li class="fragment"><strong>About 20,000 labels</strong>: fine-tuning a large pretrained model</li>
+<li class="fragment"><strong>Always</strong>: a small task model as the baseline</li>
 </ul>
 
 </section>
 <section id="from-a-question-to-a-model" class="slide level2">
 <h2>6.5 From a question to a model</h2>
 <ol type="1">
-<li><strong>Question</strong>: what to predict, and which experiment gives the labels</li>
-<li><strong>Negatives</strong>: how they were chosen</li>
-<li><strong>Baselines</strong>: composition and word counts</li>
-<li><strong>Model</strong>: train from scratch or adapt, by the number of labels</li>
-<li><strong>Controls</strong>: insert, shuffle, match; report uncertainty</li>
+<li class="fragment"><strong>Question</strong>: what to predict, and which experiment gives the labels</li>
+<li class="fragment"><strong>Negatives</strong>: how they were chosen</li>
+<li class="fragment"><strong>Baselines</strong>: composition and word counts</li>
+<li class="fragment"><strong>Model</strong>: train from scratch or adapt, by the number of labels</li>
+<li class="fragment"><strong>Controls</strong>: insert, shuffle, match; report uncertainty</li>
 </ol>
 
 </section>
@@ -480,7 +361,7 @@
 <li>R. Mourad and B. Batut, <strong>Galaxy Training Network</strong>: pretraining and fine-tuning an LLM on DNA (CC-BY); R. Mourad (2024), <em>Mistral-DNA</em> models.</li>
 <li>Dalla-Torre et al.&nbsp;(2024) <em>Nucleotide Transformer</em>, Nature Methods. Zhou et al.&nbsp;(2024) <em>DNABERT-2</em>, ICLR. Nguyen et al.&nbsp;(2023) <em>HyenaDNA</em>, NeurIPS. Nguyen et al.&nbsp;(2024) <em>Evo</em>, Science. Brixi et al.&nbsp;(2025) <em>Evo 2</em>.</li>
 <li>Hu et al.&nbsp;(2021) <em>LoRA</em>. Tang and Koo (2024) <em>Evaluating the representational power of pre-trained DNA language models for regulatory genomics</em>.</li>
-<li>Altschul and Erickson (1985) dinucleotide shuffle. Tareen and Kinney (2020) <em>logomaker</em>. Friedman et al.&nbsp;(2009) <em>Most mammalian mRNAs are conserved targets of microRNAs</em>, Genome Research. Chin et al.&nbsp;(2008) <em>A SNP in a let-7 microRNA complementary site in the KRAS 3′ untranslated region increases non-small cell lung cancer risk</em>, Cancer Research.</li>
+<li>Altschul and Erickson (1985) dinucleotide shuffle. Tareen and Kinney (2020) <em>logomaker</em>.</li>
 </ul>
 </div>
 
