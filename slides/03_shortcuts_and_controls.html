@@ -224,10 +224,11 @@
 </section>
 <section id="lora" class="slide level2">
 <h2>3.2 LoRA</h2>
+<p><strong>Low-Rank Adaptation</strong>: train a small correction to each weight matrix, keep the matrix itself</p>
 <p><span class="math display">\[W x \;\rightarrow\; (W + BA)\,x, \qquad B \in \mathbb{R}^{256 \times r},\; A \in \mathbb{R}^{r \times 256},\; r = 16\]</span></p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/lora.png" class="quarto-figure quarto-figure-center" height="605"></p>
+<p><img data-src="assets/custom/lora.png" class="quarto-figure quarto-figure-center" height="565"></p>
 </figure>
 </div>
 
@@ -262,7 +263,7 @@
 <ol type="1">
 <li>How much of each score do two composition numbers explain?</li>
 <li>Which model barely changed after the shuffle, and what does that say about what it uses?</li>
-<li>Which part of the G+C difference could be AGO2 biology (3′ UTRs are A/U-rich), and which part could come from how the unbound positions were drawn?</li>
+<li>Which part of the G+C difference could be AGO2 biology (3′ UTRs, the end of an mRNA after its protein-coding part, are A/U-rich), and which part could come from how the unbound positions were drawn?</li>
 </ol>
 
 </section>

@@ -274,7 +274,7 @@
 <section id="the-data" class="slide level2">
 <h2>1.7 The data</h2>
 <ul>
-<li><strong>Bound</strong>: 48,095 CLIP-seq sites. <strong>Unbound</strong>: 44,251 random positions in the same genes</li>
+<li><strong>Bound</strong>: 48,095 sites measured by CLIP-seq, an experiment that captures the RNA a protein binds. <strong>Unbound</strong>: 44,251 random positions in the same genes</li>
 <li>The 40-letter measured site sits at letters 150 to 190</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
@@ -439,21 +439,35 @@
 </div>
 
 </section>
-<section id="gradient-descent" class="slide level2">
-<h2>2.12 Gradient descent</h2>
-<p><span class="math display">\[\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}\]</span></p>
-<ul>
-<li>On our data: <span class="math inline">\(\;\hat p = \sigma(w^\top x + b)\)</span>, <span class="math inline">\(\;x\)</span> = (G+C fraction, U fraction)</li>
-</ul>
+<section id="features-chosen-or-learned" class="slide level2">
+<h2>2.12 Features: chosen or learned</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/features_0.png" height="700"></p>
+<p><img data-src="assets/custom/features_1.png" class="fragment" height="700"></p>
+</div>
+
+</section>
+<section id="the-sigmoid-from-a-score-to-a-probability" class="slide level2">
+<h2>2.13 The sigmoid: from a score to a probability</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/lr_training.png" class="quarto-figure quarto-figure-center" height="547"></p>
+<p><img data-src="assets/custom/sigmoid.png" class="quarto-figure quarto-figure-center" height="680"></p>
+</figure>
+</div>
+
+</section>
+<section id="gradient-descent" class="slide level2">
+<h2>2.14 Gradient descent</h2>
+<p><span class="math inline">\(\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}\)</span>, on <span class="math inline">\(\;\hat p = \sigma(w^\top x + b)\)</span> with <span class="math inline">\(x\)</span> = (G+C fraction, U fraction)</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/lr_training.png" class="quarto-figure quarto-figure-center" height="690"></p>
 </figure>
 </div>
 
 </section>
 <section id="the-learning-rate" class="slide level2">
-<h2>2.13 The learning rate</h2>
+<h2>2.15 The learning rate</h2>
 <ul>
 <li><span class="math inline">\(\eta\)</span> sets the size of each step</li>
 </ul>
@@ -465,7 +479,7 @@
 
 </section>
 <section id="mini-batches-and-epochs" class="slide level2">
-<h2>2.14 Mini-batches and epochs</h2>
+<h2>2.16 Mini-batches and epochs</h2>
 <ul>
 <li>Each step uses a <strong>batch</strong> of 256 sequences; an <strong>epoch</strong> is one pass over all 92,346 (360 steps)</li>
 </ul>
@@ -476,14 +490,24 @@
 </div>
 
 </section>
+<section id="relu-the-bend-between-layers" class="slide level2">
+<h2>2.17 ReLU: the bend between layers</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/relu.png" class="quarto-figure quarto-figure-center" height="680"></p>
+</figure>
+</div>
+
+</section>
 <section id="from-logistic-regression-to-a-neural-network" class="slide level2">
-<h2>2.15 From logistic regression to a neural network</h2>
+<h2>2.18 From logistic regression to a neural network</h2>
 <ul>
-<li>A <strong>neural network</strong> stacks layers of units, with <strong>ReLU</strong>, <span class="math inline">\(\max(0, z)\)</span>, between them</li>
+<li>A <strong>neural network</strong> stacks layers of units, with <strong>ReLU</strong> between them</li>
+<li>A <strong>convolutional neural network (CNN)</strong>: its first layer slides small filters along the sequence (section 4)</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/nn_diagram.png" class="quarto-figure quarto-figure-center" height="629"></p>
+<p><img data-src="assets/custom/nn_diagram.png" class="quarto-figure quarto-figure-center" height="540"></p>
 </figure>
 </div>
 
@@ -509,10 +533,11 @@
 </section>
 <section id="drawing-the-roc-curve" class="slide level2">
 <h2>3.3 Drawing the ROC curve</h2>
+<p>The scores of our convolutional neural network (CNN, section 4) on the 1,000 held-out sequences</p>
 <div class="r-stack">
-<p><img data-src="assets/custom/roc_frame_0.png" height="640"></p>
-<p><img data-src="assets/custom/roc_frame_1.png" class="fragment" height="640"></p>
-<p><img data-src="assets/custom/roc_frame_2.png" class="fragment" height="640"></p>
+<p><img data-src="assets/custom/roc_frame_0.png" height="600"></p>
+<p><img data-src="assets/custom/roc_frame_1.png" class="fragment" height="600"></p>
+<p><img data-src="assets/custom/roc_frame_2.png" class="fragment" height="600"></p>
 </div>
 
 </section>
@@ -521,8 +546,8 @@
 <div class="columns">
 <div class="column" style="width:38%;">
 <ul>
-<li class="fragment">All thresholds together give the <strong>ROC curve</strong></li>
-<li class="fragment"><strong>AUROC</strong>: the area under it, the probability that a random bound sequence scores higher than a random unbound one</li>
+<li class="fragment">All thresholds together give the <strong>ROC curve</strong> (receiver operating characteristic)</li>
+<li class="fragment"><strong>AUROC</strong> (area under the ROC curve): the probability that a random bound sequence scores higher than a random unbound one</li>
 <li class="fragment">0.5 is chance, 1.0 is perfect</li>
 <li class="fragment">It scores the ranking we care about, on sequences the model has not seen</li>
 </ul>
@@ -535,10 +560,11 @@
 <h2>3.5 Overfitting</h2>
 <ul>
 <li>A model that scores much higher on its training data than on held-out data has <strong>overfit</strong>: it memorised its training examples. Report the held-out score</li>
+<li>Below: logistic regression on how often each 5-letter word occurs in a sequence (1,024 features; more in part 3). <strong>Regularised</strong>: large weights are penalised, which limits memorising</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/probe_trap.png" class="quarto-figure quarto-figure-center" height="596"></p>
+<p><img data-src="assets/custom/probe_trap.png" class="quarto-figure quarto-figure-center" height="440"></p>
 </figure>
 </div>
 
@@ -643,6 +669,7 @@
 </section>
 <section id="from-hits-to-a-logo" class="slide level2">
 <h2>5.2 From hits to a logo</h2>
+<p>PWM: position weight matrix, the frequency of each letter at each position</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/toy_pwm.png" class="quarto-figure quarto-figure-center" height="700"></p>
