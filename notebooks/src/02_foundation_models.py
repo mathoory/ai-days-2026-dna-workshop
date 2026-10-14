@@ -3,7 +3,7 @@
 #
 # **Use a pretrained DNA model**
 #
-# **Technion AI Days 2026: Teaching Machines to Read DNA**
+# **Technion AI Days 2026: Applications of AI in Biotechnology and Genomics**
 #
 # In part 1 you trained a CNN from scratch on our data only. Now we use a **foundation model**: a
 # language model trained on the human genome before it ever sees our task. This general-purpose

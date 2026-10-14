@@ -1,7 +1,7 @@
 # %% [markdown]
 # # Part 3: Shortcuts, controls and fine-tuning
 #
-# **Technion AI Days 2026: Teaching Machines to Read DNA**
+# **Technion AI Days 2026: Applications of AI in Biotechnology and Genomics**
 #
 # Two models now separate bound from unbound RNA:
 #

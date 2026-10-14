@@ -3,7 +3,7 @@
 #
 # **Build a CNN that predicts AGO2 binding, and look inside it**
 #
-# **Technion AI Days 2026: Teaching Machines to Read DNA**
+# **Technion AI Days 2026: Applications of AI in Biotechnology and Genomics**
 #
 # **AGO2** is a protein that carries a small RNA, a microRNA, and binds RNA molecules that pair with
 # that microRNA. **CLIP-seq** measures where it binds: UV light crosslinks proteins to the RNA they

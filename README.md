@@ -1,4 +1,4 @@
-# Teaching Machines to Read DNA: AI Days 2026 workshop
+# Applications of AI in Biotechnology and Genomics: AI Days 2026 workshop
 
 Technion AI Days, Thu 15.10.2026. Prof. Roee Amit opens at 10:00; the three hands-on parts run from 11:00
 to 13:30. All parts use the AGO2 CLIP-seq data of the GraphProt benchmark (Maticzka et al. 2014).

@@ -32,7 +32,7 @@ def hero():
             ax.add_patch(Circle((x, y0), 2.2, fc=BLUE_L, ec=BLUE, lw=2.5, zorder=2))
     arrow(ax, 130, 34, 139, 34)
     box(ax, 140, 27, 17, 14, "bound?\n0.93", fc=GOLD_L, ec=GOLD, fs=24, bold=True)
-    label(ax, 113, 64, "Teaching Machines to Read DNA", fs=36, bold=True)
+    label(ax, 113, 64, "Applications of AI in Biotechnology and Genomics", fs=36, bold=True)
     label(ax, 113, 55, "and checking that they really did", fs=26, color=RED, style="italic")
     save(fig, "hero")
 

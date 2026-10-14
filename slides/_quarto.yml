@@ -1,7 +1,7 @@
 project:
   type: default
 
-title: "Teaching Machines to Read DNA"
+title: "Applications of AI in Biotechnology and Genomics"
 format:
   revealjs:
     width: 1600

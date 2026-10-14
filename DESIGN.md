@@ -1,4 +1,4 @@
-# Teaching Machines to Read DNA: design decisions
+# Applications of AI in Biotechnology and Genomics: design decisions
 
 ## 1. The audience problem, from first principles
 
