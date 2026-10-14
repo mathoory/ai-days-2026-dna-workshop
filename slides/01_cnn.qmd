@@ -105,7 +105,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Every notebook runs on its own. Part 3 starts from our CNN and our embeddings, so everyone has the same models there.
 :::
 
-## 0.5 Today
+## 0.5 Agenda
 
 | Time | Part | Notebook |
 |:--|:--|:--|
