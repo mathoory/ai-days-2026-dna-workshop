@@ -94,6 +94,8 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 :::
 ::: {.column width="42%"}
 ![](assets/custom/qr_site.png){width="80%"}
+
+[Scan for the notebooks and slides]{.caption-small}
 :::
 :::
 
