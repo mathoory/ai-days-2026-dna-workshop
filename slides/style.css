@@ -1,0 +1,110 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap");
+
+:root {
+  --ink: #202124;
+  --muted: #5F6368;
+  --hair: #DADCE0;
+  --accent: #1A73E8;
+}
+
+.reveal {
+  font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+}
+.reveal h1, .reveal h2, .reveal h3 {
+  font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.reveal h2 { font-size: 1.5em; }
+.reveal strong { font-weight: 500; color: var(--ink); }
+.reveal a { color: var(--accent); }
+.reveal code, .reveal pre code { font-family: "Roboto Mono", Consolas, monospace; }
+.reveal ul li, .reveal ol li { margin-bottom: 0.35em; }
+.reveal .muted { color: var(--muted); }
+
+.reveal table { border-collapse: collapse; font-size: 0.8em; margin: 0.4em 0; }
+.reveal table th, .reveal table td { padding: 0.28em 1.1em 0.28em 0; }
+.reveal table th { font-weight: 500; border-bottom: 1.5px solid var(--ink); }
+.reveal table td { border-bottom: 1px solid var(--hair); }
+
+.reveal .slide-logo {
+    max-height: 1.8em !important;
+ }
+/* Center all slide images (fig-align is unreliable in reveal.js) */
+.reveal section img:not(.slide-logo) { display: block; margin-left: auto; margin-right: auto; }
+
+/* ---------- chrome, after the Triplexis seminar: thin bar on top, logo and number at the bottom ---------- */
+.reveal .footer, .reveal .progress { display: none !important; }
+.reveal .slides section { text-align: left; }
+.reveal .menubar {
+  position: fixed; top: 0; left: 0; width: 100%; height: 40px; margin: 0; padding: 0;
+  background: #FFFFFF; border-bottom: 1px solid var(--hair); z-index: 40;
+  display: flex; align-items: center; justify-content: center;
+}
+.reveal .menubar ul.menu {
+  list-style: none; display: flex; gap: 1.6em; margin: 0; padding: 0 18px; align-items: center;
+}
+.reveal .menubar ul.menu li {
+  font-size: 14.5px; color: #80868B; font-weight: 500; letter-spacing: .01em; cursor: pointer;
+  line-height: 38px; white-space: nowrap; border-bottom: 2px solid transparent;
+}
+.reveal .menubar ul.menu li.active { color: var(--ink); border-bottom-color: var(--accent); }
+.reveal .slides { margin-top: 26px; }
+.reveal .slide-logo {
+  max-height: 56px !important; height: auto !important; width: auto !important;
+  top: auto !important; bottom: 20px !important; left: 32px !important; right: auto !important; opacity: .9;
+}
+.reveal .slide-number {
+  color: var(--muted) !important; font-size: 20px !important; font-weight: 500;
+  background: none !important; top: auto !important; bottom: 22px !important; right: 34px !important;
+}
+.reveal .slide-number a { color: var(--muted); }
+
+/* section dividers: type only */
+.reveal section.center h1 { font-weight: 500; font-size: 2.4em; letter-spacing: -.02em; color: var(--ink); }
+
+/* figures: sizes come from scripts/fit_figures.py; do not let reveal shrink them (it clamps to 95%) */
+.reveal img { max-width: none !important; max-height: none !important; }
+.reveal .slides section img:not(.slide-logo) { object-fit: contain; }
+
+/* code blocks readable from the back of the room */
+.reveal div.sourceCode pre code, .reveal pre code { font-size: 28px !important; line-height: 1.45; }
+.reveal div.sourceCode { border: none; background: #F8F9FA; }
+
+/* ---------- fixes after the deck audit ---------- */
+.reveal .slide-number, .reveal .slide-number a { color: #5F6368 !important; opacity: 1 !important; }
+.reveal .menubar ul.menu li { display: flex; align-items: center; height: 38px; line-height: 1; margin: 0; padding: 0; }
+.reveal p code, .reveal li code, .reveal td code, .reveal th code {
+  color: var(--ink); background: #F1F3F4; padding: 0.05em 0.25em; border-radius: 3px; }
+.reveal .nowrap { white-space: nowrap; }
+.reveal .slide-menu-button { display: none !important; }
+
+/* About me: round photo; Goals: green and red headings, larger list text */
+.reveal img.avatar { width: 92%; margin-top: 0.4em; }
+.reveal .caption-small { display: block; font-size: 0.62em; color: var(--muted); text-align: center; margin-top: 0.3em; }
+.reveal .goal-yes, .reveal .goal-no { display: block; font-size: 1.15em; font-weight: 500; margin-bottom: 0.4em; }
+.reveal .goal-yes { color: #1E8E3E; }
+.reveal .goal-no { color: #D93025; }
+.reveal .goal-yes + ul, .reveal .goal-no + ul, .reveal .goal-yes ~ ul, .reveal .goal-no ~ ul { font-size: 1.1em; }
+.reveal img.avatar-small { width: 190px; margin: 0.2em 0 0.4em 0; }
+.reveal img.avatar-small { margin-left: 0 !important; margin-right: auto !important; }
+.reveal .goals { padding-top: 0.6em; }
+.reveal .goals .goal-yes, .reveal .goals .goal-no { font-size: 1.3em; margin-bottom: 0.6em; }
+.reveal .goals ul { font-size: 1.05em; }
+.reveal .goals ul li { padding-bottom: 0.3em; }
+.reveal .columns.vcenter { display: flex; align-items: center; }
+.reveal table.agenda { width: 100%; font-size: 0.86em; border-collapse: collapse; margin-top: 0.4em; }
+.reveal table.agenda th { color: var(--muted); font-weight: 500; text-align: left; border-bottom: 2px solid #DADCE0; padding: 0.35em 0.5em; }
+.reveal table.agenda td { padding: 0.62em 0.5em; border-bottom: 1px solid #F1F3F4; vertical-align: middle; }
+.reveal table.agenda td:first-child { font-weight: 600; white-space: nowrap; }
+.reveal table.agenda .tut { color: #1A73E8; font-weight: 600; }
+.reveal table.agenda .hands { color: #1E8E3E; font-weight: 600; }
+.reveal table.agenda tr.brk td { background: #FEEFC3; color: #B06000; font-weight: 500; padding: 0.45em 0.5em; }
+.reveal table.agenda code { font-size: 0.85em; }
+/* As in the Triplexis seminar: reveal ships `.reveal img{max-width:95%}`, which quietly draws every figure
+   smaller than the height we set. Heights are fitted to each slide (scripts/fit_measured.py), so drop the clamp. */
+.reveal img{ max-height:none; max-width:none; object-fit:contain; }
+.reveal .fill-table table { width: 100%; font-size: 0.9em; }
+.reveal .fill-table td, .reveal .fill-table th { padding: 0.42em 0.6em; }

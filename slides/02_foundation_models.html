@@ -29,7 +29,7 @@
     }
   </style>
   <link rel="stylesheet" href="02_foundation_models_files/libs/revealjs/dist/theme/quarto-00ac2f6af1389919a18f42df5b7c0002.css">
-  <link rel="stylesheet" href="style.css?v=cd94bf8b">
+  <link rel="stylesheet" href="style.css">
   <link href="02_foundation_models_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="02_foundation_models_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="02_foundation_models_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -156,8 +156,8 @@
 <section id="pretraining-by-analogy" class="slide level2">
 <h2>1.1 Pretraining, by analogy</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/pretrain_analogy_0.png?v=81b44aec" height="742"></p>
-<p><img data-src="assets/custom/pretrain_analogy_1.png?v=f970bae2" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/pretrain_analogy_0.png" height="742"></p>
+<p><img data-src="assets/custom/pretrain_analogy_1.png" class="fragment" height="742"></p>
 </div>
 
 </section>
@@ -165,7 +165,7 @@
 <h2>1.2 Pretraining a model</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/adapt_0.png?v=f1f1b745" class="quarto-figure quarto-figure-center" height="766"></p>
+<p><img data-src="assets/custom/adapt_0.png" class="quarto-figure quarto-figure-center" height="766"></p>
 </figure>
 </div>
 
@@ -174,7 +174,7 @@
 <h2>1.3 Adapting it to new tasks</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/adapt_1.png?v=5044d85d" class="quarto-figure quarto-figure-center" height="737"></p>
+<p><img data-src="assets/custom/adapt_1.png" class="quarto-figure quarto-figure-center" height="737"></p>
 </figure>
 </div>
 
@@ -182,8 +182,8 @@
 <section id="the-same-for-dna" class="slide level2">
 <h2>1.4 The same for DNA</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/adapt_2.png?v=8a0949ea" height="730"></p>
-<p><img data-src="assets/custom/adapt_3.png?v=b9404b28" class="fragment" height="730"></p>
+<p><img data-src="assets/custom/adapt_2.png" height="730"></p>
+<p><img data-src="assets/custom/adapt_3.png" class="fragment" height="730"></p>
 </div>
 
 </section>
@@ -192,12 +192,12 @@
 <p><span class="math inline">\(\mathcal{L} = -\log p_\theta(x_t \mid x_{&lt;t})\)</span>: hide the last token, predict it from the ones before</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/objective_next.png?v=228b6d55" class="quarto-figure quarto-figure-center" height="246"></p>
+<p><img data-src="assets/custom/objective_next.png" class="quarto-figure quarto-figure-center" height="246"></p>
 </figure>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/next_token.png?v=d5f09603" class="fragment quarto-figure quarto-figure-center" height="377"></p>
+<p><img data-src="assets/custom/next_token.png" class="fragment quarto-figure quarto-figure-center" height="377"></p>
 </figure>
 </div>
 
@@ -207,7 +207,7 @@
 <p><span class="math inline">\(\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})\)</span>: hide a token in the middle, predict it from both sides</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/objective_masked.png?v=986e181c" class="quarto-figure quarto-figure-center" height="696"></p>
+<p><img data-src="assets/custom/objective_masked.png" class="quarto-figure quarto-figure-center" height="696"></p>
 </figure>
 </div>
 
@@ -216,7 +216,7 @@
 <h2>1.7 Four stages</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/stages_0.png?v=d60800f7" class="quarto-figure quarto-figure-center" height="754"></p>
+<p><img data-src="assets/custom/stages_0.png" class="quarto-figure quarto-figure-center" height="754"></p>
 </figure>
 </div>
 
@@ -224,14 +224,14 @@
 <section id="in-the-cnn-and-in-a-dna-language-model" class="slide level2">
 <h2>1.8 In the CNN and in a DNA language model</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/stages_1.png?v=df443f12" height="692"></p>
-<p><img data-src="assets/custom/stages_2.png?v=17d1e010" class="fragment" height="692"></p>
+<p><img data-src="assets/custom/stages_1.png" height="692"></p>
+<p><img data-src="assets/custom/stages_2.png" class="fragment" height="692"></p>
 </div>
 
 </section>
 <section id="tokenization" class="title-slide slide level1 center" data-name="Tokens">
 <h1>2 Tokenization</h1>
-<p><img data-src="assets/custom/stage_strip_0.png?v=1e78991d" height="141"></p>
+<p><img data-src="assets/custom/stage_strip_0.png" height="141"></p>
 </section>
 
 <section id="single-letters" class="slide level2">
@@ -241,7 +241,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/tokens_letters.png?v=35940d86" class="quarto-figure quarto-figure-center" height="655"></p>
+<p><img data-src="assets/custom/tokens_letters.png" class="quarto-figure quarto-figure-center" height="655"></p>
 </figure>
 </div>
 
@@ -253,7 +253,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/tokens_kmer.png?v=7190ca81" class="quarto-figure quarto-figure-center" height="655"></p>
+<p><img data-src="assets/custom/tokens_kmer.png" class="quarto-figure quarto-figure-center" height="655"></p>
 </figure>
 </div>
 
@@ -265,14 +265,14 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/tokens_bpe.png?v=628e6505" class="quarto-figure quarto-figure-center" height="655"></p>
+<p><img data-src="assets/custom/tokens_bpe.png" class="quarto-figure quarto-figure-center" height="655"></p>
 </figure>
 </div>
 
 </section>
 <section id="embedding" class="title-slide slide level1 center" data-name="Embedding">
 <h1>3 Embedding</h1>
-<p><img data-src="assets/custom/stage_strip_1.png?v=63cebb68" height="141"></p>
+<p><img data-src="assets/custom/stage_strip_1.png" height="141"></p>
 </section>
 
 <section id="token-embeddings" class="slide level2">
@@ -282,14 +282,14 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/emb_lookup.png?v=6c778e36" class="quarto-figure quarto-figure-center" height="655"></p>
+<p><img data-src="assets/custom/emb_lookup.png" class="quarto-figure quarto-figure-center" height="655"></p>
 </figure>
 </div>
 
 </section>
 <section id="the-transformer" class="title-slide slide level1 center" data-name="Transformer">
 <h1>4 The transformer</h1>
-<p><img data-src="assets/custom/stage_strip_2.png?v=fdffb977" height="141"></p>
+<p><img data-src="assets/custom/stage_strip_2.png" height="141"></p>
 </section>
 
 <section id="the-transformer-as-a-black-box" class="slide level2">
@@ -299,7 +299,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/blackbox.png?v=5189773c" class="quarto-figure quarto-figure-center" height="650"></p>
+<p><img data-src="assets/custom/blackbox.png" class="quarto-figure quarto-figure-center" height="650"></p>
 </figure>
 </div>
 
@@ -307,11 +307,11 @@
 <section id="the-whole-pipeline-on-one-sequence" class="slide level2" data-todo="TODO-1">
 <h2>4.2 The whole pipeline on one sequence</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/walk_0.png?v=f0730e11" height="711"></p>
-<p><img data-src="assets/custom/walk_1.png?v=19ff0426" class="fragment" height="711"></p>
-<p><img data-src="assets/custom/walk_2.png?v=01da45d4" class="fragment" height="711"></p>
-<p><img data-src="assets/custom/walk_3.png?v=0f5da612" class="fragment" height="711"></p>
-<p><img data-src="assets/custom/walk_4.png?v=625a3703" class="fragment" height="711"></p>
+<p><img data-src="assets/custom/walk_0.png" height="711"></p>
+<p><img data-src="assets/custom/walk_1.png" class="fragment" height="711"></p>
+<p><img data-src="assets/custom/walk_2.png" class="fragment" height="711"></p>
+<p><img data-src="assets/custom/walk_3.png" class="fragment" height="711"></p>
+<p><img data-src="assets/custom/walk_4.png" class="fragment" height="711"></p>
 </div>
 
 </section>
@@ -322,23 +322,23 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/pad_mask.png?v=42837147" class="quarto-figure quarto-figure-center" height="606"></p>
+<p><img data-src="assets/custom/pad_mask.png" class="quarto-figure quarto-figure-center" height="606"></p>
 </figure>
 </div>
 
 </section>
 <section id="prediction-heads" class="title-slide slide level1 center" data-name="Heads">
 <h1>5 Prediction heads</h1>
-<p><img data-src="assets/custom/stage_strip_3.png?v=7c8c7bbf" height="141"></p>
+<p><img data-src="assets/custom/stage_strip_3.png" height="141"></p>
 </section>
 
 <section id="prediction-heads-1" class="slide level2">
 <h2>5.1 Prediction heads</h2>
 <p><strong>Softmax</strong>: the sigmoid for many classes; one score per token in, probabilities that sum to 1 out</p>
 <div class="r-stack">
-<p><img data-src="assets/custom/heads_0.png?v=ad702727" height="616"></p>
-<p><img data-src="assets/custom/heads_1.png?v=755dfa77" class="fragment" height="616"></p>
-<p><img data-src="assets/custom/heads_2.png?v=f7f2eeb9" class="fragment" height="616"></p>
+<p><img data-src="assets/custom/heads_0.png" height="616"></p>
+<p><img data-src="assets/custom/heads_1.png" class="fragment" height="616"></p>
+<p><img data-src="assets/custom/heads_2.png" class="fragment" height="616"></p>
 </div>
 
 </section>
@@ -350,7 +350,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/probe_pipeline.png?v=213f1148" class="quarto-figure quarto-figure-center" height="444"></p>
+<p><img data-src="assets/custom/probe_pipeline.png" class="quarto-figure quarto-figure-center" height="444"></p>
 </figure>
 </div>
 
@@ -359,7 +359,7 @@
 <h2>5.3 DNA language models, 2021 to 2025</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/landscape.png?v=8f52a014" class="quarto-figure quarto-figure-center" height="752"></p>
+<p><img data-src="assets/custom/landscape.png" class="quarto-figure quarto-figure-center" height="752"></p>
 </figure>
 </div>
 
@@ -373,7 +373,7 @@
 <h2>6.1 Loading a model from Hugging Face</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/hf_load.png?v=e5babf93" class="quarto-figure quarto-figure-center" height="766"></p>
+<p><img data-src="assets/custom/hf_load.png" class="quarto-figure quarto-figure-center" height="766"></p>
 </figure>
 </div>
 
@@ -383,7 +383,7 @@
 <p>Open <strong><code>02_foundation_models.ipynb</code></strong>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/your_turn_d2.png?v=c448ad9c" class="quarto-figure quarto-figure-center" height="679"></p>
+<p><img data-src="assets/custom/your_turn_d2.png" class="quarto-figure quarto-figure-center" height="679"></p>
 </figure>
 </div>
 
@@ -397,7 +397,7 @@
 <h2>7.1 Frozen pretrained models against the CNN</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/results_part2.png?v=0301b84e" class="quarto-figure quarto-figure-center" height="766"></p>
+<p><img data-src="assets/custom/results_part2.png" class="quarto-figure quarto-figure-center" height="766"></p>
 </figure>
 </div>
 
@@ -405,7 +405,7 @@
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
-<p><img src="assets/logo.png?v=440542c4" class="slide-logo"></p>
+<p><img src="assets/logo.png" class="slide-logo"></p>
 <div class="footer footer-default">
 
 </div>
