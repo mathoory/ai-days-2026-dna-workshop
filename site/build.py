@@ -106,14 +106,6 @@ def page():
   </div>
 </section>
 <main class="wrap">
-  <section class="start">
-    <h2>Before you start</h2>
-    <ol>
-      <li>Sign in to Google and open a notebook with <b>Open in Colab</b>.</li>
-      <li>In Colab: <i>Runtime → Change runtime type → T4 GPU</i>.</li>
-      <li>Run the cells from the top. The data download by themselves; nothing to install.</li>
-    </ol>
-  </section>
   <section>
     <h2>Schedule</h2>
     <ol class="schedule">
@@ -123,7 +115,6 @@ def page():
   <section class="feedback">
     <div>
       <h2>Feedback</h2>
-      <p>Two minutes: what should change for your background?</p>
       <p>{link(FORM, "Open the feedback form", "btn primary")}</p>
     </div>
     <img class="qr" src="assets/qr_feedback.svg" alt="QR code for the feedback form">
@@ -133,6 +124,8 @@ def page():
   <div class="wrap foot-in">
     <a class="gh" href="{REPO}" target="_blank" rel="noopener">{GITHUB_MARK}<span>mathoory/ai-days-2026-dna-workshop</span></a>
     <p>Data: AGO2 CLIP-seq from the GraphProt benchmark (Maticzka et al. 2014), as used by Pan and Shen (2018).</p>
+    <p>Pipeline ideas from the KAUST Genomic Foundation Models workshop (I. Ullah, 2026), used with permission:
+      <a href="https://github.com/bioinfo-kaust/gfm-workshop" target="_blank" rel="noopener">github.com/bioinfo-kaust/gfm-workshop</a></p>
     <p class="built">Updated {built}</p>
   </div>
 </footer>
