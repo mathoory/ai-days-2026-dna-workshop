@@ -71,7 +71,8 @@ def row(start, end, kind, title, who, stem, split=()):
     desc = f'<p class="desc">{html.escape(SUMMARY[stem])}</p>' if SUMMARY.get(stem) else ""
     who = f'<div class="who">{html.escape(who)}</div>' if who else ""
     if split:
-        who += ('<p class="split">' + ", ".join(f"<b>{html.escape(l)}</b> {a}–{b}" for l, a, b in split) + "</p>")
+        mins = lambda a, b: (int(b[:2]) * 60 + int(b[3:])) - (int(a[:2]) * 60 + int(a[3:]))  # noqa: E731
+        who += ('<p class="split">' + ", ".join(f"<b>{html.escape(l)}</b> {mins(a, b)} min" for l, a, b in split) + "</p>")
     return f'<li class="slot {kind}">{t}<div class="what"><h3>{html.escape(title)}</h3>{who}{desc}{acts}</div></li>'
 
 
