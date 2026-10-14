@@ -107,19 +107,12 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 0.5 Agenda
 
-| Time | Part | Notebook |
-|:--|:--|:--|
-| 11:00 | 1. Machine learning and CNNs | |
-| 11:40 | Break | |
-| 11:50 | 1. Machine learning and CNNs, continued | `01_cnn` |
-| 12:15 | 2. DNA foundation models | `02_foundation_models` |
-| 13:05 | Break | |
-| 13:15 | 3. Shortcuts, controls and fine-tuning | `03_shortcuts_and_controls` |
-| 13:50 | Break, end at 14:00 | |
+![](assets/custom/agenda.png){fig-align="center" width="100%"}
 
 ::: {.notes}
 - Projected: 1 min.
 - Each part: a talk, then the notebook. Part 1: 40 minutes of talk, a break, 25 of notebook. Part 2: 30 and 20. Part 3: 15 and 20, with the feedback at the end.
+- Notebooks: `01_cnn`, `02_foundation_models`, `03_shortcuts_and_controls`.
 - One data set all day: 92,346 training sequences plus 1,000 held out, each a stretch of RNA where AGO2 did or did not bind.
 :::
 
@@ -145,13 +138,11 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 1.2 The data
 
-- **Bound**: 48,095 sites measured by CLIP-seq, an experiment that captures the RNA a protein binds. **Unbound**: 44,251 random positions in the same genes
-- The 40-letter measured site sits at letters 150 to 190
-
-![](assets/custom/labels_raster.png){fig-align="center" height="538px"}
+![](assets/custom/labels_raster.png){fig-align="center" height="735px"}
 
 ::: {.notes}
 - Projected: 2 min.
+- CLIP-seq: an experiment that captures the RNA a protein binds. The 40-letter measured site sits at letters 150 to 190 (the black lines).
 - Each row is one sequence, one colour per letter (A green, C blue, G yellow, U red); 150 of each class, sorted by G+C, first 330 letters. The white stripes on the right are sequence ends.
 - Counts are the training file; 1,000 more sequences (500 of each) are held out as the test set.
 - CLIP-seq: UV light crosslinks proteins to the RNA they touch, an antibody pulls down AGO2, and the attached RNA fragments are sequenced.

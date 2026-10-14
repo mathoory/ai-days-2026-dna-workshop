@@ -131,15 +131,23 @@ def labels_raster(tr, ty):
         return M
 
     fig, axes = plt.subplots(1, 2, figsize=(16, 9), dpi=120)
-    for ax, S, t in ((axes[0], P, "Bound"), (axes[1], N, "Unbound")):
+    titles = (f"Bound: {len(pos):,} sites measured by CLIP-seq", f"Unbound: {len(neg):,} random positions in the same genes")
+    for ax, S, t in ((axes[0], P, titles[0]), (axes[1], N, titles[1])):
         ax.imshow(img(S), aspect="auto", interpolation="nearest")
-        ax.set_title(t); ax.set_xlabel("Position"); ax.set_yticks([])
+        ax.set_title(t, fontsize=22, pad=46); ax.set_xlabel("Position in the sequence"); ax.set_yticks([])
         for sp in ax.spines.values():
             sp.set_visible(False)
-    axes[0].set_ylabel("150 sequences, sorted by G+C")
+        for x in (150, 190):                                    # the measured site, letters 150 to 190
+            ax.axvline(x, color=INK, lw=3.5)
+        ax.annotate("", (150, -4), (190, -4), annotation_clip=False,
+                    arrowprops=dict(arrowstyle="<->", color=INK, lw=2, shrinkA=0, shrinkB=0))
+        ax.text(170, -7, "measured site", ha="center", va="bottom", fontsize=19, color=INK, fontweight="bold",
+                clip_on=False)
+        ax.set_xticks([0, 50, 100, 150, 190, 250, 300])
+    axes[0].set_ylabel("150 of them, sorted by G+C")
     fig.legend(handles=[Patch(color=BASE[b], label=b) for b in ALPH], loc="upper right", ncol=4,
                bbox_to_anchor=(0.98, 0.98), handlelength=1, columnspacing=1.2)
-    fig.subplots_adjust(left=0.05, right=0.98, top=0.86, bottom=0.11, wspace=0.06)
+    fig.subplots_adjust(left=0.05, right=0.98, top=0.82, bottom=0.1, wspace=0.06)
     save(fig, "labels_raster")
 
 

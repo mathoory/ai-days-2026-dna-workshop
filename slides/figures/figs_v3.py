@@ -53,6 +53,54 @@ def timeline():
     save(fig, "timeline")
 
 
+# ------------------------------------------------------------------ 0.5 the agenda as a timeline
+def agenda():
+    """10:00 to 14:00, block widths proportional to minutes; tutorial, hands-on and breaks in their own colours."""
+    BREAK_C, BREAK_T = "#FEEFC3", "#B06000"
+    slots = [("10:00", "10:50", "roee"), ("10:50", "11:00", "break"),
+             ("11:00", "11:40", "tutorial"), ("11:40", "11:50", "break"), ("11:50", "12:15", "hands-on"),
+             ("12:15", "12:45", "tutorial"), ("12:45", "13:05", "hands-on"), ("13:05", "13:15", "break"),
+             ("13:15", "13:30", "tutorial"), ("13:30", "13:50", "hands-on"), ("13:50", "14:00", "break")]
+    parts = [("11:00", "12:15", "Part 1", "Machine learning and CNNs"),
+             ("12:15", "13:05", "Part 2", "DNA foundation\nmodels"),
+             ("13:15", "13:50", "Part 3", "Shortcuts\nand controls")]
+    m = lambda s: int(s[:2]) * 60 + int(s[3:])                          # noqa: E731
+    x0, x1, t0, t1 = 4, 156, m("10:00"), m("14:00")
+    X = lambda s: x0 + (m(s) - t0) / (t1 - t0) * (x1 - x0)              # noqa: E731
+    col = {"tutorial": (ACCENT, "white"), "hands-on": (GOOD_C, "white"), "break": (BREAK_C, BREAK_T),
+           "roee": (FAINT, MUTED)}
+    fig, ax = canvas(16, 7.9, ylim=(-4, 75))
+    y, h = 12, 36
+    for a, b, kind in slots:
+        fc, tc = col[kind]
+        ax.add_patch(Rectangle((X(a) + 0.15, y), X(b) - X(a) - 0.3, h, fc=fc, ec="none"))
+        w = X(b) - X(a)
+        txt = {"roee": "Opening lecture\nProf. Roee Amit", "break": "Break", "tutorial": "Tutorial",
+               "hands-on": "Hands-on"}[kind]
+        if kind == "break":
+            ax.text((X(a) + X(b)) / 2, y + h / 2, txt, rotation=90, ha="center", va="center", fontsize=20, color=tc)
+        else:
+            fs = min(23, w * 1.5)
+            ax.text((X(a) + X(b)) / 2, y + h / 2, txt, ha="center", va="center", fontsize=fs, color=tc,
+                    fontweight="bold" if kind != "roee" else "normal")
+    for a, b, part, name in parts:
+        ax.plot([X(a) + 0.3, X(b) - 0.3], [y + h + 2.5, y + h + 2.5], color=INK, lw=2)
+        label(ax, (X(a) + X(b)) / 2, y + h + 5.5, name, fs=22, color=MUTED, va="bottom")
+        label(ax, (X(a) + X(b)) / 2, y + h + 19, part, fs=27, color=INK, bold=True,
+              va="bottom")
+    ticks = sorted({s for a, b, _ in slots for s in (a, b)}, key=m)
+    low = set()                                       # two times 10 minutes apart: the second goes one line lower
+    for prev, s in zip(ticks, ticks[1:]):
+        if m(s) - m(prev) <= 10 and prev not in low:
+            low.add(s)
+    for s in ticks:
+        dy = 4.5 if s in low else 0
+        ax.plot([X(s), X(s)], [y - 1.2, y - 2.6 - dy], color=MUTED, lw=1.2)
+        label(ax, X(s), y - 5.5 - dy, s, fs=18, color=INK if s in ("10:00", "11:00", "14:00") else MUTED,
+              bold=s in ("10:00", "11:00", "14:00"))
+    save(fig, "agenda")
+
+
 # ------------------------------------------------------------------ 1.6: biology in two clicks
 def bio_flow(with_ago2):
     fig, ax = canvas(16, 6.2, ylim=(0, 62))
@@ -491,6 +539,8 @@ def activation(kind):
 if __name__ == "__main__":
     want = set(sys.argv[1:])
     run = (lambda n: not want or n in want)
+    if run("agenda"):
+        agenda()
     if run("sigmoid"):
         activation("sigmoid")
     if run("relu"):

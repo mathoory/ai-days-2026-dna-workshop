@@ -283,61 +283,12 @@
 </section>
 <section id="agenda" class="slide level2">
 <h2>0.5 Agenda</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Time</th>
-<th style="text-align: left;">Part</th>
-<th style="text-align: left;">Notebook</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">11:00</td>
-<td style="text-align: left;">1. Machine learning and CNNs</td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">11:40</td>
-<td style="text-align: left;">Break</td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">11:50</td>
-<td style="text-align: left;">1. Machine learning and CNNs, continued</td>
-<td style="text-align: left;"><code>01_cnn</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">12:15</td>
-<td style="text-align: left;">2. DNA foundation models</td>
-<td style="text-align: left;"><code>02_foundation_models</code></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">13:05</td>
-<td style="text-align: left;">Break</td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">13:15</td>
-<td style="text-align: left;">3. Shortcuts, controls and fine-tuning</td>
-<td style="text-align: left;"><code>03_shortcuts_and_controls</code></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">13:50</td>
-<td style="text-align: left;">Break, end at 14:00</td>
-<td style="text-align: left;"></td>
-</tr>
-</tbody>
-</table>
-<aside class="notes">
+
+<img data-src="assets/custom/agenda.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"><aside class="notes">
 <ul>
 <li>Projected: 1 min.</li>
 <li>Each part: a talk, then the notebook. Part 1: 40 minutes of talk, a break, 25 of notebook. Part 2: 30 and 20. Part 3: 15 and 20, with the feedback at the end.</li>
+<li>Notebooks: <code>01_cnn</code>, <code>02_foundation_models</code>, <code>03_shortcuts_and_controls</code>.</li>
 <li>One data set all day: 92,346 training sequences plus 1,000 held out, each a stretch of RNA where AGO2 did or did not bind.</li>
 </ul>
 <style type="text/css">
@@ -385,18 +336,15 @@
 </section>
 <section id="the-data" class="slide level2">
 <h2>1.2 The data</h2>
-<ul>
-<li><strong>Bound</strong>: 48,095 sites measured by CLIP-seq, an experiment that captures the RNA a protein binds. <strong>Unbound</strong>: 44,251 random positions in the same genes</li>
-<li>The 40-letter measured site sits at letters 150 to 190</li>
-</ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/labels_raster.png" class="quarto-figure quarto-figure-center" height="538"></p>
+<p><img data-src="assets/custom/labels_raster.png" class="quarto-figure quarto-figure-center" height="735"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
+<li>CLIP-seq: an experiment that captures the RNA a protein binds. The 40-letter measured site sits at letters 150 to 190 (the black lines).</li>
 <li>Each row is one sequence, one colour per letter (A green, C blue, G yellow, U red); 150 of each class, sorted by G+C, first 330 letters. The white stripes on the right are sequence ends.</li>
 <li>Counts are the training file; 1,000 more sequences (500 of each) are held out as the test set.</li>
 <li>CLIP-seq: UV light crosslinks proteins to the RNA they touch, an antibody pulls down AGO2, and the attached RNA fragments are sequenced.</li>
