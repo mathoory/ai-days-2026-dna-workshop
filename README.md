@@ -1,4 +1,4 @@
-# Teaching Machines to Read DNA
+# Applications of AI in Biotechnology and Genomics
 
 Hands-on notebooks for the AI Days 2026 workshop at the Technion (15.10.2026), Prof. Roee Amit and Mattan Hoory.
 
