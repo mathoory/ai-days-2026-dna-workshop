@@ -91,6 +91,6 @@
 .reveal img.avatar-small { width: 190px; margin: 0.2em 0 0.4em 0; }
 .reveal img.avatar-small { margin-left: 0 !important; margin-right: auto !important; }
 .reveal .goals { padding-top: 0.6em; }
-.reveal .goals .goal-yes, .reveal .goals .goal-no { font-size: 1.45em; margin-bottom: 0.9em; }
-.reveal .goals ul { font-size: 1.25em; }
-.reveal .goals ul li { padding-bottom: 0.45em; }
+.reveal .goals .goal-yes, .reveal .goals .goal-no { font-size: 1.3em; margin-bottom: 0.6em; }
+.reveal .goals ul { font-size: 1.05em; }
+.reveal .goals ul li { padding-bottom: 0.3em; }
