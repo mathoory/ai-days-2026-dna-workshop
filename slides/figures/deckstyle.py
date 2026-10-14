@@ -46,6 +46,9 @@ BASE = {"A": "#0F9D58", "C": "#4285F4", "G": "#F4B400", "U": "#DB4437", "T": "#D
 # training vs held-out, everywhere: blue vs orange; a third line colour for "good"
 TRAIN_C, HELD_C, GOOD_C = "#1A73E8", "#E8710A", "#1E8E3E"
 TRAIN_L = "#AECBFA"
+# models: CNN green, frozen pretrained blue, fine-tuned purple; shortcut baselines stay grey
+TUNED_PURPLE = "#9334E6"
+CNN_C, FROZEN_C, TUNED_C = GOOD_C, ACCENT, TUNED_PURPLE
 
 from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
 DIVERGING = LinearSegmentedColormap.from_list("orange_white_accent", [HELD_C, "#FFFFFF", ACCENT])

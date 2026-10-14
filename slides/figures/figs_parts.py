@@ -182,7 +182,13 @@ def adapt_layers():
             ("Partial fine-tuning", "minutes", 3, False),
             ("Full fine-tuning", "minutes to days", 8, False),
             ("LoRA", "minutes", 0, True)]
+    label(ax, 4, 60, "Head", fs=20, color=MUTED, ha="left")
+    label(ax, 4, 32, "8 layers", fs=20, color=MUTED, ha="left")
+    ax.add_patch(Rectangle((60, -6), 4, 3, color=ACCENT)); label(ax, 66, -4.5, "trained", fs=20, color=MUTED, ha="left")
+    ax.add_patch(Rectangle((84, -6), 4, 3, color=LIGHT)); label(ax, 90, -4.5, "frozen", fs=20, color=MUTED, ha="left")
     for c, (name, cost, top_trained, lora) in enumerate(cols):
+        if c:                                   # frames for the slide: one method per click
+            fig.savefig(OUT / f"adapt_layers_{c - 1}.png", dpi=120, facecolor="white")
         x = 22 + c * 35
         label(ax, x + 12, 71, name, fs=24)
         ax.add_patch(Rectangle((x, 58), 24, 4, color=ACCENT))
@@ -193,10 +199,8 @@ def adapt_layers():
             if lora:
                 ax.add_patch(Rectangle((x + 26, y), 3, 3.6, color=ACCENT))
         label(ax, x + 12, 5, cost, fs=21, color=MUTED)
-    label(ax, 4, 60, "Head", fs=20, color=MUTED, ha="left")
-    label(ax, 4, 32, "8 layers", fs=20, color=MUTED, ha="left")
-    ax.add_patch(Rectangle((60, -6), 4, 3, color=ACCENT)); label(ax, 66, -4.5, "trained", fs=20, color=MUTED, ha="left")
-    ax.add_patch(Rectangle((84, -6), 4, 3, color=LIGHT)); label(ax, 90, -4.5, "frozen", fs=20, color=MUTED, ha="left")
+    fig.savefig(OUT / "adapt_layers_3.png", dpi=120, facecolor="white")
+    trim_group([f"adapt_layers_{c}" for c in range(4)])
     save(fig, "adapt_layers")
 
 
@@ -439,7 +443,7 @@ def word_counts(pos):
     show = s[:24]
     dx, x0 = 3.6, 6
     for i, ch in enumerate(show):
-        label(ax0, x0 + i * dx, 30, ch, fs=22, family=MONO)
+        label(ax0, x0 + i * dx, 30, ch, fs=22, family=MONO, color=BASE[ch], bold=True)
     label(ax0, x0 + 24 * dx + 2, 30, f"… ({len(s)} letters)", fs=19, color=MUTED, ha="left")
     for k in range(4):
         yk = 22 - k * 5.5
@@ -448,7 +452,7 @@ def word_counts(pos):
     label(ax0, 120, 14, f"{len(words)} overlapping words", fs=21, color=MUTED)
     ax = fig.add_axes([0.07, 0.12, 0.9, 0.42])
     ax.set_ylim(0, v.max() + 1.5)
-    ax.bar(range(1024), v, width=1.0, color=INK)
+    ax.bar(range(1024), v, width=1.0, color=ACCENT)
     top = np.argsort(-v)[:3]
     for t in top:
         ax.annotate(vocab[t], (t, v[t]), xytext=(t - 30, v[t] + 0.2), fontsize=18, family=MONO, color=INK, ha="right",

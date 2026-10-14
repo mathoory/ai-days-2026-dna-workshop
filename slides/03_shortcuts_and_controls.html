@@ -142,7 +142,7 @@
 <li><a href="#/a-control" id="/toc-a-control">2 A control</a></li>
 <li><a href="#/fine-tuning" id="/toc-fine-tuning">3 Fine-tuning</a></li>
 <li><a href="#/hands-on" id="/toc-hands-on">4 Hands-on</a></li>
-<li><a href="#/results-of-the-controls" id="/toc-results-of-the-controls">5 Results of the controls</a></li>
+<li><a href="#/beyond-the-notebook" id="/toc-beyond-the-notebook">5 Beyond the notebook</a></li>
 <li><a href="#/wrap-up" id="/toc-wrap-up">6 Wrap-up</a></li>
 </ul>
 </nav>
@@ -175,7 +175,7 @@
 <li>TODO-3: the shuffle test, slide 1.3.</li>
 </ul></li>
 <li>If a simple model scores well, a larger model may be using the same shortcut.</li>
-<li>The G+C/U model is the logistic regression of part 1 slide 2.3, trained here on 12,000 sequences; it scores 0.66 held out (part 1 slide 3.3).</li>
+<li>The G+C/U model is the logistic regression of part 1 slide 2.12, trained here on 12,000 sequences; it scores 0.66 held out.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -204,7 +204,7 @@
 <li>Top: the start of one real bound sequence and its first four overlapping 5-letter words. A sequence of 340 letters has 336 of them.</li>
 <li>Bottom: how often each of the 1,024 possible words occurs in this sequence, in alphabetical order from AAAAA to UUUUU. 258 different words occur; the most frequent, UUUUU, 6 times.</li>
 <li>The notebook divides the counts by the number of words, so long and short sequences are comparable, and fits a logistic regression on the 1,024 numbers (12,000 labelled sequences): 0.74 held out.</li>
-<li>The counts keep which short words occur and drop everything longer than 5 letters, including their order and where in the sequence they are. A seed site of 7 letters appears only as its 5-letter pieces.</li>
+<li>The counts keep which short words occur and drop everything longer than 5 letters, including their order and where in the sequence they are. A 7-letter motif appears only as its 5-letter pieces.</li>
 <li>The next slide’s shuffle keeps even less: letters and letter pairs.</li>
 </ul>
 <style type="text/css">
@@ -231,8 +231,8 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Top: part of a real bound sequence and of its dinucleotide shuffle (Altschul and Erickson 1985); the miR-16 site is underlined in the original. Bottom: the counts of the 16 letter pairs in the whole sequence, black original, light grey shuffled.</li>
-<li>All 16 letter-pair counts are identical, so G+C is identical too; the miR-16 site is gone.</li>
+<li>Top: part of a real bound sequence and of its dinucleotide shuffle (Altschul and Erickson 1985). Bottom: the counts of the 16 letter pairs in the whole sequence, blue original, orange shuffled.</li>
+<li>All 16 letter-pair counts are identical, so G+C is identical too; every longer word is scrambled.</li>
 <li>Shuffle the 500 bound test sequences, keep the 500 unbound ones, and ask the trained model, without retraining, to separate them.</li>
 <li>A model that uses only letter and letter-pair composition keeps its score. A model that also uses longer patterns loses that part and drops towards the composition model’s 0.66. The shuffled sequences keep their composition, so the score has no reason to fall to 0.5.</li>
 <li>For our CNN the shuffle also moves the site away from letters 150 to 190, so its drop mixes letter order and position.</li>
@@ -291,15 +291,17 @@
 
 <section id="four-ways-to-adapt-a-pretrained-model" class="slide level2">
 <h2>3.1 Four ways to adapt a pretrained model</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/adapt_layers.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
+<div class="r-stack">
+<p><img data-src="assets/custom/adapt_layers_0.png" height="680"></p>
+<p><img data-src="assets/custom/adapt_layers_1.png" class="fragment" height="680"></p>
+<p><img data-src="assets/custom/adapt_layers_2.png" class="fragment" height="680"></p>
+<p><img data-src="assets/custom/adapt_layers_3.png" class="fragment" height="680"></p>
 </div>
 <aside class="notes">
 <ul>
 <li>Projected: 2 min.</li>
-<li>One column per method: the head at the top, the 8 layers below; blue trained, grey frozen. The bottom line gives the typical training time.</li>
+<li>One column per method, one per click: the head at the top, the 8 layers below; blue trained, grey frozen. The bottom line gives the typical training time.</li>
+<li>These are the body and the heads of part 2: what changes is how much of the body is trained for the new task.</li>
 <li>Linear probe: a new output layer only, after one pass to compute embeddings. Partial fine-tuning: the head and the top layers. Full fine-tuning: all weights. LoRA: small low-rank matrices added to each layer.</li>
 <li>“Fine-tuning” usually refers to the last three; the first is called probing. Part 2 used a probe; this part uses LoRA.</li>
 <li>Full fine-tuning with few labels overfits easily.</li>
@@ -346,16 +348,15 @@
 </section>
 <section id="the-lora-training-step" class="slide level2">
 <h2>3.3 The LoRA training step</h2>
-<pre><code>for each batch (DNA strings, labels):
-    clear the gradients
-    predict: one score per sequence
-    loss: the scores against the labels
-    gradients: only for B, A and the new output layer
-    step: move B, A and the output layer; W stays fixed</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/lora_loop.png" class="quarto-figure quarto-figure-center" height="680"></p>
+</figure>
+</div>
 <aside class="notes">
 <ul>
-<li>The same steps as part 1 slide 4.7, and the notebook gives this step. Only the LoRA matrices B and A and the new output layer are trainable; the pretrained weights W stay fixed.</li>
-<li>The loss is the binary cross-entropy of part 1 slide 2.2.</li>
+<li>The same loop as part 1 slide 4.8. Only the LoRA matrices B and A and the new output layer are trainable; the pretrained weights W stay fixed.</li>
+<li>The loss is the binary cross-entropy of part 1 slide 2.11.</li>
 <li>Batches of 32 sequences, 2 epochs over 20,000 matched sequences: 625 steps per epoch.</li>
 <li>In the notebook, TODO-4a counts the numbers LoRA trains from the shapes of W and r, and TODO-4b is a written prediction of the result before training.</li>
 </ul>
@@ -379,51 +380,9 @@
 <section id="your-turn" class="slide level2">
 <h2>4.1 Your turn</h2>
 <p>Open <strong><code>03_shortcuts_and_controls.ipynb</code></strong>; it starts from our CNN and our embeddings.</p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Step</th>
-<th style="text-align: left;">Task</th>
-<th style="text-align: left;">Check</th>
-<th style="text-align: left;">Time</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">TODO-1</td>
-<td style="text-align: left;">write <code>gc_u</code>, then AUROC from G+C and U</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">6 min</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">TODO-2</td>
-<td style="text-align: left;">count words by hand, then AUROC from 5-letter words</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">4 min</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">TODO-3</td>
-<td style="text-align: left;">check what one shuffle keeps (with <code>count_words</code>), then the shuffle test</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">10 min</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">TODO-4</td>
-<td style="text-align: left;">count the numbers LoRA trains, then predict the result</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">7 min</td>
-</tr>
-</tbody>
-</table>
-<aside class="notes">
+
+<img data-src="assets/custom/your_turn_d3.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"><aside class="notes">
 <ul>
-<li>Given cells (setup, <code>shortcut_scores</code>, CNN retrain, before and after, take-aways): about 12 min. Projected hands-on total: about 39 min, 41 with the optional section, including LoRA training.</li>
 <li>Helpers: TODO-1 <code>probe_auc</code> (<code>gc_u</code> is written by the students); TODO-2 <code>Counter</code>, <code>kmer_counts(seqs, k=5)</code>; TODO-3 <code>dinuc_shuffle</code>; TODO-4 the shapes of W printed above it.</li>
 <li>TODO-3: score the shuffled sequences with the probe already fitted on real sequences.</li>
 <li><code>shortcut_scores</code> is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.</li>
@@ -442,68 +401,13 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="results-of-the-controls" class="title-slide slide level1 center" data-name="Results">
-<h1>5 Results of the controls</h1>
+<section id="beyond-the-notebook" class="title-slide slide level1 center" data-name="Results">
+<h1>5 Beyond the notebook</h1>
 
 </section>
 
-<section id="scores-before-and-after-shuffling" class="slide level2">
-<h2>5.1 Scores before and after shuffling</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/shuffle_scores.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>Our run; the notebook prints only the two AUROCs.</li>
-<li>Score distributions on the held-out set: bound (blue), unbound (grey), shuffled bound (black outline). Left: the CNN; right: Mistral-DNA with a probe. Each title gives the AUROC of shuffled bound against unbound.</li>
-<li>CNN: shuffled bound sequences move towards the unbound distribution, AUROC 0.66. Part of what the CNN uses is letter order or position.</li>
-<li>Mistral-DNA with a probe: shuffled sequences score almost like the originals, AUROC 0.77. Its embeddings change little when everything beyond letter pairs is scrambled.</li>
-<li>About a quarter of the unbound sequences get a probe score near 0 (the tall grey bar at score 0 in the right panel). They do not differ from the other unbound sequences in G+C, length or repetitiveness; we have not found what they share.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="shuffling-lowers-the-cnns-score-and-barely-changes-the-probes" class="slide level2">
-<h2>5.2 Shuffling lowers the CNN’s score and barely changes the probe’s</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/shuffle_scoreboard.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>Bars start at 0.5. Filled: real held-out sequences; white: bound sequences shuffled. Black: the CNN; grey: the Mistral-DNA probe. Dashed line: G+C and U only; dotted line: 5-letter word counts.</li>
-<li>Two numbers alone reach 0.66, nearly half of the distance from chance (0.5) to the CNN (0.86).</li>
-<li>Five-letter word counts, with no order or position, reach 0.74. Counted only inside the 40-letter site, word counts reach 0.83, close to the CNN, which suggests that much of what the CNN adds is where it looks.</li>
-<li>CNN: 0.86 on real sequences, 0.66 after shuffling, the same as the composition model. The shuffle removes both letter order and site position.</li>
-<li>Mistral-DNA probe: 0.78 on real sequences, 0.77 shuffled. Its score barely changes under a shuffle that keeps letter and letter-pair counts, so most of what it uses is composition at that level.</li>
-<li>The gap between real and shuffled is the part of a score that depends on letter order and position.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
 <section id="discussion" class="slide level2">
-<h2>5.3 Discussion</h2>
+<h2>5.1 Discussion</h2>
 <ol type="1">
 <li>How much of each score do two composition numbers explain?</li>
 <li>Which model barely changed after the shuffle, and what does that say about what it uses?</li>
@@ -512,34 +416,7 @@
 <aside class="notes">
 <ul>
 <li>Two minutes with your neighbour.</li>
-<li>Question 3 connects the shuffle results with the matched data on the next slide.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="before-and-after-matching" class="slide level2">
-<h2>5.4 Before and after matching</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/dumbbell.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>One row per model. Open circle: the original-negatives test set; filled circle: the matched test set. Black: the CNN; grey: the other models.</li>
-<li>These are new 3,000-sequence test sets, not the 1,000 held-out sequences used until now, so the “original” values differ slightly from earlier results (CNN 0.84 here, 0.86 before). On 3,000 sequences, 95% of resampled AUROCs fall within about ±0.015.</li>
-<li>Two numbers: 0.64 to 0.51, chance level. That score came from single-letter composition.</li>
-<li>Five-letter word counts (0.76 to 0.73) and the frozen probe (0.81 to 0.77) each lose about 0.04 and keep most of their score: they rely on letter-pair and short-word composition, which matching does not remove.</li>
-<li>The CNN: 0.84 to 0.84 (notebook run), so it uses more than single-letter composition.</li>
+<li>Use the numbers from your notebook. Question 3 connects the shuffle results with the matched data of section 2.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -554,7 +431,7 @@
       }</style></aside>
 </section>
 <section id="fine-tuning-against-the-cnn" class="slide level2">
-<h2>5.5 Fine-tuning against the CNN</h2>
+<h2>5.2 Fine-tuning against the CNN</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/headtohead.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -562,7 +439,7 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Bars: mean AUROC; dots: single runs. Black: CNN from scratch; grey: NT-500M frozen with a probe; blue: NT-500M fine-tuned with LoRA. Left: 500 labels; right: 20,000.</li>
+<li>Bars: mean AUROC; dots: single runs. Green: CNN from scratch; blue: NT-500M frozen with a probe; purple: NT-500M fine-tuned with LoRA. Left: 500 labels; right: 20,000.</li>
 <li>Run offline on our A30 server with NT-500M (human reference), on matched data: the same labelled sequences and the same 3,000-sequence matched test set for every model.</li>
 <li>20,000 labels: CNN 0.84, frozen probe 0.78, fine-tuned 0.87.</li>
 <li>500 labels: CNN 0.66, frozen 0.73, fine-tuned 0.75.</li>
@@ -583,7 +460,7 @@
       }</style></aside>
 </section>
 <section id="test-auroc-against-the-number-of-labels" class="slide level2">
-<h2>5.6 Test AUROC against the number of labels</h2>
+<h2>5.3 Test AUROC against the number of labels</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/label_curve2.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -591,7 +468,7 @@
 </div>
 <aside class="notes">
 <ul>
-<li>x: labelled training sequences, log scale; y: AUROC on the 3,000-sequence matched test set. Each model trained on 100 to 30,000 labelled matched sequences, three random draws per size (lines, with one standard deviation shaded). Black: CNN; grey: frozen Mistral-DNA; dotted: 5-letter word counts; light dashed: Mistral-DNA with random weights.</li>
+<li>x: labelled training sequences, log scale; y: AUROC on the 3,000-sequence matched test set. Each model trained on 100 to 30,000 labelled matched sequences, three random draws per size (lines, with one standard deviation shaded). Green: CNN; blue: frozen Mistral-DNA; grey dotted: 5-letter word counts; light dashed: Mistral-DNA with random weights.</li>
 <li>The notebook plots three of these lines, up to 12,000 labels.</li>
 <li>Frozen Mistral-DNA scores higher than the CNN up to about 2,500 labels; above about 5,000 the CNN is better. At 12,000 labels: CNN 0.82, frozen probe 0.77.</li>
 <li>The same Mistral-DNA architecture with random weights stays between 0.50 and 0.57, so the advantage at low label counts comes from pretraining.</li>
@@ -615,68 +492,18 @@
 
 </section>
 
-<section id="the-day-in-eight-results" class="slide level2">
-<h2>6.1 The day in eight results</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Part</th>
-<th style="text-align: left;">Finding</th>
-<th style="text-align: left;">Number</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">seed-site words enriched in bound sites</td>
-<td style="text-align: left;">miR-19 site enriched 6×</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">CNN, 92,346 training sequences</td>
-<td style="text-align: left;">AUROC 0.86</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">it weighs position</td>
-<td style="text-align: left;">effect only at letters ~140–190</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2</td>
-<td style="text-align: left;">frozen pretrained models + probe</td>
-<td style="text-align: left;">0.78–0.79</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">two composition numbers alone</td>
-<td style="text-align: left;">0.66</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">dinucleotide shuffle</td>
-<td style="text-align: left;">CNN 0.86 → 0.66, probe 0.78 → 0.77</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">composition-matched data</td>
-<td style="text-align: left;">G+C/U 0.64 → 0.51, CNN 0.84 → 0.84</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">Mistral-DNA + LoRA, 20,000 labels</td>
-<td style="text-align: left;">0.81 matched (frozen 0.77)</td>
-</tr>
-</tbody>
-</table>
+<section id="the-day-in-numbers" class="slide level2">
+<h2>6.1 The day in numbers</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/day_numbers.png" class="quarto-figure quarto-figure-center" height="720"></p>
+</figure>
+</div>
 <aside class="notes">
 <ul>
-<li>Each row is a measured number from today; the slides of each part have the figure behind it.</li>
-<li>The position row comes from inserting one copy at every position: the score changes only where the measured site is in almost every sequence.</li>
+<li>Each row is a measured held-out AUROC from today; open circle to filled circle is the same model before and after a control.</li>
+<li>Green: the CNN; blue: frozen pretrained models; purple: fine-tuned; grey: two composition numbers.</li>
+<li>The shuffle and the matched data separate what each model uses: the composition model falls to chance on matched data, the CNN keeps its score there, and the frozen probe barely notices the shuffle.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -700,9 +527,9 @@
 <aside class="notes">
 <ul>
 <li>Ten pretrained models from 3M to 2.5B parameters on the matched data, run offline. x: parameters, log scale; y: AUROC. All values on the 3,000-sequence matched test set.</li>
-<li>Frozen with a probe (grey): all between 0.72 and 0.79, below the CNN. Size makes little difference.</li>
-<li>Fine-tuned with one shared LoRA recipe (blue, one run each; the arrow goes from frozen to fine-tuned): NT-500M and DNABERT-2 reach 0.87, Mistral-DNA 0.79 (the notebook’s own recipe gives 0.81), and HyenaDNA drops from 0.78 to 0.72.</li>
-<li>The dashed line is the CNN trained on the whole matched training set (0.84); the probes used 12,000 labels and LoRA 20,000.</li>
+<li>Frozen with a probe (blue): all between 0.72 and 0.79, below the CNN. Size makes little difference.</li>
+<li>Fine-tuned with one shared LoRA recipe (purple, one run each; the arrow goes from frozen to fine-tuned): NT-500M and DNABERT-2 reach 0.87, Mistral-DNA 0.79 (the notebook’s own recipe gives 0.81), and HyenaDNA drops from 0.78 to 0.72.</li>
+<li>The green dashed line is the CNN trained on the whole matched training set (0.84); the probes used 12,000 labels and LoRA 20,000.</li>
 <li>NT-2.5B was not fine-tuned: our recipe undertrained it at that size.</li>
 </ul>
 <style type="text/css">
@@ -720,16 +547,16 @@
 <section id="five-points-to-take-home" class="slide level2">
 <h2>6.3 Five points to take home</h2>
 <ol type="1">
-<li>Two composition numbers separated bound from unbound (AUROC 0.66)</li>
-<li>The encoding limits what a model can use</li>
-<li>Check simple baselines first</li>
-<li>Test what a model uses with insertions, shuffles and matched data</li>
-<li>Frozen pretrained models relied mostly on short-range composition</li>
+<li class="fragment">Two composition numbers separated bound from unbound (AUROC 0.66)</li>
+<li class="fragment">The encoding limits what a model can use</li>
+<li class="fragment">Check simple baselines first</li>
+<li class="fragment">Test what a model uses with insertions, shuffles and matched data</li>
+<li class="fragment">Frozen pretrained models relied mostly on short-range composition</li>
 </ol>
 <aside class="notes">
 <ul>
 <li>Point 1: the negatives were random positions in the same genes; on the 1,000 held-out sequences G+C and U alone reached 0.66.</li>
-<li>Point 2: one-hot letters keep order and position, 5-letter word counts drop both, and each tokenizer splits the same seed site differently.</li>
+<li>Point 2: one-hot letters keep order and position, 5-letter word counts drop both, and each tokenizer splits the same stretch of sequence differently.</li>
 <li>Point 3: two composition numbers reached 0.66 and 5-letter word counts 0.74 (12,000 labels each), against 0.86 for the CNN (92,346 labels).</li>
 <li>Point 4: the motif insertion against a control of the same letters, the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (G+C/U 0.64 to 0.51).</li>
 <li>Point 5: frozen Mistral-DNA with a probe scored 0.77 against 0.78 under the shuffle and 0.77 on the 3,000-sequence matched test set. In one offline benchmark, NT-500M fine-tuned with LoRA reached 0.87 against the CNN’s 0.84 (20,000 labels, 3 runs each); it has not been shuffle-tested.</li>
@@ -749,15 +576,15 @@
 <section id="when-to-use-a-pretrained-model" class="slide level2">
 <h2>6.4 When to use a pretrained model</h2>
 <ul>
-<li><strong>Below about 2,500 labels</strong>: a frozen pretrained model with a probe</li>
-<li><strong>About 20,000 labels</strong>: fine-tuning a large pretrained model</li>
-<li><strong>Always</strong>: a small task model as the baseline</li>
+<li class="fragment"><strong>Below about 2,500 labels</strong>: a frozen pretrained model with a probe</li>
+<li class="fragment"><strong>About 20,000 labels</strong>: fine-tuning a large pretrained model</li>
+<li class="fragment"><strong>Always</strong>: a small task model as the baseline</li>
 </ul>
 <aside class="notes">
 <ul>
-<li>Below about 2,500 labels the frozen probe scored higher than the CNN on this task (slide 5.6).</li>
+<li>Below about 2,500 labels the frozen probe scored higher than the CNN on this task (slide 5.3).</li>
 <li>With 20,000 labels, fine-tuned NT-500M (0.87) scored higher than the CNN (0.84) in one offline benchmark (3,000 matched test sequences, 3 runs each).</li>
-<li>The thresholds are from today’s AGO2 label curve (slide 5.6) and will differ between tasks.</li>
+<li>The thresholds are from today’s AGO2 label curve (slide 5.3) and will differ between tasks.</li>
 <li>Whatever model is chosen, the same tests apply: a simple baseline, a shuffle, a matched control.</li>
 <li>Not tested today: scoring mutations (variants) without labels by how unexpected the model finds them; published results are mixed.</li>
 </ul>
@@ -776,11 +603,11 @@
 <section id="from-a-question-to-a-model" class="slide level2">
 <h2>6.5 From a question to a model</h2>
 <ol type="1">
-<li><strong>Question</strong>: what to predict, and which experiment gives the labels</li>
-<li><strong>Negatives</strong>: how they were chosen</li>
-<li><strong>Baselines</strong>: composition and word counts</li>
-<li><strong>Model</strong>: train from scratch or adapt, by the number of labels</li>
-<li><strong>Controls</strong>: insert, shuffle, match; report uncertainty</li>
+<li class="fragment"><strong>Question</strong>: what to predict, and which experiment gives the labels</li>
+<li class="fragment"><strong>Negatives</strong>: how they were chosen</li>
+<li class="fragment"><strong>Baselines</strong>: composition and word counts</li>
+<li class="fragment"><strong>Model</strong>: train from scratch or adapt, by the number of labels</li>
+<li class="fragment"><strong>Controls</strong>: insert, shuffle, match; report uncertainty</li>
 </ol>
 <aside class="notes">
 <ul>
@@ -837,7 +664,7 @@
 <li>R. Mourad and B. Batut, <strong>Galaxy Training Network</strong>: pretraining and fine-tuning an LLM on DNA (CC-BY); R. Mourad (2024), <em>Mistral-DNA</em> models.</li>
 <li>Dalla-Torre et al.&nbsp;(2024) <em>Nucleotide Transformer</em>, Nature Methods. Zhou et al.&nbsp;(2024) <em>DNABERT-2</em>, ICLR. Nguyen et al.&nbsp;(2023) <em>HyenaDNA</em>, NeurIPS. Nguyen et al.&nbsp;(2024) <em>Evo</em>, Science. Brixi et al.&nbsp;(2025) <em>Evo 2</em>.</li>
 <li>Hu et al.&nbsp;(2021) <em>LoRA</em>. Tang and Koo (2024) <em>Evaluating the representational power of pre-trained DNA language models for regulatory genomics</em>.</li>
-<li>Altschul and Erickson (1985) dinucleotide shuffle. Tareen and Kinney (2020) <em>logomaker</em>. Friedman et al.&nbsp;(2009) <em>Most mammalian mRNAs are conserved targets of microRNAs</em>, Genome Research. Chin et al.&nbsp;(2008) <em>A SNP in a let-7 microRNA complementary site in the KRAS 3′ untranslated region increases non-small cell lung cancer risk</em>, Cancer Research.</li>
+<li>Altschul and Erickson (1985) dinucleotide shuffle. Tareen and Kinney (2020) <em>logomaker</em>.</li>
 </ul>
 </div>
 <aside class="notes">

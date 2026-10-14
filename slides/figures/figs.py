@@ -759,14 +759,13 @@ def shuffle_demo(pos):
     fig = newfig()
     a0 = fig.add_axes([0.02, 0.5, 0.96, 0.44]); a0.set_xlim(0, 160); a0.set_ylim(0, 30); a0.axis("off")
     st = max(0, k - 14)
-    seq(a0, 30, 22, s[st:st + 32], fs=26, dx=4.0, colored=False, weight="normal")
-    seq(a0, 30, 8, sh[st:st + 32], fs=26, dx=4.0, colored=False, weight="normal")
+    seq(a0, 30, 22, s[st:st + 32], fs=26, dx=4.0)
+    seq(a0, 30, 8, sh[st:st + 32], fs=26, dx=4.0)
     label(a0, 4, 22, "Original", fs=22, color=MUTED, ha="left"); label(a0, 4, 8, "Shuffled", fs=22, color=MUTED, ha="left")
-    a0.plot([30 + (k - st) * 4.0 - 1.8, 30 + (k - st + 6) * 4.0 + 1.8], [16.5, 16.5], color=INK, lw=3)
     a1 = fig.add_axes([0.07, 0.1, 0.9, 0.3])
     x = np.arange(16)
-    a1.bar(x - 0.19, counts(s), 0.36, color=INK, label="Original")
-    a1.bar(x + 0.19, counts(sh), 0.36, color=LIGHT, label="Shuffled")
+    a1.bar(x - 0.19, counts(s), 0.36, color=ACCENT, label="Original")
+    a1.bar(x + 0.19, counts(sh), 0.36, color=HELD_C, label="Shuffled")
     a1.set_xticks(x); a1.set_xticklabels(pairs, family=MONO); a1.tick_params(axis="x", length=0)
     a1.set_yticks([]); a1.spines["left"].set_visible(False)
     a1.set_title(f"Letter-pair counts in the whole sequence: {same} of 16 identical")
@@ -906,8 +905,8 @@ def headtohead():
     d = json.load(open(SPIKE / "s10_headtohead.json"))
     fig = newfig()
     ax = fig.add_axes([0.08, 0.13, 0.88, 0.7])
-    series = [("cnn", "CNN from scratch (3 runs)", INK), ("frozen_probe", "NT-500M frozen + probe (1 run)", MID),
-              ("lora", "NT-500M fine-tuned with LoRA (3 runs)", ACCENT)]
+    series = [("cnn", "CNN from scratch (3 runs)", CNN_C), ("frozen_probe", "NT-500M frozen + probe (1 run)", FROZEN_C),
+              ("lora", "NT-500M fine-tuned with LoRA (3 runs)", TUNED_C)]
     for gi, k in enumerate(("500", "20000")):
         for si, (key, name, c) in enumerate(series):
             x = gi + (si - 1) * 0.26
@@ -956,7 +955,7 @@ def label_curve():
     ns = sorted(int(k) for k in d)
     fig = newfig()
     ax = fig.add_axes([0.08, 0.13, 0.68, 0.75])
-    lab = {"cnn": ("CNN", INK, "-"), "fm_probe": ("Mistral-DNA, frozen", MID, "-"),
+    lab = {"cnn": ("CNN", CNN_C, "-"), "fm_probe": ("Mistral-DNA, frozen", FROZEN_C, "-"),
            "kmer5": ("5-letter word counts", MID, ":"), "random_probe": ("Mistral-DNA, random weights", LIGHT, "--")}
     for k, (name, c, ls_) in lab.items():
         m = np.array([d[str(n)][k]["mean"] for n in ns]); sd = np.array([d[str(n)][k]["sd"] for n in ns])
@@ -965,7 +964,7 @@ def label_curve():
         ax.text(ns[-1] * 1.12, m[-1], name, color=c if c != LIGHT else MUTED, va="center")
     for n in (500, 20000):
         c_ = h[str(n)]["cnn"]; l_ = h[str(n)]["lora"]
-        ax.errorbar([n], [c_["mean"]], yerr=[c_["sd"]], fmt="s", mfc="white", mec=INK, color=INK, ms=11, capsize=4)
+        ax.errorbar([n], [c_["mean"]], yerr=[c_["sd"]], fmt="s", mfc="white", mec=CNN_C, color=CNN_C, ms=11, capsize=4)
         ax.errorbar([n], [l_["mean"]], yerr=[l_["sd"]], fmt="D", color=TUNED_C, ms=12, capsize=4)
 
     ax.axhline(0.5, color=HAIR, lw=1.5, ls="--")
@@ -973,7 +972,7 @@ def label_curve():
     ax.minorticks_off(); ax.set_xlabel("Labelled training sequences"); ax.set_ylabel("Held-out AUROC, matched negatives")
     ax.set_ylim(0.45, 0.92); ygrid(ax)
     ax.legend(handles=[Line2D([], [], marker="D", ls="", ms=11, color=TUNED_C, label="NT-500M fine-tuned (head-to-head)"),
-                       Line2D([], [], marker="s", ls="", ms=10, mfc="white", mec=INK, label="CNN, other draws (head-to-head)")],
+                       Line2D([], [], marker="s", ls="", ms=10, mfc="white", mec=CNN_C, label="CNN, other draws (head-to-head)")],
               loc="lower right", fontsize=17)
     save(fig, "label_curve2")
 
