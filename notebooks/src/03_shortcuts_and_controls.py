@@ -406,8 +406,8 @@ for k in scores["original"]:
 # %% [markdown]
 # ## 5. Retrain the CNN on both benchmarks
 #
-# Same architecture as part 1, 6 epochs on each training set of about 65,000 sequences (~1.5 minutes
-# on a T4 for both). The three models above used 12,000 of them.
+# Same architecture as part 1, 6 epochs on each training set of about 65,000 sequences.
+# The three models above used 12,000 of them.
 
 # %%
 #@title Retrain the CNN twice - run this cell, nothing to change { display-mode: "form" }
@@ -441,7 +441,7 @@ for name in BENCH:
 # are about 1.6% of the parameters.
 #
 # We train on the **matched** benchmark, 2 epochs over 20,000 labelled sequences (the frozen probe used
-# 12,000), and test on the matched test set. This takes **about 3 minutes on a T4**. Start the
+# 12,000), and test on the matched test set. Start the
 # TODO-5 cell as soon as you have written it, and read on while it trains.
 #
 # The setup cell defines what TODO-5 needs: `make_lora()`, which returns a fresh model with LoRA
@@ -528,7 +528,7 @@ print(f"LoRA fine-tuned: {scores['matched']['Mistral-DNA, LoRA fine-tuned']:.3f}
       f"{scores['matched']['Mistral-DNA + probe (frozen)']:.3f}   ({time.time() - t0:.0f}s)   (want ≈ 0.81)")
 
 # %%
-#@title Stuck? Run this only if TODO-5 failed: it trains a fresh LoRA model for you (3 more minutes) { display-mode: "form" }
+#@title Stuck? Run this only if TODO-5 failed: it trains a fresh LoRA model for you { display-mode: "form" }
 clf, opt, scaler = make_lora()
 t0 = time.time()
 clf.train()
@@ -579,11 +579,11 @@ _ = (DATA_DIR / "my_part3_matched_results.json").write_text(json.dumps(scores, i
 #
 # **This cell is optional and precomputed.** By default it plots our offline results (3 random draws
 # of the labels per size: points are means, bars are standard deviations) and prints our offline
-# NT-500M head-to-head. Set `RUN_LIVE = True` to rerun one draw at 4 sizes yourself (~3 minutes on a T4).
+# NT-500M head-to-head. Set `RUN_LIVE = True` to rerun one draw at 4 sizes yourself.
 
 # %%
 #@title Learn from fewer labels (optional; precomputed by default) { display-mode: "form" }
-RUN_LIVE = False   # True = rerun the label curve yourself (one draw per size, ~3 min on a T4)
+RUN_LIVE = False   # True = rerun the label curve yourself (one draw per size)
 
 # Our offline runs on this matched benchmark and test set: mean and standard deviation over 3 draws.
 PRECOMPUTED = {

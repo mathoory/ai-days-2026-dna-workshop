@@ -221,7 +221,7 @@ print(f"reference probe: test AUROC = {auc_fm:.3f}")
 # **Nucleotide Transformer 500M** (NT-500M, InstaDeep): 486 million parameters, pretrained on the human
 # reference genome by masked-token prediction. The download is about 2 GB, so by default we load its
 # embeddings, precomputed on these same sequences with the same `embed`. Set `RUN_NT500M = True` to
-# compute them yourself (~1 min download + ~1 min on a T4).
+# compute them yourself.
 
 # %%
 #@title Nucleotide Transformer 500M - run this cell { display-mode: "form" }
@@ -250,8 +250,7 @@ print(f"NT-500M + probe: {auc_nt:.3f}   vs   Mistral-DNA (16M): {auc_fm:.3f}")
 # Mistral). It starts from random weights and is trained to predict the next token on 200-letter pieces
 # of the human genome. We probe it on AGO2 before and after.
 #
-# Start the cell (about 4 minutes on a T4), then read **What to take away** below the Summary cell
-# while the loss goes down. A T4 runs about 1,200 training steps in the 3 minutes.
+# Start the cell, then read **What to take away** below the Summary cell while the loss goes down.
 
 # %%
 #@title Pretrain from scratch for a few minutes - run this cell { display-mode: "form" }
