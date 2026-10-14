@@ -790,7 +790,7 @@
 <li>The live cell: a 105M-parameter model of the same design as Mistral-DNA but larger, with random weights, trained to predict the next token on 200-letter pieces of the human genome for about 3 minutes (recipe from the Galaxy Training Network, Mourad and Batut, CC-BY).</li>
 <li>The figure: the next-token loss every 100 steps of one 3-minute run (logged from step 100 to 1,000). Dashed: uniform guessing, ln 4096 ≈ 8.3. Dotted: a model that knows only how frequent each token is, with no context (about 7.1).</li>
 <li>The loss falls from about 7.0 after 100 steps to about 6.4. Most of the early drop is learning token frequencies; going below the dotted line requires using context.</li>
-<li>Probed on AGO2 before and after: 0.55 to 0.73 in our latest run (1,834 steps; earlier runs gave 0.72 and 0.75). That is only a little above the two composition numbers of part 1, slide 2.4 (0.66), so it should not be read as learned binding biology.</li>
+<li>Probed on AGO2 before and after: 0.55 to 0.73 in our latest run (1,834 steps; earlier runs gave 0.72 and 0.75). That is only a little above the two composition numbers of part 1, slide 3.3 (0.66), so it should not be read as learned binding biology.</li>
 <li>A T4 completes about 1,200 steps in 3 minutes against 1,834 on our A30 test GPU; in our Colab test the probe still went from 0.57 to 0.72. The released Mistral-DNA, a different model trained far longer, reaches 0.78.</li>
 </ul>
 <style type="text/css">

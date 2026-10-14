@@ -205,10 +205,11 @@
 <h2 id="toc-title">Table of contents</h2>
 <ul>
 <li><a href="#/the-task" id="/toc-the-task">1 The task</a></li>
-<li><a href="#/learning-and-testing" id="/toc-learning-and-testing">2 Learning and testing</a></li>
-<li><a href="#/the-cnn" id="/toc-the-cnn">3 The CNN</a></li>
-<li><a href="#/look-inside" id="/toc-look-inside">4 Look inside</a></li>
-<li><a href="#/what-the-cnn-learned" id="/toc-what-the-cnn-learned">5 What the CNN learned</a></li>
+<li><a href="#/learning-from-examples" id="/toc-learning-from-examples">2 Learning from examples</a></li>
+<li><a href="#/testing-a-model" id="/toc-testing-a-model">3 Testing a model</a></li>
+<li><a href="#/the-cnn" id="/toc-the-cnn">4 The CNN</a></li>
+<li><a href="#/look-inside" id="/toc-look-inside">5 Look inside</a></li>
+<li><a href="#/what-the-cnn-learned" id="/toc-what-the-cnn-learned">6 What the CNN learned</a></li>
 </ul>
 </nav>
 </section>
@@ -500,29 +501,91 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="learning-and-testing" class="title-slide slide level1 center" data-name="Learning">
-<h1>2 Learning and testing</h1>
+<section id="learning-from-examples" class="title-slide slide level1 center" data-name="Learning">
+<h1>2 Learning from examples</h1>
 
 </section>
 
-<section id="what-training-does" class="slide level2">
-<h2>2.1 What training does</h2>
+<section id="supervised-learning" class="slide level2">
+<h2>2.1 Supervised learning</h2>
 <ul>
-<li>Model: <span class="math inline">\(\;\hat p = \sigma(w^\top x + b)\)</span>, <span class="math inline">\(\;x\)</span> = (G+C fraction, U fraction)</li>
-<li>Training: follow the gradient of the loss downhill, step by step</li>
+<li>Examples <span class="math inline">\((x_i, y_i)\)</span>, <span class="math inline">\(i = 1, \dots, N\)</span>: a sequence <span class="math inline">\(x_i\)</span> and its label <span class="math inline">\(y_i\)</span> (1 bound, 0 unbound)</li>
+<li>A model <span class="math inline">\(f_\theta\)</span> with parameters <span class="math inline">\(\theta\)</span> predicts <span class="math inline">\(\hat p = f_\theta(x)\)</span>, the probability of bound</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/lr_training.png" class="quarto-figure quarto-figure-center" height="584"></p>
+<p><img data-src="assets/custom/setup_examples.png" class="quarto-figure quarto-figure-center" height="458"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
+<li>Four real training sequences, the first 32 of their 340 letters. <span class="math inline">\(y\)</span> is the CLIP-seq label; <span class="math inline">\(\hat p\)</span> is the prediction of the CNN trained in this part.</li>
+<li>Supervised learning: every training example comes with its answer. Here <span class="math inline">\(N\)</span> = 92,346.</li>
+<li>Training chooses <span class="math inline">\(\theta\)</span> so that <span class="math inline">\(\hat p\)</span> is close to <span class="math inline">\(y\)</span> on the training examples. The goal is good predictions on sequences the model has not seen (section 3).</li>
+<li>The second bound example gets 0.35 and the second unbound one 0.52: the model is often uncertain, and sometimes wrong.</li>
+<li>Tutorial 1 notation, for those who took the course: input space <span class="math inline">\(\mathcal{X}\)</span> (sequences), output space <span class="math inline">\(\mathcal{Y} = \{0, 1\}\)</span>, hypothesis set <span class="math inline">\(\mathcal{H}\)</span> (all CNNs of one architecture), final hypothesis <span class="math inline">\(g\)</span> (the trained CNN).</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-loss" class="slide level2">
+<h2>2.2 The loss</h2>
+<ul>
+<li><strong>Binary cross-entropy</strong>: <span class="math inline">\(\;\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, y_i \log \hat p_i + (1 - y_i)\log(1 - \hat p_i) \,\big]\)</span></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/bce_curve.png" class="quarto-figure quarto-figure-center" height="596"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>One example’s contribution to the loss, against the predicted probability. Blue: a bound example, <span class="math inline">\(-\log \hat p\)</span>. Grey: an unbound example, <span class="math inline">\(-\log(1 - \hat p)\)</span>.</li>
+<li>A confident correct prediction costs almost nothing; a confident wrong one costs a lot (<span class="math inline">\(-\log 0.01 = 4.6\)</span>).</li>
+<li>On slide 2.1: predicting 0.90 for a bound sequence costs 0.11; predicting 0.35 for a bound sequence costs 1.05.</li>
+<li>Predicting 0.5 for everything gives <span class="math inline">\(\ln 2 = 0.69\)</span>, the loss of a coin flip.</li>
+<li>Tutorial 1 used the mean squared error, for predicting a number. Cross-entropy is the standard loss for a predicted probability.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gradient-descent" class="slide level2">
+<h2>2.3 Gradient descent</h2>
+<p><span class="math display">\[\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}\]</span></p>
+<ul>
+<li>On our data: <span class="math inline">\(\;\hat p = \sigma(w^\top x + b)\)</span>, <span class="math inline">\(\;x\)</span> = (G+C fraction, U fraction)</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/lr_training.png" class="quarto-figure quarto-figure-center" height="547"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>The update: <span class="math inline">\(\theta\)</span> are all the parameters, <span class="math inline">\(\mathcal{L}\)</span> the loss, <span class="math inline">\(\eta\)</span> the learning rate. Start from some <span class="math inline">\(\theta\)</span>, compute the gradient of the loss with respect to every parameter, move each parameter against its gradient, scaled by <span class="math inline">\(\eta\)</span>, and repeat.</li>
 <li>Left and middle: 3,000 training sequences, one point each, placed by G+C fraction and U fraction; blue bound, grey unbound. The black line is where the predicted probability equals 0.5, at step 0 (a deliberately bad start) and after 300 steps. Right: the loss at each step.</li>
 <li>The smallest possible model on our data: two features per sequence and three parameters (two weights and a bias).</li>
 <li><span class="math inline">\(\sigma(z) = 1/(1+e^{-z})\)</span> turns any score into a probability between 0 and 1. Every model today ends with a sigmoid.</li>
-<li>Loss: binary cross-entropy, minus the log of the probability the model gives the true label. A coin flip gives 0.69. Here it falls from 0.77 at the bad start to 0.67.</li>
-<li>How well these two numbers separate the classes on held-out data is measured on slide 2.4 (AUROC 0.66).</li>
+<li>The loss (slide 2.2) falls from 0.77 at the bad start to 0.67.</li>
+<li>How well these two numbers separate the classes on held-out data is measured on slide 3.3 (AUROC 0.66).</li>
 <li>Our CNN has 2,491 parameters. The genome models have millions to billions.</li>
 </ul>
 <style type="text/css">
@@ -537,8 +600,102 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="the-learning-rate" class="slide level2">
+<h2>2.4 The learning rate</h2>
+<ul>
+<li><span class="math inline">\(\eta\)</span> sets the size of each step</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/lr_rates.png" class="quarto-figure quarto-figure-center" height="642"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>The model of slide 2.3, from the same bad start, trained with three learning rates. Training loss after each step.</li>
+<li><span class="math inline">\(\eta\)</span> = 0.05: every step goes downhill, but after 40 steps the loss is still 0.72.</li>
+<li><span class="math inline">\(\eta\)</span> = 2: the loss reaches 0.67 within a few steps.</li>
+<li><span class="math inline">\(\eta\)</span> = 10: each step overshoots the minimum, and the loss jumps between 0.7 and 1.75.</li>
+<li>The learning rate is set before training, a hyperparameter, and chosen on validation data (section 3). The notebook uses Adam with <span class="math inline">\(\eta\)</span> = 0.001.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="mini-batches-and-epochs" class="slide level2">
+<h2>2.5 Mini-batches and epochs</h2>
+<ul>
+<li>Each step uses a <strong>batch</strong> of 256 sequences; an <strong>epoch</strong> is one pass over all 92,346 (360 steps)</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/sgd_noise.png" class="quarto-figure quarto-figure-center" height="596"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>The CNN of this part, trained as in the notebook: 10 epochs, 3,600 steps. Grey: the loss on each batch. Black: the mean over each epoch.</li>
+<li>The gradient on one batch estimates the gradient on the whole training set. It is cheap, so the model takes many steps per epoch; it is noisy, so the grey line jumps (0.38 to 0.61 within the last epoch). This is mini-batch, or stochastic, gradient descent.</li>
+<li>The epoch means fall from 0.61 to 0.44, most of it in the first three epochs.</li>
+<li>92,346 / 256 gives 360 full batches; the notebook drops the incomplete last one (<code>drop_last=True</code>) and reshuffles the order every epoch.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="from-logistic-regression-to-a-neural-network" class="slide level2">
+<h2>2.6 From logistic regression to a neural network</h2>
+<ul>
+<li>A <strong>neural network</strong> stacks layers of units, with <strong>ReLU</strong>, <span class="math inline">\(\max(0, z)\)</span>, between them</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/nn_diagram.png" class="quarto-figure quarto-figure-center" height="629"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Left: logistic regression is one unit, a weighted sum of the inputs plus a bias, then the sigmoid.</li>
+<li>Right: a hidden layer of units, each a weighted sum followed by ReLU, feeds the output unit.</li>
+<li>Without the nonlinearity, stacked weighted sums collapse into one weighted sum, which is no more expressive than logistic regression.</li>
+<li>Training is the same as on slide 2.3. <code>loss.backward()</code> computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.</li>
+<li>The CNN of section 4 is a network of this kind in which each first-layer unit looks at a 10-letter window.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="testing-a-model" class="title-slide slide level1 center" data-name="Testing">
+<h1>3 Testing a model</h1>
+
+</section>
+
 <section id="train-validate-test" class="slide level2">
-<h2>2.2 Train, validate, test</h2>
+<h2>3.1 Train, validate, test</h2>
 <ul>
 <li><strong>Train</strong>: fit the weights</li>
 <li><strong>Validation</strong>: choose settings, such as the number of epochs</li>
@@ -566,7 +723,7 @@
       }</style></aside>
 </section>
 <section id="auroc" class="slide level2">
-<h2>2.3 AUROC</h2>
+<h2>3.2 AUROC</h2>
 <ul>
 <li><strong>AUROC</strong> = the probability that a random bound sequence scores higher than a random unbound one. 0.5 is chance, 1.0 is perfect.</li>
 </ul>
@@ -596,7 +753,7 @@
       }</style></aside>
 </section>
 <section id="noise-in-a-held-out-auroc" class="slide level2">
-<h2>2.4 Noise in a held-out AUROC</h2>
+<h2>3.3 Noise in a held-out AUROC</h2>
 <ul>
 <li>On 1,000 test sequences, 95% of resampled AUROCs fall within about <strong>±0.025</strong></li>
 </ul>
@@ -608,7 +765,7 @@
 <aside class="notes">
 <ul>
 <li>One row per model, all scored on the same 1,000 held-out sequences. The dot is the AUROC. Resample the 1,000 test sequences with replacement 2,000 times; the bar covers 95% of the resulting AUROCs.</li>
-<li>Three models from today: the CNN 0.86 (0.84 to 0.88), logistic regression on 5-letter word counts 0.74 (0.71 to 0.77), and on the two composition numbers of slide 2.1 0.66 (0.63 to 0.69). The bars do not overlap, so these differences are larger than the sampling noise.</li>
+<li>Three models from today: the CNN 0.86 (0.84 to 0.88), logistic regression on 5-letter word counts 0.74 (0.71 to 0.77), and on the two composition numbers of slide 2.3 0.66 (0.63 to 0.69). The bars do not overlap, so these differences are larger than the sampling noise.</li>
 <li>The bars describe one model at a time. Two models scored on the same sequences make correlated errors, so their difference varies less than the bars suggest; a paired bootstrap measures it. Overlapping bars mean there is no evidence of a difference; they do not show that the models are equal.</li>
 <li>Rule of thumb: on 1,000 test sequences ignore differences below about 0.03; on 3,000 (part 3), below about 0.02.</li>
 </ul>
@@ -625,7 +782,7 @@
       }</style></aside>
 </section>
 <section id="overfitting" class="slide level2">
-<h2>2.5 Overfitting</h2>
+<h2>3.4 Overfitting</h2>
 <ul>
 <li>A model that scores much higher on its training data than on held-out data has <strong>overfit</strong>: it memorised its training examples. Report the held-out score</li>
 </ul>
@@ -639,6 +796,7 @@
 <li>The same model, logistic regression on 5-letter word counts, scored two ways. Light bars: AUROC on its own training sequences. Black bars: AUROC on the 1,000 held-out sequences.</li>
 <li>Left: 12,000 training sequences with regularisation. 0.82 on its own training data, 0.74 held out. A small gap is normal.</li>
 <li>Right: 600 sequences and almost no regularisation. 1.00 on its training data, 0.67 held out.</li>
+<li>Underfitting is the opposite: a model too simple for the pattern scores low on both its training data and held-out data.</li>
 <li>Regularisation penalises large weights, which limits how closely a model can fit its training data.</li>
 <li>In any evaluation code, including code an AI assistant wrote, check first which data the score was computed on.</li>
 </ul>
@@ -656,12 +814,12 @@
       }</style></aside>
 </section>
 <section id="the-cnn" class="title-slide slide level1 center" data-name="CNN">
-<h1>3 The CNN</h1>
+<h1>4 The CNN</h1>
 
 </section>
 
 <section id="one-hot-encoding-todo-1" class="slide level2">
-<h2>3.1 One-hot encoding (TODO-1)</h2>
+<h2>4.1 One-hot encoding (TODO-1)</h2>
 <ul>
 <li>One column per letter, with a 1 in its row; padding columns of 0.25 up to 501</li>
 </ul>
@@ -690,18 +848,21 @@
       }</style></aside>
 </section>
 <section id="a-filter-computes-a-dot-product" class="slide level2">
-<h2>3.2 A filter computes a dot product</h2>
+<h2>4.2 A filter computes a dot product</h2>
+<ul>
+<li>The same 40 weights at every position: <strong>weight sharing</strong></li>
+</ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/filter_dot.png" class="quarto-figure quarto-figure-center" height="700"></p>
+<p><img data-src="assets/custom/filter_dot.png" class="quarto-figure quarto-figure-center" height="642"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>A real learned filter (filter 7) from the trained CNN, applied to the real window where it responds most strongly. The slides from 3.5 on use filter 0.</li>
+<li>A real learned filter (filter 7) from the trained CNN, applied to the real window where it responds most strongly. The slides from 4.6 on use filter 0.</li>
 <li>Left: the filter, a 4 × 10 matrix of weights, one per letter and position; blue positive, grey negative. Right: the one-hot window.</li>
 <li>Multiplied element by element with the one-hot window, the filter keeps one weight per position: the weight of the letter that is there (the number under each column). Their sum plus a bias is the filter’s output at that position (bottom line).</li>
-<li>The same 40 weights are applied at every one of the 492 positions. Sharing the weights across positions makes it a convolution.</li>
+<li>The same 40 weights are applied at every one of the 492 positions. Sharing the weights across positions makes it a convolution. A fully connected layer from the same 4 × 501 input to the same 492 outputs would have 4 × 501 × 492 = 985,968 weights.</li>
 <li>This filter prefers U-rich windows, and its strongest response is only 1.07 times larger on bound than on unbound sequences. It responds to something common in both classes. Part 3 tests composition effects of this kind with a shuffle and with matched data.</li>
 </ul>
 <style type="text/css">
@@ -717,19 +878,46 @@
       }</style></aside>
 </section>
 <section id="the-filter-along-one-sequence" class="slide level2">
-<h2>3.3 The filter along one sequence</h2>
-<ul>
-<li><strong>ReLU</strong>: <span class="math inline">\(\max(0, z)\)</span>, so negative outputs become 0</li>
-</ul>
+<h2>4.3 The filter along one sequence</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/activation_track.png" class="quarto-figure quarto-figure-center" height="642"></p>
+<p><img data-src="assets/custom/activation_track.png" class="quarto-figure quarto-figure-center" height="700"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>The same filter (filter 7): its output at every position of one bound sequence, after ReLU. x: position; y: output.</li>
-<li>Most positions give 0. Windows that resemble the weights give large values. The highest one is drawn dark and its 10 letters are printed.</li>
+<li>ReLU (slide 2.6) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn dark and its 10 letters are printed.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="channels-and-pooling" class="slide level2">
+<h2>4.4 Channels and pooling</h2>
+<ul>
+<li>10 filters give 10 output rows, <strong>channels</strong>; <strong>max pooling</strong> keeps the largest of every 3 positions</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/channels_pool.png" class="quarto-figure quarto-figure-center" height="596"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>One bound sequence of 340 letters, the one on slide 4.3, positions 210 to 330 (filter 7 peaks at 273). Top: the output of all 10 first-layer filters after ReLU at each position; darker blue is larger. Bottom: after max pooling, one value per block of 3 positions.</li>
+<li>Each row is one filter’s track; row 7 is the track of slide 4.3.</li>
+<li>The network computes all 492 positions of the padded input (164 after pooling); the figure shows 120 of them.</li>
+<li>Pooling shortens each track threefold and keeps the strongest responses; the exact position within each block of 3 is lost. It has no parameters.</li>
+<li>The second convolution reads all 10 channels at once: each of its 20 filters is 10 × 5, one weight per channel and pooled position.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -744,7 +932,7 @@
       }</style></aside>
 </section>
 <section id="the-network-todo-2" class="slide level2">
-<h2>3.4 The network (TODO-2)</h2>
+<h2>4.5 The network (TODO-2)</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 50%">
@@ -791,7 +979,9 @@
 <li>10 first-layer filters, each 4 × 10. Each produces one output row, a channel.</li>
 <li>Max pooling keeps the largest value in each block of 3 positions.</li>
 <li>The second convolution combines nearby first-layer outputs: 20 channels, each looking at 5 pooled positions.</li>
-<li>The final linear layer has one weight per channel and pooled position: 20 × 53 = 1,060 weights. Slide 5.2 shows them after training.</li>
+<li>The final linear layer has one weight per channel and pooled position: 20 × 53 = 1,060 weights. Slide 6.2 shows them after training.</li>
+<li>Both convolutions move one position at a time (stride 1) and add no padding of their own, so each output row is shorter than its input by the kernel width minus 1 (501 − 9 = 492, 164 − 4 = 160). The pooling layers move 3 positions at a time (stride 3).</li>
+<li>Receptive field: one second-layer output depends on 5 pooled positions, which cover 15 first-layer positions, which cover 24 letters. After the second pooling, one value covers 30 letters.</li>
 <li>The 2,491 parameters are weights plus biases: 410 in the first convolution, 1,020 in the second and 1,061 in the linear layer.</li>
 <li>A logit is any real number; the sigmoid turns it into a probability between 0 and 1. <code>BCEWithLogitsLoss</code> applies the sigmoid and the binary cross-entropy in one step.</li>
 </ul>
@@ -808,18 +998,17 @@
       }</style></aside>
 </section>
 <section id="training-changes-the-filters" class="slide level2">
-<h2>3.5 Training changes the filters</h2>
-<p><span class="math display">\[\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}\]</span></p>
+<h2>4.6 Training changes the filters</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/filter_learning.png" class="quarto-figure quarto-figure-center" height="605"></p>
+<p><img data-src="assets/custom/filter_learning.png" class="quarto-figure quarto-figure-center" height="606"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>Filter 0 at epochs 0, 1, 3 and 10 of one training run, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, grey negative weights.</li>
 <li>Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.</li>
-<li>The formula: <span class="math inline">\(\theta\)</span> are all the weights, <span class="math inline">\(\mathcal{L}\)</span> the loss, <span class="math inline">\(\eta\)</span> the learning rate. Each step computes the gradient of the loss with respect to every weight and moves each weight against its gradient, scaled by <span class="math inline">\(\eta\)</span>. We use Adam, a variant that adapts the step size per weight.</li>
+<li>Each step is the update of slide 2.3, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -834,7 +1023,7 @@
       }</style></aside>
 </section>
 <section id="the-training-step-and-the-evaluation-todo-3" class="slide level2">
-<h2>3.6 The training step and the evaluation (TODO-3)</h2>
+<h2>4.7 The training step and the evaluation (TODO-3)</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>opt.zero_grad()                       <span class="co"># clear the previous step's gradients</span></span>
 <span id="cb1-2"><a href=""></a>loss <span class="op">=</span> criterion(model(X), y)         <span class="co"># predict a batch, measure the error</span></span>
 <span id="cb1-3"><a href=""></a>loss.backward()                       <span class="co"># gradient of the loss for every weight</span></span>
@@ -862,12 +1051,12 @@
       }</style></aside>
 </section>
 <section id="look-inside" class="title-slide slide level1 center" data-name="Look inside">
-<h1>4 Look inside</h1>
+<h1>5 Look inside</h1>
 
 </section>
 
 <section id="from-a-filter-to-a-sequence-logo-todo-4" class="slide level2">
-<h2>4.1 From a filter to a sequence logo (TODO-4)</h2>
+<h2>5.1 From a filter to a sequence logo (TODO-4)</h2>
 <ul>
 <li><code>cutoff_for</code> → <code>windows_above</code> → <code>pwm_of</code> → logo: collect the windows with the highest output, count letters per position</li>
 <li>Logo height = information content: 2 bits = always the same letter, 0 = all four equally often</li>
@@ -897,7 +1086,7 @@
       }</style></aside>
 </section>
 <section id="test-a-logo-insert-it-against-a-shuffled-copy-todo-5" class="slide level2">
-<h2>4.2 Test a logo: insert it, against a shuffled copy (TODO-5)</h2>
+<h2>5.2 Test a logo: insert it, against a shuffled copy (TODO-5)</h2>
 <ul>
 <li>Insert one filter’s consensus 1 to 7 times; control: the same letters, shuffled</li>
 </ul>
@@ -928,7 +1117,7 @@
       }</style></aside>
 </section>
 <section id="your-turn" class="slide level2">
-<h2>4.3 Your turn</h2>
+<h2>5.3 Your turn</h2>
 <p>Open <strong><code>01_cnn.ipynb</code></strong> in Colab, select the T4 GPU, run from the top.</p>
 <table class="caption-top">
 <colgroup>
@@ -984,7 +1173,7 @@
 <li>TODO-3 check: about 0.79 after epoch 1 and 0.86 after epoch 10. Encoding and 10 epochs take about a minute on a T4 (2 to 8 seconds per epoch).</li>
 <li>Helpers for TODO-4: <code>acts[:, f, :]</code>, <code>cutoff_for</code>, <code>windows_above</code>, <code>pwm_of</code>; then set <code>MY_FILTER</code> and <code>MY_MOTIF</code>. TODO-4 ends with choosing a motif. TODO-5 uses <code>plant</code>.</li>
 <li>Each TODO has a “Stuck?” cell below it that loads our version.</li>
-<li>Section 5, right after training, downloads <code>my_cnn.pt</code>, which part 3 can load.</li>
+<li>Notebook section 5, right after training, downloads <code>my_cnn.pt</code>, which part 3 can load.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -999,12 +1188,12 @@
       }</style></aside>
 </section>
 <section id="what-the-cnn-learned" class="title-slide slide level1 center" data-name="Results">
-<h1>5 What the CNN learned</h1>
+<h1>6 What the CNN learned</h1>
 
 </section>
 
 <section id="training-curve" class="slide level2">
-<h2>5.1 Training curve</h2>
+<h2>6.1 Training curve</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/learning_curve.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -1030,7 +1219,7 @@
       }</style></aside>
 </section>
 <section id="the-last-layer-weighs-positions" class="slide level2">
-<h2>5.2 The last layer weighs positions</h2>
+<h2>6.2 The last layer weighs positions</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/last_layer.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -1056,7 +1245,7 @@
       }</style></aside>
 </section>
 <section id="all-ten-filters" class="slide level2">
-<h2>5.3 All ten filters</h2>
+<h2>6.3 All ten filters</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/logo_grid.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -1081,7 +1270,7 @@
       }</style></aside>
 </section>
 <section id="the-same-filter-on-unbound-sequences" class="slide level2">
-<h2>5.4 The same filter on unbound sequences</h2>
+<h2>6.4 The same filter on unbound sequences</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/logo_bound_unbound.png" class="quarto-figure quarto-figure-center" height="628"></p>
@@ -1107,7 +1296,7 @@
       }</style></aside>
 </section>
 <section id="insert-the-motif" class="slide level2">
-<h2>5.5 Insert the motif</h2>
+<h2>6.5 Insert the motif</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/dose_response.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -1132,7 +1321,7 @@
       }</style></aside>
 </section>
 <section id="the-effect-depends-on-position" class="slide level2">
-<h2>5.6 The effect depends on position</h2>
+<h2>6.6 The effect depends on position</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/position_scan.png" class="quarto-figure quarto-figure-center" height="700"></p>
@@ -1143,7 +1332,7 @@
 <li>One copy of the motif at every position, averaged over 400 random sequences (a given cell in the notebook). y: change in mean CNN score against nothing inserted. The numbers 1 to 7 mark where <code>plant()</code> puts each copy in the previous test; shaded: letters 150 to 190.</li>
 <li>The motif changes the score only between about letters 140 and 190, where almost every sequence in the data has its measured site: up to about +0.35 inside, dips of about −0.1 at both edges.</li>
 <li>The shuffled copy gets much of the same increase there (up to about +0.26), so a good part of the effect comes from which letters are in that region, whatever their order.</li>
-<li>This is the last-layer pattern from slide 5.2: the CNN weighs positions. It reflects how the data were cut, and it means the answer to “does this motif matter?” depends on where it is placed.</li>
+<li>This is the last-layer pattern from slide 6.2: the CNN weighs positions. It reflects how the data were cut, and it means the answer to “does this motif matter?” depends on where it is placed.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1158,7 +1347,7 @@
       }</style></aside>
 </section>
 <section id="the-cnn-responds-to-one-of-four-seed-sites" class="slide level2">
-<h2>5.7 The CNN responds to one of four seed sites</h2>
+<h2>6.7 The CNN responds to one of four seed sites</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/planting_bars.png" class="quarto-figure quarto-figure-center" height="700"></p>

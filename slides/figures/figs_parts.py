@@ -201,12 +201,188 @@ def adapt_layers():
     save(fig, "adapt_layers")
 
 
+# ------------------------------------------------------------------ part 1, ML fundamentals
+def setup_examples(model, tr, ty):
+    """Four real training examples: x (start of the sequence), y, and the trained CNN's prediction."""
+    from intuition import cnn_scores
+    b = [i for i in range(len(ty)) if ty[i] == 1][:2]
+    u = [i for i in range(len(ty)) if ty[i] == 0][:2]
+    rows = [b[0], u[0], b[1], u[1]]
+    p = cnn_scores(model, [tr[i] for i in rows])
+    fig, ax = canvas(16, 5.6, ylim=(0, 56))
+    label(ax, 4, 50, "$x$: sequence (first 32 letters)", fs=22, color=MUTED, ha="left")
+    label(ax, 112, 50, "Length", fs=22, color=MUTED)
+    label(ax, 130, 50, "$y$", fs=24, color=MUTED)
+    label(ax, 149, 50, r"$\hat p = f_\theta(x)$", fs=24, color=MUTED)
+    for r, (i, pi) in enumerate(zip(rows, p)):
+        yy = 39 - r * 10
+        label(ax, 4, yy, tr[i][:32] + " …", fs=22, family=MONO, ha="left")
+        label(ax, 112, yy, f"{len(tr[i])}", fs=22)
+        label(ax, 130, yy, f"{int(ty[i])}", fs=24, color=BOUND if ty[i] == 1 else MUTED, bold=True)
+        label(ax, 149, yy, f"{pi:.2f}", fs=24)
+    save(fig, "setup_examples")
+    print("setup_examples", [int(ty[i]) for i in rows], [round(float(v), 3) for v in p])
+
+
+def bce_curve():
+    """Binary cross-entropy for one example, against the predicted probability of bound."""
+    q = np.linspace(0.005, 0.995, 400)
+    fig = newfig(); fig.set_size_inches(16, 7.4)
+    ax = fig.add_axes([0.1, 0.15, 0.85, 0.75])
+    ax.plot(q, -np.log(q), color=BOUND, lw=3.5)
+    ax.plot(q, -np.log(1 - q), color=MID, lw=3.5)
+    ax.text(0.10, 3.4, "True label bound ($y = 1$)\n$-\\log \\hat p$", color=BOUND, fontsize=22, va="center")
+    ax.text(0.66, 3.4, "True label unbound ($y = 0$)\n$-\\log (1 - \\hat p)$", color=MUTED, fontsize=22, va="center")
+    ax.plot([0.5], [np.log(2)], "o", color=INK, ms=10)
+    ax.annotate("0.69 at $\\hat p = 0.5$", (0.5, np.log(2)), xytext=(0.53, 1.25), fontsize=21, color=INK)
+    ax.set_xlabel(r"Predicted probability of bound, $\hat p$"); ax.set_ylabel("Loss")
+    ax.set_xlim(0, 1); ax.set_ylim(0, 4.2); ygrid(ax)
+    save(fig, "bce_curve")
+
+
+def lr_rates(tr, ty):
+    """Loss per step of the G+C/U logistic regression (same 3,000 sequences and start as lr_training), three learning rates."""
+    from intuition2 import gc
+    rng = np.random.default_rng(1)
+    idx = rng.choice(len(tr), 3000, replace=False)
+    X = np.array([[gc(tr[i]), tr[i].count("U") / len(tr[i])] for i in idx]); y = ty[idx].astype(float)
+    Z = (X - X.mean(0)) / X.std(0)
+    fig = newfig(); fig.set_size_inches(16, 7.4)
+    ax = fig.add_axes([0.1, 0.15, 0.66, 0.75])
+    for lr, c, lw in [(0.05, LIGHT, 3.5), (2.0, INK, 3.5), (10.0, ACCENT, 2.2)]:
+        w, b, L = np.array([-1.0, -1.0]), 0.8, []
+        for _ in range(41):
+            p = 1 / (1 + np.exp(-(Z @ w + b)))
+            L.append(-np.mean(y * np.log(p + 1e-9) + (1 - y) * np.log(1 - p + 1e-9)))
+            g = p - y; w = w - lr * Z.T @ g / len(y); b = b - lr * g.mean()
+        ax.plot(range(len(L)), L, color=c, lw=lw, marker="o" if lr == 10 else None, ms=5)
+        name = {0.05: "too small", 2.0: "good", 10.0: "too large"}[lr]
+        ypos = {0.05: L[-1] + 0.03, 2.0: L[-1] - 0.03, 10.0: max(L) * 0.9}[lr]
+        ax.text(41.5, ypos, f"$\\eta$ = {lr:g}: {name}", color=MUTED if lr == 0.05 else c, fontsize=21, va="center")
+        print("lr", lr, round(L[0], 3), round(L[-1], 3), round(max(L), 3))
+    ax.set_xlabel("Step"); ax.set_ylabel("Training loss"); ax.set_xlim(0, 40); ygrid(ax)
+    save(fig, "lr_rates")
+
+
+def sgd_noise(tr, ty):
+    """The CNN's loss on every mini-batch of 256 during 10 epochs (as in the notebook), and the epoch means."""
+    from torch import nn
+    from intuition import DEV, GlobalCNN, onehot
+    torch.manual_seed(0)
+    model = GlobalCNN().to(DEV)
+    opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    crit = nn.BCEWithLogitsLoss()
+    X = onehot(tr); y = torch.tensor(ty, dtype=torch.float32)
+    losses, n_per = [], len(X) // 256
+    for ep in range(10):
+        model.train(); perm = torch.randperm(len(X))
+        for i in range(n_per):
+            bi = perm[i * 256:(i + 1) * 256]
+            opt.zero_grad(); loss = crit(model(X[bi].to(DEV)), y[bi].to(DEV)); loss.backward(); opt.step()
+            losses.append(loss.item())
+    L = np.array(losses)
+    fig = newfig(); fig.set_size_inches(16, 7.4)
+    ax = fig.add_axes([0.1, 0.15, 0.66, 0.75])
+    ax.plot(L, color=LIGHT, lw=0.8)
+    m = L.reshape(10, n_per).mean(1)
+    ax.plot((np.arange(10) + 0.5) * n_per, m, color=INK, lw=3, marker="o", ms=9)
+    for e in range(1, 10):
+        ax.axvline(e * n_per, color=HAIR, lw=1, zorder=0)
+    ax.set_xticks([e * n_per for e in range(0, 11, 2)]); ax.set_xticklabels([f"{e * n_per:,}" for e in range(0, 11, 2)])
+    ax.set_xlabel(f"Step (one epoch = {n_per} steps)"); ax.set_ylabel("Training loss"); ax.set_xlim(0, 10 * n_per)
+    ax.text(10.15 * n_per, m[-1] - 0.02, "Mean per epoch", color=INK, fontsize=21, va="center")
+    ax.text(10.15 * n_per, np.percentile(L[-n_per:], 99), "One batch\n(256 sequences)", color=MUTED, fontsize=21, va="center")
+    save(fig, "sgd_noise")
+    print("sgd_noise steps/epoch", n_per, "epoch means", [round(v, 3) for v in m], "batch range last epoch",
+          round(L[-n_per:].min(), 3), round(L[-n_per:].max(), 3))
+
+
+def nn_diagram():
+    """Logistic regression as one unit, and a network with one hidden layer of ReLU units."""
+    from matplotlib.patches import Circle
+    fig, ax = canvas(16, 7.4, ylim=(0, 74))
+
+    def node(x, y, txt="", r=3.4, fc=FAINT):
+        ax.add_patch(Circle((x, y), r, fc=fc, ec=MUTED, lw=1.2, zorder=3))
+        if txt:
+            label(ax, x, y, txt, fs=17)
+
+    def edge(a, b):
+        ax.plot([a[0], b[0]], [a[1], b[1]], color=LIGHT, lw=1.4, zorder=1)
+
+    label(ax, 30, 69, "Logistic regression: one unit", fs=24)
+    ins = [(14, 46), (14, 26)]
+    for (x, y), n in zip(ins, ["G+C", "U"]):
+        node(x, y); label(ax, x - 5, y, n, fs=20, color=MUTED, ha="right")
+    out = (40, 36)
+    for a in ins:
+        edge(a, out)
+    node(*out, r=4.2, fc=ACCENT_L); label(ax, out[0], out[1], r"$\sigma$", fs=24)
+    arrow(ax, 45, 36, 51, 36); label(ax, 53, 36, r"$\hat p$", fs=24, ha="left")
+    label(ax, 30, 12, r"$\hat p = \sigma(w_1 x_1 + w_2 x_2 + b)$", fs=22, color=MUTED)
+
+    x0 = 88
+    label(ax, 118, 69, "A neural network: layers of units", fs=24)
+    ins = [(x0, 51 - 10 * k) for k in range(4)]
+    hid = [(x0 + 28, 56 - 10 * k) for k in range(5)]
+    out = (x0 + 56, 36)
+    for a in ins:
+        for h in hid:
+            edge(a, h)
+    for h in hid:
+        edge(h, out)
+    for a in ins:
+        node(*a)
+    for h in hid:
+        node(*h, txt="ReLU", r=3.9)
+    node(*out, r=4.2, fc=ACCENT_L); label(ax, out[0], out[1], r"$\sigma$", fs=24)
+    arrow(ax, out[0] + 5, 36, out[0] + 10, 36); label(ax, out[0] + 12, 36, r"$\hat p$", fs=24, ha="left")
+    label(ax, x0, 9, "Input", fs=20, color=MUTED)
+    label(ax, x0 + 28, 9, "Hidden layer", fs=20, color=MUTED)
+    label(ax, x0 + 56, 9, "Output", fs=20, color=MUTED)
+    save(fig, "nn_diagram")
+
+
+def channels_pool(model, pos):
+    """All 10 first-layer channels on one bound sequence after ReLU, and after max pooling over 3 positions."""
+    from intuition import acts
+    A = acts(model, pos[:2000])
+    i = int(np.argmax(A[:, 7, :].max(1)))
+    full = A[i][:, :len(pos[i]) - 9]           # positions inside the sequence; the rest is padding
+    j = int(np.argmax(full[7]))
+    lo = max(0, min(j - 60, full.shape[1] - 120)) // 3 * 3
+    a = full[:, lo:lo + 120]                    # a 120-position window, aligned to the pooling blocks
+    P = a.reshape(10, 40, 3).max(2)
+    v = np.percentile(full, 99.5)
+    fig = newfig(); fig.set_size_inches(16, 8.4)
+    for k, (M, ttl) in enumerate([(a, "First convolution + ReLU: one value per position"),
+                                  (P, "After max pooling: the largest of every 3 positions")]):
+        ax = fig.add_axes([0.08, 0.56 - k * 0.45, 0.9, 0.34])
+        ax.imshow(M, cmap=SEQUENTIAL, vmin=0, vmax=v, aspect="auto", interpolation="nearest",
+                  extent=(lo, lo + 120, 9.5, -0.5))
+        ax.set_yticks(range(10)); ax.set_yticklabels([str(f) for f in range(10)], fontsize=18)
+        ax.set_ylabel("Filter"); ax.set_title(ttl)
+        ax.tick_params(length=0)
+        for sp in ax.spines.values():
+            sp.set_visible(False)
+    ax.set_xlabel("Position along one bound sequence")
+    save(fig, "channels_pool")
+    print("channels_pool seq len", len(pos[i]), "window", lo, lo + 120, "filter 7 peak at", j)
+
+
 if __name__ == "__main__":
     want = set(sys.argv[1:])
     run = (lambda n: not want or n in want)
     tr, ty = split("train")
     pos = [s for s, l in zip(tr, ty) if l == 1]
-    for n, job in [("bio_flow", bio_flow), ("plant_scheme", plant_scheme), ("tokens_split", lambda: tokens_split(pos)),
+    model = None
+    if not want or want & {"setup_examples", "channels_pool"}:
+        from intuition import load_cnn
+        model = load_cnn()
+    for n, job in [("setup_examples", lambda: setup_examples(model, tr, ty)), ("bce_curve", bce_curve),
+                   ("lr_rates", lambda: lr_rates(tr, ty)), ("sgd_noise", lambda: sgd_noise(tr, ty)),
+                   ("nn_diagram", nn_diagram), ("channels_pool", lambda: channels_pool(model, pos)),
+                   ("bio_flow", bio_flow), ("plant_scheme", plant_scheme), ("tokens_split", lambda: tokens_split(pos)),
                    ("emb_lookup", lambda: emb_lookup(pos)), ("blackbox", lambda: blackbox(pos)),
                    ("adapt_layers", adapt_layers)]:
         if run(n):
