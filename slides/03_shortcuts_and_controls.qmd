@@ -245,7 +245,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 :::
 
 ::: {.notes}
-- Wrap-up and feedback run 13:30 to 13:40. The link and the QR code open the same form.
+- Feedback in the last minutes before 14:00, after the notebook. The link and the QR code open the same form.
 :::
 
 ## 6.7 Credits and further reading
