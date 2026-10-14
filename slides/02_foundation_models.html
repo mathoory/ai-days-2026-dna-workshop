@@ -27,72 +27,6 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-    /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      { color: #003b4f; background-color: #f1f3f5; }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span { color: #003b4f; } /* Normal */
-    code span.al { color: #ad0000; } /* Alert */
-    code span.an { color: #5e5e5e; } /* Annotation */
-    code span.at { color: #657422; } /* Attribute */
-    code span.bn { color: #ad0000; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #20794d; } /* Char */
-    code span.cn { color: #8f5902; } /* Constant */
-    code span.co { color: #5e5e5e; } /* Comment */
-    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
-    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
-    code span.dt { color: #ad0000; } /* DataType */
-    code span.dv { color: #ad0000; } /* DecVal */
-    code span.er { color: #ad0000; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #ad0000; } /* Float */
-    code span.fu { color: #4758ab; } /* Function */
-    code span.im { color: #00769e; } /* Import */
-    code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
-    code span.op { color: #5e5e5e; } /* Operator */
-    code span.ot { color: #003b4f; } /* Other */
-    code span.pp { color: #ad0000; } /* Preprocessor */
-    code span.sc { color: #5e5e5e; } /* SpecialChar */
-    code span.ss { color: #20794d; } /* SpecialString */
-    code span.st { color: #20794d; } /* String */
-    code span.va { color: #111111; } /* Variable */
-    code span.vs { color: #20794d; } /* VerbatimString */
-    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="02_foundation_models_files/libs/revealjs/dist/theme/quarto-00ac2f6af1389919a18f42df5b7c0002.css">
   <link rel="stylesheet" href="style.css">
@@ -210,7 +144,7 @@
 <li><a href="#/the-transformer" id="/toc-the-transformer">4 The transformer</a></li>
 <li><a href="#/prediction-heads" id="/toc-prediction-heads">5 Prediction heads</a></li>
 <li><a href="#/hands-on" id="/toc-hands-on">6 Hands-on</a></li>
-<li><a href="#/what-the-probe-found" id="/toc-what-the-probe-found">7 What the probe found</a></li>
+<li><a href="#/frozen-models-and-the-cnn" id="/toc-frozen-models-and-the-cnn">7 Frozen models and the CNN</a></li>
 </ul>
 </nav>
 </section>
@@ -219,72 +153,82 @@
 
 </section>
 
-<section id="pretrain-once-reuse-many-times" class="slide level2">
-<h2>1.1 Pretrain once, reuse many times</h2>
-<ul>
-<li><strong>Pretraining</strong>: billions of letters of genome sequence, no labels</li>
-<li><strong>Adaptation</strong>: one task, thousands of labels (AGO2: 92,346)</li>
-<li>Today’s model: <strong>Mistral-DNA</strong>, 16M parameters, pretrained on the human genome</li>
-</ul>
+<section id="pretraining-by-analogy" class="slide level2">
+<h2>1.1 Pretraining, by analogy</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/pretrain_analogy_0.png" height="700"></p>
+<p><img data-src="assets/custom/pretrain_analogy_1.png" class="fragment" height="700"></p>
+</div>
 
 </section>
-<section id="two-pretraining-objectives" class="slide level2">
-<h2>1.2 Two pretraining objectives</h2>
-<ul>
-<li><strong>Next token</strong> (Mistral-DNA, HyenaDNA, Evo): <span class="math inline">\(\;\mathcal{L} = -\log p_\theta(x_t \mid x_{&lt;t})\)</span></li>
-<li><strong>Masked tokens</strong> (Nucleotide Transformer, DNABERT-2): <span class="math inline">\(\;\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})\)</span>, hidden tokens predicted from both sides</li>
-</ul>
+<section id="pretraining-a-model" class="slide level2">
+<h2>1.2 Pretraining a model</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/next_token.png" class="quarto-figure quarto-figure-center" height="492"></p>
+<p><img data-src="assets/custom/adapt_0.png" class="quarto-figure quarto-figure-center" height="641"></p>
 </figure>
 </div>
 
 </section>
-<section id="four-stages-in-the-cnn-and-in-a-language-model" class="slide level2">
-<h2>1.3 Four stages, in the CNN and in a language model</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Stage</th>
-<th style="text-align: left;">CNN (part 1)</th>
-<th style="text-align: left;">DNA language model</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><strong>Tokenization</strong></td>
-<td style="text-align: left;">single letters</td>
-<td style="text-align: left;">k-mers or BPE tokens</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Embedding</strong></td>
-<td style="text-align: left;">one-hot, 4 numbers</td>
-<td style="text-align: left;">learned, 256 numbers</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong>Body</strong></td>
-<td style="text-align: left;">2 convolution layers</td>
-<td style="text-align: left;">transformer, 8 layers</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Prediction head</strong></td>
-<td style="text-align: left;">linear → 1 logit</td>
-<td style="text-align: left;">linear → token probabilities, or 1 logit</td>
-</tr>
-</tbody>
-</table>
+<section id="adapting-it-to-new-tasks" class="slide level2">
+<h2>1.3 Adapting it to new tasks</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/adapt_1.png" class="quarto-figure quarto-figure-center" height="586"></p>
+</figure>
+</div>
+
+</section>
+<section id="the-same-for-dna" class="slide level2">
+<h2>1.4 The same for DNA</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/adapt_2.png" height="568"></p>
+<p><img data-src="assets/custom/adapt_3.png" class="fragment" height="568"></p>
+</div>
+
+</section>
+<section id="pretraining-objective-the-next-token" class="slide level2">
+<h2>1.5 Pretraining objective: the next token</h2>
+<p><span class="math inline">\(\mathcal{L} = -\log p_\theta(x_t \mid x_{&lt;t})\)</span>: hide the last token, predict it from the ones before</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/objective_next.png" class="quarto-figure quarto-figure-center" style="width:85.0%"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/next_token.png" class="fragment quarto-figure quarto-figure-center" height="380"></p>
+</figure>
+</div>
+
+</section>
+<section id="pretraining-objective-masked-tokens" class="slide level2">
+<h2>1.6 Pretraining objective: masked tokens</h2>
+<p><span class="math inline">\(\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})\)</span>: hide a token in the middle, predict it from both sides</p>
+
+<img data-src="assets/custom/objective_masked.png" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%">
+</section>
+<section id="four-stages" class="slide level2">
+<h2>1.7 Four stages</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/stages_0.png" class="quarto-figure quarto-figure-center" height="339"></p>
+</figure>
+</div>
+
+</section>
+<section id="in-the-cnn-and-in-a-dna-language-model" class="slide level2">
+<h2>1.8 In the CNN and in a DNA language model</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/stages_1.png" height="700"></p>
+<p><img data-src="assets/custom/stages_2.png" class="fragment" height="700"></p>
+</div>
 
 </section>
 <section id="tokenization" class="title-slide slide level1 center" data-name="Tokens">
 <h1>2 Tokenization</h1>
 
-</section>
+<img data-src="assets/custom/stage_strip_0.png" style="width:80.0%" class="r-stretch"></section>
 
 <section id="single-letters" class="slide level2">
 <h2>2.1 Single letters</h2>
@@ -325,7 +269,7 @@
 <section id="embedding" class="title-slide slide level1 center" data-name="Embedding">
 <h1>3 Embedding</h1>
 
-</section>
+<img data-src="assets/custom/stage_strip_1.png" style="width:80.0%" class="r-stretch"></section>
 
 <section id="token-embeddings" class="slide level2">
 <h2>3.1 Token embeddings</h2>
@@ -342,7 +286,7 @@
 <section id="the-transformer" class="title-slide slide level1 center" data-name="Transformer">
 <h1>4 The transformer</h1>
 
-</section>
+<img data-src="assets/custom/stage_strip_2.png" style="width:80.0%" class="r-stretch"></section>
 
 <section id="the-transformer-as-a-black-box" class="slide level2">
 <h2>4.1 The transformer, as a black box</h2>
@@ -356,15 +300,14 @@
 </div>
 
 </section>
-<section id="from-token-vectors-to-one-sequence-embedding" class="slide level2">
-<h2>4.2 From token vectors to one sequence embedding</h2>
-<ul>
-<li><strong>Sequence embedding</strong>: the transformer’s last-layer output, averaged over all non-padding tokens (including the special start and end tokens <code>[CLS]</code> and <code>[SEP]</code>)</li>
-</ul>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/pipeline_real.png" class="quarto-figure quarto-figure-center" height="596"></p>
-</figure>
+<section id="the-whole-pipeline-on-one-sequence" class="slide level2">
+<h2>4.2 The whole pipeline on one sequence</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/walk_0.png" height="720"></p>
+<p><img data-src="assets/custom/walk_1.png" class="fragment" height="720"></p>
+<p><img data-src="assets/custom/walk_2.png" class="fragment" height="720"></p>
+<p><img data-src="assets/custom/walk_3.png" class="fragment" height="720"></p>
+<p><img data-src="assets/custom/walk_4.png" class="fragment" height="720"></p>
 </div>
 
 </section>
@@ -383,44 +326,15 @@
 <section id="prediction-heads" class="title-slide slide level1 center" data-name="Heads">
 <h1>5 Prediction heads</h1>
 
-</section>
+<img data-src="assets/custom/stage_strip_3.png" style="width:80.0%" class="r-stretch"></section>
 
 <section id="prediction-heads-1" class="slide level2">
 <h2>5.1 Prediction heads</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Use</th>
-<th style="text-align: left;">Head</th>
-<th style="text-align: left;">Output</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Next token</td>
-<td style="text-align: left;">256 → 4,096, softmax</td>
-<td style="text-align: left;">probability of each token</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Masked tokens</td>
-<td style="text-align: left;">256 → vocabulary, softmax</td>
-<td style="text-align: left;">probability of each hidden token</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Our task</td>
-<td style="text-align: left;">average, 256 → 1, sigmoid</td>
-<td style="text-align: left;">P(bound)</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li><strong>Linear probe</strong>: our task’s head on a frozen model, which is logistic regression</li>
-</ul>
+<div class="r-stack">
+<p><img data-src="assets/custom/heads_0.png" height="645"></p>
+<p><img data-src="assets/custom/heads_1.png" class="fragment" height="645"></p>
+<p><img data-src="assets/custom/heads_2.png" class="fragment" height="645"></p>
+</div>
 
 </section>
 <section id="the-linear-probe" class="slide level2">
@@ -451,86 +365,25 @@
 
 <section id="loading-a-model-from-hugging-face" class="slide level2">
 <h2>6.1 Loading a model from Hugging Face</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModel</span>
-<span id="cb1-2"><a href=""></a>name  <span class="op">=</span> <span class="st">"RaphaelMourad/Mistral-DNA-v1-17M-hg38"</span></span>
-<span id="cb1-3"><a href=""></a>tok   <span class="op">=</span> AutoTokenizer.from_pretrained(name, trust_remote_code<span class="op">=</span><span class="va">True</span>)   <span class="co"># the token vocabulary</span></span>
-<span id="cb1-4"><a href=""></a>model <span class="op">=</span> AutoModel.from_pretrained(name, trust_remote_code<span class="op">=</span><span class="va">True</span>)       <span class="co"># the weights</span></span>
-<span id="cb1-5"><a href=""></a></span>
-<span id="cb1-6"><a href=""></a>seq <span class="op">=</span> <span class="st">"UGAUUUAUCAAG..."</span>.replace(<span class="st">"U"</span>, <span class="st">"T"</span>)            <span class="co"># the model reads DNA letters</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
+<img data-src="assets/custom/hf_load.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
 </section>
 <section id="your-turn" class="slide level2">
 <h2>6.2 Your turn</h2>
 <p>Open <strong><code>02_foundation_models.ipynb</code></strong>.</p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Step</th>
-<th style="text-align: left;">Task</th>
-<th style="text-align: left;">Check</th>
-<th style="text-align: left;">Time</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">TODO-1</td>
-<td style="text-align: left;"><code>embed</code>: tokens, last layer, average over real tokens</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">9 min</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">TODO-2</td>
-<td style="text-align: left;"><code>probe_auc</code>: standardise, then logistic regression</td>
-<td style="text-align: left;">the test cell passes</td>
-<td style="text-align: left;">5 min</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">live</td>
-<td style="text-align: left;">pretrain a 105M model for 3 minutes</td>
-<td style="text-align: left;">probe before and after</td>
-<td style="text-align: left;">6 min</td>
-</tr>
-</tbody>
-</table>
 
+<img data-src="assets/custom/your_turn_d2.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
 </section>
-<section id="what-the-probe-found" class="title-slide slide level1 center" data-name="Results">
-<h1>7 What the probe found</h1>
+<section id="frozen-models-and-the-cnn" class="title-slide slide level1 center" data-name="Results">
+<h1>7 Frozen models and the CNN</h1>
 
 </section>
 
-<section id="what-the-sequence-embeddings-vary-with" class="slide level2">
-<h2>7.1 What the sequence embeddings vary with</h2>
-<ul>
-<li><strong>PCA</strong>: project the 256-dimensional embeddings onto the two directions of largest variance</li>
-</ul>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/emb_pca.png" class="quarto-figure quarto-figure-center" height="596"></p>
-</figure>
-</div>
-
-</section>
 <section id="frozen-pretrained-models-against-the-cnn" class="slide level2">
-<h2>7.2 Frozen pretrained models against the CNN</h2>
+<h2>7.1 Frozen pretrained models against the CNN</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/results_part2.png" class="quarto-figure quarto-figure-center" height="700"></p>
-</figure>
-</div>
-
-</section>
-<section id="pretraining-from-random-weights" class="slide level2">
-<h2>7.3 Pretraining from random weights</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/pretrain_loss.png" class="quarto-figure quarto-figure-center" height="700"></p>
 </figure>
 </div>
 
