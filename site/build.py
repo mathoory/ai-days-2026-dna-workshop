@@ -104,7 +104,7 @@ def page():
   <div class="wrap">
     <p class="kicker">Technion AI Days 2026 &nbsp;/&nbsp; Workshop</p>
     <h1>{TITLE}</h1>
-    <p class="meta">Thursday 15 October 2026, 10:00 to 13:30 (at the latest 14:00) &nbsp;/&nbsp; Ullmann 803, Technion</p>
+    <p class="meta">Thursday 15 October 2026, 10:00 to 14:00 &nbsp;/&nbsp; Ullmann 803, Technion</p>
     <p class="meta">Prof. Roee Amit &nbsp;and&nbsp; Mattan Hoory</p>
     <p class="host">Hosted by the <a href="{LAB}" target="_blank" rel="noopener">Roee Amit Lab</a></p>
   </div>
