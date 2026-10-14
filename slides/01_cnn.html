@@ -156,9 +156,9 @@
 <h2>0.1 About me</h2>
 <div class="columns">
 <div class="column" style="width:58%;">
-<p><img data-src="assets/custom/timeline.png" height="680"></p>
+<p><img data-src="assets/custom/timeline.png" height="697"></p>
 </div><div class="column" style="width:42%;">
-<p><img data-src="assets/mattan_taiwan.jpg" height="660"></p>
+<p><img data-src="assets/mattan_taiwan.jpg" height="677"></p>
 <p><span class="caption-small">During the exchange semester, Sun Moon Lake (日月潭), Taiwan, 2023</span></p>
 </div></div>
 
@@ -168,10 +168,10 @@
 <p><strong>Machine learning for molecular design</strong>: from a sequence to how it binds</p>
 <div class="columns vcenter">
 <div class="column" style="width:42%;">
-<p><img data-src="assets/hero_triplex.png" height="520"></p>
+<p><img data-src="assets/hero_triplex.png" height="593"></p>
 <p><span class="caption-small"><strong>Triplexis</strong>: design RNA strands that bind a chosen DNA sequence as a triple helix</span></p>
 </div><div class="column" style="width:58%;">
-<p><img data-src="assets/peptide_pose.png" height="400"></p>
+<p><img data-src="assets/peptide_pose.png" height="435"></p>
 <p><span class="caption-small"><strong>Peptides</strong> against influenza: screening millions of variants with AlphaFold 3</span></p>
 </div></div>
 
@@ -210,15 +210,67 @@
 <li>Notebooks and slides: <strong><span class="nowrap">mathoory.github.io/ai-days-2026-dna-workshop</span></strong></li>
 </ul>
 </div><div class="column" style="width:42%;">
-<p><img data-src="assets/custom/qr_site.png" style="width:80.0%"></p>
+<p><img data-src="assets/custom/qr_site.png" height="671"></p>
 <p><span class="caption-small">Scan for the notebooks and slides</span></p>
 </div></div>
 
 </section>
 <section id="agenda" class="slide level2">
 <h2>0.5 Agenda</h2>
+<table class="agenda caption-top" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Time</th>
+<th data-quarto-table-cell-role="th">Part</th>
+<th class="tut" data-quarto-table-cell-role="th">Tutorial</th>
+<th class="hands" data-quarto-table-cell-role="th">Hands-on</th>
+<th data-quarto-table-cell-role="th">Notebook</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>11:00</td>
+<td>1. Machine learning and CNNs</td>
+<td class="tut">40 min</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="brk even">
+<td>11:40</td>
+<td colspan="4">Break, 10 min</td>
+</tr>
+<tr class="odd">
+<td>11:50</td>
+<td>1. Machine learning and CNNs, continued</td>
+<td></td>
+<td class="hands">25 min</td>
+<td><code>01_cnn</code></td>
+</tr>
+<tr class="even">
+<td>12:15</td>
+<td>2. DNA foundation models</td>
+<td class="tut">30 min</td>
+<td class="hands">20 min</td>
+<td><code>02_foundation_models</code></td>
+</tr>
+<tr class="brk odd">
+<td>13:05</td>
+<td colspan="4">Break, 10 min</td>
+</tr>
+<tr class="even">
+<td>13:15</td>
+<td>3. Shortcuts, controls and fine-tuning</td>
+<td class="tut">15 min</td>
+<td class="hands">20 min</td>
+<td><code>03_shortcuts_and_controls</code></td>
+</tr>
+<tr class="brk odd">
+<td>13:50</td>
+<td colspan="4">Break, end at 14:00</td>
+</tr>
+</tbody>
+</table>
 
-<img data-src="assets/custom/agenda.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
 </section>
 <section id="the-task" class="title-slide slide level1 center" data-name="Task">
 <h1>1 The task</h1>
@@ -228,17 +280,16 @@
 <section id="rna-and-ago2" class="slide level2">
 <h2>1.1 RNA and AGO2</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/bio_flow_base.png" height="509"></p>
-<p><img data-src="assets/custom/bio_flow_ago2.png" class="fragment" height="509"></p>
+<p><img data-src="assets/custom/bio_flow_base.png" height="491"></p>
+<p><img data-src="assets/custom/bio_flow_ago2.png" class="fragment" height="491"></p>
 </div>
 
 </section>
 <section id="the-data" class="slide level2">
 <h2>1.2 The data</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/labels_raster.png" class="quarto-figure quarto-figure-center" height="735"></p>
-</figure>
+<div class="r-stack">
+<p><img data-src="assets/custom/labels_raster_0.png" height="735"></p>
+<p><img data-src="assets/custom/labels_raster_1.png" class="fragment" height="735"></p>
 </div>
 
 </section>
@@ -247,47 +298,23 @@
 
 </section>
 
-<section id="what-is-learning" class="slide level2">
-<h2>2.1 What is learning?</h2>
+<section id="what-is-learning-and-why-machine-learning" class="slide level2">
+<h2>2.1 What is learning, and why machine learning?</h2>
 <ul>
 <li class="fragment"><strong>Learning</strong>: observations → learning → a skill</li>
 <li class="fragment"><strong>Machine learning</strong>: data → an algorithm → a skill</li>
+<li class="fragment">A skill improves a <strong>performance measure</strong>: earlier detection of disease, or today, finding where AGO2 binds</li>
+<li class="fragment">Define “tree” and write a program for it: <strong>hard</strong>. Learn trees from examples: <strong>a 3-year-old can do it</strong></li>
 </ul>
-
-</section>
-<section id="what-is-a-skill" class="slide level2">
-<h2>2.2 What is a skill?</h2>
-<ul>
-<li class="fragment">A skill improves a <strong>performance measure</strong></li>
-<li class="fragment">Diagnostics: patient data → machine learning → earlier detection of disease</li>
-<li class="fragment">Today: RNA sequences → machine learning → where AGO2 binds</li>
-</ul>
-
-</section>
-<section id="why-machine-learning" class="slide level2">
-<h2>2.3 Why machine learning?</h2>
-<div class="columns">
-<div class="column" style="width:55%;">
-<ul>
-<li class="fragment">Define “tree” and write a program for it: <strong>hard</strong></li>
-<li class="fragment">Learn trees from examples: <strong>a 3-year-old can do it</strong></li>
-</ul>
-</div><div class="column" style="width:45%;">
-<p><img data-src="assets/ash_tree.jpg" height="560"></p>
-</div></div>
-
-</section>
-<section id="when-to-use-machine-learning" class="slide level2">
-<h2>2.4 When to use machine learning?</h2>
-<ol type="1">
-<li class="fragment">There is an underlying pattern to learn</li>
-<li class="fragment">There is no easy rule to program it</li>
-<li class="fragment">There are data about the pattern</li>
-</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/ash_tree.jpg" class="fragment quarto-figure quarto-figure-center" data-fragment-index="3" height="349"></p>
+</figure>
+</div>
 
 </section>
 <section id="a-short-history" class="slide level2">
-<h2>2.5 A short history</h2>
+<h2>2.2 A short history</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/ml_timeline.png" class="quarto-figure quarto-figure-center" height="760"></p>
@@ -296,169 +323,173 @@
 
 </section>
 <section id="statistics-machine-learning-and-ai" class="slide level2">
-<h2>2.6 Statistics, machine learning and AI</h2>
+<h2>2.3 Statistics, machine learning and AI</h2>
 <ul>
 <li class="fragment"><strong>Statistics</strong>: use data to make inferences about a population or a process</li>
 <li class="fragment"><strong>Machine learning</strong>: use data to find a function <span class="math inline">\(g\)</span> that approximates an unknown target <span class="math inline">\(f\)</span></li>
 <li class="fragment"><strong>AI</strong>: compute something that shows intelligent behaviour</li>
+<li class="fragment"><strong>Use machine learning when</strong>
+<ul>
+<li class="fragment">there is a pattern to learn</li>
+<li class="fragment">there is no easy rule to program it</li>
+<li class="fragment">there are data about it</li>
+</ul></li>
 </ul>
 
 </section>
 <section id="ai-machine-learning-deep-learning" class="slide level2">
-<h2>2.7 AI, machine learning, deep learning</h2>
+<h2>2.4 AI, machine learning, deep learning</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/meme_iceberg.jpg" class="quarto-figure quarto-figure-center" height="760"></p>
 </figure>
 </div>
 </section>
+<section id="supervised-learning" class="slide level2">
+<h2>2.5 Supervised learning</h2>
+<ul>
+<li>Examples <span class="math inline">\((x_i, y_i)\)</span>, <span class="math inline">\(i = 1, \dots, N\)</span>: a sequence <span class="math inline">\(x_i\)</span> and its label <span class="math inline">\(y_i\)</span> (1 bound, 0 unbound)</li>
+<li>A model <span class="math inline">\(g_\theta\)</span> with parameters <span class="math inline">\(\theta\)</span> predicts <span class="math inline">\(\hat p = g_\theta(x)\)</span>, the probability of bound</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/setup_examples.png" class="quarto-figure quarto-figure-center" height="442"></p>
+</figure>
+</div>
+
+</section>
 <section id="notation" class="slide level2">
-<h2>2.8 Notation</h2>
+<h2>2.6 Notation</h2>
+<div class="fill-table">
 <table class="caption-top">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 48%">
 </colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;"></th>
 <th style="text-align: left;">Symbol</th>
-<th style="text-align: left;">Today</th>
+<th style="text-align: left;">Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Input space</td>
 <td style="text-align: left;"><span class="math inline">\(\mathcal{X}\)</span></td>
-<td style="text-align: left;">RNA sequences</td>
+<td style="text-align: left;">what we observe</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Output space</td>
 <td style="text-align: left;"><span class="math inline">\(\mathcal{Y}\)</span></td>
-<td style="text-align: left;">1 bound, 0 unbound</td>
+<td style="text-align: left;">the answers</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Training examples</td>
 <td style="text-align: left;"><span class="math inline">\(D = \{(x_i, y_i)\}_{i=1}^{N}\)</span></td>
-<td style="text-align: left;">92,346 labelled sequences</td>
+<td style="text-align: left;">inputs with known answers</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Unknown target</td>
 <td style="text-align: left;"><span class="math inline">\(f: \mathcal{X} \to \mathcal{Y}\)</span></td>
-<td style="text-align: left;">where AGO2 binds</td>
+<td style="text-align: left;">the true input-to-answer relation</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Hypothesis set</td>
 <td style="text-align: left;"><span class="math inline">\(\mathcal{H}\)</span></td>
-<td style="text-align: left;">all CNNs of one shape</td>
+<td style="text-align: left;">the models we allow, <span class="math inline">\(g_\theta\)</span> for every <span class="math inline">\(\theta\)</span></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Learning algorithm</td>
 <td style="text-align: left;"><span class="math inline">\(\mathcal{A}\)</span></td>
-<td style="text-align: left;">gradient descent</td>
+<td style="text-align: left;">how one <span class="math inline">\(g_\theta\)</span> is picked</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Final hypothesis</td>
-<td style="text-align: left;"><span class="math inline">\(g \approx f\)</span></td>
-<td style="text-align: left;">the trained CNN</td>
+<td style="text-align: left;"><span class="math inline">\(g_\theta \approx f\)</span></td>
+<td style="text-align: left;">the trained model</td>
 </tr>
 </tbody>
 </table>
+</div>
 
 </section>
 <section id="the-learning-flow" class="slide level2">
-<h2>2.9 The learning flow</h2>
-
-<img data-src="assets/custom/learning_flow.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
-</section>
-<section id="supervised-learning" class="slide level2">
-<h2>2.10 Supervised learning</h2>
-<ul>
-<li>Examples <span class="math inline">\((x_i, y_i)\)</span>, <span class="math inline">\(i = 1, \dots, N\)</span>: a sequence <span class="math inline">\(x_i\)</span> and its label <span class="math inline">\(y_i\)</span> (1 bound, 0 unbound)</li>
-<li>A model <span class="math inline">\(f_\theta\)</span> with parameters <span class="math inline">\(\theta\)</span> predicts <span class="math inline">\(\hat p = f_\theta(x)\)</span>, the probability of bound</li>
-</ul>
+<h2>2.7 The learning flow</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/setup_examples.png" class="quarto-figure quarto-figure-center" height="458"></p>
+<p><img data-src="assets/custom/learning_flow.png" class="quarto-figure quarto-figure-center" height="534"></p>
 </figure>
 </div>
 
 </section>
 <section id="the-loss" class="slide level2">
-<h2>2.11 The loss</h2>
+<h2>2.8 The loss</h2>
 <ul>
-<li><strong>Binary cross-entropy</strong>: <span class="math inline">\(\;\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, y_i \log \hat p_i + (1 - y_i)\log(1 - \hat p_i) \,\big]\)</span></li>
+<li><strong>Binary cross-entropy</strong>: <span class="math inline">\(\;\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#1A73E8}{y_i \log \hat p_i} + \color{#E8710A}{(1 - y_i)\log(1 - \hat p_i)} \,\big]\)</span></li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/bce_curve.png" class="quarto-figure quarto-figure-center" height="596"></p>
+<p><img data-src="assets/custom/bce_curve.png" class="quarto-figure quarto-figure-center" height="650"></p>
 </figure>
 </div>
 
 </section>
 <section id="features-chosen-or-learned" class="slide level2">
-<h2>2.12 Features: chosen or learned</h2>
+<h2>2.9 Features: chosen or learned</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/features_0.png" height="700"></p>
-<p><img data-src="assets/custom/features_1.png" class="fragment" height="700"></p>
+<p><img data-src="assets/custom/features_0.png" height="742"></p>
+<p><img data-src="assets/custom/features_1.png" class="fragment" height="742"></p>
 </div>
 
 </section>
 <section id="the-sigmoid-from-a-score-to-a-probability" class="slide level2">
-<h2>2.13 The sigmoid: from a score to a probability</h2>
+<h2>2.10 The sigmoid: from a score to a probability</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/sigmoid.png" class="quarto-figure quarto-figure-center" height="680"></p>
+<p><img data-src="assets/custom/sigmoid.png" class="quarto-figure quarto-figure-center" height="633"></p>
 </figure>
 </div>
 
 </section>
 <section id="gradient-descent" class="slide level2">
-<h2>2.14 Gradient descent</h2>
-<p><span class="math inline">\(\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}\)</span>, on <span class="math inline">\(\;\hat p = \sigma(w^\top x + b)\)</span> with <span class="math inline">\(x\)</span> = (G+C fraction, U fraction)</p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/lr_training.png" class="quarto-figure quarto-figure-center" height="690"></p>
-</figure>
-</div>
-
-</section>
-<section id="the-learning-rate" class="slide level2">
-<h2>2.15 The learning rate</h2>
+<h2>2.11 Gradient descent</h2>
 <ul>
-<li><span class="math inline">\(\eta\)</span> sets the size of each step</li>
+<li>Model: <span class="math inline">\(\hat p = \sigma\big(w_1 \cdot \text{G+C fraction} + w_2 \cdot \text{U fraction} + b\big)\)</span></li>
+<li>Each step: <span class="math inline">\((w_1, w_2, b) \leftarrow (w_1, w_2, b) - \eta \, \nabla \mathcal{L}\)</span></li>
 </ul>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/lr_rates.png" class="quarto-figure quarto-figure-center" height="642"></p>
-</figure>
+<div class="r-stack">
+<p><img data-src="assets/custom/lr_training_0.png" height="572"></p>
+<p><img data-src="assets/custom/lr_training_1.png" class="fragment" height="572"></p>
+<p><img data-src="assets/custom/lr_training_2.png" class="fragment" height="572"></p>
+<p><img data-src="assets/custom/lr_training_3.png" class="fragment" height="572"></p>
 </div>
 
 </section>
 <section id="mini-batches-and-epochs" class="slide level2">
-<h2>2.16 Mini-batches and epochs</h2>
+<h2>2.12 Mini-batches and epochs</h2>
 <ul>
 <li>Each step uses a <strong>batch</strong> of 256 sequences; an <strong>epoch</strong> is one pass over all 92,346 (360 steps)</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/sgd_noise.png" class="quarto-figure quarto-figure-center" height="596"></p>
+<p><img data-src="assets/custom/sgd_noise.png" class="quarto-figure quarto-figure-center" height="606"></p>
 </figure>
 </div>
 
 </section>
-<section id="relu-the-bend-between-layers" class="slide level2">
-<h2>2.17 ReLU: the bend between layers</h2>
+<section id="relu" class="slide level2">
+<h2>2.13 ReLU</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/relu.png" class="quarto-figure quarto-figure-center" height="680"></p>
+<p><img data-src="assets/custom/relu.png" class="quarto-figure quarto-figure-center" height="642"></p>
 </figure>
 </div>
 
 </section>
 <section id="from-logistic-regression-to-a-neural-network" class="slide level2">
-<h2>2.18 From logistic regression to a neural network</h2>
+<h2>2.14 From logistic regression to a neural network</h2>
 <ul>
 <li>A <strong>neural network</strong> stacks layers of units, with <strong>ReLU</strong> between them</li>
 <li>A <strong>convolutional neural network (CNN)</strong>: its first layer slides small filters along the sequence (section 4)</li>
@@ -477,14 +508,18 @@
 
 <section id="train-validate-test" class="slide level2">
 <h2>3.1 Train, validate, test</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/data_split.png" class="quarto-figure quarto-figure-center" height="299"></p>
+</figure>
+</div>
 
-<img data-src="assets/custom/data_split.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
 </section>
 <section id="why-not-the-training-loss" class="slide level2">
 <h2>3.2 Why not the training loss?</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/overfit_curve.png" class="quarto-figure quarto-figure-center" height="700"></p>
+<p><img data-src="assets/custom/overfit_curve.png" class="quarto-figure quarto-figure-center" height="766"></p>
 </figure>
 </div>
 
@@ -493,9 +528,9 @@
 <h2>3.3 Drawing the ROC curve</h2>
 <p>The scores of our convolutional neural network (CNN, section 4) on the 1,000 held-out sequences</p>
 <div class="r-stack">
-<p><img data-src="assets/custom/roc_frame_0.png" height="600"></p>
-<p><img data-src="assets/custom/roc_frame_1.png" class="fragment" height="600"></p>
-<p><img data-src="assets/custom/roc_frame_2.png" class="fragment" height="600"></p>
+<p><img data-src="assets/custom/roc_frame_0.png" height="626"></p>
+<p><img data-src="assets/custom/roc_frame_1.png" class="fragment" height="626"></p>
+<p><img data-src="assets/custom/roc_frame_2.png" class="fragment" height="626"></p>
 </div>
 
 </section>
@@ -539,7 +574,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/onehot_big.png" class="quarto-figure quarto-figure-center" height="611"></p>
+<p><img data-src="assets/custom/onehot_big.png" class="quarto-figure quarto-figure-center" height="591"></p>
 </figure>
 </div>
 
@@ -547,11 +582,11 @@
 <section id="a-filter-slides-along-the-sequence" class="slide level2">
 <h2>4.2 A filter slides along the sequence</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/slide_filter_0.png" height="700"></p>
-<p><img data-src="assets/custom/slide_filter_1.png" class="fragment" height="700"></p>
-<p><img data-src="assets/custom/slide_filter_2.png" class="fragment" height="700"></p>
-<p><img data-src="assets/custom/slide_filter_3.png" class="fragment" height="700"></p>
-<p><img data-src="assets/custom/slide_filter_4.png" class="fragment" height="700"></p>
+<p><img data-src="assets/custom/slide_filter_0.png" height="742"></p>
+<p><img data-src="assets/custom/slide_filter_1.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/slide_filter_2.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/slide_filter_3.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/slide_filter_4.png" class="fragment" height="742"></p>
 </div>
 
 </section>
@@ -562,7 +597,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/filter_dot.png" class="quarto-figure quarto-figure-center" height="642"></p>
+<p><img data-src="assets/custom/filter_dot.png" class="quarto-figure quarto-figure-center" height="657"></p>
 </figure>
 </div>
 
@@ -583,23 +618,27 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/channels_pool.png" class="quarto-figure quarto-figure-center" height="596"></p>
+<p><img data-src="assets/custom/channels_pool.png" class="quarto-figure quarto-figure-center" height="606"></p>
 </figure>
 </div>
 
 </section>
 <section id="build-your-network-todo-2" class="slide level2" data-todo="TODO-2">
 <h2>4.6 Build your network (TODO-2)</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/cnn_template.png" class="quarto-figure quarto-figure-center" height="389"></p>
+</figure>
+</div>
 
-<img data-src="assets/custom/cnn_template.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
 </section>
 <section id="training-changes-the-filters" class="slide level2">
 <h2>4.7 Training changes the filters</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/filter_learning_0.png" height="640"></p>
-<p><img data-src="assets/custom/filter_learning_1.png" class="fragment" height="640"></p>
-<p><img data-src="assets/custom/filter_learning_2.png" class="fragment" height="640"></p>
-<p><img data-src="assets/custom/filter_learning_3.png" class="fragment" height="640"></p>
+<p><img data-src="assets/custom/filter_learning_0.png" height="585"></p>
+<p><img data-src="assets/custom/filter_learning_1.png" class="fragment" height="585"></p>
+<p><img data-src="assets/custom/filter_learning_2.png" class="fragment" height="585"></p>
+<p><img data-src="assets/custom/filter_learning_3.png" class="fragment" height="585"></p>
 </div>
 
 </section>
@@ -607,7 +646,7 @@
 <h2>4.8 The training step and the evaluation (TODO-3)</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/train_loop.png" class="quarto-figure quarto-figure-center" height="720"></p>
+<p><img data-src="assets/custom/train_loop.png" class="quarto-figure quarto-figure-center" height="766"></p>
 </figure>
 </div>
 
@@ -620,8 +659,8 @@
 <section id="which-windows-does-a-filter-like" class="slide level2">
 <h2>5.1 Which windows does a filter like?</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/toy_cutoff_0.png" height="700"></p>
-<p><img data-src="assets/custom/toy_cutoff_1.png" class="fragment" height="700"></p>
+<p><img data-src="assets/custom/toy_cutoff_0.png" height="742"></p>
+<p><img data-src="assets/custom/toy_cutoff_1.png" class="fragment" height="742"></p>
 </div>
 
 </section>
@@ -651,7 +690,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/plant_scheme_motif.png" class="quarto-figure quarto-figure-center" height="470"></p>
+<p><img data-src="assets/custom/plant_scheme_motif.png" class="quarto-figure quarto-figure-center" height="455"></p>
 </figure>
 </div>
 
@@ -659,8 +698,12 @@
 <section id="your-turn" class="slide level2">
 <h2>5.5 Your turn</h2>
 <p>Open <strong><code>01_cnn.ipynb</code></strong> in Colab, select the T4 GPU, run from the top.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/your_turn.png" class="quarto-figure quarto-figure-center" height="515"></p>
+</figure>
+</div>
 
-<img data-src="assets/custom/your_turn.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
 
 </section>
     </div>

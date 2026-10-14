@@ -156,8 +156,8 @@
 <section id="pretraining-by-analogy" class="slide level2">
 <h2>1.1 Pretraining, by analogy</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/pretrain_analogy_0.png" height="700"></p>
-<p><img data-src="assets/custom/pretrain_analogy_1.png" class="fragment" height="700"></p>
+<p><img data-src="assets/custom/pretrain_analogy_0.png" height="742"></p>
+<p><img data-src="assets/custom/pretrain_analogy_1.png" class="fragment" height="742"></p>
 </div>
 
 </section>
@@ -165,7 +165,7 @@
 <h2>1.2 Pretraining a model</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/adapt_0.png" class="quarto-figure quarto-figure-center" height="641"></p>
+<p><img data-src="assets/custom/adapt_0.png" class="quarto-figure quarto-figure-center" height="624"></p>
 </figure>
 </div>
 
@@ -174,7 +174,7 @@
 <h2>1.3 Adapting it to new tasks</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/adapt_1.png" class="quarto-figure quarto-figure-center" height="586"></p>
+<p><img data-src="assets/custom/adapt_1.png" class="quarto-figure quarto-figure-center" height="570"></p>
 </figure>
 </div>
 
@@ -182,8 +182,8 @@
 <section id="the-same-for-dna" class="slide level2">
 <h2>1.4 The same for DNA</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/adapt_2.png" height="568"></p>
-<p><img data-src="assets/custom/adapt_3.png" class="fragment" height="568"></p>
+<p><img data-src="assets/custom/adapt_2.png" height="553"></p>
+<p><img data-src="assets/custom/adapt_3.png" class="fragment" height="553"></p>
 </div>
 
 </section>
@@ -192,12 +192,12 @@
 <p><span class="math inline">\(\mathcal{L} = -\log p_\theta(x_t \mid x_{&lt;t})\)</span>: hide the last token, predict it from the ones before</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/objective_next.png" class="quarto-figure quarto-figure-center" style="width:85.0%"></p>
+<p><img data-src="assets/custom/objective_next.png" class="quarto-figure quarto-figure-center" height="261"></p>
 </figure>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/next_token.png" class="fragment quarto-figure quarto-figure-center" height="380"></p>
+<p><img data-src="assets/custom/next_token.png" class="fragment quarto-figure quarto-figure-center" height="399"></p>
 </figure>
 </div>
 
@@ -205,14 +205,18 @@
 <section id="pretraining-objective-masked-tokens" class="slide level2">
 <h2>1.6 Pretraining objective: masked tokens</h2>
 <p><span class="math inline">\(\mathcal{L} = -\log p_\theta(x_t \mid x_{\setminus t})\)</span>: hide a token in the middle, predict it from both sides</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/objective_masked.png" class="quarto-figure quarto-figure-center" height="300"></p>
+</figure>
+</div>
 
-<img data-src="assets/custom/objective_masked.png" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%">
 </section>
 <section id="four-stages" class="slide level2">
 <h2>1.7 Four stages</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/stages_0.png" class="quarto-figure quarto-figure-center" height="339"></p>
+<p><img data-src="assets/custom/stages_0.png" class="quarto-figure quarto-figure-center" height="330"></p>
 </figure>
 </div>
 
@@ -227,8 +231,8 @@
 </section>
 <section id="tokenization" class="title-slide slide level1 center" data-name="Tokens">
 <h1>2 Tokenization</h1>
-
-<img data-src="assets/custom/stage_strip_0.png" style="width:80.0%" class="r-stretch"></section>
+<p><img data-src="assets/custom/stage_strip_0.png" height="155"></p>
+</section>
 
 <section id="single-letters" class="slide level2">
 <h2>2.1 Single letters</h2>
@@ -237,7 +241,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/tokens_letters.png" class="quarto-figure quarto-figure-center" height="300"></p>
+<p><img data-src="assets/custom/tokens_letters.png" class="quarto-figure quarto-figure-center" height="289"></p>
 </figure>
 </div>
 
@@ -249,7 +253,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/tokens_kmer.png" class="quarto-figure quarto-figure-center" height="445"></p>
+<p><img data-src="assets/custom/tokens_kmer.png" class="quarto-figure quarto-figure-center" height="430"></p>
 </figure>
 </div>
 
@@ -261,15 +265,15 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/tokens_bpe.png" class="quarto-figure quarto-figure-center" height="302"></p>
+<p><img data-src="assets/custom/tokens_bpe.png" class="quarto-figure quarto-figure-center" height="292"></p>
 </figure>
 </div>
 
 </section>
 <section id="embedding" class="title-slide slide level1 center" data-name="Embedding">
 <h1>3 Embedding</h1>
-
-<img data-src="assets/custom/stage_strip_1.png" style="width:80.0%" class="r-stretch"></section>
+<p><img data-src="assets/custom/stage_strip_1.png" height="155"></p>
+</section>
 
 <section id="token-embeddings" class="slide level2">
 <h2>3.1 Token embeddings</h2>
@@ -278,15 +282,15 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/emb_lookup.png" class="quarto-figure quarto-figure-center" height="508"></p>
+<p><img data-src="assets/custom/emb_lookup.png" class="quarto-figure quarto-figure-center" height="491"></p>
 </figure>
 </div>
 
 </section>
 <section id="the-transformer" class="title-slide slide level1 center" data-name="Transformer">
 <h1>4 The transformer</h1>
-
-<img data-src="assets/custom/stage_strip_2.png" style="width:80.0%" class="r-stretch"></section>
+<p><img data-src="assets/custom/stage_strip_2.png" height="155"></p>
+</section>
 
 <section id="the-transformer-as-a-black-box" class="slide level2">
 <h2>4.1 The transformer, as a black box</h2>
@@ -295,7 +299,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/blackbox.png" class="quarto-figure quarto-figure-center" height="642"></p>
+<p><img data-src="assets/custom/blackbox.png" class="quarto-figure quarto-figure-center" height="657"></p>
 </figure>
 </div>
 
@@ -303,11 +307,11 @@
 <section id="the-whole-pipeline-on-one-sequence" class="slide level2" data-todo="TODO-1">
 <h2>4.2 The whole pipeline on one sequence</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/walk_0.png" height="720"></p>
-<p><img data-src="assets/custom/walk_1.png" class="fragment" height="720"></p>
-<p><img data-src="assets/custom/walk_2.png" class="fragment" height="720"></p>
-<p><img data-src="assets/custom/walk_3.png" class="fragment" height="720"></p>
-<p><img data-src="assets/custom/walk_4.png" class="fragment" height="720"></p>
+<p><img data-src="assets/custom/walk_0.png" height="741"></p>
+<p><img data-src="assets/custom/walk_1.png" class="fragment" height="741"></p>
+<p><img data-src="assets/custom/walk_2.png" class="fragment" height="741"></p>
+<p><img data-src="assets/custom/walk_3.png" class="fragment" height="741"></p>
+<p><img data-src="assets/custom/walk_4.png" class="fragment" height="741"></p>
 </div>
 
 </section>
@@ -318,23 +322,23 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/pad_mask.png" class="quarto-figure quarto-figure-center" height="596"></p>
+<p><img data-src="assets/custom/pad_mask.png" class="quarto-figure quarto-figure-center" height="606"></p>
 </figure>
 </div>
 
 </section>
 <section id="prediction-heads" class="title-slide slide level1 center" data-name="Heads">
 <h1>5 Prediction heads</h1>
-
-<img data-src="assets/custom/stage_strip_3.png" style="width:80.0%" class="r-stretch"></section>
+<p><img data-src="assets/custom/stage_strip_3.png" height="155"></p>
+</section>
 
 <section id="prediction-heads-1" class="slide level2">
 <h2>5.1 Prediction heads</h2>
 <p><strong>Softmax</strong>: the sigmoid for many classes; one score per token in, probabilities that sum to 1 out</p>
 <div class="r-stack">
-<p><img data-src="assets/custom/heads_0.png" height="610"></p>
-<p><img data-src="assets/custom/heads_1.png" class="fragment" height="610"></p>
-<p><img data-src="assets/custom/heads_2.png" class="fragment" height="610"></p>
+<p><img data-src="assets/custom/heads_0.png" height="626"></p>
+<p><img data-src="assets/custom/heads_1.png" class="fragment" height="626"></p>
+<p><img data-src="assets/custom/heads_2.png" class="fragment" height="626"></p>
 </div>
 
 </section>
@@ -355,7 +359,7 @@
 <h2>5.3 DNA language models, 2021 to 2025</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/landscape.png" class="quarto-figure quarto-figure-center" height="700"></p>
+<p><img data-src="assets/custom/landscape.png" class="quarto-figure quarto-figure-center" height="711"></p>
 </figure>
 </div>
 
@@ -367,14 +371,22 @@
 
 <section id="loading-a-model-from-hugging-face" class="slide level2">
 <h2>6.1 Loading a model from Hugging Face</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/hf_load.png" class="quarto-figure quarto-figure-center" height="647"></p>
+</figure>
+</div>
 
-<img data-src="assets/custom/hf_load.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
 </section>
 <section id="your-turn" class="slide level2">
 <h2>6.2 Your turn</h2>
 <p>Open <strong><code>02_foundation_models.ipynb</code></strong>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/your_turn_d2.png" class="quarto-figure quarto-figure-center" height="491"></p>
+</figure>
+</div>
 
-<img data-src="assets/custom/your_turn_d2.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%">
 </section>
 <section id="frozen-models-and-the-cnn" class="title-slide slide level1 center" data-name="Results">
 <h1>7 Frozen models and the CNN</h1>
@@ -385,7 +397,7 @@
 <h2>7.1 Frozen pretrained models against the CNN</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/results_part2.png" class="quarto-figure quarto-figure-center" height="700"></p>
+<p><img data-src="assets/custom/results_part2.png" class="quarto-figure quarto-figure-center" height="766"></p>
 </figure>
 </div>
 
