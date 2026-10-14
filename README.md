@@ -1,7 +1,7 @@
 # Applications of AI in Biotechnology and Genomics: AI Days 2026 workshop
 
 Technion AI Days, Thu 15.10.2026. Prof. Roee Amit opens at 10:00; the three parts run from 11:00 to
-14:00 (each a talk, then a notebook), with 10-minute breaks at 11:50 and 13:15. All parts use the AGO2 CLIP-seq data of the GraphProt benchmark (Maticzka et al. 2014).
+14:00 (each a talk, then a notebook), with three 10-minute breaks. All parts use the AGO2 CLIP-seq data of the GraphProt benchmark (Maticzka et al. 2014).
 
 | part | notebook | deck | you write |
 |---|---|---|---|
