@@ -1,0 +1,102 @@
+:root {
+  --ink: #202124;
+  --muted: #5F6368;
+  --mid: #80868B;
+  --light: #C4C7C5;
+  --hair: #DADCE0;
+  --faint: #F1F3F4;
+  --accent: #1A73E8;
+  --accent-dark: #174EA6;
+  --page: #FFFFFF;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 400 17px/1.55 "Roboto", "Helvetica Neue", Arial, sans-serif;
+}
+a { color: var(--accent); }
+h1, h2, h3 { font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+/* top bar: logos on white */
+.top { border-bottom: 1px solid var(--hair); background: var(--page); }
+.top-in { display: flex; align-items: center; justify-content: space-between; min-height: 76px; gap: 24px; }
+.logos { display: flex; align-items: center; gap: 28px; }
+.logos img { display: block; height: 44px; width: auto; }
+.gh { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; font-weight: 500; }
+.gh:hover { color: var(--accent); }
+
+/* hero: dark band, accent rule */
+.hero { background: var(--ink); color: #fff; padding: 72px 0 64px; border-bottom: 4px solid var(--accent); }
+.kicker {
+  margin: 0 0 18px; color: var(--light);
+  font: 500 13px/1 "Roboto Mono", monospace; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.hero h1 { font-size: clamp(34px, 5.2vw, 60px); line-height: 1.08; max-width: 900px; }
+.meta { margin: 18px 0 0; color: var(--light); font-size: 18px; font-weight: 300; }
+.meta + .meta { margin-top: 6px; }
+
+main section { padding: 56px 0 8px; }
+main h2 {
+  font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); padding-bottom: 14px; border-bottom: 1px solid var(--ink); margin-bottom: 8px;
+}
+
+.start ol { margin: 18px 0 0; padding-left: 22px; }
+.start li { margin: 6px 0; }
+
+/* schedule */
+.schedule { list-style: none; margin: 0; padding: 0; }
+.slot { display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--hair); }
+.time { font: 500 20px/1.2 "Roboto Mono", monospace; color: var(--ink); }
+.time span { display: block; font-size: 14px; color: var(--mid); margin-top: 4px; }
+.time span::before { content: "to "; }
+.slot h3 { font-size: 24px; line-height: 1.25; }
+.who { color: var(--muted); margin-top: 4px; }
+.desc { margin: 10px 0 0; max-width: 720px; }
+.slot.part { border-left: 4px solid var(--accent); padding-left: 20px; margin-left: -24px; }
+.slot.break { padding: 12px 0; color: var(--mid); }
+.slot.break .time { font-size: 15px; color: var(--mid); white-space: nowrap; }
+.slot.break .time span { display: inline; font-size: 15px; margin: 0 0 0 6px; }
+.slot.break .time span::before { content: "to "; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.btn {
+  display: inline-block; padding: 10px 18px; border: 1px solid var(--ink); color: var(--ink);
+  text-decoration: none; font-weight: 500; font-size: 15px; line-height: 1.2; background: var(--page);
+}
+.btn:hover { background: var(--ink); color: #fff; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.btn.off { border-color: var(--hair); color: var(--mid); }
+
+/* feedback */
+.feedback { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+.feedback > div { flex: 1; }
+.feedback p { margin: 18px 0 0; }
+.qr { width: 160px; height: 160px; margin-top: 40px; }
+
+/* footer */
+.foot { margin-top: 72px; background: var(--ink); color: var(--light); padding: 40px 0; font-size: 14px; }
+.foot .gh { color: #fff; font-size: 16px; }
+.foot .gh:hover { color: var(--accent); }
+.foot p { margin: 14px 0 0; }
+.foot .built { color: var(--mid); }
+
+@media (max-width: 700px) {
+  .wrap { padding: 0 16px; }
+  .top-in { min-height: 64px; }
+  .logos { gap: 16px; }
+  .logos img { height: 34px; }
+  .gh span { display: none; }
+  .foot .gh span { display: inline; }
+  .hero { padding: 48px 0 40px; }
+  .slot { grid-template-columns: 1fr; gap: 8px; }
+  .slot.part { margin-left: -16px; padding-left: 12px; }
+  .feedback { flex-direction: column; align-items: flex-start; }
+  .qr { margin-top: 0; }
+}
