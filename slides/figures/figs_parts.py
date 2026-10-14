@@ -43,26 +43,27 @@ def bio_flow():
     save(fig, "bio_flow")
 
 
-def plant_scheme():
-    """Where plant() writes copies 1 to 7 in a 330-letter sequence, and the shuffled control."""
+def plant_scheme(with_control=True, name="plant_scheme"):
+    """Where plant() writes copies 1 to 7 in a 330-letter sequence (and, optionally, the shuffled control)."""
     fig = newfig()
     fig.set_size_inches(16, 4.6)
     ax = fig.add_axes([0.22, 0.22, 0.75, 0.66])
     L, k = 330, 9
     ax.axvspan(150, 190, color=FAINT, zorder=0)
     ax.text(170, 2.62, "Measured site\n(letters 150 to 190)", ha="center", va="bottom", fontsize=19, color=MUTED)
-    for y, name, c in [(1.6, "Motif", INK), (0.5, "Same letters, shuffled", MID)]:
+    rows = [(1.6, "Motif", INK)] + ([(0.5, "Same letters, shuffled", MID)] if with_control else [])
+    for y, row_name, c in rows:
         ax.plot([0, L], [y, y], color=HAIR, lw=8, solid_capstyle="butt", zorder=1)
         for n in range(1, 8):
             a = 40 + 45 * (n - 1)
             ax.add_patch(Rectangle((a, y - 0.22), k, 0.44, color=c, zorder=2))
             if y > 1:
                 ax.text(a + k / 2, y + 0.38, str(n), ha="center", fontsize=19, color=MUTED)
-        ax.text(-6, y, name, ha="right", va="center", fontsize=21, color=c)
-    ax.set_xlim(-2, L + 2); ax.set_ylim(0, 3.4)
+        ax.text(-6, y, row_name, ha="right", va="center", fontsize=21, color=c)
+    ax.set_xlim(-2, L + 2); ax.set_ylim(0 if with_control else 1.0, 3.4)
     ax.set_yticks([]); ax.spines["left"].set_visible(False)
     ax.set_xticks([0, 50, 100, 150, 190, 250, 300, 330]); ax.set_xlabel("Position in a 330-letter random sequence")
-    save(fig, "plant_scheme")
+    save(fig, name)
 
 
 # ------------------------------------------------------------------ part 2
@@ -461,6 +462,37 @@ def word_counts(pos):
           [vocab[t] for t in top])
 
 
+
+def cnn_template():
+    """The building blocks of the CNN: [convolution -> ReLU -> max pooling] (repeat) -> flatten -> linear."""
+    fig, ax = canvas(16, 5.6, ylim=(0, 56))
+    y0 = 20
+
+    def grid(x, w, rows, h=2.2, gap=0.6, fill=FAINT, edge=MID):
+        for r in range(rows):
+            ax.add_patch(Rectangle((x, y0 + r * (h + gap)), w, h, fc=fill, ec=edge, lw=0.8))
+        return y0 + rows * (h + gap) - gap
+
+    top = grid(2, 16, 4, h=2.6)                        # one-hot input: 4 letter rows
+    label(ax, 10, y0 - 5, "one-hot input\n4 letters × length", fs=17, color=MUTED)
+    grid(28, 14, 6)                                     # convolution: one row per filter (channel)
+    label(ax, 35, y0 - 5, "convolution\none row per filter", fs=17, color=MUTED)
+    grid(50, 14, 6, fill="white")                       # ReLU: same shape
+    label(ax, 57, y0 - 5, "ReLU\nnegatives to 0", fs=17, color=MUTED)
+    grid(78, 6, 6)                                      # max pooling: shorter rows
+    label(ax, 81, y0 - 5, "max pooling\nshorter rows", fs=17, color=MUTED)
+    ax.add_patch(Rectangle((90, y0 + 6.5), 38, 2.2, fc=FAINT, ec=MID, lw=0.8))   # flatten: one long row
+    label(ax, 109, y0 - 5, "flatten\nall numbers in one row", fs=17, color=MUTED)
+    ax.add_patch(plt.Circle((148, y0 + 7.6), 1.8, color=INK))                     # linear: one number
+    label(ax, 148, y0 - 5, "linear\none score (logit)", fs=17, color=MUTED)
+    for a, b in ((19, 27), (43, 49), (65, 77), (85, 89), (129, 145)):
+        arrow(ax, a, y0 + 7.6, b, y0 + 7.6, color=MUTED, lw=1.5, ms=18)
+    # the repeatable block
+    ax.plot([26, 26, 86, 86], [43, 46, 46, 43], color=INK, lw=1.4)
+    label(ax, 56, 50, "repeat as often as you like", fs=19, color=INK)
+    save(fig, "cnn_template")
+
+
 if __name__ == "__main__":
     want = set(sys.argv[1:])
     run = (lambda n: not want or n in want)
@@ -475,8 +507,9 @@ if __name__ == "__main__":
                    ("setup_examples", lambda: setup_examples(model, tr, ty)), ("bce_curve", bce_curve),
                    ("lr_rates", lambda: lr_rates(tr, ty)), ("sgd_noise", lambda: sgd_noise(tr, ty)),
                    ("nn_diagram", nn_diagram), ("channels_pool", lambda: channels_pool(model, pos)),
-                   ("bio_flow", bio_flow), ("plant_scheme", plant_scheme), ("tokens_split", lambda: tokens_split(pos)),
+                   ("bio_flow", bio_flow), ("plant_scheme", plant_scheme), ("plant_scheme_motif", lambda: plant_scheme(False, "plant_scheme_motif")), ("tokens_split", lambda: tokens_split(pos)),
                    ("emb_lookup", lambda: emb_lookup(pos)), ("blackbox", lambda: blackbox(pos)),
-                   ("adapt_layers", adapt_layers)]:
+                   ("adapt_layers", adapt_layers), ("cnn_template", cnn_template)]:
         if run(n):
             job()
+

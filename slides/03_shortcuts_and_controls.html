@@ -9,7 +9,7 @@
 <link href="03_shortcuts_and_controls_files/libs/quarto-html/quarto-syntax-highlighting-226bd0f977fa82dfae4534cac220d79a.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.7.23">
 
-  <title>Applications of AI in Biotechnology and Genomics</title>
+  <title>Part 3: Shortcuts, controls and fine-tuning</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -27,72 +27,6 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-    /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      { color: #003b4f; background-color: #f1f3f5; }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span { color: #003b4f; } /* Normal */
-    code span.al { color: #ad0000; } /* Alert */
-    code span.an { color: #5e5e5e; } /* Annotation */
-    code span.at { color: #657422; } /* Attribute */
-    code span.bn { color: #ad0000; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #20794d; } /* Char */
-    code span.cn { color: #8f5902; } /* Constant */
-    code span.co { color: #5e5e5e; } /* Comment */
-    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
-    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
-    code span.dt { color: #ad0000; } /* DataType */
-    code span.dv { color: #ad0000; } /* DecVal */
-    code span.er { color: #ad0000; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #ad0000; } /* Float */
-    code span.fu { color: #4758ab; } /* Function */
-    code span.im { color: #00769e; } /* Import */
-    code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
-    code span.op { color: #5e5e5e; } /* Operator */
-    code span.ot { color: #003b4f; } /* Other */
-    code span.pp { color: #ad0000; } /* Preprocessor */
-    code span.sc { color: #5e5e5e; } /* SpecialChar */
-    code span.ss { color: #20794d; } /* SpecialString */
-    code span.st { color: #20794d; } /* String */
-    code span.va { color: #111111; } /* Variable */
-    code span.vs { color: #20794d; } /* VerbatimString */
-    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="03_shortcuts_and_controls_files/libs/revealjs/dist/theme/quarto-00ac2f6af1389919a18f42df5b7c0002.css">
   <link rel="stylesheet" href="style.css">
@@ -410,19 +344,20 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-lora-training-step-todo-4" class="slide level2">
-<h2>3.3 The LoRA training step (TODO-4)</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>loss <span class="op">=</span> crit(batch_logits(seqs), y)    <span class="co"># predict a batch of DNA strings, measure the error</span></span>
-<span id="cb1-2"><a href=""></a>opt.zero_grad()                       <span class="co"># clear the previous step's gradients</span></span>
-<span id="cb1-3"><a href=""></a>scaler.scale(loss).backward()         <span class="co"># gradients of the scaled loss</span></span>
-<span id="cb1-4"><a href=""></a>scaler.step(opt)                      <span class="co"># unscale them, then move the trainable weights</span></span>
-<span id="cb1-5"><a href=""></a>scaler.update()                       <span class="co"># adjust the scale for the next step</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="the-lora-training-step" class="slide level2">
+<h2>3.3 The LoRA training step</h2>
+<pre><code>for each batch (DNA strings, labels):
+    clear the gradients
+    predict: one score per sequence
+    loss: the scores against the labels
+    gradients: only for B, A and the new output layer
+    step: move B, A and the output layer; W stays fixed</code></pre>
 <aside class="notes">
 <ul>
-<li>The same steps as part 1 slide 4.7. Only the LoRA matrices and the new output layer are trainable; the pretrained weights stay fixed.</li>
-<li><code>batch_logits</code> tokenizes the DNA strings and returns one raw score per sequence; <code>crit</code> is the binary cross-entropy of part 1 slide 2.2.</li>
-<li>The scaler: in float16, very small gradients round to 0, so the loss is multiplied by a large factor before <code>backward()</code> and the gradients are divided by it before the step. On a GPU with bfloat16, Colab’s T4 included, the scaler does nothing, and the same code runs.</li>
+<li>The same steps as part 1 slide 4.7, and the notebook gives this step. Only the LoRA matrices B and A and the new output layer are trainable; the pretrained weights W stay fixed.</li>
+<li>The loss is the binary cross-entropy of part 1 slide 2.2.</li>
 <li>Batches of 32 sequences, 2 epochs over 20,000 matched sequences: 625 steps per epoch.</li>
+<li>In the notebook, TODO-4a counts the numbers LoRA trains from the shapes of W and r, and TODO-4b is a written prediction of the result before training.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -463,25 +398,25 @@
 <tr class="odd">
 <td style="text-align: left;">TODO-1</td>
 <td style="text-align: left;">write <code>gc_u</code>, then AUROC from G+C and U</td>
-<td style="text-align: left;">the test cell passes; about 0.66</td>
+<td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">6 min</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">TODO-2</td>
 <td style="text-align: left;">count words by hand, then AUROC from 5-letter words</td>
-<td style="text-align: left;">the test cell passes; about 0.74</td>
+<td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">4 min</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">TODO-3</td>
 <td style="text-align: left;">shuffle one sequence, then the shuffle test on CNN and probe</td>
-<td style="text-align: left;">the test cell passes; 0.66 and 0.77</td>
+<td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">10 min</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">TODO-4</td>
-<td style="text-align: left;">the LoRA training step</td>
-<td style="text-align: left;">the test cell passes; about 0.81</td>
+<td style="text-align: left;">count the numbers LoRA trains, then predict the result</td>
+<td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">7 min</td>
 </tr>
 </tbody>
@@ -490,10 +425,10 @@
 <ul>
 <li>Given cells (setup, <code>shortcut_scores</code>, CNN retrain, before and after, take-aways): about 12 min. Projected hands-on total: about 39 min, 41 with the optional section, including LoRA training.</li>
 <li>The rejoin cell is at the end of section 0; keep <code>USE_MY_FILES = False</code> to use our files.</li>
-<li>Helpers: TODO-1 <code>probe_auc</code> (<code>gc_u</code> is written by the students); TODO-2 <code>Counter</code>, <code>kmer_counts(seqs, k=5)</code>; TODO-3 <code>dinuc_shuffle</code>; TODO-4 <code>batch_logits</code>, <code>crit</code>, <code>opt</code>, <code>scaler</code>.</li>
+<li>Helpers: TODO-1 <code>probe_auc</code> (<code>gc_u</code> is written by the students); TODO-2 <code>Counter</code>, <code>kmer_counts(seqs, k=5)</code>; TODO-3 <code>dinuc_shuffle</code>; TODO-4 the shapes of W printed above it.</li>
 <li>TODO-3: score the shuffled sequences with the probe already fitted on real sequences.</li>
 <li><code>shortcut_scores</code> is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.</li>
-<li>TODO-4: write the step, run its test (one batch on a fresh model), then start the training cell and read on while it trains.</li>
+<li>TODO-4: count LoRA’s numbers (4a) and write a prediction (4b), then start the training cell and read on while it trains. Expected after training: about 0.81, between the frozen probe (0.77) and the CNN (0.84).</li>
 <li>The label curve (optional, 2 min) is precomputed. Each TODO has a test cell and a “Stuck?” cell.</li>
 </ul>
 <style type="text/css">

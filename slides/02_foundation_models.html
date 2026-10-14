@@ -9,7 +9,7 @@
 <link href="02_foundation_models_files/libs/quarto-html/quarto-syntax-highlighting-226bd0f977fa82dfae4534cac220d79a.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.7.23">
 
-  <title>Applications of AI in Biotechnology and Genomics</title>
+  <title>Part 2: DNA foundation models</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -697,8 +697,7 @@
 <li>The same calls load any model on the Hugging Face Hub. Each model has a page with a model card: what it was trained on, how, and its known limits.</li>
 <li>The download goes to the Colab machine. Mistral-DNA is about 60 MB, roughly 10 seconds.</li>
 <li>Mistral-DNA has 16M parameters; the “17M” in its name includes an output layer we do not use.</li>
-<li>The tokenizer returns more keys than the model accepts, so pass only <code>input_ids</code> and <code>attention_mask</code>.</li>
-<li>From here TODO-1 goes in steps: tokenize the sequence, run the model and keep its last layer, then the masked mean of slide 4.3. <code>unsqueeze(-1)</code> gives the mask shape (tokens, 1), so it multiplies all 256 numbers of each token.</li>
+<li>From here TODO-1 goes in steps: tokenize the sequence, run the model and keep its last layer, then the masked mean of slide 4.3.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -734,13 +733,13 @@
 <tr class="odd">
 <td style="text-align: left;">TODO-1</td>
 <td style="text-align: left;">one sequence: tokens, last layer, masked mean; then <code>embed</code> for a list</td>
-<td style="text-align: left;">the test cell passes; shape <code>(N, 256)</code></td>
+<td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">9 min</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">TODO-2</td>
-<td style="text-align: left;"><code>probe_auc</code>: logistic regression</td>
-<td style="text-align: left;">the test cell passes; about 0.78</td>
+<td style="text-align: left;"><code>probe_auc</code>: standardise, then logistic regression</td>
+<td style="text-align: left;">the test cell passes</td>
 <td style="text-align: left;">5 min</td>
 </tr>
 <tr class="odd">

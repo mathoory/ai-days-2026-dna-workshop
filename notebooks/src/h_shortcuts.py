@@ -1,4 +1,4 @@
-#@title Shortcut toolkit - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Shortcut toolkit { display-mode: "form" }
 from collections import defaultdict
 
 

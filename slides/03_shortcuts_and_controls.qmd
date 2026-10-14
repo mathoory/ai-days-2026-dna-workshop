@@ -132,7 +132,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 |:--|:--|:--|:--|
 | TODO-1 | write `gc_u`, then AUROC from G+C and U | the test cell passes | 6 min |
 | TODO-2 | count words by hand, then AUROC from 5-letter words | the test cell passes | 4 min |
-| TODO-3 | shuffle one sequence, then the shuffle test on CNN and probe | the test cell passes | 10 min |
+| TODO-3 | check what one shuffle keeps (with `count_words`), then the shuffle test | the test cell passes | 10 min |
 | TODO-4 | count the numbers LoRA trains, then predict the result | the test cell passes | 7 min |
 
 ::: {.notes}
@@ -142,7 +142,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 - TODO-3: score the shuffled sequences with the probe already fitted on real sequences.
 - `shortcut_scores` is a given cell that repeats TODO-1, TODO-2 and the probe on both benchmarks: G+C/U 0.64 → 0.51, 5-letter words 0.76 → 0.73, probe 0.81 → 0.77. The CNN retrained on each training set scores about 0.84 on both.
 - TODO-4: count LoRA's numbers (4a) and write a prediction (4b), then start the training cell and read on while it trains. Expected after training: about 0.81, between the frozen probe (0.77) and the CNN (0.84).
-- The label curve (optional, 2 min) is precomputed. Each TODO has a test cell and a "Stuck?" cell.
+- The label curve (optional, 2 min) is precomputed. Each TODO has a test cell; the solutions are published on the workshop site during the workshop.
 :::
 
 ::: {.center}
@@ -228,13 +228,12 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 # 6 Wrap-up {data-name="Wrap-up"}
 :::
 
-## 6.1 The day in nine results
+## 6.1 The day in eight results
 
 | Part | Finding | Number |
 |:--|:--|:--|
 | 1 | seed-site words enriched in bound sites | miR-19 site enriched 6× |
 | 1 | CNN, 92,346 training sequences | AUROC 0.86 |
-| 1 | responds to one inserted seed site | miR-15/16 0.53 vs 0.30 shuffled |
 | 1 | it weighs position | effect only at letters ~140–190 |
 | 2 | frozen pretrained models + probe | 0.78–0.79 |
 | 3 | two composition numbers alone | 0.66 |
@@ -244,7 +243,6 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 
 ::: {.notes}
 - Each row is a measured number from today; the slides of each part have the figure behind it.
-- The miR-15/16 row is the only seed site with an effect clearly beyond its shuffled controls (0.30 ± 0.09 in the reference run). miR-19 (0.42 against 0.34 ± 0.06) was slightly beyond one standard deviation; miR-30 and let-7 were within the spread.
 - The position row comes from inserting one copy at every position: the score changes only where the measured site is in almost every sequence.
 :::
 
@@ -272,7 +270,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 - Point 1: the negatives were random positions in the same genes; on the 1,000 held-out sequences G+C and U alone reached 0.66.
 - Point 2: one-hot letters keep order and position, 5-letter word counts drop both, and each tokenizer splits the same seed site differently.
 - Point 3: two composition numbers reached 0.66 and 5-letter word counts 0.74 (12,000 labels each), against 0.86 for the CNN (92,346 labels).
-- Point 4: the insertion test (miR-15/16 0.53 against 0.30 shuffled), the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (G+C/U 0.64 to 0.51).
+- Point 4: the motif insertion against a control of the same letters, the dinucleotide shuffle (CNN 0.86 to 0.66) and matched data (G+C/U 0.64 to 0.51).
 - Point 5: frozen Mistral-DNA with a probe scored 0.77 against 0.78 under the shuffle and 0.77 on the 3,000-sequence matched test set. In one offline benchmark, NT-500M fine-tuned with LoRA reached 0.87 against the CNN's 0.84 (20,000 labels, 3 runs each); it has not been shuffle-tested.
 :::
 

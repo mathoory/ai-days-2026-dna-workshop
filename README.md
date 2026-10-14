@@ -29,9 +29,10 @@ data/                      files to host (gitignored): the 4 AGO2 FASTAs, cnn.pt
 ## Student work markers
 `# TODO-N:` comments, then the student's code between `# === Your code here ===` and
 `# === End of your code ===`. `build.py` replaces exactly those regions with `...`; nothing else differs
-between the student and solution versions. Given cells start with `#@title … run this cell, nothing to change`
-(Colab collapses them). Each TODO lists the functions to use, the gotchas and the number to expect; a
-"Stuck?" cell after it loads our version.
+between the student and solution versions. Given cells have a `#@title` (Colab shows the title and hides
+the code). Each TODO states the problem, the rules and the tools (with documentation links), never the answer;
+a test cell after it checks the student's code. There are no fallback cells: the solution notebooks go on
+the workshop site during the workshop.
 
 ## Rebuild
 ```

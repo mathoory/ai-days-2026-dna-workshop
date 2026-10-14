@@ -1,4 +1,4 @@
-#@title Data helpers - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Data helpers { display-mode: "form" }
 MAX_LEN  = 501          # fixed global length (pad / truncate)
 ALPHABET = "ACGU"       # order = the 4 rows of the one-hot matrix
 FILES = {split: (f"CLIPSEQ_AGO2.{split}.positives.fa", f"CLIPSEQ_AGO2.{split}.negatives.fa")

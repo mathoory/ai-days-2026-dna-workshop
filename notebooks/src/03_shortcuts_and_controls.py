@@ -21,10 +21,9 @@
 #
 # | cell | what you do |
 # |---|---|
-# | `#@title ... run this cell, nothing to change` | run it |
+# | ▶ a cell with a title (its code is hidden) | run it (Shift+Enter) |
 # | `# TODO-N` with `# === Your code here ===` | write it (yourself or with an assistant) |
-# | `#@title Test TODO-N ...` | run it: it checks your code and says what is wrong |
-# | `#@title Stuck? ...` | run it only if the test of your TODO fails: it computes our version |
+# | ▶ Test TODO-N | run it: it checks your code and says what is wrong |
 #
 # Before you start: *Runtime → Change runtime type → T4 GPU*.
 
@@ -58,7 +57,7 @@
 # %include h_shortcuts.py
 
 # %%
-#@title Rejoin here: the CNN (part 1) and the vectors (part 2), yours or ours - run this cell { display-mode: "form" }
+#@title ▶ Rejoin here: the CNN (part 1) and the vectors (part 2), yours or ours { display-mode: "form" }
 USE_MY_FILES = False   # True = upload my_cnn.pt and/or my_emb_mistral17m.npz from parts 1 and 2
 if USE_MY_FILES:
     upload_yours()
@@ -104,13 +103,16 @@ for k, v in table.items():
 # show whether bound and unbound sequences are made of different letters. You write the function
 # that computes them, first for one sequence (TODO-1a), then for a list of sequences (TODO-1b). Then
 # you fit a logistic regression on only these **two numbers** per sequence and report its AUROC on
-# the test set (TODO-1c), with the probe function of part 2:
+# the test set (TODO-1c), with the probe function of part 2. For counting letters, Python's
+# [`str.count`](https://docs.python.org/3/library/stdtypes.html#str.count) is enough.
+#
+# The probe function of part 2:
 #
 # - `probe_auc(F_train, y_train, F_test, y_test)` → **returns `(auc, probe)`**; it works on any
 #   feature matrix (one row of numbers per sequence), not only embeddings.
 
 # %%
-#@title One sequence - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ One sequence { display-mode: "form" }
 s = S_train[0]
 print("first 60 letters:", s[:60], "| length:", len(s), "| label:", y_train[0])
 print("letter counts:", {b: s.count(b) for b in "ACGU"})
@@ -154,7 +156,7 @@ table["G+C and U content only (2 numbers)"] = auc_gc
 print(f"2 numbers: {auc_gc:.3f}")
 
 # %%
-#@title Test TODO-1 - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Test TODO-1 { display-mode: "form" }
 def test_gc_u():
     rng = np.random.default_rng(0)
     seqs = [S_train[i] for i in rng.choice(len(S_train), 500, replace=False)]
@@ -176,22 +178,7 @@ def test_gc_u():
 test_gc_u()
 
 # %%
-#@title Stuck? Run this only if the test failed: it defines our gc_u and computes auc_gc { display-mode: "form" }
-def gc_u(seqs):
-    """(N, 2): the fraction of G+C letters and the fraction of U (or T) letters in each sequence."""
-    out = np.zeros((len(seqs), 2))
-    for i, s in enumerate(seqs):
-        n = max(len(s), 1)
-        out[i] = ((s.count("G") + s.count("C")) / n, (s.count("U") + s.count("T")) / n)
-    return out
-
-
-auc_gc, _ = probe_auc(gc_u(S_train), y_train, gc_u(S_test), y_test)
-table["G+C and U content only (2 numbers)"] = auc_gc
-test_gc_u()
-
-# %%
-#@title Plot G+C and U content - run this cell { display-mode: "form" }
+#@title ▶ Plot G+C and U content { display-mode: "form" }
 import matplotlib.pyplot as plt
 C = gc_u(S_train)
 fig, ax = plt.subplots(1, 2, figsize=(8, 2.8))
@@ -219,12 +206,14 @@ plt.tight_layout(); plt.show()
 #
 # You first count the words of one short sequence yourself and compare your counts with
 # `kmer_counts` (TODO-2a). Then you fit the model on the counts of all sequences (TODO-2b).
+# For counting, Python's [`Counter`](https://docs.python.org/3/library/collections.html#collections.Counter)
+# turns a list of words into word → count.
 #
 # **Tools:** `kmer_counts(seqs, k=5)` → an array with one row of 1,024 numbers per sequence, and
 # `probe_auc` as above.
 
 # %%
-#@title The 1,024 words and one short sequence - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ The 1,024 words and one short sequence { display-mode: "form" }
 import itertools
 WORDS5 = ["".join(w) for w in itertools.product("ACGU", repeat=5)]   # column j of kmer_counts(seqs, 5) counts WORDS5[j]
 s = min(S_train, key=len)
@@ -263,7 +252,7 @@ table["5-letter word counts (1,024 numbers)"] = auc_k5
 print(f"word counts: {auc_k5:.3f}")
 
 # %%
-#@title Test TODO-2 - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Test TODO-2 { display-mode: "form" }
 def test_words():
     rng = np.random.default_rng(0)
     seqs = [S_train[i] for i in rng.choice(len(S_train), 50, replace=False)]
@@ -284,16 +273,6 @@ def test_words():
 
 test_words()
 
-# %%
-#@title Stuck? Run this only if the test failed: it defines our count_words and computes auc_k5 { display-mode: "form" }
-def count_words(seq, k=5):
-    return Counter(seq[i:i + k] for i in range(len(seq) - k + 1))
-
-
-auc_k5, _ = probe_auc(kmer_counts(S_train, 5), y_train, kmer_counts(S_test, 5), y_test)
-table["5-letter word counts (1,024 numbers)"] = auc_k5
-test_words()
-
 # %% [markdown]
 # ## 3. The shuffle test (TODO-3)
 #
@@ -312,7 +291,7 @@ test_words()
 # * The shuffle also moves a binding site out of letters 150–190. The CNN weights that region (part
 #   1), so for the CNN the drop mixes letter order and position.
 #
-# First shuffle one sequence and check what the shuffle keeps (TODO-3a).
+# First shuffle one sequence and check what the shuffle keeps (TODO-3a): letters, letter pairs, longer words.
 
 # %%
 s = next(q for q, label in zip(S_test, y_test) if label == 1)     # one bound test sequence
@@ -320,28 +299,26 @@ s_shuf = dinuc_shuffle(s, np.random.default_rng(1))
 print("original:", s[:60], "...")
 print("shuffled:", s_shuf[:60], "...")
 
-# TODO-3a: check what the shuffle kept. First write pair_counts(seq): how often each pair of
-#          neighbouring letters occurs in seq, as a Counter.
-def pair_counts(seq):
-    # === Your code here ===
-    return Counter(seq[i:i + 2] for i in range(len(seq) - 1))
-    # === End of your code ===
-
-
-# TODO-3a, continued: `same_pairs` is True if s and s_shuf have the same pair counts, and
-#          `same_sequence` is True if they are the same sequence.
+# TODO-3a: check what the shuffle kept, with your count_words from TODO-2a. Compare s and s_shuf:
+#          `same_letters`  True if they have the same counts of single letters,
+#          `same_pairs`    True if they have the same counts of letter pairs,
+#          `same_words5`   True if they have the same counts of 5-letter words,
+#          `same_sequence` True if they are the same sequence.
 # === Your code here ===
-same_pairs = pair_counts(s) == pair_counts(s_shuf)
+same_letters = count_words(s, 1) == count_words(s_shuf, 1)
+same_pairs = count_words(s, 2) == count_words(s_shuf, 2)
+same_words5 = count_words(s, 5) == count_words(s_shuf, 5)
 same_sequence = s == s_shuf
 # === End of your code ===
-pc, ps = pair_counts(s), pair_counts(s_shuf)
+pc, ps = count_words(s, 2), count_words(s_shuf, 2)
 print("\nthe 16 letter-pair counts, original / shuffled:")
 for a in "ACGU":
     print("   ".join(f"{a + b}: {pc[a + b]:3d} / {ps[a + b]:3d}" for b in "ACGU"))
-print("\nsame 16 pair counts:", same_pairs, "| same sequence:", same_sequence)
+print(f"\nsame letters: {same_letters} | same letter pairs: {same_pairs} | "
+      f"same 5-letter words: {same_words5} | same sequence: {same_sequence}")
 
 # %%
-#@title Make the shuffled sequences - run this cell { display-mode: "form" }
+#@title ▶ Make the shuffled sequences { display-mode: "form" }
 rng = np.random.default_rng(0)
 bound = [s for s, y in zip(S_test, y_test) if y == 1]
 unbound = [s for s, y in zip(S_test, y_test) if y == 0]
@@ -364,6 +341,12 @@ y_shuf = np.array([1] * len(shuffled) + [0] * len(unbound))
 # The models are the ones already trained on real sequences: `cnn`, and `probe` on top of the frozen
 # language model. Do **not** train anything on the shuffled sequences; the question is how the trained
 # models respond to them.
+#
+# **API:** `score_sequences(cnn, seqs)` gives the CNN's probability of "bound" for each RNA sequence;
+# `embed(tok, fm, dna_seqs)` gives the embeddings (it needs DNA letters: `to_dna(s)` turns U into T);
+# `probe.predict_proba(embeddings)[:, 1]` gives the probe's probability of "bound"
+# (https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression.predict_proba);
+# `roc_auc_score(labels, probabilities)` gives the AUROC (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html).
 
 # %%
 # TODO-3b: shuffle-test AUROC for the CNN and for Mistral-DNA + probe
@@ -376,13 +359,13 @@ print(f"CNN         : real {table['CNN (part 1)']:.3f}  ->  shuffled {auc_shuf_c
 print(f"Mistral-DNA : real {probe_real:.3f}  ->  shuffled {auc_shuf_fm:.3f}")
 
 # %%
-#@title Test TODO-3 - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Test TODO-3 { display-mode: "form" }
 def test_shuffle_test():
-    got = pair_counts("ACGUA")
-    assert got == Counter({"AC": 1, "CG": 1, "GU": 1, "UA": 1}), \
-        f"pair_counts('ACGUA') = {dict(got)}, want AC, CG, GU and UA once each"
-    assert same_pairs and not same_sequence, \
-        f"same_pairs = {same_pairs} (want True), same_sequence = {same_sequence} (want False)"
+    for name, got, want in (("same_letters", same_letters, count_words(s, 1) == count_words(s_shuf, 1)),
+                            ("same_pairs", same_pairs, count_words(s, 2) == count_words(s_shuf, 2)),
+                            ("same_words5", same_words5, count_words(s, 5) == count_words(s_shuf, 5)),
+                            ("same_sequence", same_sequence, s == s_shuf)):
+        assert got == want, f"{name} = {got}, but comparing the counts of s and s_shuf gives {want}"
     assert unbound == [q for q, label in zip(S_test, y_test) if label == 0], \
         "unbound is no longer the list of real unbound test sequences: the test shuffles only the bound ones"
     assert len(shuffled) == len(bound), f"shuffled has {len(shuffled)} sequences, want {len(bound)}, one per bound sequence"
@@ -401,20 +384,7 @@ def test_shuffle_test():
 test_shuffle_test()
 
 # %%
-#@title Stuck? Run this only if the test failed: it runs the shuffle test for you { display-mode: "form" }
-def pair_counts(seq):
-    return Counter(seq[i:i + 2] for i in range(len(seq) - 1))
-
-
-same_pairs, same_sequence = pair_counts(s) == pair_counts(s_shuf), s == s_shuf
-auc_shuf_cnn = roc_auc_score(y_shuf, score_sequences(cnn, shuffled + unbound))
-auc_shuf_fm = roc_auc_score(y_shuf, probe.predict_proba(embed(tok, fm, [to_dna(s) for s in shuffled + unbound]))[:, 1])
-print(f"CNN         : real {table['CNN (part 1)']:.3f}  ->  shuffled {auc_shuf_cnn:.3f}")
-print(f"Mistral-DNA : real {probe_real:.3f}  ->  shuffled {auc_shuf_fm:.3f}")
-test_shuffle_test()
-
-# %%
-#@title The scoreboard - run this cell { display-mode: "form" }
+#@title ▶ The scoreboard { display-mode: "form" }
 import json
 results = dict(table)
 results["CNN on shuffled bound sequences"] = auc_shuf_cnn
@@ -482,7 +452,7 @@ _ = (DATA_DIR / "my_part3_shuffle_results.json").write_text(json.dumps(results, 
 # "original" numbers below differ slightly from those of sections 1 to 3.
 
 # %%
-#@title Build the two benchmarks - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Build the two benchmarks { display-mode: "form" }
 import matplotlib.pyplot as plt
 
 all_seqs, all_y = read_split("train")
@@ -546,7 +516,7 @@ plt.tight_layout(); plt.show()
 # The function is called twice, once per benchmark, so it uses only its arguments and `tok`, `fm`.
 
 # %%
-#@title Three simple models on both benchmarks - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Three simple models on both benchmarks { display-mode: "form" }
 def shortcut_scores(train_seqs, train_y, test_seqs, test_y, n=12000):
     tr, ytr = train_seqs[:n], train_y[:n]
     auc_gc, _ = probe_auc(gc_u(tr), ytr, gc_u(test_seqs), test_y)
@@ -569,7 +539,7 @@ for k in scores["original"]:
 # The three models above used 12,000 of them.
 
 # %%
-#@title Retrain the CNN twice - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Retrain the CNN twice { display-mode: "form" }
 from torch.utils.data import DataLoader, TensorDataset
 for name in BENCH:
     S_tr, y_tr, S_te, y_te = BENCH[name]
@@ -603,7 +573,7 @@ for name in BENCH:
 # Before training, you work out how small LoRA's correction is (TODO-4a) and predict the result (TODO-4b).
 
 # %%
-#@title Set up LoRA - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Set up LoRA { display-mode: "form" }
 !pip -q install peft==0.21.2   # pinned version
 # remove a package that this peft version cannot load (not used here)
 !pip -q uninstall -y torchao
@@ -674,7 +644,7 @@ n_W = n_layers * sum(rows * cols for rows, cols in W.values())
 print(f"LoRA trains {n_lora:,} numbers to adapt {n_W:,} fixed ones ({n_lora / n_W:.1%})")
 
 # %%
-#@title Test TODO-4a - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Test TODO-4a { display-mode: "form" }
 def test_lora_count():
     real = sum(p.numel() for n, p in clf.named_parameters() if "lora_" in n)
     real_W = sum(p.numel() for n, p in clf.named_parameters() if n.endswith("base_layer.weight"))
@@ -690,13 +660,7 @@ def test_lora_count():
 test_lora_count()
 
 # %%
-#@title Stuck? Run this only if the test failed: it computes both counts for you { display-mode: "form" }
-n_lora = n_layers * sum(R * (rows + cols) for rows, cols in W.values())
-n_W = n_layers * sum(rows * cols for rows, cols in W.values())
-test_lora_count()
-
-# %%
-#@title The models so far on the matched test set - run this cell { display-mode: "form" }
+#@title ▶ The models so far on the matched test set { display-mode: "form" }
 for k in ("Mistral-DNA + probe (frozen)", "CNN (part 1 architecture)"):
     print(f"{k:32s} matched test AUROC {scores['matched'][k]:.3f}")
 
@@ -707,7 +671,7 @@ for k in ("Mistral-DNA + probe (frozen)", "CNN (part 1 architecture)"):
 MY_PREDICTION = ""
 
 # %%
-#@title Train with LoRA - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Train with LoRA { display-mode: "form" }
 clf, opt, scaler = make_lora()   # a fresh model every time this cell runs
 t0 = time.time()
 clf.train()
@@ -730,7 +694,7 @@ print("your prediction:", MY_PREDICTION or "(none written)")
 # ## 7. Before and after the control
 
 # %%
-#@title The before/after table - run this cell { display-mode: "form" }
+#@title ▶ The before/after table { display-mode: "form" }
 import json
 print(f"{'model':40s} {'original':>9s} {'matched':>9s}   lost to the control")
 for k in scores["original"]:
@@ -762,7 +726,7 @@ _ = (DATA_DIR / "my_part3_matched_results.json").write_text(json.dumps(scores, i
 # NT-500M head-to-head. Set `RUN_LIVE = True` to rerun one draw at 4 sizes yourself.
 
 # %%
-#@title Learn from fewer labels (optional; precomputed by default) { display-mode: "form" }
+#@title ▶ Learn from fewer labels (optional; precomputed by default) { display-mode: "form" }
 RUN_LIVE = False   # True = rerun the label curve yourself (one draw per size)
 
 # Our offline runs on this matched benchmark and test set: mean and standard deviation over 3 draws.

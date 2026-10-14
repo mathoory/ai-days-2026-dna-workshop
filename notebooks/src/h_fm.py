@@ -1,4 +1,4 @@
-#@title Foundation-model helpers - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Foundation-model helpers { display-mode: "form" }
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler

@@ -62,7 +62,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Colab with a GPU: *Runtime → Change runtime type → T4 GPU*
 - Notebooks and slides: **[mathoory.github.io/ai-days-2026-dna-workshop]{.nowrap}**
 - Nothing to install; the data download by themselves
-- If a cell fails, raise a hand, or run its "Stuck?" cell and continue
+- If a cell fails, raise a hand
 :::
 ::: {.column width="42%"}
 ![](assets/custom/qr_site.png){width="80%"}
@@ -115,7 +115,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Projected: 1 min.
 - Top row: a real bound sequence from our data, written 5′ to 3′. Bottom row: miR-16, written 3′ to 5′ so that paired letters line up; the vertical lines mark the pairs.
 - The bold letters are the miR-16 site UGCUGCU. It pairs with microRNA letters 2 to 8, the seed (letters 2 to 7) plus letter 8.
-- Hypothesis for the day: a model that learned AGO2 targeting should respond to seed sites like this one. The last slide of this part tests it (an optional cell in the notebook).
+- Hypothesis for the day: a model that learned AGO2 targeting should respond to seed sites like this one.
 :::
 
 ## 1.7 The data
@@ -144,7 +144,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Counted inside the 40-letter measured sites. One bar per 7-letter word: the fraction of bound sites that contain it divided by the fraction of unbound sites. The 16 most enriched words among those found in at least 150 bound sites; the text after each bar is the percentage of bound sites that contain the word.
 - Black bars are seed matches of known microRNAs. The top word, UUUGCAC, is the seed match of miR-19 (6 times enriched). GCUGCUA (miR-15/16, letters 2 to 7 plus an A) and UGUUUAC (miR-30) are also in the list. The 7-letter miR-15/16 site UGCUGCU of slide 1.6 is not among these 16.
 - Even the most enriched word occurs in only 1.3% of bound sites (0.4 to 1.3% across the 16), so no single word separates the classes.
-- A model that learned AGO2 targeting should respond to these words. This part ends by testing whether our CNN does.
+- A model that learned AGO2 targeting should respond to these words.
 :::
 
 ::: {.center}
@@ -316,7 +316,7 @@ Next: build the CNN.
 - Each column is one letter; the four rows are A, C, G, U, and the dark cell holds the 1. A sequence becomes a 4 × length matrix. The longest sequence is 375 letters.
 - A padding column of 0.25 means "unknown letter": each base equally likely. 501 is the input width used by Pan and Shen, whose CNN this one follows.
 - If asked why not A=1, C=2, G=3, U=4: that would impose an order (G "greater than" C) with no biological meaning. One-hot keeps the four letters equally far apart.
-- TODO-1 writes the conversion: `one_hot` for one sequence (TODO-1a), then `encode_batch` for a list of sequences (TODO-1b). A test cell checks 201 sequences, including padding and an unknown letter. The rest of the notebook then uses a faster version with identical output.
+- TODO-1 writes the conversion: `one_hot` for one sequence (TODO-1a), then `encode_batch` for a list of sequences (TODO-1b). A test cell checks 201 sequences, including padding and an unknown letter. The rest of the notebook uses the students' own `encode_batch`.
 :::
 
 ## 4.2 A filter computes a dot product
@@ -356,28 +356,19 @@ Next: build the CNN.
 - The second convolution reads all 10 channels at once: each of its 20 filters is 10 × 5, one weight per channel and pooled position.
 :::
 
-## 4.5 The network (TODO-2)
+## 4.5 Build your network (TODO-2)
 
-| Layer | Output shape |
-|:--|:--|
-| input | $1 \times 4 \times 501$ |
-| `Conv2d(1, 10, (4, 10))` + ReLU | $10 \times 1 \times 492$ |
-| `MaxPool2d((1, 3))` | $10 \times 1 \times 164$ |
-| `Conv2d(10, 20, (1, 5))` + ReLU | $20 \times 1 \times 160$ |
-| `MaxPool2d((1, 3))` | $20 \times 1 \times 53$ |
-| `Flatten` → `Linear(1060, 1)` | one score, a **logit** (any real number) |
+![](assets/custom/cnn_template.png){fig-align="center" height="402px"}
 
-- 2,491 parameters. No sigmoid inside the network: `BCEWithLogitsLoss` applies it.
+- Build it from these parts; you choose how many blocks, how many filters and how wide
 
 ::: {.notes}
-- 10 first-layer filters, each 4 × 10. Each produces one output row, a channel.
-- Max pooling keeps the largest value in each block of 3 positions.
-- The second convolution combines nearby first-layer outputs: 20 channels, each looking at 5 pooled positions.
-- The final linear layer has one weight per channel and pooled position: 20 × 53 = 1,060 weights. Slide 6.2 shows them after training.
-- Both convolutions move one position at a time (stride 1) and add no padding of their own, so each output row is shorter than its input by the kernel width minus 1 (501 − 9 = 492, 164 − 4 = 160). The pooling layers move 3 positions at a time (stride 3).
-- Receptive field: one second-layer output depends on 5 pooled positions, which cover 15 first-layer positions, which cover 24 letters. After the second pooling, one value covers 30 letters.
-- The 2,491 parameters are weights plus biases: 410 in the first convolution, 1,020 in the second and 1,061 in the linear layer.
-- A logit is any real number; the sigmoid turns it into a probability between 0 and 1. `BCEWithLogitsLoss` applies the sigmoid and the binary cross-entropy in one step.
+- The parts: a convolution slides its filters along the sequence (one output row, a channel, per filter); ReLU sets negative values to 0; max pooling keeps the largest value of each block of neighbouring positions, so the rows get shorter; flatten lays everything out in one row; a linear layer makes one number, the logit.
+- Two rules: the first filters cover all 4 letter rows, and the network ends with one number per sequence. Everything else is the students' choice; the notebook prints the shape after every layer (`show_shapes`), which tells them how many inputs the linear layer needs.
+- Our reference network, used on the results slides: 10 filters of 4 × 10, ReLU, pooling by 3; 20 filters covering 5 pooled positions, ReLU, pooling by 3; flatten (20 × 53 = 1,060 numbers); linear to one logit. 2,491 parameters: 410 in the first convolution, 1,020 in the second, 1,061 in the linear layer.
+- Shapes in our network: 4 × 501 → 10 × 492 → 10 × 164 → 20 × 160 → 20 × 53 → 1,060 → 1. A convolution shortens a row by the filter width minus 1; pooling by 3 divides its length by 3.
+- No sigmoid inside the network: the loss (`BCEWithLogitsLoss`) applies it.
+- Students who finish early can try other networks and compare held-out AUROCs against the ±0.025 noise.
 :::
 
 ## 4.6 Training changes the filters
@@ -407,7 +398,7 @@ for each epoch:
 
 ::: {.notes}
 - The training loop in pseudocode, the same as in the notebook. Students write the code with their assistant; the pseudocode is what they need to understand.
-- TODO-3a runs one training step by hand on one batch: the loss, one gradient, one step, and the loss again on the same batch, now lower. TODO-3b is the training step inside the loop of `train()`; TODO-3c is the evaluation. The test cell trains one epoch on 5,000 sequences and checks that the evaluation used probabilities.
+- TODO-3a: `train_step`, one training step on one batch; the notebook runs it five times on the same batch so the loss falls. TODO-3b: `evaluate`, the held-out AUROC without learning. The given `train()` calls both for every batch and epoch, and measures from epoch 0, so the curves show the start and training against held-out. TODO-3c: the ROC curve of the trained model.
 :::
 
 ::: {.center}
@@ -428,18 +419,18 @@ for each epoch:
 - A logo shows which windows activate a filter. It leaves out the letters the filter penalises (its negative weights).
 :::
 
-## 5.2 Test a logo: insert it, against a shuffled copy (TODO-5)
+## 5.2 Test a logo: insert it into random RNA (TODO-5)
 
-- Insert one filter's consensus 1 to 7 times; control: the same letters, shuffled
+- Insert one filter's consensus 1 to 7 times. Which control shows that its pattern matters?
 
-![](assets/custom/plant_scheme.png){fig-align="center" height="405px"}
+![](assets/custom/plant_scheme_motif.png){fig-align="center" height="470px"}
 
 ::: {.notes}
 - Projected: 1 min.
-- The bars are a 330-letter random RNA sequence; each box is one inserted copy. `plant(seqs, motif, copies)` writes copy n starting at letter 40 + 45(n − 1), so 7 copies fit. Top row: the motif; bottom row: the same letters shuffled. Shaded: letters 150 to 190, where the measured site is in the real data.
+- The bar is a 330-letter random RNA sequence; each box is one inserted copy. `plant(seqs, motif, copies)` writes copy n starting at letter 40 + 45(n − 1), so 7 copies fit. Shaded: letters 150 to 190, where the measured site is in the real data.
 - The consensus is the filter's most frequent letter at each position: a candidate motif.
-- Both versions go into the same 1,000 random RNA sequences at the same places, and the CNN scores them.
-- The shuffled copy has the same letters, so the difference between the two curves is what the letter order adds.
+- The question to leave with the room: if the score goes up, is it the pattern or only the letters each copy adds (a U-rich motif adds U letters)? The students design the control in TODO-5b; the notebook states this problem and hints at building it from the motif's own letters.
+- The intended control is the same letters in another order, inserted at the same places: the difference between the two curves is then what the letter order adds. The debrief slides (6.5, 6.6) show it.
 - This turns a logo, which is only a description of what a filter responds to, into an experiment on the whole model's output.
 :::
 
@@ -450,16 +441,16 @@ Open **`01_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
 | Step | Task | Check | Time |
 |:--|:--|:--|:--|
 | TODO-1 | write `one_hot` and `encode_batch` | the test cell passes | 3 min |
-| TODO-2 | build the network | the test cell passes | 7 min |
-| TODO-3 | one batch by hand, then the loop in `train()` | the test cell passes | 7 min |
+| TODO-2 | build your own network from the parts | the test cell passes | 7 min |
+| TODO-3 | `train_step`, `evaluate`, then the ROC curve | the test cell passes | 7 min |
 | TODO-4 | filter 0 step by step, then a logo for every filter | the test cell passes | 9 min |
-| TODO-5 | one copy in one sequence, then the motif and a shuffled copy | the test cell passes | 8 min |
+| TODO-5 | one copy in one sequence, design a control, then both curves | the test cell passes | 8 min |
 
 ::: {.notes}
-- Given cells (setup, data, motif toolkit, take-aways): about 12 min. Projected hands-on total: about 46 min, 51 with the optional sections.
-- TODO-3 check: about 0.79 after epoch 1 and 0.86 after epoch 10. Encoding and 10 epochs take about a minute on Colab.
+- Given cells (setup, data, motif toolkit, take-aways): about 12 min. Projected hands-on total: about 46 min.
+- TODO-3: our network reaches about 0.79 after epoch 1 and 0.86 after epoch 10; the students' networks differ. Encoding and 10 epochs take about a minute on Colab.
 - Helpers for TODO-4: `acts[:, f, :]`, `cutoff_for`, `windows_above`, `pwm_of`; then set `MY_FILTER` and `MY_MOTIF`. TODO-4 ends with choosing a motif. TODO-5 uses `plant`, first on one sequence (TODO-5a), then on all 1,000 (TODO-5b).
-- Each TODO has a test cell and, below it, a "Stuck?" cell that loads our version.
+- Each TODO has a test cell; the solutions are published on the workshop site during the workshop.
 - Notebook section 5, right after training, downloads `my_cnn.pt`, which part 3 can load.
 :::
 
@@ -530,20 +521,6 @@ Next: the trained last-layer weights.
 - The motif changes the score only between about letters 140 and 190, where almost every sequence in the data has its measured site: up to about +0.35 inside, dips of about −0.1 at both edges.
 - The shuffled copy gets much of the same increase there (up to about +0.26), so a good part of the effect comes from which letters are in that region, whatever their order.
 - This is the last-layer pattern from slide 6.2: the CNN weighs positions. It reflects how the data were cut, and it means the answer to "does this motif matter?" depends on where it is placed.
-:::
-
-## 6.7 The CNN responds to one of four seed sites
-
-![](assets/custom/planting_bars.png){fig-align="center" height="700px"}
-
-::: {.notes}
-- The hypothesis from slide 1.6: a model that learned AGO2 targeting should respond to seed sites. This is the optional bonus cell.
-- 6 copies of each site inserted into the 500 unbound held-out sequences. Black: the site. Grey: the same letters shuffled, mean and standard deviation over 10 shuffles. Dotted: nothing inserted (about 0.29).
-- miR-15/16 (UGCUGCU): 0.53 against 0.30 ± 0.09, a clear effect. miR-19: 0.42 against 0.34 ± 0.06, slightly more than one standard deviation. miR-30 (0.37 against 0.38) and let-7 (0.39 against 0.38) lie within the spread of their shuffles.
-- Of the 6 copies, only copy 4 (letter 175) is in letters 150 to 190, the region the CNN weighs.
-- The CNN was not given seed sites and responds to one of the four tested. None of the ten logos shows this site; the insertion test detected the response.
-- Inside the 40-letter measured site, these seed sites are 3 to 6 times enriched in bound sequences but occur in only about 1 to 2% of them, so the signal is weak.
-- The notebook's shuffle numbers differ slightly from these because the shuffles are random.
 
 Next, after the break: part 2, DNA foundation models, pretrained on the whole genome.
 :::

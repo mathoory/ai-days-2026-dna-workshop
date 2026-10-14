@@ -1,4 +1,4 @@
-#@title The CNN from part 1 - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ The CNN from part 1 { display-mode: "form" }
 class GlobalCNN(nn.Module):
     """The part 1 network: one-hot (N,1,4,501) -> one binding score (logit) per sequence."""
 

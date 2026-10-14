@@ -1,4 +1,4 @@
-#@title Setup - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Setup { display-mode: "form" }
 import os, time, urllib.request
 _SETUP_T0 = time.time()   # when this cell started; used only by the optional timing log at the end
 from pathlib import Path

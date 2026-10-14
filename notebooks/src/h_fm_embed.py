@@ -1,4 +1,4 @@
-#@title Embedding helper (written in part 2) - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Embedding helper (written in part 2) { display-mode: "form" }
 @torch.no_grad()
 def embed(tok, model, seqs, batch=128):
     """List of DNA strings -> (N, hidden) numpy array: the mean of the last layer over all

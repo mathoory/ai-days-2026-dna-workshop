@@ -1,4 +1,4 @@
-#@title Probe helper (written in part 2) - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Probe helper (written in part 2) { display-mode: "form" }
 def probe_auc(E_train, y_train, E_test, y_test, C=0.1):
     """Fit a linear probe (logistic regression) on the training vectors; AUROC on the test vectors.
     Smaller C = stronger regularisation (smaller weights)."""

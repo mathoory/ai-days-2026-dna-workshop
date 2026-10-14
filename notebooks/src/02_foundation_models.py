@@ -23,22 +23,18 @@
 #
 # In this notebook you will:
 #
-# 1. write `embed()`, which turns each sequence into one vector with Mistral-DNA (TODO-1);
+# 1. turn each sequence into one vector with Mistral-DNA: its tokens, the last layer, and the average
+#    over the real tokens (TODO-1);
 # 2. write `probe_auc()`, which trains a linear probe on these vectors (TODO-2), and compare the
 #    result with a 30× larger model;
 # 3. pretrain a model from random weights for 3 minutes, and probe it before and after.
 #
 #
-# Use an AI assistant (Gemini in Colab, or any chat assistant) as much as you like. Each TODO states
-# what to build, the rules it must follow and the names later cells use. A test cell after each TODO
-# checks your code. Run it before you move on.
-#
 # | cell | what you do |
 # |---|---|
-# | `#@title ... run this cell, nothing to change` | run it |
+# | ▶ a cell with a title (its code is hidden) | run it (Shift+Enter) |
 # | `# TODO-N` with `# === Your code here ===` | write it (yourself or with an assistant) |
-# | `#@title Test TODO-N ...` | run it: it checks your code and says what is wrong |
-# | `#@title Stuck? ...` | run it only if the test of your TODO fails: it defines our version |
+# | ▶ Test TODO-N | run it: it checks your code and says what is wrong |
 #
 # Before you start: *Runtime → Change runtime type → T4 GPU*.
 
@@ -63,7 +59,7 @@
 # on the same 1,000-sequence held-out test set as the CNN.
 
 # %%
-#@title The data: a fixed subset of AGO2 sequences - run this cell { display-mode: "form" }
+#@title ▶ The data: a fixed subset of AGO2 sequences { display-mode: "form" }
 S_train, y_train, S_test, y_test = workshop_data()
 S_train, S_test = [to_dna(s) for s in S_train], [to_dna(s) for s in S_test]
 print(f"train {len(S_train):,} | test {len(S_test):,} | bound: {y_train.mean():.0%}")
@@ -80,7 +76,7 @@ print("example:", S_train[0][:70], "...")
 # tokens the tokenizer adds at the start and end; they are not DNA.
 
 # %%
-#@title Download + load the model, look at its tokens - run this cell { display-mode: "form" }
+#@title ▶ Download + load the model, look at its tokens { display-mode: "form" }
 t0 = time.time()
 tok, fm = load_fm(FM_REPO)
 print(f"loaded {FM_REPO} in {time.time() - t0:.1f}s | "
@@ -92,84 +88,44 @@ print("as tokens        :", " | ".join(tok.convert_ids_to_tokens(ids)))
 # %% [markdown]
 # ### TODO-1: Turn sequences into vectors
 #
-# **Build** `embed(tok, model, seqs, batch=128)`: a list of DNA strings in, a numpy array out, with one
-# row of 256 numbers per sequence, its **embedding**. You build it in four steps, first on one sequence:
-#
-# 1. **TODO-1a** tokenize one sequence: its token numbers and its attention mask;
-# 2. **TODO-1b** run the model on it and keep the **last** layer: one vector of 256 numbers per token;
-# 3. **TODO-1c** average these vectors over the real tokens only (`[CLS]` and `[SEP]` count as real);
-# 4. **TODO-1d** `embed()`: the same for a list of sequences, a batch at a time.
-#
-# **Padding and the mask.** Sequences in a batch have different lengths, so the short ones are filled
-# up with padding tokens until all have the same length. The **attention mask** marks which tokens are
-# real (1) and which are padding (0). The average of step 3 must use only the real tokens, so that a
-# sequence gets the same embedding whether it is alone or in a batch with longer ones.
-#
-# The test after TODO-1d checks exactly that.
+# Each sequence becomes one vector of 256 numbers, its **embedding**. First look at what the first steps
+# do to one sequence, and to the same sequence next to a longer one.
 
 # %%
+#@title ▶ Tokens, padding and the mask { display-mode: "form" }
 s = S_train[0][:60]      # the first 60 letters of one sequence, so the printout is short
-
-# TODO-1a: tokenize s with the tokenizer `tok`, as a batch of one sequence, into `enc`.
-#          enc["input_ids"] holds the token numbers and enc["attention_mask"] the mask.
-# === Your code here ===
-enc = tok([s], return_tensors="pt")
-# === End of your code ===
-print("letters       :", s)
-print("tokens        :", tok.convert_ids_to_tokens(enc["input_ids"][0]))
-print("input_ids     :", enc["input_ids"].tolist(), "shape", tuple(enc["input_ids"].shape))
-print("attention_mask:", enc["attention_mask"].tolist())
-print("all keys      :", list(enc.keys()))
-
-# %%
-# TODO-1b: run the language model `fm` on this one sequence, without learning. Keep:
-#          `mask`  its attention mask, on the model's device
-#          `out`   the model's output, with every layer's vectors (hidden states)
-#          `h`     the last layer: one vector of 256 numbers per token
-# === Your code here ===
-ids, mask = enc["input_ids"].to(DEVICE), enc["attention_mask"].to(DEVICE)
+enc = tok([s, S_train[1][:120]], return_tensors="pt", padding=True)
+for i in range(2):
+    print(f"sequence {i + 1}, {len(enc['input_ids'][i])} positions:")
+    print("  tokens        :", tok.convert_ids_to_tokens(enc["input_ids"][i]))
+    print("  attention_mask:", enc["attention_mask"][i].tolist())
 with torch.no_grad():
-    out = fm(input_ids=ids, attention_mask=mask, output_hidden_states=True)
-h = out.hidden_states[-1].float()
-# === End of your code ===
-print("hidden_states holds", len(out.hidden_states), "layers (the input embeddings, then one per transformer layer)")
-print("last layer h:", tuple(h.shape), "= (sequences, tokens, numbers per token)")
-print("the first 4 of the 256 numbers of each token:")
-for t, row in zip(tok.convert_ids_to_tokens(enc["input_ids"][0]), h[0, :, :4].tolist()):
-    print(f"  {t:>12s}", [round(v, 2) for v in row])
+    h = fm(input_ids=enc["input_ids"].to(DEVICE), attention_mask=enc["attention_mask"].to(DEVICE),
+           output_hidden_states=True).hidden_states[-1]
+print("\nthe last layer for this batch:", tuple(h.shape), "= (sequences, tokens, numbers per token)")
+
+# %% [markdown]
+# **Look at the printout.** How many letters does one token hold? The sequences of our data have about
+# 330 letters: do they fit the model's limit of 512 tokens? The first sequence was **padded** to the
+# length of the second: the extra tokens are not DNA, and the **attention mask** marks which tokens are
+# real (1) and which are padding (0).
+#
+# **Build** `embed(tok, model, seqs, batch=128)`: a list of DNA strings in, a numpy array out, with one
+# row of 256 numbers per sequence. It handles `batch` sequences at a time:
+#
+# | step | what it means | API |
+# |---|---|---|
+# | tokenize | the batch's token numbers and attention masks; short sequences padded, long ones cut to 512 tokens | call the tokenizer on the list: `tok(seqs, ...)` with `padding`, `truncation`, `max_length`, `return_tensors="pt"` ([tokenizer](https://huggingface.co/docs/transformers/main_classes/tokenizer#transformers.PreTrainedTokenizer.__call__)) |
+# | run the model | without learning, on the GPU | [`torch.no_grad`](https://pytorch.org/docs/stable/generated/torch.no_grad.html), `.to(DEVICE)`, `model(input_ids=..., attention_mask=..., output_hidden_states=True)` |
+# | last layer | one vector of 256 numbers per token | the output's `.hidden_states`, one entry per layer ([model outputs](https://huggingface.co/docs/transformers/main_classes/output)); `.float()` for 32-bit numbers |
+# | average | per sequence, the mean of its token vectors over the **real** tokens only | tensor `*`, `/` and [`.sum(dim)`](https://pytorch.org/docs/stable/generated/torch.sum.html); the mask needs a third axis of size 1 to multiply the vectors ([`unsqueeze`](https://pytorch.org/docs/stable/generated/torch.unsqueeze.html)) |
+# | collect | one row per sequence, in the order of `seqs`, as a numpy array | `.cpu().numpy()`, [`np.concatenate`](https://numpy.org/doc/stable/reference/generated/numpy.concatenate.html) |
+#
+# **The rule that matters:** a sequence must get the same embedding whether it is alone or in a batch
+# with longer ones. If the padding tokens enter the average, it does not. The test checks this.
 
 # %%
-# TODO-1c: write masked_mean(h, mask): for each sequence in h, the average of its token vectors over
-#          its real tokens only (mask 1); padding tokens (mask 0) must not count.
-#          h holds one vector of 256 numbers per token of each sequence; the result holds one vector
-#          of 256 numbers per sequence.
-def masked_mean(h, mask):
-    # === Your code here ===
-    m = mask.unsqueeze(-1).float()
-    return (h * m).sum(1) / m.sum(1)
-    # === End of your code ===
-
-
-v = masked_mean(h, mask)
-print("one sequence:", tuple(h.shape), "->", tuple(v.shape), "| first 4 numbers:", [round(x, 3) for x in v[0, :4].tolist()])
-print("it has no padding, so this equals the plain mean over its tokens:", torch.allclose(v, h.mean(1), atol=1e-4))
-
-# the same sequence in a batch with a longer one: the tokenizer pads it
-enc2 = tok([s, S_train[1][:120]], return_tensors="pt", padding=True)
-ids2, mask2 = enc2["input_ids"].to(DEVICE), enc2["attention_mask"].to(DEVICE)
-with torch.no_grad():
-    h2 = fm(input_ids=ids2, attention_mask=mask2, output_hidden_states=True).hidden_states[-1].float()
-print("\nnext to a longer sequence, its attention_mask is", enc2["attention_mask"][0].tolist())
-print("largest difference between its vector alone and in this batch:")
-print(f"  masked_mean: {(masked_mean(h2, mask2)[0] - v[0]).abs().max().item():.4f}   (padding left out)")
-print(f"  .mean(1)   : {(h2.mean(1)[0] - v[0]).abs().max().item():.4f}   (padding averaged in)")
-
-# %%
-# TODO-1d: write embed(tok, model, seqs, batch=128): TODO-1a to TODO-1c for a list of DNA strings,
-#          `batch` sequences at a time. Within a batch the short sequences are padded; sequences
-#          longer than 512 tokens are cut to 512. Return a numpy array with one row of 256 numbers
-#          per sequence, in the order of `seqs`.
-@torch.no_grad()
+# TODO-1: write embed(tok, model, seqs, batch=128), following the table above.
 def embed(tok, model, seqs, batch=128):
     # === Your code here ===
     model.eval()
@@ -177,31 +133,22 @@ def embed(tok, model, seqs, batch=128):
     for i in range(0, len(seqs), batch):
         enc = tok(seqs[i:i + batch], return_tensors="pt", padding=True, truncation=True, max_length=512)
         ids, mask = enc["input_ids"].to(DEVICE), enc["attention_mask"].to(DEVICE)
-        with torch.autocast(DEVICE.type, dtype=torch.float16, enabled=DEVICE.type == "cuda"):
+        with torch.no_grad():
             h = model(input_ids=ids, attention_mask=mask, output_hidden_states=True).hidden_states[-1].float()
-        out.append(masked_mean(h, mask).cpu().numpy())
+        m = mask.unsqueeze(-1).float()
+        out.append(((h * m).sum(1) / m.sum(1)).cpu().numpy())
     return np.concatenate(out)
     # === End of your code ===
 
 
-E = embed(tok, fm, S_train[:3])
-print("3 sequences ->", E.shape)
+E = embed(tok, fm, [s, S_train[1][:120]])
+print("2 sequences ->", E.shape)
+print("the first sequence alone and next to the longer one, largest difference:",
+      f"{np.abs(embed(tok, fm, [s])[0] - E[0]).max():.4f}")
 
 # %%
-#@title Test TODO-1 - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Test TODO-1 { display-mode: "form" }
 def test_embed():
-    # masked_mean on a small example with a known answer: 2 sequences, 4 tokens, 3 numbers per token
-    hh = torch.arange(24, dtype=torch.float32).reshape(2, 4, 3)
-    mm = torch.tensor([[1, 1, 1, 1], [1, 1, 0, 0]])
-    want = torch.stack([hh[0].mean(0), hh[1, :2].mean(0)])
-    got = masked_mean(hh, mm)
-    assert tuple(got.shape) == (2, 3), \
-        f"masked_mean of h with shape (2, 4, 3) has shape {tuple(got.shape)}, want (2, 3): one vector per sequence"
-    assert torch.allclose(got[0], want[0]), \
-        f"masked_mean, a sequence with 4 real tokens: {got[0].tolist()}, want {want[0].tolist()}, the mean of its 4 vectors"
-    assert torch.allclose(got[1], want[1]), \
-        (f"masked_mean, a sequence with 2 real tokens and 2 padding tokens: {got[1].tolist()}, want {want[1].tolist()}, "
-         "the mean of its 2 real token vectors only")
     E = embed(tok, fm, S_train[:3])
     assert isinstance(E, np.ndarray), f"embed returned a {type(E).__name__}, want a numpy array"
     assert E.shape == (3, 256), f"embed of 3 sequences has shape {E.shape}, want (3, 256)"
@@ -216,26 +163,14 @@ def test_embed():
         f"embed of 5 sequences with batch=2 has shape {E5_in_2s.shape}, want (5, 256): keep the vectors of every batch"
     assert np.allclose(E5, E5_in_2s, atol=5e-2), \
         f"embed gives different vectors with batch=2 and with batch=128 (largest difference {np.abs(E5 - E5_in_2s).max():.3f})"
-    print("TODO-1 passed: masked_mean leaves out padding; embed gives shape (3, 256), the same vector alone "
+    print("TODO-1 passed: embed gives shape (3, 256), the same vector alone "
           "or in a batch, and the same vectors in batches of 2")
 
 
 test_embed()
 
 # %%
-#@title Stuck? Run this only if the test failed: it defines our masked_mean() and embed() { display-mode: "form" }
-# %include-body h_fm_embed.py
-
-
-def masked_mean(h, mask):
-    m = mask.unsqueeze(-1).float()
-    return (h * m).sum(1) / m.sum(1)
-
-
-test_embed()
-
-# %%
-#@title Embed all sequences - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Embed all sequences { display-mode: "form" }
 t0 = time.time()
 E_train, E_test = embed(tok, fm, S_train), embed(tok, fm, S_test)
 print(f"embedded {len(S_train) + len(S_test):,} sequences in {time.time() - t0:.1f}s -> {E_train.shape[1]} numbers each")
@@ -245,7 +180,7 @@ np.savez_compressed(DATA_DIR / "my_emb_mistral17m.npz", train=E_train, test=E_te
 # ### A 2-D map of the vectors
 
 # %%
-#@title A 2-D map of the vectors - run this cell { display-mode: "form" }
+#@title ▶ A 2-D map of the vectors { display-mode: "form" }
 # PCA finds the 2 directions along which the 12,000 vectors vary most, so we can look at them.
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
@@ -253,7 +188,7 @@ P = PCA(2).fit_transform(StandardScaler().fit_transform(E_train))
 gc_frac = np.array([(s.count("G") + s.count("C")) / len(s) for s in S_train])
 order = np.random.default_rng(0).permutation(len(P))    # random drawing order: neither class hides the other
 fig, ax = plt.subplots(1, 2, figsize=(9, 4))
-sc = ax[0].scatter(*P[order].T, c=gc_frac[order], s=3, cmap=CMAP_SEQ)
+sc = ax[0].scatter(*P[order].T, c=gc_frac[order], s=3, cmap="viridis")
 plt.colorbar(sc, ax=ax[0], label="G+C fraction")
 ax[1].scatter(*P[order].T, c=[BOUND if y else UNBOUND for y in y_train[order]], s=3, alpha=.6)
 for col, name in ((UNBOUND, "Unbound"), (BOUND, "Bound")):
@@ -287,6 +222,11 @@ for j in (0, 1):
 #
 # Fit on the training set only. The AUROC compares the probe's probability of "bound" for every test
 # sequence with the true test labels.
+#
+# **Tools:** [`StandardScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html),
+# [`LogisticRegression`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html),
+# [`make_pipeline`](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.make_pipeline.html),
+# [`roc_auc_score`](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html).
 
 # %%
 # TODO-2: the linear probe, as described above. Return (auc, probe).
@@ -303,7 +243,7 @@ results = {"Mistral-DNA (16M), pretrained": auc_fm}
 print(f"Mistral-DNA + linear probe: test AUROC = {auc_fm:.3f}")
 
 # %%
-#@title Test TODO-2 - run this cell, nothing to change { display-mode: "form" }
+#@title ▶ Test TODO-2 { display-mode: "form" }
 def test_probe():
     res = probe_auc(E_train, y_train, E_test, y_test)
     assert isinstance(res, tuple) and len(res) == 2, \
@@ -326,14 +266,6 @@ def test_probe():
 
 test_probe()
 
-# %%
-#@title Stuck? Run this only if the test failed: it defines our probe_auc() { display-mode: "form" }
-# %include-body h_fm_probe.py
-auc_fm, _ = probe_auc(E_train, y_train, E_test, y_test)
-results = {"Mistral-DNA (16M), pretrained": auc_fm}
-print(f"reference probe: test AUROC = {auc_fm:.3f}")
-test_probe()
-
 # %% [markdown]
 # ## 2. A 30× larger model: Nucleotide Transformer
 #
@@ -343,7 +275,7 @@ test_probe()
 # compute them yourself.
 
 # %%
-#@title Nucleotide Transformer 500M - run this cell { display-mode: "form" }
+#@title ▶ Nucleotide Transformer 500M { display-mode: "form" }
 RUN_NT500M = False   # True = download the 2 GB model and compute the vectors yourself
 if RUN_NT500M or os.environ.get("AIDAYS_RUN_NT500M") == "1":
     t0 = time.time()
@@ -369,10 +301,16 @@ print(f"NT-500M + probe: {auc_nt:.3f}   vs   Mistral-DNA (16M): {auc_fm:.3f}")
 # Mistral). It starts from random weights and is trained to predict the next token on 200-letter pieces
 # of the human genome. We probe it on AGO2 before and after.
 #
+# **Think first.** The probe on Mistral-DNA's embeddings separates bound from unbound RNA. Is that
+# because of what the model learned in pretraining, or would any network of the same design give
+# embeddings that work as well? Which comparison would answer this? Hint: what would the same network
+# give before it has learned anything? Discuss with your neighbour, then run the cell and compare its
+# result with your answer.
+#
 # Start the cell, then read **What to take away** below the Summary cell while the loss goes down.
 
 # %%
-#@title Pretrain from scratch for a few minutes - run this cell { display-mode: "form" }
+#@title ▶ Pretrain from scratch for a few minutes { display-mode: "form" }
 import pandas as pd
 from transformers import AutoConfig, AutoModelForCausalLM
 
@@ -441,7 +379,7 @@ del scratch
 torch.cuda.empty_cache()
 
 # %%
-#@title Summary - run this cell { display-mode: "form" }
+#@title ▶ Summary { display-mode: "form" }
 import json
 print("test AUROC, bars start at 0.5 (a coin flip)")
 for k, v in sorted(results.items(), key=lambda kv: kv[1]):
@@ -469,5 +407,5 @@ _ = (DATA_DIR / "my_part2_results.json").write_text(json.dumps(results, indent=1
 # An AUROC does not tell you what signal a model uses. Part 3 tests that.
 
 # %%
-#@title Download your vectors (optional: part 3 can use them, or ours) - run this cell { display-mode: "form" }
+#@title ▶ Download your vectors (optional: part 3 can use them, or ours) { display-mode: "form" }
 download_outputs("my_emb_mistral17m.npz")
