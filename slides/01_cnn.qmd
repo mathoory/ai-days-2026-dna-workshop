@@ -367,7 +367,7 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 ::: {.notes}
 - ReLU (rectified linear unit) keeps positive values and sets negative ones to 0.
 - It introduces non-linearity. Without it, a stack of weighted sums is just one weighted sum, a straight boundary like logistic regression.
-- In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.4).
+- In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.3).
 :::
 
 ## 2.14 From logistic regression to a neural network
@@ -478,44 +478,30 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 - The same toy filter comes back in section 5, when we read what a filter likes.
 :::
 
-## 4.3 A filter computes a dot product
-
-- The same 40 weights at every position: **weight sharing**
-
-![](assets/custom/filter_dot.png){fig-align="center" height="657px"}
-
-::: {.notes}
-- A real learned filter (filter 7) from the trained CNN, applied to the real window where it responds most strongly. The slides from 4.7 on use filter 0.
-- Left: the filter, a 4 × 10 matrix of weights, one per letter and position; blue positive, orange negative. Right: the one-hot window.
-- Multiplied element by element with the one-hot window, the filter keeps one weight per position: the weight of the letter that is there (the number under each column). Their sum plus a bias is the filter's output at that position (bottom line).
-- The same 40 weights are applied at every one of the 492 positions. Sharing the weights across positions makes it a convolution. A fully connected layer from the same 4 × 501 input to the same 492 outputs would have 4 × 501 × 492 = 985,968 weights.
-- This filter prefers U-rich windows, and its strongest response is only 1.07 times larger on bound than on unbound sequences. It responds to something common in both classes. Part 3 tests composition effects of this kind with a shuffle and with matched data.
-:::
-
-## 4.4 The filter along one sequence
+## 4.3 The filter along one sequence
 
 ![](assets/custom/activation_track.png){fig-align="center" height="700px"}
 
 ::: {.notes}
-- The same filter (filter 7): its output at every position of one bound sequence, after ReLU. x: position; y: output.
+- A real filter of our trained CNN (filter 7, which prefers U-rich windows): its output at every position of one bound sequence, after ReLU. x: position; y: output.
 - ReLU (slide 2.13) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.
 :::
 
-## 4.5 Channels and pooling
+## 4.4 Channels and pooling
 
 - 10 filters give 10 output rows, **channels**; **max pooling** keeps the largest of every 3 positions
 
 ![](assets/custom/channels_pool.png){fig-align="center" height="606px"}
 
 ::: {.notes}
-- One bound sequence of 340 letters, the one on slide 4.4, positions 210 to 330 (filter 7 peaks at 273). Top: the output of all 10 first-layer filters after ReLU at each position; darker blue is larger. Bottom: after max pooling, one value per block of 3 positions.
-- Each row is one filter's track; row 7 is the track of slide 4.4.
+- One bound sequence of 340 letters, the one on slide 4.3, positions 210 to 330 (filter 7 peaks at 273). Top: the output of all 10 first-layer filters after ReLU at each position; darker blue is larger. Bottom: after max pooling, one value per block of 3 positions.
+- Each row is one filter's track; row 7 is the track of slide 4.3.
 - The network computes all 492 positions of the padded input (164 after pooling); the figure shows 120 of them.
 - Pooling shortens each track threefold and keeps the strongest responses; the exact position within each block of 3 is lost. It has no parameters.
 - The second convolution reads all 10 channels at once: each of its 20 filters is 10 × 5, one weight per channel and pooled position.
 :::
 
-## 4.6 Build your network (TODO-2) {data-todo="TODO-2"}
+## 4.5 Build your network (TODO-2) {data-todo="TODO-2"}
 
 ![](assets/custom/cnn_template.png){fig-align="center" height="389px"}
 
@@ -528,7 +514,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 - Students who finish early can try other networks and compare their held-out AUROCs.
 :::
 
-## 4.7 Training changes the filters
+## 4.6 Training changes the filters
 
 ::: {.r-stack}
 ![](assets/custom/filter_learning_0.png){height="585px"}
@@ -546,7 +532,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 - Each step is the update of slide 2.11, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
 :::
 
-## 4.8 The training step and the evaluation (TODO-3) {data-todo="TODO-3"}
+## 4.7 The training step and the evaluation (TODO-3) {data-todo="TODO-3"}
 
 ![](assets/custom/train_loop.png){fig-align="center" height="766px"}
 
