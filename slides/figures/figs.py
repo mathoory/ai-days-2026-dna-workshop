@@ -43,7 +43,10 @@ def heat(ax, W, vmax=None, rows=True):
 
 
 def nb_text(stem):
-    nb = json.load(open(EXEC / f"{stem}_solution.ipynb", encoding="utf-8"))
+    path = EXEC / f"{stem}_solution.ipynb"
+    if not path.exists():                      # runs of the old slot notebooks were moved to the archive
+        path = EXEC.parent / "archive" / "executed" / f"{stem}_solution.ipynb"
+    nb = json.load(open(path, encoding="utf-8"))
     return "".join("".join(o.get("text", "")) for c in nb["cells"] for o in c.get("outputs", []))
 
 
