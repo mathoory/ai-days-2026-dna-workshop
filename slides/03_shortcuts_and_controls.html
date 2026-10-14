@@ -29,7 +29,7 @@
     }
   </style>
   <link rel="stylesheet" href="03_shortcuts_and_controls_files/libs/revealjs/dist/theme/quarto-00ac2f6af1389919a18f42df5b7c0002.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=cd94bf8b">
   <link href="03_shortcuts_and_controls_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="03_shortcuts_and_controls_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="03_shortcuts_and_controls_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -155,12 +155,12 @@
 <section id="the-two-classes-differ-in-composition" class="slide level2" data-todo="TODO-1">
 <h2>1.1 The two classes differ in composition</h2>
 <ul>
-<li>A <strong>shortcut</strong> is a simple property that differs between the classes in this data set, such as G+C</li>
+<li>A <strong>shortcut</strong> is a simple property that differs between the classes in this data set, such as GC</li>
 <li>Before crediting a model with biology, measure what much simpler features achieve</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/gc_hist.png" class="quarto-figure quarto-figure-center" height="484"></p>
+<p><img data-src="assets/custom/gc_hist.png?v=8856d275" class="quarto-figure quarto-figure-center" height="484"></p>
 </figure>
 </div>
 
@@ -172,7 +172,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/word_counts.png" class="quarto-figure quarto-figure-center" height="641"></p>
+<p><img data-src="assets/custom/word_counts.png?v=5bb2177d" class="quarto-figure quarto-figure-center" height="641"></p>
 </figure>
 </div>
 
@@ -184,7 +184,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/shuffle_demo.png" class="quarto-figure quarto-figure-center" height="513"></p>
+<p><img data-src="assets/custom/shuffle_demo.png?v=d81b8eed" class="quarto-figure quarto-figure-center" height="513"></p>
 </figure>
 </div>
 
@@ -197,12 +197,12 @@
 <section id="composition-matched-data" class="slide level2">
 <h2>2.1 Composition-matched data</h2>
 <ul>
-<li>Bin every sequence by G+C, U and length; in each bin keep <strong>as many unbound as bound</strong></li>
+<li>Bin every sequence by GC, U and length; in each bin keep <strong>as many unbound as bound</strong></li>
 <li>Bound and unbound then have the same single-letter composition and length; letter pairs and longer words can still differ</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/matched_hist.png" class="quarto-figure quarto-figure-center" height="507"></p>
+<p><img data-src="assets/custom/matched_hist.png?v=ff469948" class="quarto-figure quarto-figure-center" height="507"></p>
 </figure>
 </div>
 
@@ -215,10 +215,10 @@
 <section id="four-ways-to-adapt-a-pretrained-model" class="slide level2">
 <h2>3.1 Four ways to adapt a pretrained model</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/adapt_layers_0.png" height="742"></p>
-<p><img data-src="assets/custom/adapt_layers_1.png" class="fragment" height="742"></p>
-<p><img data-src="assets/custom/adapt_layers_2.png" class="fragment" height="742"></p>
-<p><img data-src="assets/custom/adapt_layers_3.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/adapt_layers_0.png?v=bc0ce964" height="742"></p>
+<p><img data-src="assets/custom/adapt_layers_1.png?v=bbc435bb" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/adapt_layers_2.png?v=f26e2513" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/adapt_layers_3.png?v=d94c1092" class="fragment" height="742"></p>
 </div>
 
 </section>
@@ -232,7 +232,7 @@
 <p>Open <strong><code>03_shortcuts_and_controls.ipynb</code></strong>; it starts from our CNN and our embeddings.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/your_turn_d3.png" class="quarto-figure quarto-figure-center" height="511"></p>
+<p><img data-src="assets/custom/your_turn_d3.png?v=5a63025c" class="quarto-figure quarto-figure-center" height="511"></p>
 </figure>
 </div>
 
@@ -247,7 +247,7 @@
 <ol type="1">
 <li>How much of each score do two composition numbers explain?</li>
 <li>Which model barely changed after the shuffle, and what does that say about what it uses?</li>
-<li>Which part of the G+C difference could be AGO2 biology (3′ UTRs, the end of an mRNA after its protein-coding part, are A/U-rich), and which part could come from how the unbound positions were drawn?</li>
+<li>Which part of the GC difference could be AGO2 biology (3′ UTRs, the end of an mRNA after its protein-coding part, are A/U-rich), and which part could come from how the unbound positions were drawn?</li>
 </ol>
 
 </section>
@@ -255,7 +255,7 @@
 <h2>5.2 Fine-tuning against the CNN</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/headtohead.png" class="quarto-figure quarto-figure-center" height="649"></p>
+<p><img data-src="assets/custom/headtohead.png?v=f671f2ab" class="quarto-figure quarto-figure-center" height="649"></p>
 </figure>
 </div>
 
@@ -264,7 +264,7 @@
 <h2>5.3 Test AUROC against the number of labels</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/label_curve2.png" class="quarto-figure quarto-figure-center" height="684"></p>
+<p><img data-src="assets/custom/label_curve2.png?v=5ec4b277" class="quarto-figure quarto-figure-center" height="684"></p>
 </figure>
 </div>
 
@@ -278,7 +278,7 @@
 <h2>6.1 The day in numbers</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/day_numbers.png" class="quarto-figure quarto-figure-center" height="766"></p>
+<p><img data-src="assets/custom/day_numbers.png?v=bef2de47" class="quarto-figure quarto-figure-center" height="766"></p>
 </figure>
 </div>
 
@@ -287,7 +287,7 @@
 <h2>6.2 Ten pretrained models on matched data</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/model_scan.png" class="quarto-figure quarto-figure-center" height="695"></p>
+<p><img data-src="assets/custom/model_scan.png?v=3bbbaa70" class="quarto-figure quarto-figure-center" height="695"></p>
 </figure>
 </div>
 
@@ -333,7 +333,7 @@
 <li>Notebooks and slides stay online: <strong><span class="nowrap">mathoory.github.io/ai-days-2026-dna-workshop</span></strong></li>
 </ul>
 </div><div class="column" style="width:42%;">
-<p><img data-src="assets/custom/qr_form.png" height="671"></p>
+<p><img data-src="assets/custom/qr_form.png?v=9acaf17a" height="671"></p>
 </div></div>
 
 </section>
@@ -354,7 +354,7 @@
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
-<p><img src="assets/logo.png" class="slide-logo"></p>
+<p><img src="assets/logo.png?v=440542c4" class="slide-logo"></p>
 <div class="footer footer-default">
 
 </div>
