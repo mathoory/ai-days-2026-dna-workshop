@@ -103,7 +103,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; set `USE_MY_FILES = True` in the rej
 | TODO-5 | the LoRA training step | about 0.81 | 7 min |
 
 ::: {.notes}
-- Given cells (setup, CNN retrain, before and after, take-aways): about 10 min. Projected hands-on total: about 49 min, 51 with the optional section (the times in the notebook headings), including LoRA training.
+- Given cells (setup, CNN retrain, before and after, take-aways): about 10 min. Projected hands-on total: about 49 min, 51 with the optional section, including LoRA training.
 - The rejoin cell is at the end of section 0; keep `USE_MY_FILES = False` to use our files.
 - Helpers: TODO-1 `gc_u`, `probe_auc`; TODO-2 `kmer_counts(seqs, k=5)`; TODO-3 `dinuc_shuffle`; TODO-5 `batch_logits`, `crit`, `opt`, `scaler`.
 - TODO-3: score the shuffled sequences with the probe already fitted on real sequences.

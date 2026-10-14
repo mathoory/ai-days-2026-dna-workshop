@@ -28,7 +28,6 @@
 #    result with a 30× larger model;
 # 3. pretrain a model from random weights for 3 minutes, and probe it before and after.
 #
-# Each section heading gives a projected time on a T4 GPU, including reading and typing.
 #
 # Use an AI assistant (Gemini in Colab, or any chat assistant) as much as you like. Each TODO states
 # what to build, the variable names to use, the gotchas to tell your assistant, and a check with the
@@ -43,7 +42,7 @@
 # Before you start: *Runtime → Change runtime type → T4 GPU*.
 
 # %% [markdown]
-# ## 0. Setup (about 4 min)
+# ## 0. Setup
 #
 # Run the three setup cells and the data cell below.
 
@@ -69,7 +68,7 @@ print(f"train {len(S_train):,} | test {len(S_test):,} | bound: {y_train.mean():.
 print("example:", S_train[0][:70], "...")
 
 # %% [markdown]
-# ## 1. Load a pretrained DNA language model (about 2 min)
+# ## 1. Load a pretrained DNA language model
 #
 # **Mistral-DNA (16M)** (Mourad, 2024): 16 million parameters, pretrained on the human genome (hg38).
 # Its repository name says 17M because it also counts the output layer that predicts the next token,
@@ -89,7 +88,7 @@ print("\nfirst 60 letters :", S_train[0][:60])
 print("as tokens        :", " | ".join(tok.convert_ids_to_tokens(ids)))
 
 # %% [markdown]
-# ### TODO-1: Turn sequences into vectors (about 9 min)
+# ### TODO-1: Turn sequences into vectors
 #
 # **Build** `embed(tok, model, seqs, batch=128)`: a list of DNA strings in, a numpy array of shape
 # `(len(seqs), 256)` out, one vector per sequence. For each batch of sequences:
@@ -146,7 +145,7 @@ print(f"embedded {len(S_train) + len(S_test):,} sequences in {time.time() - t0:.
 np.savez_compressed(DATA_DIR / "my_emb_mistral17m.npz", train=E_train, test=E_test)
 
 # %% [markdown]
-# ### A 2-D map of the vectors (about 2 min)
+# ### A 2-D map of the vectors
 
 # %%
 #@title A 2-D map of the vectors - run this cell { display-mode: "form" }
@@ -177,7 +176,7 @@ for j in (0, 1):
 # the signs can flip between runs. Bound sequences concentrate at the low-G+C end of the map. Part 3
 # tests whether the probe uses this.
 #
-# ### TODO-2: A linear probe (about 5 min)
+# ### TODO-2: A linear probe
 #
 # **Build** `probe_auc(E_train, y_train, E_test, y_test)`. It must **return a tuple `(auc, probe)`**:
 # the AUROC on the **test** set, and the fitted model. Inside:
@@ -217,7 +216,7 @@ results = {"Mistral-DNA (16M), pretrained": auc_fm}
 print(f"reference probe: test AUROC = {auc_fm:.3f}")
 
 # %% [markdown]
-# ## 2. A 30× larger model: Nucleotide Transformer (about 2 min)
+# ## 2. A 30× larger model: Nucleotide Transformer
 #
 # **Nucleotide Transformer 500M** (NT-500M, InstaDeep): 486 million parameters, pretrained on the human
 # reference genome by masked-token prediction. The download is about 2 GB, so by default we load its
@@ -243,7 +242,7 @@ results["Nucleotide Transformer (486M), pretrained"] = auc_nt
 print(f"NT-500M + probe: {auc_nt:.3f}   vs   Mistral-DNA (16M): {auc_fm:.3f}")
 
 # %% [markdown]
-# ## 3. Pretraining from scratch, live (about 6 min, 4 of them computing)
+# ## 3. Pretraining from scratch, live
 #
 # Real pretraining takes days of GPU time. Here we run the first 3 minutes of it, following the Galaxy
 # Training Network tutorial (Mourad & Batut, CC-BY). The new model has the same design as Mistral-DNA
@@ -337,7 +336,7 @@ for k, v in sorted(results.items(), key=lambda kv: kv[1]):
 _ = (DATA_DIR / "my_part2_results.json").write_text(json.dumps(results, indent=1))
 
 # %% [markdown]
-# ### What to take away (about 2 min)
+# ### What to take away
 #
 # **Reading the loss.** The loss is minus the log of the probability the model gave the true next token. A
 # uniform guess among 4,096 tokens gives ln 4096 ≈ 8.3 (the dashed line). A model that knows only how

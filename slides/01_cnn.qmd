@@ -363,7 +363,7 @@ Open **`01_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
 | TODO-5 | insert the motif and a shuffled copy | two curves | 8 min |
 
 ::: {.notes}
-- Given cells (setup, data, motif toolkit, take-aways): about 12 min. Projected hands-on total: about 46 min, 51 with the optional sections (the times in the notebook headings).
+- Given cells (setup, data, motif toolkit, take-aways): about 12 min. Projected hands-on total: about 46 min, 51 with the optional sections.
 - TODO-3 check: about 0.79 after epoch 1 and 0.86 after epoch 10. Encoding and 10 epochs take about a minute on a T4 (2 to 8 seconds per epoch).
 - Helpers for TODO-4: `acts[:, f, :]`, `cutoff_for`, `windows_above`, `pwm_of`; then set `MY_FILTER` and `MY_MOTIF`. TODO-4 ends with choosing a motif. TODO-5 uses `plant`.
 - Each TODO has a "Stuck?" cell below it that loads our version.

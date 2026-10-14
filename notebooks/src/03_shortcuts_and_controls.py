@@ -18,7 +18,6 @@
 # 3. select bound and unbound sequences with the same composition, then train and test every model
 #    again on them, including a fine-tuned language model (TODO-4 and TODO-5).
 #
-# Each section heading gives a projected time on a T4 GPU, including reading and typing.
 #
 # | cell | what you do |
 # |---|---|
@@ -29,7 +28,7 @@
 # Before you start: *Runtime → Change runtime type → T4 GPU*.
 
 # %% [markdown]
-# ## 0. Setup and rejoin (about 4 min)
+# ## 0. Setup and rejoin
 #
 # Run the setup cells, then the rejoin cell. It uses your files if you upload them (`USE_MY_FILES = True`):
 # `my_cnn.pt` from part 1 (`01_cnn`) and `my_emb_mistral17m.npz` from part 2
@@ -97,7 +96,7 @@ for k, v in table.items():
 #    and see how much of each model's score remains.
 
 # %% [markdown]
-# ## 1. Composition (about 3 min)
+# ## 1. Composition
 #
 # Look first: are bound and unbound sequences made of different letters?
 
@@ -120,7 +119,7 @@ plt.tight_layout(); plt.show()
 # how the unbound positions were drawn. Sequence length is also a weak shortcut (alone it gives an AUROC
 # of about 0.54); section 4 controls for it together with composition.
 #
-# ### TODO-1: A two-number model (about 3 min)
+# ### TODO-1: A two-number model
 #
 # Fit a logistic regression on only these **two numbers** per sequence and report its AUROC on the
 # test set. The tools are already here:
@@ -146,7 +145,7 @@ table["G+C and U content only (2 numbers)"] = auc_gc
 print(f"2 numbers (reference): {auc_gc:.3f}")
 
 # %% [markdown]
-# ## 2. Word counts (TODO-2, about 4 min)
+# ## 2. Word counts (TODO-2)
 #
 # `kmer_counts(seqs, k=5)` turns each sequence into 1,024 numbers: how often each 5-letter word
 # occurs. A linear model on these counts sees which words appear, but not where or in what order.
@@ -173,7 +172,7 @@ table["5-letter word counts (1,024 numbers)"] = auc_k5
 print(f"word counts (reference): {auc_k5:.3f}")
 
 # %% [markdown]
-# ## 3. The shuffle test (about 2 min)
+# ## 3. The shuffle test
 #
 # Take every **bound** test sequence and shuffle it with `dinuc_shuffle`. The result has the same
 # letters, the same letter pairs and the same G+C content, but any longer motif is broken up. Then
@@ -202,7 +201,7 @@ print("same G+C and U?", np.allclose(gc_u(bound), gc_u(shuffled)))
 y_shuf = np.array([1] * len(shuffled) + [0] * len(unbound))
 
 # %% [markdown]
-# ### TODO-3: Run the shuffle test on both models (about 6 min)
+# ### TODO-3: Run the shuffle test on both models
 #
 # Compute two AUROCs, both against `y_shuf` (1 for the shuffled bound sequences, 0 for the real
 # unbound ones), for the list `shuffled + unbound`:
@@ -258,7 +257,7 @@ plt.tight_layout(); plt.show()
 _ = (DATA_DIR / "my_part3_shuffle_results.json").write_text(json.dumps(results, indent=1))
 
 # %% [markdown]
-# ### Discuss (about 2 min)
+# ### Discuss
 #
 # 1. How much of each model's score can two numbers reproduce?
 # 2. Which model was least affected by the shuffle? Compare its shuffled score with the composition
@@ -286,7 +285,7 @@ _ = (DATA_DIR / "my_part3_shuffle_results.json").write_text(json.dumps(results, 
 # differ between the classes, so a score above 0.5 can still come from them.
 
 # %% [markdown]
-# ## 4. A composition-matched benchmark (about 4 min)
+# ## 4. A composition-matched benchmark
 #
 # We sort every training sequence into a bin by its G+C fraction, U fraction and length. In each bin
 # we keep the **same number of bound and unbound sequences** (the smaller of the two counts) and drop
@@ -352,7 +351,7 @@ plt.tight_layout(); plt.show()
 # were, `matched` uses the composition-matched subset. Every model below is trained and tested on both,
 # so the two columns of results differ only in how the sequences were selected.
 #
-# ### TODO-4: One function, two benchmarks (about 8 min)
+# ### TODO-4: One function, two benchmarks
 #
 # **Build** the body of `shortcut_scores(train_seqs, train_y, test_seqs, test_y)`: it gets the first
 # 12,000 training sequences as `tr`, `ytr` and must compute three test AUROCs (numbers), as in sections 1 and 2.
@@ -405,7 +404,7 @@ for k in scores["original"]:
     print(f"{k:38s} original {scores['original'][k]:.3f} | matched {scores['matched'][k]:.3f}")
 
 # %% [markdown]
-# ## 5. Retrain the CNN on both benchmarks (about 2 min)
+# ## 5. Retrain the CNN on both benchmarks
 #
 # Same architecture as part 1, 6 epochs on each training set of about 65,000 sequences (~1.5 minutes
 # on a T4 for both). The three models above used 12,000 of them.
@@ -432,7 +431,7 @@ for name in BENCH:
     print(f"CNN, {name:8s}: {scores[name]['CNN (part 1 architecture)']:.3f}  ({time.time() - t0:.0f}s)")
 
 # %% [markdown]
-# ## 6. Fine-tuning with LoRA (TODO-5, about 7 min)
+# ## 6. Fine-tuning with LoRA (TODO-5)
 #
 # So far the language model was **frozen**: we only trained a linear probe on top. **Fine-tuning**
 # also updates the model's own weights for the AGO2 task. A 16M-parameter model like Mistral-DNA could
@@ -547,7 +546,7 @@ scores["matched"]["Mistral-DNA, LoRA fine-tuned"] = lora_auc()
 print(f"LoRA fine-tuned: {scores['matched']['Mistral-DNA, LoRA fine-tuned']:.3f}  ({time.time() - t0:.0f}s)")
 
 # %% [markdown]
-# ## 7. Before and after the control (about 2 min)
+# ## 7. Before and after the control
 
 # %%
 #@title The before/after table - run this cell { display-mode: "form" }
@@ -567,7 +566,7 @@ print("(labelled training sequences: CNN about 65,000; LoRA 20,000; the other th
 _ = (DATA_DIR / "my_part3_matched_results.json").write_text(json.dumps(scores, indent=1))
 
 # %% [markdown]
-# ## 8. Pretraining and the number of labels (optional, about 2 min)
+# ## 8. Pretraining and the number of labels (optional)
 #
 # The table above compares models trained on different numbers of labels. At equal numbers the CNN
 # still scores higher. With 12,000 labels on matched data it reaches about 0.82, against 0.77 for the
@@ -675,7 +674,7 @@ for n, row in HEAD_TO_HEAD.items():
     print(f"{n:6,} labels | " + " | ".join(f"{k} {v:.3f}" for k, v in row.items()))
 
 # %% [markdown]
-# ### What to take away (about 2 min)
+# ### What to take away
 #
 # * **Frozen probe.** It still scores about 0.77 after matching, and in section 3 it barely changed under
 #   the shuffle. So it relies mostly on short-word composition (letter pairs, 5-letter words), which

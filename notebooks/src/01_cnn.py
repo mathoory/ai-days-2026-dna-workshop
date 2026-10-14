@@ -23,7 +23,6 @@
 # 2. read off the letter patterns that its first-layer filters respond to, as sequence logos;
 # 3. test one of these patterns by inserting it into random RNA, next to a shuffled control.
 #
-# Each section heading gives a projected time on a T4 GPU, including reading and typing.
 #
 # **How this notebook works**
 #
@@ -36,7 +35,7 @@
 # Before you start: *Runtime → Change runtime type → T4 GPU*.
 
 # %% [markdown]
-# ## 0. Setup (about 3 min)
+# ## 0. Setup
 #
 # Run the next two cells. The first one also installs `logomaker`, which draws the sequence logos in
 # section 7.
@@ -51,7 +50,7 @@
 # %% [markdown]
 # # Build a CNN (sections 1 to 5)
 #
-# ## 1. The data (about 2 min)
+# ## 1. The data
 #
 # Each sequence is a string over the 4-letter RNA alphabet `A C G U`. The *train* files are used to
 # fit the model. The *ls* files hold 1,000 other sequences, the **held-out test set**, which we use only
@@ -72,7 +71,7 @@ print(f"length: {min(map(len, train_seqs))}-{max(map(len, train_seqs))} letters"
 print("\na bound sequence:\n", train_seqs[0][:90], "...")
 
 # %% [markdown]
-# ## 2. One-hot encoding: a sequence becomes a matrix (TODO-1, about 3 min)
+# ## 2. One-hot encoding: a sequence becomes a matrix (TODO-1)
 #
 # The model takes numbers as input. We encode each letter as a column of 4 numbers: 1 in the row of
 # that letter and 0 elsewhere (rows = `A, C, G, U`). A sequence of length $L$ becomes a $4 \times L$ matrix,
@@ -104,7 +103,7 @@ print("letters:", "  ".join(train_seqs[0][:8]))
 print(X_one[0, 0, :, :8].numpy())
 
 # %% [markdown]
-# ## 3. The model (TODO-2, about 7 min)
+# ## 3. The model (TODO-2)
 #
 # A **convolution** layer computes the dot product of a small weight matrix (a *filter*) with every
 # window of the input. Our first-layer filters are $4 \times 10$, so each one gives a score to every
@@ -178,7 +177,7 @@ class GlobalCNN(nn.Module):
 print("reference GlobalCNN:", GlobalCNN()(encode_batch(train_seqs[:2])).shape, "<- should be torch.Size([2])")
 
 # %% [markdown]
-# ## 4. Training (TODO-3, about 7 min)
+# ## 4. Training (TODO-3)
 #
 # Training minimises a **loss** by gradient descent (here the Adam variant): each step computes the
 # gradient of the loss on one batch of 256 sequences and moves every weight a small amount against
@@ -296,7 +295,7 @@ plt.title("Learning curve"); plt.tight_layout(); plt.show()
 # A difference of 0.01 (0.85 against 0.86) is within this noise; a difference of 0.06 (0.80 against 0.86) is not.
 
 # %% [markdown]
-# ## 5. Take your model with you (about 1 min)
+# ## 5. Take your model with you
 #
 # Each Colab notebook runs on its own machine. Download your trained CNN now. At the start of part 3
 # (`03_shortcuts_and_controls`) you can upload it, or use ours.
@@ -319,7 +318,7 @@ download_outputs("my_cnn.pt")
 #    and check whether the model's score goes up.
 
 # %% [markdown]
-# ## 6. The toolkit (given, about 3 min)
+# ## 6. The toolkit (given)
 #
 # Read the names and descriptions. You will combine these functions in the TODOs below.
 #
@@ -424,7 +423,7 @@ def score_sequences(model, seqs, batch=1024):
 print(f"toolkit ready (filter width = {KERNEL})")
 
 # %% [markdown]
-# ## 7. Read a motif off the model (TODO-4, about 9 min)
+# ## 7. Read a motif off the model (TODO-4)
 #
 # For **every** filter: compute its threshold, collect the windows above it, turn them into a letter
 # frequency table, and record its consensus (the most frequent letter at each position). Keep the
@@ -509,7 +508,7 @@ draw_logo(pwms[f], f"Filter {f:02d}, bound RNA", ax[0]); draw_logo(pwm_neg, f"Fi
 plt.tight_layout(); plt.show()
 
 # %% [markdown]
-# ## 8. Now test it (TODO-5, about 8 min)
+# ## 8. Now test it (TODO-5)
 #
 # A logo shows which windows activate one filter. Whether that filter changes the model's *output* is a
 # separate question, and you answer it by intervening:
@@ -586,7 +585,7 @@ plt.legend(); plt.title("Effect of one copy by position")
 plt.tight_layout(); plt.show()
 
 # %% [markdown]
-# ### What to take away (about 3 min)
+# ### What to take away
 #
 # * The logo suggests a pattern. Inserting the motif, next to a shuffled control, tests whether the
 #   model's output responds to it.
@@ -604,7 +603,7 @@ plt.tight_layout(); plt.show()
 # **Discuss with your neighbour:** did your motif score higher than its shuffled control? Did theirs?
 
 # %% [markdown]
-# ## 9. Bonus (optional): known microRNA target sites (about 2 min)
+# ## 9. Bonus (optional): known microRNA target sites
 
 # %%
 #@title Bonus (optional): insert known microRNA target sites - run this cell { display-mode: "form" }
@@ -632,7 +631,7 @@ for name, site in SITES.items():
 # weights most. A copy that does not fit into a shorter sequence is skipped.
 
 # %% [markdown]
-# ## 10. If you finish early (about 3 min)
+# ## 10. If you finish early
 #
 # Change `EPOCHS` (e.g. 3 or 20) and rerun the training cell of section 4. Does more training still
 # help after epoch 10? Compare with your neighbour. (Keep the architecture as it is: part 3 loads this
