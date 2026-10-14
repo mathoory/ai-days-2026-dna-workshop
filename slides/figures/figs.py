@@ -209,11 +209,11 @@ def lr_training(tr, ty):
         w_raw = ws / sd
         return w_raw, bs - float((ws * mu / sd).sum())
 
-    fig = newfig()
+    fig = newfig(); fig.set_size_inches(16, 9.5)
     o = rng.permutation(len(y))
     panels = []
     for k, step in enumerate(steps):
-        ax = fig.add_axes([0.075 + k * 0.16, 0.13, 0.138, 0.62]); panels.append(ax)
+        ax = fig.add_axes([0.075 + k * 0.16, 0.09, 0.138, 0.6]); panels.append(ax)
         ax.scatter(X[o, 0], X[o, 1], c=np.where(y[o] == 1, BOUND, MID), s=22, alpha=.6, lw=0)
         ws, bs = snaps[step]
         xs = np.linspace(X[:, 0].min(), X[:, 0].max(), 50)
@@ -237,14 +237,14 @@ def lr_training(tr, ty):
             ax.set_ylabel("U fraction")
         else:
             ax.set_yticklabels([])
-    ax = fig.add_axes([0.59, 0.13, 0.135, 0.62]); panels.append(ax)     # this run's loss, all 300 steps
+    ax = fig.add_axes([0.59, 0.09, 0.135, 0.6]); panels.append(ax)      # this run's loss, all 300 steps
     ax.plot(losses, color=TRAIN_C, lw=3)
     for st in steps:
         ax.scatter(st, losses[st], s=70, color=TRAIN_C, zorder=3)
     ax.annotate(f"{losses[0]:.2f}", (0, losses[0]), xytext=(10, 2), textcoords="offset points", fontsize=17)
     ax.annotate(f"{losses[300]:.2f}", (300, losses[300]), xytext=(-46, 10), textcoords="offset points", fontsize=17)
     ax.set_title("Loss\n\n\n", fontsize=19); ax.set_xlabel("Step"); ygrid(ax)
-    ax = fig.add_axes([0.785, 0.13, 0.135, 0.62]); panels.append(ax)
+    ax = fig.add_axes([0.785, 0.09, 0.135, 0.6]); panels.append(ax)
     n = 60                                               # the first 60 steps, where the three runs differ
     ax.plot(range(n), other[10.0][:n], color=HELD_C, lw=1.6, marker="o", ms=3)
     ax.plot(range(n), other[0.05][:n], color=MID, lw=3)
@@ -259,7 +259,12 @@ def lr_training(tr, ty):
     fig.legend(handles=[Line2D([], [], marker="o", ls="", ms=10, color=BOUND, label="Bound"),
                         Line2D([], [], marker="o", ls="", ms=10, color=MID, label="Unbound"),
                         Line2D([], [], color=HELD_C, lw=3, label=r"$\hat p$ = 0.5: undecided")],
-               loc="upper right", ncol=3, bbox_to_anchor=(0.98, 1.0))
+               loc="upper right", ncol=3, bbox_to_anchor=(0.995, 1.0))
+    # the model and the update, in the band above the panels (the slide carries no text)
+    fig.text(0.02, 0.985, r"Model:  $\hat p = \sigma\,(\,w_1 \cdot \mathrm{G{+}C\ fraction} + w_2 \cdot \mathrm{U\ fraction} + b\,)$",
+             fontsize=25, va="top", color=INK)
+    fig.text(0.02, 0.925, r"Each step:  $(w_1, w_2, b) \leftarrow (w_1, w_2, b) - \eta\, \nabla \mathcal{L}$",
+             fontsize=25, va="top", color=INK)
     names = [f"lr_training_{k}" for k in range(5)]
     for k, name in enumerate(names):                     # frames for the slide: one panel per click
         for j, a in enumerate(panels):
@@ -450,6 +455,10 @@ def activation_track(model, f, pos):
     ax = fig.add_axes([0.08, 0.14, 0.88, 0.7])
     ax.bar(range(len(a)), a, color=[ACCENT if k == j else TRAIN_L for k in range(len(a))], width=1.0)
     ax.set_xlim(-1, len(a)); ax.set_ylabel(f"Filter {f} output"); ax.set_xlabel("Position along one bound sequence")
+    lo = max(0, min(j - 60, len(a) - 120)) // 3 * 3              # the window the next slide zooms into
+    ax.axvspan(lo - 0.5, lo + 119.5, color=ACCENT_L, alpha=0.5, zorder=0)
+    ax.text(lo + 60, 1.0, "next slide", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=18,
+            color=ACCENT)
     ax.annotate(s[j:j + 10], (j, a[j]), xytext=(j + 20 if j < 0.6 * len(a) else j - 120, a[j] * 0.97),
                 fontsize=24, family=MONO, color=INK, va="center", arrowprops=dict(arrowstyle="-", color=MUTED, lw=1.2))
     save(fig, "activation_track")

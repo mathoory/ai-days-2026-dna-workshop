@@ -87,6 +87,7 @@ def xgrid(ax):
 def canvas(w=16, h=9, xlim=(0, 160), ylim=(0, 90)):
     """A blank drawing area in slide units (160 x 90)."""
     fig = plt.figure(figsize=(w, h), dpi=120)
+    fig._canvas = True                                   # a drawing: never stretched to a slide's shape
     ax = fig.add_axes([0, 0, 1, 1])
     ax.set_xlim(*xlim); ax.set_ylim(*ylim); ax.axis("off")
     return fig, ax
@@ -154,3 +155,37 @@ def trim_group(names, pad=24):
     x1 = min(ims[0].width, max(b[2] for b in boxes) + 1 + pad); y1 = min(ims[0].height, max(b[3] for b in boxes) + 1 + pad)
     for n, im in zip(names, ims):
         im.crop((x0, y0, x1, y1)).save(OUT / f"{n}.png")
+
+
+# ---------------------------------------------------------------------------- every save goes through here
+# 200 dpi so figures stay sharp when fitted to a slide; plot figures named in WIDEN are stretched to the shape of
+# the space their slide leaves (width / height of the saved PNG), so they fill the slide sideways as well.
+import re as _re
+from matplotlib.figure import Figure as _Figure
+
+SAVE_DPI = 200
+ASPECTS = Path(__file__).resolve().parent / "aspects.json"     # written by scripts/fit_measured.py --aspects
+_orig_savefig = _Figure.savefig
+
+
+def _aspect_for(stem):
+    import json
+    if not ASPECTS.exists():
+        return None
+    table = json.loads(ASPECTS.read_text(encoding="utf-8"))
+    return table.get(stem) or table.get(_re.sub(r"_\d+$", "", stem))
+
+
+def _savefig(self, fname, *a, **k):
+    stem = Path(str(fname)).stem
+    asp = None if getattr(self, "_canvas", False) else _aspect_for(stem)
+    if asp and not getattr(self, "_widened", False):
+        w, h = self.get_size_inches()
+        self.set_size_inches(h * asp, h)                 # the slide's free width / free height
+        self._widened = True
+    if k.get("dpi") in (None, 120):
+        k["dpi"] = SAVE_DPI
+    return _orig_savefig(self, fname, *a, **k)
+
+
+_Figure.savefig = _savefig

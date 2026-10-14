@@ -12,7 +12,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 - A **shortcut** is a simple property that differs between the classes in this data set, such as G+C
 - Before crediting a model with biology, measure what much simpler features achieve
 
-![](assets/custom/gc_hist.png){fig-align="center" height="538px"}
+![](assets/custom/gc_hist.png){fig-align="center" height="484px"}
 
 ::: {.notes}
 - G+C fraction of all 92,346 training sequences: bound filled blue, unbound grey outline, dashed lines at the class means.
@@ -30,7 +30,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 
 - Count every 5-letter word in a sequence: 1,024 numbers, one per possible word
 
-![](assets/custom/word_counts.png){fig-align="center" height="657px"}
+![](assets/custom/word_counts.png){fig-align="center" height="641px"}
 
 ::: {.notes}
 - Top: the start of one real bound sequence and its first four overlapping 5-letter words. A sequence of 340 letters has 336 of them.
@@ -44,7 +44,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 
 - A **dinucleotide** is a pair of neighbouring letters. The shuffle keeps every letter and dinucleotide count and scrambles everything longer, including where sites sit
 
-![](assets/custom/shuffle_demo.png){fig-align="center" height="606px"}
+![](assets/custom/shuffle_demo.png){fig-align="center" height="513px"}
 
 ::: {.notes}
 - Top: part of a real bound sequence and of its dinucleotide shuffle (Altschul and Erickson 1985). Bottom: the counts of the 16 letter pairs in the whole sequence, blue original, orange shuffled.
@@ -63,7 +63,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
 - Bin every sequence by G+C, U and length; in each bin keep **as many unbound as bound**
 - Bound and unbound then have the same single-letter composition and length; letter pairs and longer words can still differ
 
-![](assets/custom/matched_hist.png){fig-align="center" height="538px"}
+![](assets/custom/matched_hist.png){fig-align="center" height="507px"}
 
 ::: {.notes}
 - G+C fraction before (left, all 92,346 training sequences) and after matching (right); blue bound, grey unbound.
@@ -131,7 +131,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 
 ## 5.2 Fine-tuning against the CNN
 
-![](assets/custom/headtohead.png){fig-align="center" height="691px"}
+![](assets/custom/headtohead.png){fig-align="center" height="649px"}
 
 ::: {.notes}
 - Bars: mean AUROC; dots: single runs. Green: CNN from scratch; blue: NT-500M frozen with a probe; purple: NT-500M fine-tuned with LoRA. Left: 500 labels; right: 20,000.
@@ -144,7 +144,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 
 ## 5.3 Test AUROC against the number of labels
 
-![](assets/custom/label_curve2.png){fig-align="center" height="717px"}
+![](assets/custom/label_curve2.png){fig-align="center" height="684px"}
 
 ::: {.notes}
 - x: labelled training sequences, log scale; y: AUROC on the 3,000-sequence matched test set. Each model trained on 100 to 30,000 labelled matched sequences, three random draws per size (lines, with one standard deviation shaded). Green: CNN; blue: frozen Mistral-DNA; grey dotted: 5-letter word counts; light dashed: Mistral-DNA with random weights.
@@ -171,7 +171,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 
 ## 6.2 Ten pretrained models on matched data
 
-![](assets/custom/model_scan.png){fig-align="center" height="738px"}
+![](assets/custom/model_scan.png){fig-align="center" height="695px"}
 
 ::: {.notes}
 - Ten pretrained models from 3M to 2.5B parameters on the matched data, run offline. x: parameters, log scale; y: AUROC. All values on the 3,000-sequence matched test set.

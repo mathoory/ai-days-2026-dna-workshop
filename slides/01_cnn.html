@@ -363,14 +363,14 @@
 <section id="rna-and-ago2" class="slide level2">
 <h2>1.1 RNA and AGO2</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/bio_flow_base.png" height="682"></p>
-<p><img data-src="assets/custom/bio_flow_ago2.png" class="fragment" height="682"></p>
+<p><img data-src="assets/custom/bio_flow_base.png" height="723"></p>
+<p><img data-src="assets/custom/bio_flow_ago2.png" class="fragment" height="723"></p>
 </div>
 <aside class="notes">
 <ul>
 <li>AGO2 is Argonaute 2.</li>
 <li>Top row, left to right: a gene’s DNA (letters A, C, G, T) is copied into a messenger RNA (mRNA, letters A, C, G, U), which the cell translates into a protein. RNA uses U where DNA has T.</li>
-<li>Click: AGO2 is a protein that binds some mRNAs; where it binds, the mRNA yields less protein.</li>
+<li>Click: AGO2 is an RNA-binding protein (RBP). It sits on some mRNAs, at a short stretch of letters, its binding site; where it binds, the mRNA yields less protein.</li>
 <li>Our question for the day: from the RNA letters alone, can a model tell where AGO2 binds?</li>
 <li>Our sequences are RNA, so the notebooks use U; the DNA models of part 2 read T.</li>
 </ul>
@@ -524,7 +524,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/setup_examples.png" class="quarto-figure quarto-figure-center" height="442"></p>
+<p><img data-src="assets/custom/setup_examples.png" class="quarto-figure quarto-figure-center" height="430"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -622,7 +622,7 @@
 <h2>2.7 The learning flow</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/learning_flow.png" class="quarto-figure quarto-figure-center" height="534"></p>
+<p><img data-src="assets/custom/learning_flow.png" class="quarto-figure quarto-figure-center" height="559"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -656,8 +656,8 @@
 </div>
 </div>
 <div class="r-stack">
-<p><img data-src="assets/custom/bce_curve_0.png" height="594"></p>
-<p><img data-src="assets/custom/bce_curve_1.png" class="fragment" data-fragment-index="1" height="594"></p>
+<p><img data-src="assets/custom/bce_curve_0.png" height="579"></p>
+<p><img data-src="assets/custom/bce_curve_1.png" class="fragment" data-fragment-index="1" height="579"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -708,7 +708,7 @@
 <h2>2.10 The sigmoid: from a score to a probability</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/sigmoid.png" class="quarto-figure quarto-figure-center" height="633"></p>
+<p><img data-src="assets/custom/sigmoid.png" class="quarto-figure quarto-figure-center" height="695"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -731,16 +731,12 @@
 </section>
 <section id="gradient-descent" class="slide level2">
 <h2>2.11 Gradient descent</h2>
-<ul>
-<li>Model: <span class="math inline">\(\hat p = \sigma\big(w_1 \cdot \text{G+C fraction} + w_2 \cdot \text{U fraction} + b\big)\)</span></li>
-<li>Each step: <span class="math inline">\((w_1, w_2, b) \leftarrow (w_1, w_2, b) - \eta \, \nabla \mathcal{L}\)</span></li>
-</ul>
 <div class="r-stack">
-<p><img data-src="assets/custom/lr_training_0.png" height="572"></p>
-<p><img data-src="assets/custom/lr_training_1.png" class="fragment" height="572"></p>
-<p><img data-src="assets/custom/lr_training_2.png" class="fragment" height="572"></p>
-<p><img data-src="assets/custom/lr_training_3.png" class="fragment" height="572"></p>
-<p><img data-src="assets/custom/lr_training_4.png" class="fragment" height="572"></p>
+<p><img data-src="assets/custom/lr_training_0.png" height="742"></p>
+<p><img data-src="assets/custom/lr_training_1.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/lr_training_2.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/lr_training_3.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/lr_training_4.png" class="fragment" height="742"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -798,14 +794,14 @@
 <h2>2.13 ReLU</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/relu.png" class="quarto-figure quarto-figure-center" height="642"></p>
+<p><img data-src="assets/custom/relu.png" class="quarto-figure quarto-figure-center" height="707"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
 <li>ReLU (rectified linear unit) keeps positive values and sets negative ones to 0.</li>
 <li>It introduces non-linearity. Without it, a stack of weighted sums is just one weighted sum, a straight boundary like logistic regression.</li>
-<li>In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.3).</li>
+<li>In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.4).</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -895,9 +891,9 @@
 <h2>3.2 Drawing the ROC curve</h2>
 <p>The scores of our convolutional neural network (CNN, section 4) on the 1,000 held-out sequences</p>
 <div class="r-stack">
-<p><img data-src="assets/custom/roc_frame_0.png" height="626"></p>
-<p><img data-src="assets/custom/roc_frame_1.png" class="fragment" height="626"></p>
-<p><img data-src="assets/custom/roc_frame_2.png" class="fragment" height="626"></p>
+<p><img data-src="assets/custom/roc_frame_0.png" height="587"></p>
+<p><img data-src="assets/custom/roc_frame_1.png" class="fragment" height="587"></p>
+<p><img data-src="assets/custom/roc_frame_2.png" class="fragment" height="587"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -923,7 +919,7 @@
 <h2>3.3 AUROC</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/roc_frame_3.png" class="quarto-figure quarto-figure-center" height="757"></p>
+<p><img data-src="assets/custom/roc_auroc.png" class="quarto-figure quarto-figure-center" height="709"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -958,7 +954,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/onehot_big.png" class="quarto-figure quarto-figure-center" height="591"></p>
+<p><img data-src="assets/custom/onehot_big.png" class="quarto-figure quarto-figure-center" height="580"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -1009,11 +1005,37 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="training-changes-the-filters" class="slide level2">
+<h2>4.3 Training changes the filters</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/filter_learning_0.png" height="526"></p>
+<p><img data-src="assets/custom/filter_learning_1.png" class="fragment" height="526"></p>
+<p><img data-src="assets/custom/filter_learning_2.png" class="fragment" height="526"></p>
+<p><img data-src="assets/custom/filter_learning_3.png" class="fragment" height="526"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>Filter 0 at epochs 0, 1, 3 and 10 of one training run, one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.</li>
+<li>Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.</li>
+<li>Each step is the update of slide 2.11, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="the-filter-along-one-sequence" class="slide level2">
-<h2>4.3 The filter along one sequence</h2>
+<h2>4.4 The filter along one sequence</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/activation_track.png" class="quarto-figure quarto-figure-center" height="700"></p>
+<p><img data-src="assets/custom/activation_track.png" class="quarto-figure quarto-figure-center" height="678"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -1034,19 +1056,20 @@
       }</style></aside>
 </section>
 <section id="channels-and-pooling" class="slide level2">
-<h2>4.4 Channels and pooling</h2>
+<h2>4.5 Channels and pooling</h2>
 <ul>
 <li>10 filters give 10 output rows, <strong>channels</strong>; <strong>max pooling</strong> keeps the largest of every 3 positions</li>
 </ul>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/channels_pool.png" class="quarto-figure quarto-figure-center" height="606"></p>
-</figure>
+<div class="r-stack">
+<p><img data-src="assets/custom/channels_pool_0.png" height="593"></p>
+<p><img data-src="assets/custom/channels_pool_1.png" class="fragment" height="593"></p>
+<p><img data-src="assets/custom/channels_pool_2.png" class="fragment" height="593"></p>
 </div>
 <aside class="notes">
 <ul>
-<li>One bound sequence of 340 letters, the one on slide 4.3, positions 210 to 330 (filter 7 peaks at 273). Top: the output of all 10 first-layer filters after ReLU at each position; darker blue is larger. Bottom: after max pooling, one value per block of 3 positions.</li>
-<li>Each row is one filter’s track; row 7 is the track of slide 4.3.</li>
+<li>Click by click: the track of slide 4.4 as bars, then the same numbers as one row of colour, then all 10 filters, then max pooling.</li>
+<li>One bound sequence of 340 letters, the one on slide 4.4, positions 210 to 330 (filter 7 peaks at 273). Top: the output of all 10 first-layer filters after ReLU at each position; darker blue is larger. Bottom: after max pooling, one value per block of 3 positions.</li>
+<li>Each row is one filter’s track; row 7 is the track of slide 4.4.</li>
 <li>The network computes all 492 positions of the padded input (164 after pooling); the figure shows 120 of them.</li>
 <li>Pooling shortens each track threefold and keeps the strongest responses; the exact position within each block of 3 is lost. It has no parameters.</li>
 <li>The second convolution reads all 10 channels at once: each of its 20 filters is 10 × 5, one weight per channel and pooled position.</li>
@@ -1064,10 +1087,10 @@
       }</style></aside>
 </section>
 <section id="build-your-network-todo-2" class="slide level2" data-todo="TODO-2">
-<h2>4.5 Build your network (TODO-2)</h2>
+<h2>4.6 Build your network (TODO-2)</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/cnn_template.png" class="quarto-figure quarto-figure-center" height="389"></p>
+<p><img data-src="assets/custom/cnn_template.png" class="quarto-figure quarto-figure-center" height="749"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -1091,37 +1114,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="training-changes-the-filters" class="slide level2">
-<h2>4.6 Training changes the filters</h2>
-<div class="r-stack">
-<p><img data-src="assets/custom/filter_learning_0.png" height="585"></p>
-<p><img data-src="assets/custom/filter_learning_1.png" class="fragment" height="585"></p>
-<p><img data-src="assets/custom/filter_learning_2.png" class="fragment" height="585"></p>
-<p><img data-src="assets/custom/filter_learning_3.png" class="fragment" height="585"></p>
-</div>
-<aside class="notes">
-<ul>
-<li>Filter 0 at epochs 0, 1, 3 and 10 of one training run, one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.</li>
-<li>Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.</li>
-<li>Each step is the update of slide 2.11, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
 <section id="the-training-step-and-the-evaluation-todo-3" class="slide level2" data-todo="TODO-3">
 <h2>4.7 The training step and the evaluation (TODO-3)</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/train_loop.png" class="quarto-figure quarto-figure-center" height="766"></p>
+<p><img data-src="assets/custom/train_loop.png" class="quarto-figure quarto-figure-center" height="661"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -1177,7 +1174,7 @@
 <p>PWM: position weight matrix, the frequency of each letter at each position</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/toy_pwm.png" class="quarto-figure quarto-figure-center" height="700"></p>
+<p><img data-src="assets/custom/toy_pwm.png" class="quarto-figure quarto-figure-center" height="684"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -1231,7 +1228,7 @@
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/plant_scheme_motif.png" class="quarto-figure quarto-figure-center" height="455"></p>
+<p><img data-src="assets/custom/plant_scheme_motif.png" class="quarto-figure quarto-figure-center" height="657"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -1260,7 +1257,7 @@
 <p>Open <strong><code>01_cnn.ipynb</code></strong> in Colab, select the T4 GPU, run from the top.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/your_turn.png" class="quarto-figure quarto-figure-center" height="515"></p>
+<p><img data-src="assets/custom/your_turn.png" class="quarto-figure quarto-figure-center" height="629"></p>
 </figure>
 </div>
 <aside class="notes">

@@ -136,15 +136,15 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ## 1.1 RNA and AGO2
 
 ::: {.r-stack}
-![](assets/custom/bio_flow_base.png){height="682px"}
+![](assets/custom/bio_flow_base.png){height="723px"}
 
-![](assets/custom/bio_flow_ago2.png){.fragment height="682px"}
+![](assets/custom/bio_flow_ago2.png){.fragment height="723px"}
 :::
 
 ::: {.notes}
 - AGO2 is Argonaute 2.
 - Top row, left to right: a gene's DNA (letters A, C, G, T) is copied into a messenger RNA (mRNA, letters A, C, G, U), which the cell translates into a protein. RNA uses U where DNA has T.
-- Click: AGO2 is a protein that binds some mRNAs; where it binds, the mRNA yields less protein.
+- Click: AGO2 is an RNA-binding protein (RBP). It sits on some mRNAs, at a short stretch of letters, its binding site; where it binds, the mRNA yields less protein.
 - Our question for the day: from the RNA letters alone, can a model tell where AGO2 binds?
 - Our sequences are RNA, so the notebooks use U; the DNA models of part 2 read T.
 :::
@@ -227,7 +227,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Examples $(x_i, y_i)$, $i = 1, \dots, N$: a sequence $x_i$ and its label $y_i$ (1 bound, 0 unbound)
 - A model $g_\theta$ with parameters $\theta$ predicts $\hat p = g_\theta(x)$, the probability of bound
 
-![](assets/custom/setup_examples.png){fig-align="center" height="442px"}
+![](assets/custom/setup_examples.png){fig-align="center" height="430px"}
 
 ::: {.notes}
 - Four real training sequences, the first 32 of their 340 letters. $y$ is the CLIP-seq label; $\hat p$ is the prediction of the CNN trained in this part.
@@ -257,7 +257,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 2.7 The learning flow
 
-![](assets/custom/learning_flow.png){fig-align="center" height="534px"}
+![](assets/custom/learning_flow.png){fig-align="center" height="559px"}
 
 ::: {.notes}
 - The six steps of any supervised learning project.
@@ -281,9 +281,9 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 :::
 
 ::: {.r-stack}
-![](assets/custom/bce_curve_0.png){height="594px"}
+![](assets/custom/bce_curve_0.png){height="579px"}
 
-![](assets/custom/bce_curve_1.png){.fragment fragment-index="1" height="594px"}
+![](assets/custom/bce_curve_1.png){.fragment fragment-index="1" height="579px"}
 :::
 
 ::: {.notes}
@@ -311,7 +311,7 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 
 ## 2.10 The sigmoid: from a score to a probability
 
-![](assets/custom/sigmoid.png){fig-align="center" height="633px"}
+![](assets/custom/sigmoid.png){fig-align="center" height="695px"}
 
 ::: {.notes}
 - A model first computes a score $z$, any number (a weighted sum of the features plus a bias). The sigmoid turns it into a probability between 0 and 1.
@@ -321,19 +321,16 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 
 ## 2.11 Gradient descent
 
-- Model: $\hat p = \sigma\big(w_1 \cdot \text{G+C fraction} + w_2 \cdot \text{U fraction} + b\big)$
-- Each step: $(w_1, w_2, b) \leftarrow (w_1, w_2, b) - \eta \, \nabla \mathcal{L}$
-
 ::: {.r-stack}
-![](assets/custom/lr_training_0.png){height="572px"}
+![](assets/custom/lr_training_0.png){height="742px"}
 
-![](assets/custom/lr_training_1.png){.fragment height="572px"}
+![](assets/custom/lr_training_1.png){.fragment height="742px"}
 
-![](assets/custom/lr_training_2.png){.fragment height="572px"}
+![](assets/custom/lr_training_2.png){.fragment height="742px"}
 
-![](assets/custom/lr_training_3.png){.fragment height="572px"}
+![](assets/custom/lr_training_3.png){.fragment height="742px"}
 
-![](assets/custom/lr_training_4.png){.fragment height="572px"}
+![](assets/custom/lr_training_4.png){.fragment height="742px"}
 :::
 
 ::: {.notes}
@@ -362,12 +359,12 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 
 ## 2.13 ReLU
 
-![](assets/custom/relu.png){fig-align="center" height="642px"}
+![](assets/custom/relu.png){fig-align="center" height="707px"}
 
 ::: {.notes}
 - ReLU (rectified linear unit) keeps positive values and sets negative ones to 0.
 - It introduces non-linearity. Without it, a stack of weighted sums is just one weighted sum, a straight boundary like logistic regression.
-- In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.3).
+- In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.4).
 :::
 
 ## 2.14 From logistic regression to a neural network
@@ -412,11 +409,11 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 The scores of our convolutional neural network (CNN, section 4) on the 1,000 held-out sequences
 
 ::: {.r-stack}
-![](assets/custom/roc_frame_0.png){height="626px"}
+![](assets/custom/roc_frame_0.png){height="587px"}
 
-![](assets/custom/roc_frame_1.png){.fragment height="626px"}
+![](assets/custom/roc_frame_1.png){.fragment height="587px"}
 
-![](assets/custom/roc_frame_2.png){.fragment height="626px"}
+![](assets/custom/roc_frame_2.png){.fragment height="587px"}
 :::
 
 ::: {.notes}
@@ -429,7 +426,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 
 ## 3.3 AUROC
 
-![](assets/custom/roc_frame_3.png){fig-align="center" height="757px"}
+![](assets/custom/roc_auroc.png){fig-align="center" height="709px"}
 
 ::: {.notes}
 - All thresholds together give the ROC curve (receiver operating characteristic). AUROC is the area under it: the probability that a random bound sequence scores higher than a random unbound one. 0.5 is chance, 1.0 is perfect.
@@ -447,7 +444,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 
 - One column per letter, with a 1 in its row; padding columns of 0.25 up to 501
 
-![](assets/custom/onehot_big.png){fig-align="center" height="591px"}
+![](assets/custom/onehot_big.png){fig-align="center" height="580px"}
 
 ::: {.notes}
 - Each column is one letter; the four rows are A, C, G, U, and the coloured cell holds the 1. A sequence becomes a 4 × length matrix. The longest sequence is 375 letters.
@@ -478,32 +475,57 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 - The same toy filter comes back in section 5, when we read what a filter likes.
 :::
 
-## 4.3 The filter along one sequence
+## 4.3 Training changes the filters
 
-![](assets/custom/activation_track.png){fig-align="center" height="700px"}
+::: {.r-stack}
+![](assets/custom/filter_learning_0.png){height="526px"}
+
+![](assets/custom/filter_learning_1.png){.fragment height="526px"}
+
+![](assets/custom/filter_learning_2.png){.fragment height="526px"}
+
+![](assets/custom/filter_learning_3.png){.fragment height="526px"}
+:::
+
+::: {.notes}
+- Filter 0 at epochs 0, 1, 3 and 10 of one training run, one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.
+- Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.
+- Each step is the update of slide 2.11, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
+:::
+
+## 4.4 The filter along one sequence
+
+![](assets/custom/activation_track.png){fig-align="center" height="678px"}
 
 ::: {.notes}
 - A real filter of our trained CNN (filter 7, which prefers U-rich windows): its output at every position of one bound sequence, after ReLU. x: position; y: output.
 - ReLU (slide 2.13) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.
 :::
 
-## 4.4 Channels and pooling
+## 4.5 Channels and pooling
 
 - 10 filters give 10 output rows, **channels**; **max pooling** keeps the largest of every 3 positions
 
-![](assets/custom/channels_pool.png){fig-align="center" height="606px"}
+::: {.r-stack}
+![](assets/custom/channels_pool_0.png){height="593px"}
+
+![](assets/custom/channels_pool_1.png){.fragment height="593px"}
+
+![](assets/custom/channels_pool_2.png){.fragment height="593px"}
+:::
 
 ::: {.notes}
-- One bound sequence of 340 letters, the one on slide 4.3, positions 210 to 330 (filter 7 peaks at 273). Top: the output of all 10 first-layer filters after ReLU at each position; darker blue is larger. Bottom: after max pooling, one value per block of 3 positions.
-- Each row is one filter's track; row 7 is the track of slide 4.3.
+- Click by click: the track of slide 4.4 as bars, then the same numbers as one row of colour, then all 10 filters, then max pooling.
+- One bound sequence of 340 letters, the one on slide 4.4, positions 210 to 330 (filter 7 peaks at 273). Top: the output of all 10 first-layer filters after ReLU at each position; darker blue is larger. Bottom: after max pooling, one value per block of 3 positions.
+- Each row is one filter's track; row 7 is the track of slide 4.4.
 - The network computes all 492 positions of the padded input (164 after pooling); the figure shows 120 of them.
 - Pooling shortens each track threefold and keeps the strongest responses; the exact position within each block of 3 is lost. It has no parameters.
 - The second convolution reads all 10 channels at once: each of its 20 filters is 10 × 5, one weight per channel and pooled position.
 :::
 
-## 4.5 Build your network (TODO-2) {data-todo="TODO-2"}
+## 4.6 Build your network (TODO-2) {data-todo="TODO-2"}
 
-![](assets/custom/cnn_template.png){fig-align="center" height="389px"}
+![](assets/custom/cnn_template.png){fig-align="center" height="749px"}
 
 ::: {.notes}
 - The parts: a convolution slides its filters along the sequence (one output row, a channel, per filter); ReLU sets negative values to 0; max pooling keeps the largest value of each block of neighbouring positions, so the rows get shorter; flatten lays everything out in one row; a linear layer makes one number, the logit.
@@ -514,27 +536,9 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 - Students who finish early can try other networks and compare their held-out AUROCs.
 :::
 
-## 4.6 Training changes the filters
-
-::: {.r-stack}
-![](assets/custom/filter_learning_0.png){height="585px"}
-
-![](assets/custom/filter_learning_1.png){.fragment height="585px"}
-
-![](assets/custom/filter_learning_2.png){.fragment height="585px"}
-
-![](assets/custom/filter_learning_3.png){.fragment height="585px"}
-:::
-
-::: {.notes}
-- Filter 0 at epochs 0, 1, 3 and 10 of one training run, one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.
-- Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.
-- Each step is the update of slide 2.11, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
-:::
-
 ## 4.7 The training step and the evaluation (TODO-3) {data-todo="TODO-3"}
 
-![](assets/custom/train_loop.png){fig-align="center" height="766px"}
+![](assets/custom/train_loop.png){fig-align="center" height="661px"}
 
 ::: {.notes}
 - Top, blue: one training step, repeated for every batch of every epoch. A batch goes through the network, the scores are compared with the labels (the loss), the gradients of the loss say how to change every weight, and the step changes them; then the next batch.
@@ -565,7 +569,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 
 PWM: position weight matrix, the frequency of each letter at each position
 
-![](assets/custom/toy_pwm.png){fig-align="center" height="700px"}
+![](assets/custom/toy_pwm.png){fig-align="center" height="684px"}
 
 ::: {.notes}
 - The hits are aligned: both start where the filter fired, so their first letters correspond. Stack them and count the letters at each position: the position weight matrix (PWM).
@@ -588,7 +592,7 @@ PWM: position weight matrix, the frequency of each letter at each position
 
 - Insert one filter's consensus 1 to 7 times. Which control shows that its pattern matters?
 
-![](assets/custom/plant_scheme_motif.png){fig-align="center" height="455px"}
+![](assets/custom/plant_scheme_motif.png){fig-align="center" height="657px"}
 
 ::: {.notes}
 - Projected: 1 min.
@@ -603,7 +607,7 @@ PWM: position weight matrix, the frequency of each letter at each position
 
 Open **`01_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
 
-![](assets/custom/your_turn.png){fig-align="center" height="515px"}
+![](assets/custom/your_turn.png){fig-align="center" height="629px"}
 
 ::: {.notes}
 - TODO-1: `one_hot` and `encode_batch`. TODO-2: build your own network from the parts. TODO-3: `train_step`, `evaluate`, then the ROC curve. TODO-4: filter 0 step by step, then a logo for every filter. TODO-5: one copy in one sequence, design a control, then both curves.

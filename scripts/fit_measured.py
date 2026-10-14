@@ -162,9 +162,41 @@ def render(stem):
     subprocess.run(["quarto", "render", f"{stem}.qmd"], cwd=SLIDES, capture_output=True)
 
 
+def aspects(slides):
+    """Ideal width / height per image: the width it may use over the height its slide leaves for it."""
+    out = {}
+    for sl in slides:
+        free = BOTTOM - sl["bottom"]
+        full = [im for im in sl["imgs"] if im["col"] is None]
+        blocks, seen = [], False
+        for im in full:
+            if im["stack"]:
+                if not seen:
+                    blocks.append(im); seen = True
+            else:
+                blocks.append(im)
+        H = sum(b["h"] for b in blocks) or 1
+        for im in sl["imgs"]:
+            stem = im["src"].split("/")[-1].rsplit(".", 1)[0]
+            if im["col"] is None:
+                h_avail = im["h"] * (H + free) / H
+                out[stem] = round(MAX_W / h_avail, 3)
+            else:
+                out[stem] = round(im["col"] / (im["h"] + free), 3)
+    return out
+
+
 if __name__ == "__main__":
     args = sys.argv[1:]
     check = "--check" in args
+    if "--aspects" in args:
+        table = {}
+        for stem in [a_ for a_ in args if not a_.startswith("--")] or [q.stem for q in sorted(SLIDES.glob("0*.qmd"))]:
+            table.update(aspects(measure(stem)))
+        path = SLIDES / "figures" / "aspects.json"
+        path.write_text(json.dumps(table, indent=1, sort_keys=True), encoding="utf-8")
+        print("wrote", path, len(table), "figures")
+        raise SystemExit
     stems = [a for a in args if not a.startswith("--")] or [q.stem for q in sorted(SLIDES.glob("0*.qmd"))]
     for stem in stems:
         if check:

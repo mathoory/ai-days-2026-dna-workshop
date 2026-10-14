@@ -100,7 +100,7 @@ def _token_rows(rows, name, w, site):
 def tokens_split(pos):
     w, site = bound_window(pos)
     _token_rows([("Single letters", None, w)], "tokens_letters", w, site)
-    _token_rows([("6-mers", NT, w), ("6-mers, shifted\nby one letter", NT, w[1:])], "tokens_kmer", w, site)
+    _token_rows([("6-mers", NT, w)], "tokens_kmer", w, site)
     _token_rows([("BPE (Mistral-DNA)", MISTRAL, w)], "tokens_bpe", w, site)
 
 
@@ -358,7 +358,7 @@ def nn_diagram():
 
 
 def channels_pool(model, pos):
-    """All 10 first-layer channels on one bound sequence after ReLU, and after max pooling over 3 positions."""
+    """Three frames: filter 7's track (last slide) above its heatmap row; all 10 rows; then max pooling."""
     from intuition import acts
     A = acts(model, pos[:2000])
     i = int(np.argmax(A[:, 7, :].max(1)))
@@ -368,19 +368,48 @@ def channels_pool(model, pos):
     a = full[:, lo:lo + 120]                    # a 120-position window, aligned to the pooling blocks
     P = a.reshape(10, 40, 3).max(2)
     v = np.percentile(full, 99.5)
-    fig = newfig(); fig.set_size_inches(16, 8.4)
-    for k, (M, ttl) in enumerate([(a, "First convolution + ReLU: one value per position"),
-                                  (P, "After max pooling: the largest of every 3 positions")]):
-        ax = fig.add_axes([0.08, 0.56 - k * 0.45, 0.9, 0.34])
-        ax.imshow(M, cmap=SEQUENTIAL, vmin=0, vmax=v, aspect="auto", interpolation="nearest",
-                  extent=(lo, lo + 120, 9.5, -0.5))
-        ax.set_yticks(range(10)); ax.set_yticklabels([str(f) for f in range(10)], fontsize=18)
-        ax.set_ylabel("Filter"); ax.set_title(ttl)
-        ax.tick_params(length=0)
-        for sp in ax.spines.values():
+    fig = newfig(); fig.set_size_inches(16, 9)
+    ext = (lo - 0.5, lo + 119.5)
+    a0 = fig.add_axes([0.08, 0.75, 0.9, 0.18])                  # the track of the last slide, same positions
+    a0.bar(range(lo, lo + 120), a[7], color=[ACCENT if p == j else TRAIN_L for p in range(lo, lo + 120)], width=1.0)
+    a0.set_xlim(*ext); a0.set_xticks([]); a0.set_ylabel("Filter 7", fontsize=18)
+    a0.set_title("Filter 7's output (slide 4.4), positions %d to %d" % (lo, lo + 119))
+    a1 = fig.add_axes([0.08, 0.42, 0.9, 0.26])
+    a2 = fig.add_axes([0.08, 0.13, 0.9, 0.19])
+    for ax_ in (a1, a2):
+        ax_.set_yticks(range(10)); ax_.set_yticklabels([str(f) for f in range(10)], fontsize=16)
+        ax_.set_ylabel("Filter"); ax_.tick_params(length=0)
+        for sp in ax_.spines.values():
             sp.set_visible(False)
-    ax.set_xlabel("Position along one bound sequence")
-    save(fig, "channels_pool")
+    a2.set_xlabel("Position along one bound sequence")
+    names = []
+    for frame in range(3):
+        a1.clear(); a2.clear()
+        M = a.copy()
+        if frame == 0:
+            M[np.arange(10) != 7] = np.nan                    # only filter 7's row, as colour
+        a1.imshow(np.ma.masked_invalid(M), cmap=SEQUENTIAL, vmin=0, vmax=v, aspect="auto", interpolation="nearest",
+                  extent=(ext[0], ext[1], 9.5, -0.5))
+        a1.set_title("First convolution + ReLU: one row per filter, darker = larger"
+                     if frame else "The same numbers as one row of colour: darker = larger")
+        if frame == 0:
+            a1.add_patch(Rectangle((ext[0], 6.5), 120, 1, fill=False, ec=INK, lw=2))
+        a2.set_visible(frame == 2)
+        if frame == 2:
+            a2.imshow(P, cmap=SEQUENTIAL, vmin=0, vmax=v, aspect="auto", interpolation="nearest",
+                      extent=(ext[0], ext[1], 9.5, -0.5))
+            a2.set_title("After max pooling: the largest of every 3 positions")
+            a2.set_xlabel("Position along one bound sequence")
+        for ax_ in (a1, a2):
+            ax_.set_yticks(range(10)); ax_.set_yticklabels([str(f) for f in range(10)], fontsize=16)
+            ax_.set_ylabel("Filter"); ax_.tick_params(length=0)
+            for sp in ax_.spines.values():
+                sp.set_visible(False)
+        a1.set_xticks([])
+        fig.savefig(OUT / f"channels_pool_{frame}.png", facecolor="white")
+        names.append(f"channels_pool_{frame}")
+    trim_group(names)
+    plt.close(fig)
     print("channels_pool seq len", len(pos[i]), "window", lo, lo + 120, "filter 7 peak at", j)
 
 
@@ -477,32 +506,61 @@ def word_counts(pos):
 
 
 def cnn_template():
-    """The building blocks of the CNN: [convolution -> ReLU -> max pooling] (repeat) -> flatten -> linear."""
-    fig, ax = canvas(16, 5.6, ylim=(0, 56))
-    y0 = 20
+    """The CNN's parts (top) and one sequence followed through them with numbers (bottom)."""
+    fig, ax = canvas(16, 9, ylim=(0, 90))
+    y0 = 47
+    W_C, X_C = GOOD_C, ACCENT                          # learned weights green, numbers from the sequence blue
+    rend = fig.canvas.get_renderer()
 
-    def grid(x, w, rows, h=2.2, gap=0.6, fill=FAINT, edge=MID):
+    def pieces(x, y, parts, fs=20, ha="center"):
+        """Coloured text pieces on one line, placed one after the other."""
+        ts, widths = [], []
+        for s, c in parts:
+            t = ax.text(0, y, s, fontsize=fs, color=c, ha="left", va="center")
+            bb = t.get_window_extent(rend).transformed(ax.transData.inverted())
+            ts.append(t); widths.append(bb.width)
+        x = x - sum(widths) / 2 if ha == "center" else x - sum(widths) if ha == "right" else x
+        for t, w in zip(ts, widths):
+            t.set_x(x); x += w
+
+    def grid(x, w, rows, h=3.6, gap=0.9, fill=FAINT, edge=MID):
         for r in range(rows):
-            ax.add_patch(Rectangle((x, y0 + r * (h + gap)), w, h, fc=fill, ec=edge, lw=0.8))
-        return y0 + rows * (h + gap) - gap
+            ax.add_patch(Rectangle((x, y0 + r * (h + gap)), w, h, fc=fill, ec=edge, lw=1.0))
 
-    top = grid(2, 16, 4, h=2.6)                        # one-hot input: 4 letter rows
-    label(ax, 10, y0 - 5, "one-hot input\n4 letters × length", fs=17, color=MUTED)
-    grid(28, 14, 6)                                     # convolution: one row per filter (channel)
-    label(ax, 35, y0 - 5, "convolution\none row per filter", fs=17, color=MUTED)
-    grid(50, 14, 6, fill="white")                       # ReLU: same shape
-    label(ax, 57, y0 - 5, "ReLU\nnegatives to 0", fs=17, color=MUTED)
-    grid(78, 6, 6)                                      # max pooling: shorter rows
-    label(ax, 81, y0 - 5, "max pooling\nshorter rows", fs=17, color=MUTED)
-    ax.add_patch(Rectangle((90, y0 + 6.5), 38, 2.2, fc=FAINT, ec=MID, lw=0.8))   # flatten: one long row
-    label(ax, 109, y0 - 5, "flatten\nall numbers in one row", fs=17, color=MUTED)
-    ax.add_patch(plt.Circle((148, y0 + 7.6), 1.8, color=INK))                     # linear: one number
-    label(ax, 148, y0 - 5, "linear\none score (logit)", fs=17, color=MUTED)
-    for a, b in ((19, 27), (43, 49), (65, 77), (85, 89), (129, 145)):
-        arrow(ax, a, y0 + 7.6, b, y0 + 7.6, color=MUTED, lw=1.5, ms=18)
-    # the repeatable block
-    ax.plot([26, 26, 86, 86], [43, 46, 46, 43], color=INK, lw=1.4)
-    label(ax, 56, 50, "repeat as often as you like", fs=19, color=INK)
+    mid = y0 + 12.9
+    cols = [10.5, 35.5, 58.5, 79.5, 110, 148]
+    grid(2, 17, 4, h=5.4, gap=1.1)                      # one-hot input: 4 letter rows
+    grid(28, 15, 6, fill=ACCENT_L, edge=ACCENT)         # convolution: one row per filter
+    grid(51, 15, 6, fill="white", edge=ACCENT)          # ReLU: same shape
+    grid(76, 7, 6, fill=ACCENT_L, edge=ACCENT)          # max pooling: shorter rows
+    ax.add_patch(Rectangle((92, mid - 2.2), 36, 4.4, fc=FAINT, ec=MID, lw=1.0))     # flatten
+    ax.add_patch(plt.Circle((148, mid), 2.4, color=INK))                           # linear: one number
+    for a_, b_ in ((20, 27), (44, 50), (67, 75), (84, 91), (129, 144.6)):
+        arrow(ax, a_, mid, b_, mid, color=MUTED, lw=2, ms=22)
+    ax.plot([26, 26, 85, 85], [y0 + 28, y0 + 31, y0 + 31, y0 + 28], color=INK, lw=2)
+    label(ax, 55.5, y0 + 35, "repeat as often as you like (we use 2 blocks)", fs=22, color=INK)
+    names = ["one-hot input", "convolution", "ReLU", "max pooling", "flatten", "linear"]
+    for x, n in zip(cols, names):
+        label(ax, x, y0 - 5, n, fs=22, color=INK, bold=True)
+
+    # one bound sequence, followed through the same columns
+    ax.plot([2, 158], [34.5, 34.5], color=HAIR, lw=1.2)
+    label(ax, 2, 30, "One sequence, followed through", fs=19, color=MUTED, ha="left")
+    pieces(158, 30, [("numbers from the sequence", X_C), ("     ", INK), ("learned weights", W_C)], fs=19, ha="right")
+    pieces(10.5, 22, [(ch + " ", BASE[ch]) for ch in "AUGGCU"] + [("…", INK)], fs=21)
+    vals = {1: "1.4   −0.3   …", 2: "1.4   0.0   …", 3: "1.4   0.6   …",
+            4: "x = (1.4, 0.6, …, 0.2)"}
+    for k, s in vals.items():
+        label(ax, cols[k], 22, s, fs=21, color=X_C)
+    label(ax, cols[5], 22, "z = 1.2", fs=21, color=INK, bold=True)
+    shapes = ["4 × 501", "10 filters: 10 × 492", "negatives → 0", "10 × 164", "1,060 numbers", "one number"]
+    for x, s in zip(cols, shapes):
+        label(ax, x, 15.5, s, fs=18, color=MUTED)
+    # the linear layer and the logistic function with these numbers
+    pieces(80, 5, [("z = ", INK), ("0.5", W_C), (" × ", INK), ("1.4", X_C), ("  +  ", INK), ("(−0.3)", W_C),
+                   (" × ", INK), ("0.6", X_C), ("  +  …  +  ", INK), ("0.1", W_C), (" × ", INK), ("0.2", X_C),
+                   ("  +  ", INK), ("(−0.2)", W_C), ("  =  1.2", INK), ("          ", INK),
+                   (r"$\hat p$", INK), (" = σ(z) = σ(1.2) = 0.77", INK)], fs=24)
     save(fig, "cnn_template")
 
 

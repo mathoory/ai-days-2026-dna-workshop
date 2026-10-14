@@ -8,7 +8,7 @@ import sys
 
 import numpy as np
 from matplotlib.colors import to_rgb
-from matplotlib.patches import Rectangle
+from matplotlib.patches import FancyBboxPatch, Rectangle
 
 from deckstyle import *  # noqa: F401,F403
 
@@ -103,19 +103,35 @@ def agenda():
 
 # ------------------------------------------------------------------ 1.6: biology in two clicks
 def bio_flow(with_ago2):
+    """DNA -> mRNA -> protein; on the click, an RNA-binding protein (AGO2) sitting on a site in the mRNA."""
+    from matplotlib.patches import FancyBboxPatch
     fig, ax = canvas(16, 8, ylim=(0, 80))
     xs = [20, 80, 140]
     for x, n, l in zip(xs, ["Gene (DNA)", "Messenger RNA\n(mRNA)", "Protein"], ["A C G T", "A C G U", ""]):
-        label(ax, x, 64, n, fs=40)
+        label(ax, x, 66, n, fs=40)
         if l:
-            label(ax, x, 48, l, fs=34, color=MUTED, family=MONO)
+            label(ax, x, 51, l, fs=34, color=MUTED, family=MONO)
     for (a, b), tx in zip([(37, 54), (106, 124)], ["copied", "translated"]):
-        arrow(ax, a, 64, b, 64, color=MUTED, lw=3, ms=32)
-        label(ax, (a + b) / 2, 71, tx, fs=28, color=MUTED)
+        arrow(ax, a, 66, b, 66, color=MUTED, lw=3, ms=32)
+        label(ax, (a + b) / 2, 73, tx, fs=28, color=MUTED)
     if with_ago2:
-        label(ax, xs[1], 8, "AGO2, a protein, binds some mRNAs", fs=36, color=ACCENT)
-        arrow(ax, xs[1], 15, xs[1], 41, color=ACCENT, lw=3.5, ms=34)
-        label(ax, xs[2], 46, "less protein", fs=34, color=ACCENT)
+        rna = "UAGCUUAACAGUUUGCACAAUCGUACGGAUUCAGCU"        # a stretch of mRNA; the bound site in the middle
+        x0, dx, yr = 23, 3.2, 14
+        site = range(13, 20)
+        # the protein: a rounded body sitting on the site
+        sx0, sx1 = x0 + dx * (site[0] - 0.5), x0 + dx * (site[-1] + 0.5)
+        ax.add_patch(FancyBboxPatch((sx0, yr + 3.4), sx1 - sx0, 19, boxstyle="round,pad=0,rounding_size=7",
+                                    fc=ACCENT_L, ec=ACCENT, lw=2.5, zorder=2))      # the protein sits on the site
+        label(ax, (sx0 + sx1) / 2, yr + 13, "AGO2", fs=30, color=ACCENT, bold=True)
+        ax.plot([sx0 + 0.6, sx1 - 0.6], [yr - 3.4, yr - 3.4], color=ACCENT, lw=4, solid_capstyle="round")
+        for i, ch in enumerate(rna):
+            ax.text(x0 + dx * i, yr, ch, ha="center", va="center_baseline", fontsize=24, family=MONO, fontweight="bold",
+                    color=BASE[ch], zorder=4)
+        label(ax, (sx0 + sx1) / 2, yr - 8, "binding site", fs=24, color=ACCENT)
+        label(ax, x0 - 6, yr, "mRNA", fs=24, color=MUTED, ha="right")
+        label(ax, sx1 + 6, yr + 15, "an RNA-binding protein:\nit binds some mRNAs,\nat a few letters", fs=24,
+              color=INK, ha="left")
+        arrow(ax, 80, 45, 80, 37.6, color=MUTED, lw=2.5, ms=26)
     save_raw(fig, "bio_flow_ago2" if with_ago2 else "bio_flow_base")
 
 
@@ -236,7 +252,7 @@ def toy_pwm():
     allv = np.array(outs).ravel(); cut = allv.mean() + 0.5 * (allv.max() - allv.mean())
     hits = [TOY_SEQS[r][j:j + 4] for r, o in enumerate(outs) for j, v in enumerate(o) if v > cut]
     P = np.array([[sum(h[i] == b for h in hits) / len(hits) for b in ALPH] for i in range(4)])
-    fig, ax = canvas()
+    fig, ax = canvas(16, 7.6, ylim=(8, 84))
     label(ax, 22, 80, "Hits, aligned", fs=23, color=MUTED)
     for r, h in enumerate(hits):
         for i, c in enumerate(h):
@@ -256,31 +272,33 @@ def toy_pwm():
     arrow(ax, 102, 52, 114, 52, color=MUTED, lw=2, ms=24)
     label(ax, 108, 57, "draw", fs=19, color=MUTED)
     label(ax, 136, 80, "Logo", fs=23, color=MUTED)
-    lax = fig.add_axes([0.74, 0.3, 0.22, 0.5])
+    lax = fig.add_axes([0.74, 0.3, 0.22, 0.56])
     draw_logo(lax, P)
     lax.set_xticks(np.arange(4) + 0.5); lax.set_xticklabels(["1", "2", "3", "4"], fontsize=18)
     for sp in ("top", "right"):
         lax.spines[sp].set_visible(False)
-    label(ax, 136, 14, "letter height = frequency × information\n2 bits: always the same letter; 0: all four equally",
+    label(ax, 130, 14, "letter height = frequency × information\n2 bits: one letter always; 0 bits: all four equally",
           fs=18, color=MUTED)
     save_raw(fig, "toy_pwm")
 
 
 # ------------------------------------------------------------------ 2.x the learning flow, on our task
 def learning_flow():
+    """Six steps on a 3 x 2 grid: number centred in its circle, heading and detail aligned to it."""
     steps = [("Collect data", "inputs, each with\nits known answer"),
              ("Choose a hypothesis set", "a family of models,\nfor example one architecture"),
              ("Choose an algorithm", "for example gradient\ndescent on the loss"),
              ("Train", "the algorithm picks the\nbest model in the set"),
              ("Evaluate", "on held-out data\nthe model never saw"),
              ("Use", "predict for new inputs\nnobody has measured")]
-    fig, ax = canvas()
+    fig, ax = canvas(16, 7.6, ylim=(0, 76))
+    col_x, row_y, r = [3, 56, 109], [62, 24], 5.2
     for k, (head, sub) in enumerate(steps):
-        x, y = 20 + (k % 3) * 50, 72 - (k // 3) * 34
-        ax.add_patch(plt.Circle((x - 15, y), 4.6, color=ACCENT if k < 5 else GOOD_C))
-        label(ax, x - 15, y, str(k + 1), fs=26, color="white", bold=True)
-        label(ax, x - 8, y + 1, head, fs=24, color=INK, bold=True, ha="left")
-        label(ax, x - 8, y - 5, sub, fs=20, color=MUTED, ha="left", va="top")
+        x, y = col_x[k % 3], row_y[k // 3]
+        ax.add_patch(plt.Circle((x + r, y), r, color=ACCENT if k < 5 else GOOD_C))
+        ax.text(x + r, y, str(k + 1), ha="center", va="center_baseline", fontsize=30, color="white", fontweight="bold")
+        ax.text(x + 2 * r + 2.5, y, head, ha="left", va="center_baseline", fontsize=23, color=INK, fontweight="bold")
+        ax.text(x + 2 * r + 2.5, y - 6.5, sub, ha="left", va="top", fontsize=21, color=MUTED, linespacing=1.3)
     save(fig, "learning_flow")
 
 
@@ -379,30 +397,45 @@ def roc_frames(ls, ly):
             a2.text(0.42, 0.2, f"AUROC {auc:.2f}", fontsize=30, color=ACCENT)
         a2.set_xlabel("False positive rate"); a2.set_ylabel("True positive rate")
         a2.set_xlim(0, 1); a2.set_ylim(0, 1.01)
+        if k == len(th):
+            fig.savefig(OUT / "roc_auroc.png", facecolor="white")      # the AUROC slide, its own shape
+            trim(OUT / "roc_auroc.png")
         save_raw(fig, f"roc_frame_{k}")
 
 
 # ------------------------------------------------------------------ 4.7 the training loop as a picture
 def train_loop():
-    fig, ax = canvas()
-    T, H = TRAIN_C, HELD_C
-    label(ax, 6, 84, "Training: for every batch, in every epoch", fs=24, color=T, ha="left", bold=True)
-    steps = [(16, 66, "a batch\nof sequences X"), (48, 66, "the network"), (80, 66, "scores"),
-             (112, 66, "loss\nagainst the labels y"), (112, 42, "gradients\nof the loss"), (48, 42, "step:\nupdate every weight")]
-    for x, y, t in steps:
-        label(ax, x, y, t, fs=22, color=INK)
-    for (a, b) in ((26, 39), (57, 73), (87, 99)):
-        arrow(ax, a, 66, b, 66, color=T, lw=2.5, ms=24)
-    arrow(ax, 112, 59, 112, 49, color=T, lw=2.5, ms=24)
-    arrow(ax, 99, 42, 63, 42, color=T, lw=2.5, ms=24)
-    arrow(ax, 48, 49, 48, 60, color=T, lw=2.5, ms=24)
-    label(ax, 6, 25, "Evaluation: after every epoch, without learning", fs=24, color=H, ha="left", bold=True)
-    ev = [(16, 10, "held-out\nsequences"), (48, 10, "the network"), (82, 10, "sigmoid:\nprobabilities"),
-          (118, 10, "AUROC\nagainst the true labels")]
-    for x, y, t in ev:
-        label(ax, x, y, t, fs=22, color=INK)
-    for (a, b) in ((25, 39), (57, 70), (94, 103)):
-        arrow(ax, a, 10, b, 10, color=H, lw=2.5, ms=24)
+    """One training step and the evaluation: flat neutral blocks, one weight of arrow, colour only for meaning."""
+    fig, ax = canvas(16, 8, ylim=(0, 80))
+    BLK, SUB = "#EEF0F2", MUTED
+
+    def node(x, y, w, h, title, sub):
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0,rounding_size=0.8", fc=BLK, ec="none"))
+        label(ax, x + 2.2, y + h * 0.62, title, fs=22, color=INK, bold=True, ha="left")
+        label(ax, x + 2.2, y + h * 0.28, sub, fs=17, color=SUB, ha="left")
+
+    def row(y, items, color):
+        for k, (ti, su) in enumerate(items):
+            node(4 + k * 39, y, 32, 13, ti, su)
+            if k < 3:
+                arrow(ax, 36.6 + k * 39, y + 6.5, 42.4 + k * 39, y + 6.5, color=color, lw=2, ms=18)
+
+    label(ax, 4, 76, "TRAINING", fs=17, color=INK, ha="left", bold=True)
+    label(ax, 18, 76, "every batch, every epoch", fs=17, color=MUTED, ha="left")
+    y = 55
+    row(y, [("Batch", "sequences X"), ("Network", "current weights"), ("Scores", "one per sequence"),
+            ("Loss", "scores vs labels y")], INK)
+    label(ax, 4, y + 16.5, "forward pass", fs=16, color=INK, ha="left")
+    yb = y - 6                                          # backward pass: under the blocks, back to the network
+    ax.plot([137, 137, 59], [y, yb, yb], color=ACCENT, lw=2, solid_capstyle="round")
+    arrow(ax, 59, yb, 59, y - 0.3, color=ACCENT, lw=2, ms=18)
+    label(ax, 64, yb - 3.6, "backward pass (backpropagation): gradient of the loss for every weight", fs=16,
+          color=ACCENT, ha="left")
+    label(ax, 64, yb - 8.4, "optimizer step: move every weight against its gradient", fs=16, color=INK, ha="left")
+    label(ax, 4, 31, "EVALUATION", fs=17, color=INK, ha="left", bold=True)
+    label(ax, 21, 31, "after every epoch, forward pass only, no learning", fs=17, color=HELD_C, ha="left")
+    row(10, [("Held-out", "sequences"), ("Network", "weights fixed"), ("Sigmoid", "probabilities"),
+             ("AUROC", "vs the true labels")], INK)
     save(fig, "train_loop")
 
 
