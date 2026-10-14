@@ -10,59 +10,91 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 ## 1.1 About me
 
 ::: columns
-::: {.column width="34%"}
-![](assets/mattan.jpg){height="560px"}
-:::
-::: {.column width="66%"}
-- **Mattan Hoory**: M.Sc. student in Prof. Roee Amit's lab; TA of 00660121 Medical Diagnostics
-- Research: predicting where an RNA strand binds DNA as a triple helix (Triplexis)
+::: {.column width="60%"}
+![](assets/mattan_circle.png){.avatar-small}
 
-![](assets/hero_triplex.png){width="42%"}
+- **B.Sc. Computer Science**, bioinformatics track, Technion
+- **Machine learning** at National Taiwan University with Prof. Hsuan-Tien Lin (co-author of *Learning from Data*)
+- **M.Sc. Data Science**, Technion; research in Prof. Roee Amit's lab
+- **Unit 81**: embedded Linux lead developer
+:::
+::: {.column width="40%"}
+![](assets/mattan_taiwan.jpg){height="660px"}
+
+[Taiwan, during the exchange semester (2023)]{.caption-small}
 :::
 :::
 
 ::: {.notes}
 - Projected: 1 min.
-- B.Sc. in CS (bioinformatics track), now an M.Sc. in Roee's lab. These three parts are a compressed version of the Medical Diagnostics course's ML part.
-- Triplexis: sequence in, "does it bind?" out, the same kind of problem as today.
+- B.Sc. in Computer Science, bioinformatics track, Technion (2020 to 2024). An exchange semester at National Taiwan University (spring 2023), where I took Machine Learning with Prof. Hsuan-Tien Lin: co-author of *Learning from Data*, known for his online machine learning courses, and co-leader of NTU teams that won the KDD Cup several times. The photo: Wenwu Temple, Sun Moon Lake.
+- M.Sc. in Data Science, Faculty of Data and Decision Sciences, Technion (2024 to 2026), with my research in Prof. Roee Amit's Synthetic Biology Laboratory. TA of 00660121 Medical Diagnostics; these three parts are a compressed version of that course's machine learning part.
+- Before that, Unit 81 (2015 to 2020): embedded Linux lead developer, video streaming products and Linux drivers.
 :::
 
-## 1.2 Goals
+## 1.2 My research
+
+**Machine learning for molecular design**: from a sequence to how it binds
 
 ::: columns
-::: {.column width="50%"}
-**We will**
+::: {.column width="42%"}
+![](assets/hero_triplex.png){height="520px"}
 
+[**Triplexis**: which DNA sequences an RNA strand binds as a triple helix]{.caption-small}
+:::
+::: {.column width="58%"}
+![](assets/peptide_pose.png){height="400px"}
+
+[**Peptides** against influenza: screening millions of variants with AlphaFold 3]{.caption-small}
+:::
+:::
+
+::: {.notes}
+- Projected: 1 min.
+- Triplexis (M.Sc. thesis): sequence-based deep learning for DNA-RNA triple helix formation, trained on synthetic libraries assayed by click chemistry and nanopore sequencing. Sequence in, "does it bind?" out, the same kind of problem as today.
+- Peptides: structure-guided pre-screening of peptide inhibitors against influenza A neuraminidase. AlphaFold 3 co-folds a sample of variants, and a model trained on those folds ranks about 14 million variants without folding them. The picture: a predicted peptide pose in the enzyme's pocket, with the drugs zanamivir and oseltamivir superposed.
+:::
+
+## 1.3 Goals
+
+:::: {.goals}
+::: columns
+::: {.column width="50%"}
+[We will]{.goal-yes}
+
+::: {.incremental}
 - look inside models that read sequence
-- judge when a difference in scores is real
-- test whether a model uses biology or a shortcut
+- build a mental model of how to approach sequence-based models in AI
+- use coding agents to bridge the gap to the code
+:::
 :::
 ::: {.column width="50%"}
-**We will not**
+[We will not]{.goal-no}
 
-- write models from scratch
+::: {.incremental}
+- learn to write code
 - learn PyTorch or Hugging Face in depth
 - open the transformer
 :::
 :::
+:::
+::::
 
 ::: {.notes}
 - Projected: 1 min.
 - Inside the models: one-hot encoding and filters (part 1), embeddings (part 2), fine-tuning (part 3).
+- The notebooks give the problem and the rules; the code is written with a coding agent (Gemini in Colab, or any assistant). The test cell after each TODO checks the result and says what is wrong.
 - Every part ends with a result to interpret.
-- Most code is given. The TODOs are short and each one says what to write and what number to expect. An AI assistant can help with a TODO; the test cell after each TODO checks the answer and says what is wrong.
 - Sit next to someone with a different background: a programmer next to a biologist.
 :::
 
-## 1.3 What you need
+## 1.4 What you need
 
 ::: columns
 ::: {.column width="58%"}
 - A laptop and a Google account
 - Colab with a GPU: *Runtime → Change runtime type → T4 GPU*
 - Notebooks and slides: **[mathoory.github.io/ai-days-2026-dna-workshop]{.nowrap}**
-- Nothing to install; the data download by themselves
-- If a cell fails, raise a hand
 :::
 ::: {.column width="42%"}
 ![](assets/custom/qr_site.png){width="80%"}
@@ -75,7 +107,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Every notebook runs on its own. Part 3 starts from our CNN and our embeddings, so everyone has the same models there.
 :::
 
-## 1.4 Today
+## 1.5 Today
 
 | Time | Part | Notebook |
 |:--|:--|:--|
@@ -92,7 +124,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - One data set all day: 92,346 training sequences plus 1,000 held out, each a stretch of RNA where AGO2 did or did not bind.
 :::
 
-## 1.5 RNA, microRNA and AGO2
+## 1.6 RNA, microRNA and AGO2
 
 ![](assets/custom/bio_flow.png){fig-align="center" height="509px"}
 
@@ -105,7 +137,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Our sequences are RNA, so the notebooks use U; the DNA models of part 2 read T.
 :::
 
-## 1.6 The seed rule
+## 1.7 The seed rule
 
 - AGO2 carries a microRNA. Its **seed** (letters 2 to 7) pairs with the target mRNA; this site also pairs letter 8
 
@@ -118,7 +150,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Hypothesis for the day: a model that learned AGO2 targeting should respond to seed sites like this one.
 :::
 
-## 1.7 The data
+## 1.8 The data
 
 - **Bound**: 48,095 CLIP-seq sites. **Unbound**: 44,251 random positions in the same genes
 - The 40-letter measured site sits at letters 150 to 190
@@ -135,14 +167,14 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - The bound half is slightly richer in A and U: mean G+C 0.41 vs 0.45 over all sequences. AGO2 sites are often in AU-rich 3′ UTRs (the part of an mRNA after its protein-coding letters), so part of this may be biology and part may come from how the unbound positions were drawn. Part 3 tests that.
 :::
 
-## 1.8 Seed matches are enriched in bound sites
+## 1.9 Seed matches are enriched in bound sites
 
 ![](assets/custom/kmer_enrichment.png){fig-align="center" height="700px"}
 
 ::: {.notes}
 - Projected: 2 min.
 - Counted inside the 40-letter measured sites. One bar per 7-letter word: the fraction of bound sites that contain it divided by the fraction of unbound sites. The 16 most enriched words among those found in at least 150 bound sites; the text after each bar is the percentage of bound sites that contain the word.
-- Black bars are seed matches of known microRNAs. The top word, UUUGCAC, is the seed match of miR-19 (6 times enriched). GCUGCUA (miR-15/16, letters 2 to 7 plus an A) and UGUUUAC (miR-30) are also in the list. The 7-letter miR-15/16 site UGCUGCU of slide 1.6 is not among these 16.
+- Black bars are seed matches of known microRNAs. The top word, UUUGCAC, is the seed match of miR-19 (6 times enriched). GCUGCUA (miR-15/16, letters 2 to 7 plus an A) and UGUUUAC (miR-30) are also in the list. The 7-letter miR-15/16 site UGCUGCU of slide 1.7 is not among these 16.
 - Even the most enriched word occurs in only 1.3% of bound sites (0.4 to 1.3% across the 16), so no single word separates the classes.
 - A model that learned AGO2 targeting should respond to these words.
 :::
