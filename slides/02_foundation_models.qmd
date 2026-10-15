@@ -398,3 +398,21 @@ Open **`02_foundation_models.ipynb`**.
 - Both are below the part 1 CNN at 0.86, but the CNN was trained on about 92,000 labels and the probes on 12,000. At equal label counts the gap is smaller (part 3: CNN 0.82 vs probe 0.77 at 12,000 labels).
 - The 105M model with random weights gives 0.55; after 3 minutes of pretraining, 0.72 in the run on this figure (0.73 in our latest run). That is only a little above the two composition numbers of part 1 (0.66), so it should not be read as learned binding biology.
 :::
+
+## 7.2 Feedback
+
+::: columns
+::: {.column width="58%"}
+- Two minutes: what should change for your background?
+- **[forms.gle/NfE6ZHj98ri3WYmG6]{.nowrap}**
+- Notebooks and slides stay online: **[mathoory.github.io/ai-days-2026-dna-workshop]{.nowrap}**
+:::
+::: {.column width="42%"}
+![](assets/custom/qr_form.png){height="671px"}
+:::
+:::
+
+::: {.notes}
+- Feedback at 14:00, the end of the day's sessions. Part 3 (slides and notebook) is optional, at home. The link and the QR code open the same form.
+:::
+

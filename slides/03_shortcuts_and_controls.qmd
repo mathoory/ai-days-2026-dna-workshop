@@ -1,6 +1,6 @@
 ---
 pagetitle: "Part 3: Shortcuts, controls and fine-tuning"
-subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
+subtitle: "Part 3: Shortcuts, controls and fine-tuning<br>(optional, at home)<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
 ---
 
 ::: {.center}
@@ -190,7 +190,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 :::
 
 ::: {.notes}
-- Feedback at the end of the notebook, at the end of the talk (13:45). The link and the QR code open the same form.
+- The same feedback slide closes part 2, at 14:00. The link and the QR code open the same form.
 :::
 
 ## 6.5 Credits and further reading
