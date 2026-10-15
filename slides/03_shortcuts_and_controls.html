@@ -142,8 +142,7 @@
 <li><a href="#/a-control" id="/toc-a-control">2 A control</a></li>
 <li><a href="#/fine-tuning" id="/toc-fine-tuning">3 Fine-tuning</a></li>
 <li><a href="#/hands-on" id="/toc-hands-on">4 Hands-on</a></li>
-<li><a href="#/beyond-the-notebook" id="/toc-beyond-the-notebook">5 Beyond the notebook</a></li>
-<li><a href="#/wrap-up" id="/toc-wrap-up">6 Wrap-up</a></li>
+<li><a href="#/wrap-up" id="/toc-wrap-up">5 Wrap-up</a></li>
 </ul>
 </nav>
 </section>
@@ -350,46 +349,13 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="beyond-the-notebook" class="title-slide slide level1 center" data-name="Results">
-<h1>5 Beyond the notebook</h1>
-
-</section>
-
-<section id="test-auroc-against-the-number-of-labels" class="slide level2">
-<h2>5.1 Test AUROC against the number of labels</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/label_curve2.png" class="quarto-figure quarto-figure-center" height="684"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>x: labelled training sequences, log scale; y: AUROC on the 3,000-sequence matched test set. Each model trained on 100 to 30,000 labelled matched sequences, three random draws per size (lines, with one standard deviation shaded). Green: CNN; blue: frozen Mistral-DNA; grey dotted: 5-letter word counts; light dashed: Mistral-DNA with random weights.</li>
-<li>The notebook plots three of these lines, up to 12,000 labels.</li>
-<li>Frozen Mistral-DNA scores higher than the CNN up to about 2,500 labels; above about 5,000 the CNN is better. At 12,000 labels: CNN 0.82, frozen probe 0.77.</li>
-<li>The same Mistral-DNA architecture with random weights stays between 0.50 and 0.57, so the advantage at low label counts comes from pretraining.</li>
-<li>Five-letter word counts also score higher than the CNN below about 1,000 labels.</li>
-<li>Squares: the CNN in a separate offline head-to-head run, diamonds: NT-500M fine-tuned with LoRA in the same run. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, the draw of training sequences changes the CNN’s score by about as much as the differences between models.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
 <section id="wrap-up" class="title-slide slide level1 center" data-name="Wrap-up">
-<h1>6 Wrap-up</h1>
+<h1>5 Wrap-up</h1>
 
 </section>
 
 <section id="the-day-in-numbers" class="slide level2">
-<h2>6.1 The day in numbers</h2>
+<h2>5.1 The day in numbers</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/day_numbers.png" class="quarto-figure quarto-figure-center" height="693"></p>
@@ -415,7 +381,7 @@
       }</style></aside>
 </section>
 <section id="ten-pretrained-models-on-matched-data" class="slide level2">
-<h2>6.2 Ten pretrained models on matched data</h2>
+<h2>5.2 Ten pretrained models on matched data</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/model_scan.png" class="quarto-figure quarto-figure-center" height="695"></p>
@@ -442,7 +408,7 @@
       }</style></aside>
 </section>
 <section id="conclusions" class="slide level2">
-<h2>6.3 Conclusions</h2>
+<h2>5.3 Conclusions</h2>
 <ul>
 <li class="fragment">A CNN read AGO2 binding from the RNA letters alone: <strong>AUROC 0.86</strong></li>
 <li class="fragment">Two composition numbers, GC and U, already reached <strong>0.66</strong>: check simple baselines first</li>
@@ -454,7 +420,7 @@
 <li>Point 1: held-out AUROC of the part 1 CNN, trained on 92,346 labelled sequences.</li>
 <li>Point 2: the negatives were random positions in the same genes; on the 1,000 held-out sequences GC and U alone reached 0.66, and 5-letter word counts 0.74.</li>
 <li>Point 3: the dinucleotide shuffle keeps letters and letter pairs and breaks longer motifs; matched data keeps GC, U and length equal between the classes (GC and U: 0.64 to 0.51). Frozen Mistral-DNA barely changed under the shuffle (0.78 to 0.77), so it relied mostly on short-range composition.</li>
-<li>Point 4: from the label curve (slide 5.1) and one offline benchmark with NT-500M and LoRA (3,000 matched test sequences, 3 runs each). The thresholds are for this task and will differ for others.</li>
+<li>Point 4: from the label curve (part 2 slide 7.2) and one offline benchmark with NT-500M and LoRA (3,000 matched test sequences, 3 runs each). The thresholds are for this task and will differ for others.</li>
 <li>For a new problem, the same order: the question and its labels, how the negatives were chosen, simple baselines, the model, then controls.</li>
 </ul>
 <style type="text/css">
@@ -470,7 +436,7 @@
       }</style></aside>
 </section>
 <section id="feedback" class="slide level2">
-<h2>6.4 Feedback</h2>
+<h2>5.4 Feedback</h2>
 <div class="columns">
 <div class="column" style="width:58%;">
 <ul>
@@ -498,7 +464,7 @@
       }</style></aside>
 </section>
 <section id="credits-and-further-reading" class="slide level2">
-<h2>6.5 Credits and further reading</h2>
+<h2>5.5 Credits and further reading</h2>
 <div style="font-size:0.62em;">
 <ul>
 <li><strong>Data</strong>: Maticzka et al.&nbsp;(2014) <em>GraphProt</em>, Genome Biology (the CLIP benchmark and its negatives). Pan and Shen (2018) <em>iDeepE</em>, Bioinformatics (the CNN design we follow).</li>

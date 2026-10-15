@@ -115,27 +115,10 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 :::
 
 ::: {.center}
-# 5 Beyond the notebook {data-name="Results"}
+# 5 Wrap-up {data-name="Wrap-up"}
 :::
 
-## 5.1 Test AUROC against the number of labels
-
-![](assets/custom/label_curve2.png){fig-align="center" height="684px"}
-
-::: {.notes}
-- x: labelled training sequences, log scale; y: AUROC on the 3,000-sequence matched test set. Each model trained on 100 to 30,000 labelled matched sequences, three random draws per size (lines, with one standard deviation shaded). Green: CNN; blue: frozen Mistral-DNA; grey dotted: 5-letter word counts; light dashed: Mistral-DNA with random weights.
-- The notebook plots three of these lines, up to 12,000 labels.
-- Frozen Mistral-DNA scores higher than the CNN up to about 2,500 labels; above about 5,000 the CNN is better. At 12,000 labels: CNN 0.82, frozen probe 0.77.
-- The same Mistral-DNA architecture with random weights stays between 0.50 and 0.57, so the advantage at low label counts comes from pretraining.
-- Five-letter word counts also score higher than the CNN below about 1,000 labels.
-- Squares: the CNN in a separate offline head-to-head run, diamonds: NT-500M fine-tuned with LoRA in the same run. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, the draw of training sequences changes the CNN's score by about as much as the differences between models.
-:::
-
-::: {.center}
-# 6 Wrap-up {data-name="Wrap-up"}
-:::
-
-## 6.1 The day in numbers
+## 5.1 The day in numbers
 
 ![](assets/custom/day_numbers.png){fig-align="center" height="693px"}
 
@@ -147,7 +130,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 - The shuffle and the matched data separate what each model uses: the composition model falls to chance on matched data, the CNN keeps its score there, and the frozen probe barely notices the shuffle.
 :::
 
-## 6.2 Ten pretrained models on matched data
+## 5.2 Ten pretrained models on matched data
 
 ![](assets/custom/model_scan.png){fig-align="center" height="695px"}
 
@@ -159,7 +142,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 - NT-2.5B was not fine-tuned: our recipe undertrained it at that size.
 :::
 
-## 6.3 Conclusions
+## 5.3 Conclusions
 
 ::: {.incremental}
 - A CNN read AGO2 binding from the RNA letters alone: **AUROC 0.86**
@@ -172,11 +155,11 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 - Point 1: held-out AUROC of the part 1 CNN, trained on 92,346 labelled sequences.
 - Point 2: the negatives were random positions in the same genes; on the 1,000 held-out sequences GC and U alone reached 0.66, and 5-letter word counts 0.74.
 - Point 3: the dinucleotide shuffle keeps letters and letter pairs and breaks longer motifs; matched data keeps GC, U and length equal between the classes (GC and U: 0.64 to 0.51). Frozen Mistral-DNA barely changed under the shuffle (0.78 to 0.77), so it relied mostly on short-range composition.
-- Point 4: from the label curve (slide 5.1) and one offline benchmark with NT-500M and LoRA (3,000 matched test sequences, 3 runs each). The thresholds are for this task and will differ for others.
+- Point 4: from the label curve (part 2 slide 7.2) and one offline benchmark with NT-500M and LoRA (3,000 matched test sequences, 3 runs each). The thresholds are for this task and will differ for others.
 - For a new problem, the same order: the question and its labels, how the negatives were chosen, simple baselines, the model, then controls.
 :::
 
-## 6.4 Feedback
+## 5.4 Feedback
 
 ::: columns
 ::: {.column width="58%"}
@@ -193,7 +176,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 - The same feedback slide closes part 2, at 14:00. The link and the QR code open the same form.
 :::
 
-## 6.5 Credits and further reading
+## 5.5 Credits and further reading
 
 <div style="font-size:0.62em;">
 

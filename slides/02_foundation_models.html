@@ -802,7 +802,7 @@
 <ul>
 <li>Show after the notebook. Held-out AUROC on the same 1,000 sequences; bars start at 0.5 (chance). Blue: probes on frozen pretrained models (light blue: the 105M model after 3 minutes of pretraining; grey: random weights); green: the CNN trained on all 92,346 sequences.</li>
 <li>Mistral-DNA with a probe: 0.78. NT-500M, 30 times larger: 0.79. A difference of 0.01 on 1,000 test sequences is within sampling noise, so there is no evidence that size helps here.</li>
-<li>Both are below the part 1 CNN at 0.86, but the CNN was trained on about 92,000 labels and the probes on 12,000. At equal label counts the gap is smaller (part 3: CNN 0.82 vs probe 0.77 at 12,000 labels).</li>
+<li>Both are below the part 1 CNN at 0.86, but the CNN was trained on about 92,000 labels and the probes on 12,000. At equal label counts the gap is smaller (next slide: CNN 0.82 vs probe 0.77 at 12,000 labels).</li>
 <li>The 105M model with random weights gives 0.55; after 3 minutes of pretraining, 0.72 in the run on this figure (0.73 in our latest run). That is only a little above the two composition numbers of part 1 (0.66), so it should not be read as learned binding biology.</li>
 </ul>
 <style type="text/css">
@@ -817,8 +817,36 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="held-out-auroc-against-the-number-of-labels" class="slide level2">
+<h2>7.2 Held-out AUROC against the number of labels</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/label_curve2.png" class="quarto-figure quarto-figure-center" height="684"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Matched data (part 3): the unbound sequences are chosen so that GC, U and length are the same in both classes, so composition alone gives chance. x: labelled training sequences, log scale; y: AUROC on a 3,000-sequence matched test set. Each model trained on 100 to 30,000 labelled matched sequences, three random draws per size (lines, with one standard deviation shaded). Green: CNN; blue: frozen Mistral-DNA; grey dotted: 5-letter word counts; light dashed: Mistral-DNA with random weights.</li>
+<li>Part 3’s notebook (optional) plots three of these lines, up to 12,000 labels.</li>
+<li>Frozen Mistral-DNA scores higher than the CNN up to about 2,500 labels; above about 5,000 the CNN is better. At 12,000 labels: CNN 0.82, frozen probe 0.77.</li>
+<li>The same Mistral-DNA architecture with random weights stays between 0.50 and 0.57, so the advantage at low label counts comes from pretraining.</li>
+<li>Five-letter word counts also score higher than the CNN below about 1,000 labels.</li>
+<li>Squares: the CNN in a separate offline head-to-head run, diamonds: NT-500M fine-tuned (slide 5.3: the body is trained too) with LoRA in the same run. At 500 labels the CNN scores 0.58 on the curve and 0.66 in the head-to-head: the same recipe on different draws of 500 sequences, with single runs between 0.51 and 0.68. At that size, the draw of training sequences changes the CNN’s score by about as much as the differences between models.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="feedback" class="slide level2">
-<h2>7.2 Feedback</h2>
+<h2>7.3 Feedback</h2>
 <div class="columns">
 <div class="column" style="width:58%;">
 <ul>
