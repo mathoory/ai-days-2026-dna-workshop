@@ -162,21 +162,21 @@ def cnn_recap(pos):
     top = H - 6
     tok_row(ax, 2, top, list(s[150:162]) + ["…"], fs=22)
     arrow(ax, 22, top - 6, 22, top - 13, color=MUTED, lw=2.5, ms=24)
-    ax.add_patch(FancyBboxPatch((4, 12), 36, top - 26, boxstyle="round,pad=0,rounding_size=1.4", fc=CNN_C, ec="none"))
+    ax.add_patch(FancyBboxPatch((4, 12), 36, top - 26, boxstyle="round,pad=0,rounding_size=1.4", fc=ACCENT, ec="none"))           # colours as in the adapt figures: body blue, head orange
     mid = (top - 14) / 2 + 12
     label(ax, 22, mid + 9, "CNN", fs=30, color="white", bold=True)
     label(ax, 22, mid - 7, "convolution,\nReLU, pooling\n(2 blocks)", fs=19, color="white")
-    label(ax, 22, 5, "Body", fs=24, color=CNN_C, bold=True)
+    label(ax, 22, 5, "Body", fs=24, color=ACCENT, bold=True)
     arrow(ax, 41, mid, 47, mid, color=MUTED, lw=2.5, ms=24)
     strip(ax, 48, mid - 16, 6, 32, e, np.abs(e).max(), vertical=True)
     label(ax, 51, 5, "Embedding", fs=22, color=INK, bold=True)
     label(ax, 57, mid - 18, "1,060 numbers\nafter flatten", fs=19, color=MUTED, ha="left")
     arrow(ax, 55, mid, 63, mid, color=MUTED, lw=2.5, ms=22)
-    blk(ax, 64, mid - 7, 40, 14, "linear head", fc=CNN_C, fs=24)
+    blk(ax, 64, mid - 7, 40, 14, "linear head", fc=HELD_C, fs=24)
     arrow(ax, 105, mid, 111, mid, color=MUTED, lw=2.5, ms=22)
     label(ax, 113, mid, f"sigmoid\nP(bound) = {p:.2f}", fs=24, ha="left")
-    label(ax, 84, 5, "Head", fs=22, color=CNN_C, bold=True)
-    label(ax, 64, mid + 20, "all of it trained from scratch\non our 92,346 labelled sequences", fs=22, color=CNN_C,
+    label(ax, 84, 5, "Head", fs=22, color=MUTED, bold=True)
+    label(ax, 64, mid + 20, "all of it trained from scratch\non our 92,346 labelled sequences", fs=22, color=INK,
           ha="left", bold=True)
     save_raw(fig, "d2_cnn_recap")
     trim_group(["d2_cnn_recap"])
