@@ -224,39 +224,55 @@ def slide_filter():
 
 
 def toy_cutoff():
-    """5.1: outputs of the toy filter on three sequences, then the cutoff and the hits (two frames)."""
+    """5.1: the toy filter's output, one position per click with its window underlined, then the cutoff and hits."""
     outs = [[o for _, _, o in toy_out(s)] for s in TOY_SEQS]
     allv = np.array(outs).ravel()
     mean, mx = allv.mean(), allv.max()
     cut = mean + 0.5 * (mx - mean)
     print("toy_cutoff mean", round(mean, 3), "max", mx, "cutoff", round(cut, 3))
-    for frame in (0, 1):
+    cx = [58, 74, 90, 106, 122]
+    last = len(cx)                                       # frames 0..4: positions 1..5; frame 5: cutoff and hits
+    names = []
+    for frame in range(last + 1):
         fig, ax = canvas()
-        cx = [58, 74, 90, 106, 122]
+        final = frame == last
         label(ax, 34, 80, "Sequence", fs=21, color=MUTED)
         for j, x in enumerate(cx):
-            label(ax, x, 80, f"pos {j + 1}", fs=21, color=MUTED)
+            if j <= frame:
+                label(ax, x, 80, f"pos {j + 1}", fs=21, color=ACCENT if j == frame and not final else MUTED,
+                      bold=j == frame and not final)
         for r, (s, o) in enumerate(zip(TOY_SEQS, outs)):
             y = 66 - r * 13
             label(ax, 4, y, f"seq {r + 1}", fs=21, color=MUTED, ha="left")
             for i, c in enumerate(s):
-                hit_letter = frame == 1 and any(v > cut and j <= i < j + 4 for j, v in enumerate(o))
                 label(ax, 21 + i * 3.7, y, c, fs=24, color=BASE[c], family=MONO, bold=True)
-                if hit_letter:
-                    ax.plot([21 + i * 3.7 - 1.8, 21 + i * 3.7 + 1.8], [y - 3.4, y - 3.4], color=ACCENT, lw=3)
+            if not final:                                # the window the filter reads now: 4 letters from pos frame+1
+                x0 = 21 + frame * 3.7 - 1.8
+                ax.add_patch(Rectangle((x0, y - 4.2), 4 * 3.7, 8.4, fc=ACCENT_L, ec="none", zorder=0))
+                ax.plot([x0, x0 + 4 * 3.7], [y - 4.2, y - 4.2], color=ACCENT, lw=3.5)
+            else:
+                for j, v in enumerate(o):
+                    if v > cut:
+                        ax.plot([21 + j * 3.7 - 1.8, 21 + (j + 3) * 3.7 + 1.8], [y - 3.4, y - 3.4], color=ACCENT, lw=3)
             for j, (x, v) in enumerate(zip(cx, o)):
-                hit = frame == 1 and v > cut
-                if hit:
+                if j > frame:
+                    continue
+                hit = final and v > cut
+                now = j == frame and not final
+                if hit or now:
                     ax.add_patch(Rectangle((x - 6, y - 4.5), 12, 9, fc=ACCENT_L, ec="none"))
-                label(ax, x, y, f"{v:.1f}", fs=24, color=ACCENT if hit else INK, bold=hit)
+                label(ax, x, y, f"{v:.1f}", fs=24, color=ACCENT if hit or now else INK, bold=hit or now)
         ax.plot([2, 130], [74, 74], color=HAIR, lw=1.2)
-        if frame == 1:
+        if final:
             label(ax, 66, 22, f"cutoff  =  mean + 0.5 × (max − mean)  =  {mean:.2f} + 0.5 × ({mx:.1f} − {mean:.2f})  =  {cut:.2f}",
                   fs=22, color=INK)
             hits = [(r, j) for r, o in enumerate(outs) for j, v in enumerate(o) if v > cut]
             label(ax, 66, 11, "Hits:  " + ",   ".join(f"seq {r + 1} pos {j + 1} → {TOY_SEQS[r][j:j + 4]}" for r, j in hits),
                   fs=22, color=ACCENT)
-        save_raw(fig, f"toy_cutoff_{frame}")
+        else:
+            label(ax, 66, 22, f"the filter reads letters {frame + 1} to {frame + 4} of every sequence", fs=22, color=ACCENT)
+        nm = f"toy_cutoff_{frame}"; save_raw(fig, nm); names.append(nm)
+    trim_group(names)
 
 
 def toy_pwm():
@@ -283,10 +299,10 @@ def toy_pwm():
             v = P[i, b]
             label(ax, 66 + i * 8, y, "1" if v == 1 else ("0" if v == 0 else f"{v:.1f}"), fs=22,
                   color=INK if v > 0 else LIGHT, bold=v > 0)
-    arrow(ax, 102, 52, 114, 52, color=MUTED, lw=2, ms=24)
-    label(ax, 108, 57, "draw", fs=19, color=MUTED)
-    label(ax, 136, 80, "Logo", fs=23, color=MUTED)
-    lax = fig.add_axes([0.74, 0.3, 0.22, 0.56])
+    arrow(ax, 97, 52, 109, 52, color=MUTED, lw=2, ms=24)
+    label(ax, 103, 57, "draw", fs=19, color=MUTED)
+    label(ax, 141, 80, "Logo", fs=23, color=MUTED)
+    lax = fig.add_axes([0.775, 0.3, 0.21, 0.56])                # right of the arrow, clear of its axis label
     draw_logo(lax, P)
     lax.set_xticks(np.arange(4) + 0.5); lax.set_xticklabels(["1", "2", "3", "4"], fontsize=18)
     for sp in ("top", "right"):

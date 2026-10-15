@@ -612,15 +612,24 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 ## 5.1 Which windows does a filter like?
 
 ::: {.r-stack}
-![](assets/custom/toy_cutoff_0.png){height="742px"}
+![](assets/custom/toy_cutoff_0.png){height="697px"}
 
-![](assets/custom/toy_cutoff_1.png){.fragment height="742px"}
+![](assets/custom/toy_cutoff_1.png){.fragment height="697px"}
+
+![](assets/custom/toy_cutoff_2.png){.fragment height="697px"}
+
+![](assets/custom/toy_cutoff_3.png){.fragment height="697px"}
+
+![](assets/custom/toy_cutoff_4.png){.fragment height="697px"}
+
+![](assets/custom/toy_cutoff_5.png){.fragment height="697px"}
 :::
 
 ::: {.notes}
 - The toy filter of slide 4.2, on three sequences: its output at each of the 5 positions of each sequence.
 - We do not read the weights; we watch the filter work. A high output means the filter met a window it likes.
-- Click: a filter's **cutoff** sits halfway between its mean output and its maximum, over all sequences and positions. Every position above it is a hit; here two of the 15.
+- One click per position: the blue window is the 4 letters the filter reads, and its output for that window appears in the column. Five positions fit in an 8-letter sequence.
+- Last click: a filter's **cutoff** sits halfway between its mean output and its maximum, over all sequences and positions. Every position above it is a hit; here two of the 15.
 - The hits are the 4 letters starting at that position: ACGU in sequence 1 and UCGU in sequence 3.
 :::
 
