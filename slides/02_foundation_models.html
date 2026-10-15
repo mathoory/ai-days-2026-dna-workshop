@@ -153,8 +153,32 @@
 
 </section>
 
+<section id="our-cnn-as-a-reminder" class="slide level2">
+<h2>1.1 Our CNN, as a reminder</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/cnn_template_0.png" height="749"></p>
+<p><img data-src="assets/custom/cnn_template_1.png" class="fragment" height="749"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>Part 1’s network (slide 4.7 of part 1): one-hot letters, two blocks of convolution, ReLU and max pooling, then flatten and one linear layer to one number, the logit; the sigmoid makes it a probability.</li>
+<li>Click: one sequence followed through, with the shape after every part: 1,060 numbers after flatten, one weighted sum, then the sigmoid.</li>
+<li>The next slide groups the same parts into the three pieces this part uses for every model: body, embedding, head.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="part-1-in-three-parts" class="slide level2">
-<h2>1.1 Part 1, in three parts</h2>
+<h2>1.2 Part 1, in three parts</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/d2_cnn_recap.png" class="quarto-figure quarto-figure-center" height="766"></p>
@@ -180,7 +204,7 @@
       }</style></aside>
 </section>
 <section id="pretraining-by-analogy" class="slide level2">
-<h2>1.2 Pretraining, by analogy</h2>
+<h2>1.3 Pretraining, by analogy</h2>
 <div class="r-stack">
 <p><img data-src="assets/custom/pretrain_analogy_0.png" height="742"></p>
 <p><img data-src="assets/custom/pretrain_analogy_1.png" class="fragment" height="742"></p>
@@ -205,7 +229,7 @@
       }</style></aside>
 </section>
 <section id="pretraining-a-model" class="slide level2">
-<h2>1.3 Pretraining a model</h2>
+<h2>1.4 Pretraining a model</h2>
 <div class="r-stack">
 <p><img data-src="assets/custom/d2_adapt_0.png" height="742"></p>
 </div>
@@ -229,7 +253,7 @@
       }</style></aside>
 </section>
 <section id="one-model-many-tasks" class="slide level2">
-<h2>1.4 One model, many tasks</h2>
+<h2>1.5 One model, many tasks</h2>
 <div class="r-stack">
 <p><img data-src="assets/custom/d2_adapt_1.png" height="742"></p>
 <p><img data-src="assets/custom/d2_adapt_2.png" class="fragment" height="742"></p>
@@ -256,7 +280,7 @@
       }</style></aside>
 </section>
 <section id="two-pretraining-objectives" class="slide level2">
-<h2>1.5 Two pretraining objectives</h2>
+<h2>1.6 Two pretraining objectives</h2>
 <div class="r-stack">
 <p><img data-src="assets/custom/d2_obj_0.png" height="723"></p>
 <p><img data-src="assets/custom/d2_obj_1.png" class="fragment" height="723"></p>
@@ -281,7 +305,7 @@
       }</style></aside>
 </section>
 <section id="what-the-model-predicts" class="slide level2">
-<h2>1.6 What the model predicts</h2>
+<h2>1.7 What the model predicts</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/d2_next.png" class="quarto-figure quarto-figure-center" height="766"></p>
@@ -307,7 +331,7 @@
       }</style></aside>
 </section>
 <section id="four-stages" class="slide level2">
-<h2>1.7 Four stages</h2>
+<h2>1.8 Four stages</h2>
 <div class="r-stack">
 <p><img data-src="assets/custom/d2_stages_0.png" height="742"></p>
 <p><img data-src="assets/custom/d2_stages_1.png" class="fragment" height="742"></p>
@@ -321,7 +345,7 @@
 <li>The example is real: Mistral-DNA on the first 40 letters of one bound sequence (its first 6 tokens shown). One click per stage.</li>
 <li>Click, tokenization: the letters are cut into tokens (section 2).</li>
 <li>Click, embedding: each token becomes a row of 256 numbers taken from a learned table, its <strong>token embedding</strong> (section 3; the first 40 numbers shown). The same token always gets the same row.</li>
-<li>Click, body: the transformer turns them into <strong>contextual embeddings</strong>: still one row per token, but now each row depends on all the tokens (section 4). These are the embeddings of slide 1.3.</li>
+<li>Click, body: the transformer turns them into <strong>contextual embeddings</strong>: still one row per token, but now each row depends on all the tokens (section 4). These are the embeddings of slide 1.4.</li>
 <li>Click, head: in pretraining it predicts the next token; for our task, P(bound), the probability that AGO2 binds (section 5).</li>
 </ul>
 <style type="text/css">
@@ -566,7 +590,7 @@
 </div>
 <aside class="notes">
 <ul>
-<li>The same four stages as slide 1.7, at the same place on the slide.</li>
+<li>The same four stages as slide 1.8, at the same place on the slide.</li>
 <li>First the CNN of part 1: single letters, a fixed one-hot table, two convolution layers, one linear layer to a logit.</li>
 <li>Click: Mistral-DNA, stage by stage: BPE tokens (slide 2.3), a learned table (slide 3.1), a transformer body (slide 4.1), and a head for the next token or for your task.</li>
 <li>The CNN’s stages were fixed by us (one-hot) or trained on 92,346 labels. A language model learns its embedding and body from unlabelled genome sequence first.</li>
@@ -601,7 +625,7 @@
 <li>Left: the body’s output for the sequence of slide 4.2, one row of 256 numbers per token: its contextual embeddings. One head per click.</li>
 <li>The first and last rows are [CLS] and [SEP], two special tokens the tokenizer adds; they are not DNA. So the next-token head reads the row just above [SEP], the last DNA token.</li>
 <li>Next token: that row’s 256 numbers go through a linear layer with 4,096 outputs. Each output is one weighted sum, <span class="math inline">\(z_k = w_{k,1} e_1 + \dots + w_{k,256} e_{256} + b_k\)</span>: one equation per vocabulary token, 4,096 equations, about a million weights. The softmax turns the 4,096 scores into probabilities that sum to 1. Masked token: the same equations, from the hidden token’s row.</li>
-<li>These two are the pretraining heads (slide 1.5). After pretraining they are dropped; the embedding table and the body are kept.</li>
+<li>These two are the pretraining heads (slide 1.6). After pretraining they are dropped; the embedding table and the body are kept.</li>
 <li>Our task: the average of all rows, the <strong>sequence embedding</strong> (the 256 numbers of slide 4.2), goes into a single equation, <span class="math inline">\(z = w_1 e_1 + \dots + w_{256} e_{256} + b\)</span>, then the sigmoid: P(bound). 257 numbers to learn, the logistic regression of part 1.</li>
 </ul>
 <style type="text/css">
