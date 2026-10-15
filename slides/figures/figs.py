@@ -181,6 +181,23 @@ def labels_raster(tr, ty):
     print("wrote", names)
 
 
+def data_scatter(tr, ty):
+    """The 3,000 training sequences of the gradient-descent slide, one point each, before any model."""
+    rng = np.random.default_rng(1)
+    idx = rng.choice(len(tr), 3000, replace=False)            # the same draw as lr_training
+    X = np.array([[gc(tr[i]), tr[i].count("U") / len(tr[i])] for i in idx]); y = ty[idx]
+    o = rng.permutation(len(y))
+    fig = newfig(); fig.set_size_inches(16, 8.5)
+    ax = fig.add_axes([0.07, 0.11, 0.91, 0.86])
+    ax.scatter(X[o, 0], X[o, 1], c=np.where(y[o] == 1, BOUND, MID), s=46, alpha=.6, lw=0)
+    ax.set_xlabel("GC fraction"); ax.set_ylabel("U fraction")
+    nb, nu = int((y == 1).sum()), int((y == 0).sum())
+    ax.legend(handles=[Line2D([], [], marker="o", ls="", ms=13, color=BOUND, label=f"Bound ({nb:,})"),
+                       Line2D([], [], marker="o", ls="", ms=13, color=MID, label=f"Unbound ({nu:,})")],
+              loc="upper right", fontsize=24, title="3,000 training sequences, one point each", title_fontsize=22)
+    save(fig, "data_scatter")
+
+
 def lr_training(tr, ty):
     """Gradient descent on two features: the boundary at steps 0, 1 and 300 with its weights, then the loss."""
     rng = np.random.default_rng(1)
@@ -1109,7 +1126,7 @@ if __name__ == "__main__":
     f = 7
     for n, job in [
         ("hero", lambda: print("hero score", hero(model, pos))), ("seed_pairing", lambda: seed_pairing(pos)),
-        ("labels_raster", lambda: labels_raster(tr, ty)), ("lr_training", lambda: lr_training(tr, ty)),
+        ("labels_raster", lambda: labels_raster(tr, ty)), ("lr_training", lambda: lr_training(tr, ty)), ("data_scatter", lambda: data_scatter(tr, ty)),
         ("auroc", lambda: auroc(model, ls, ly)), ("auroc_ci", lambda: auroc_ci(model, tr, ty, ls, ly)),
         ("probe_trap", lambda: probe_trap(tr, ty)), ("onehot_big", onehot_big),
         ("filter_dot", lambda: filter_dot(model, pos[:6000], neg[:6000])),

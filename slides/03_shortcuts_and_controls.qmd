@@ -23,7 +23,7 @@ subtitle: "Part 3: Shortcuts, controls and fine-tuning<br><br>AI Days 2026<br><b
   - TODO-2: count the 5-letter words of one sequence by hand, then a logistic regression on the counts of all 1,024 five-letter words, which ignores order and position.
   - TODO-3: the shuffle test, slide 1.3.
 - If a simple model scores well, a larger model may be using the same shortcut.
-- The GC/U model is the logistic regression of part 1 slide 2.11, trained here on 12,000 sequences; it scores 0.66 held out.
+- The GC/U model is the logistic regression of part 1 slide 2.12, trained here on 12,000 sequences; it scores 0.66 held out.
 :::
 
 ## 1.2 Word counts: a model without order {data-todo="TODO-2"}

@@ -339,7 +339,17 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 - Every model today ends with a sigmoid. The score before it is called the **logit**.
 :::
 
-## 2.11 Gradient descent
+## 2.11 The data in two numbers
+
+![](assets/custom/data_scatter.png){fig-align="center" height="760px"}
+
+::: {.notes}
+- 3,000 of our training sequences, one point each, placed by two numbers: the fraction of their letters that are G or C (x axis) and the fraction that are U (y axis). Blue bound, grey unbound.
+- The two clouds overlap heavily, but bound sequences sit a little lower on GC (towards the left).
+- The question for the next slide: can a straight line separate blue from grey better than chance? Logistic regression finds the best such line by gradient descent.
+:::
+
+## 2.12 Gradient descent
 
 ::: {.r-stack}
 ![](assets/custom/lr_training_0.png){height="742px"}
@@ -364,7 +374,7 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 - The learning rate is set before training, a hyperparameter, and chosen on validation data (section 3). The notebook uses Adam with $\eta$ = 0.001.
 :::
 
-## 2.12 Mini-batches and epochs
+## 2.13 Mini-batches and epochs
 
 - Each step uses a **batch** of 256 sequences; an **epoch** is one pass over all 92,346 (360 steps)
 
@@ -377,7 +387,7 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 - 92,346 / 256 gives 360 full batches; the notebook drops the incomplete last one (`drop_last=True`) and reshuffles the order every epoch.
 :::
 
-## 2.13 ReLU
+## 2.14 ReLU
 
 ![](assets/custom/relu.png){fig-align="center" height="707px"}
 
@@ -387,7 +397,7 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 - In the CNN, ReLU after a filter means: a window that does not resemble the filter gives 0, a window that does gives a positive value (slide 4.4).
 :::
 
-## 2.14 From logistic regression to a neural network
+## 2.15 From logistic regression to a neural network
 
 - A **neural network** stacks layers of units, with **ReLU** between them
 
@@ -397,7 +407,7 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 - Left: logistic regression is one unit, a weighted sum of the inputs plus a bias, then the sigmoid.
 - Right: a hidden layer of units, each a weighted sum followed by ReLU, feeds the output unit.
 - Without the nonlinearity, stacked weighted sums add up to a single weighted sum, which is no more expressive than logistic regression.
-- Training is the same as on slide 2.11. `loss.backward()` computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.
+- Training is the same as on slide 2.12. `loss.backward()` computes the gradient for every weight in every layer by the chain rule (backpropagation), and the optimizer takes the step.
 - The CNN of section 4 is a network of this kind in which each first-layer unit looks at a 10-letter window.
 :::
 
@@ -510,7 +520,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 ::: {.notes}
 - One filter at epochs 0, 1, 3 and 10 of one training run (its number is in the figure), one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.
 - Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.
-- Each step is the update of slide 2.11, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
+- Each step is the update of slide 2.12, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
 :::
 
 ## 4.4 The filter along one sequence
@@ -519,7 +529,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 
 ::: {.notes}
 - A real filter of our trained CNN (filter 7, which prefers U-rich windows): its output at every position of one bound sequence, after ReLU. x: position; y: output.
-- ReLU (slide 2.13) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.
+- ReLU (slide 2.14) sets negative outputs to 0, so most positions give 0. Windows that resemble the weights give large values. The highest one is drawn in dark blue and its 10 letters are printed.
 :::
 
 ## 4.5 Channels and pooling
