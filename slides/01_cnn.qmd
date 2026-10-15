@@ -553,7 +553,28 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 - The second convolution reads all 10 channels at once: each of its 20 filters is 10 × 5, one weight per channel and pooled position.
 :::
 
-## 4.6 Build your network (TODO-2) {data-todo="TODO-2"}
+## 4.6 A classic CNN: LeNet-5
+
+![](assets/lenet5.png){fig-align="center" height="350px"}
+
+[LeNet-5 (LeCun et al., 1998) reads handwritten digits. Image: Zhang, Lipton, Li and Smola, *Dive into Deep Learning*, CC BY-SA 4.0, via Wikimedia Commons]{.caption-small}
+
+::: {.fragment}
+![](assets/custom/lenet_vs_ours.png){fig-align="center" height="290px"}
+:::
+
+::: {.notes}
+- One of the first CNNs: a 28 × 28 image of a handwritten digit in, one score per digit (10) out. The same parts as ours.
+- Convolution: 6 filters of 5 × 5, so 6 feature maps of 28 × 28 (the image is padded by 2 so the size stays).
+- Pooling: every 2 × 2 block becomes one number, 6 × 14 × 14.
+- Convolution again: 16 filters, each reading all 6 maps, 16 × 10 × 10; pooling, 16 × 5 × 5.
+- Flatten: 16 × 5 × 5 = 400 numbers, then three linear (dense) layers: 120, 84, and 10 scores.
+- For our sequences (next slide and notebook TODO-2): the input is a 4 × 501 one-hot matrix, the first filters are 4 rows tall so they read whole letters, pooling runs along the sequence only, and the end is one number, the logit.
+- Click: the table, LeNet-5 against ours, part by part.
+- The notebook prints LeNet-5's shapes layer by layer with `show_shapes`.
+:::
+
+## 4.7 Build your network (TODO-2) {data-todo="TODO-2"}
 
 ::: {.r-stack}
 ![](assets/custom/cnn_template_0.png){height="749px"}
@@ -570,7 +591,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 - Students who finish early can try other networks and compare their held-out AUROCs.
 :::
 
-## 4.7 The training step and the evaluation (TODO-3) {data-todo="TODO-3"}
+## 4.8 The training step and the evaluation (TODO-3) {data-todo="TODO-3"}
 
 ::: {.r-stack}
 ![](assets/custom/train_loop_0.png){height="742px"}

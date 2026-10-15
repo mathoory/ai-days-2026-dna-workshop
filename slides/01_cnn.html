@@ -1121,8 +1121,46 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="a-classic-cnn-lenet-5" class="slide level2">
+<h2>4.6 A classic CNN: LeNet-5</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/lenet5.png" class="quarto-figure quarto-figure-center" height="350"></p>
+</figure>
+</div>
+<p><span class="caption-small">LeNet-5 (LeCun et al., 1998) reads handwritten digits. Image: Zhang, Lipton, Li and Smola, <em>Dive into Deep Learning</em>, CC BY-SA 4.0, via Wikimedia Commons</span></p>
+<div class="fragment">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/lenet_vs_ours.png" class="quarto-figure quarto-figure-center" height="290"></p>
+</figure>
+</div>
+</div>
+<aside class="notes">
+<ul>
+<li>One of the first CNNs: a 28 × 28 image of a handwritten digit in, one score per digit (10) out. The same parts as ours.</li>
+<li>Convolution: 6 filters of 5 × 5, so 6 feature maps of 28 × 28 (the image is padded by 2 so the size stays).</li>
+<li>Pooling: every 2 × 2 block becomes one number, 6 × 14 × 14.</li>
+<li>Convolution again: 16 filters, each reading all 6 maps, 16 × 10 × 10; pooling, 16 × 5 × 5.</li>
+<li>Flatten: 16 × 5 × 5 = 400 numbers, then three linear (dense) layers: 120, 84, and 10 scores.</li>
+<li>For our sequences (next slide and notebook TODO-2): the input is a 4 × 501 one-hot matrix, the first filters are 4 rows tall so they read whole letters, pooling runs along the sequence only, and the end is one number, the logit.</li>
+<li>Click: the table, LeNet-5 against ours, part by part.</li>
+<li>The notebook prints LeNet-5’s shapes layer by layer with <code>show_shapes</code>.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="build-your-network-todo-2" class="slide level2" data-todo="TODO-2">
-<h2>4.6 Build your network (TODO-2)</h2>
+<h2>4.7 Build your network (TODO-2)</h2>
 <div class="r-stack">
 <p><img data-src="assets/custom/cnn_template_0.png" height="749"></p>
 <p><img data-src="assets/custom/cnn_template_1.png" class="fragment" height="749"></p>
@@ -1149,7 +1187,7 @@
       }</style></aside>
 </section>
 <section id="the-training-step-and-the-evaluation-todo-3" class="slide level2" data-todo="TODO-3">
-<h2>4.7 The training step and the evaluation (TODO-3)</h2>
+<h2>4.8 The training step and the evaluation (TODO-3)</h2>
 <div class="r-stack">
 <p><img data-src="assets/custom/train_loop_0.png" height="742"></p>
 <p><img data-src="assets/custom/train_loop_1.png" class="fragment" height="742"></p>

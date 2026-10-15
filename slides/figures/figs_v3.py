@@ -419,6 +419,23 @@ def roc_frames(ls, ly):
 
 
 # ------------------------------------------------------------------ 4.7 the training loop as a picture
+def lenet_vs_ours():
+    """Under the LeNet-5 picture: what changes from digits to sequences, part by part."""
+    fig, ax = canvas(16, 3.9, ylim=(0, 39))
+    cols = [("Input", 33), ("First filters", 70), ("Pooling", 106), ("End", 141)]
+    for t, x in cols:
+        label(ax, x, 34.5, t, fs=22, color=MUTED, bold=True)
+    ax.plot([2, 158], [30.5, 30.5], color=HAIR, lw=1.2)
+    rows = [("LeNet-5", INK, ["1 × 28 × 28 image", "6 filters, 5 × 5", "2 × 2 blocks", "3 linear layers\n→ 10 scores"], 21),
+            ("Ours", CNN_C, ["1 × 4 × 501 one-hot", "10 filters, 4 × 10:\nwhole letters", "1 × 3, along\nthe sequence",
+                             "1 linear layer\n→ 1 logit"], 6)]
+    for name, col, cells, y in rows:
+        label(ax, 2, y, name, fs=24, color=col, bold=True, ha="left")
+        for (t, x), c in zip(cols, cells):
+            label(ax, x, y, c, fs=22, color=col)
+    save(fig, "lenet_vs_ours")
+
+
 def train_loop():
     """One training step and the evaluation: flat neutral blocks, one weight of arrow, colour only for meaning."""
     fig, ax = canvas(16, 9, ylim=(0, 90))
@@ -613,6 +630,8 @@ if __name__ == "__main__":
         toy_pwm()
     if run("train_loop"):
         train_loop()
+    if run("lenet_vs_ours"):
+        lenet_vs_ours()
     if run("overfit_curve") or run("roc_frames") or run("your_turn"):
         from intuition import split
         tr, ty = split("train"); ls, ly = split("ls")

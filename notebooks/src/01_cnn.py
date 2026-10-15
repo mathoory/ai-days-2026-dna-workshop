@@ -170,26 +170,40 @@ test_encoding()
 # large and positive for "bound", large and negative for "unbound" (section 4 turns it into a
 # probability). Everything else is your choice: how many blocks, how many filters, how wide.
 #
-# **An example.** A network with two blocks looks like this; the letters stand for numbers you choose:
+# **An example: LeNet-5.** One of the first CNNs (LeCun and colleagues, 1998) read handwritten digits:
+# a 28 × 28 grey image in, one score for each of the 10 digits out. It follows the same template, with
+# two blocks:
 #
 # ```python
-# nn.Sequential(
-#     nn.Conv2d(1, a, (4, b)), nn.ReLU(), nn.MaxPool2d((1, c)),
-#     nn.Conv2d(a, d, (1, e)), nn.ReLU(), nn.MaxPool2d((1, c)),
-#     nn.Flatten(),
-#     nn.Linear(f, 1),
+# lenet = nn.Sequential(
+#     nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.ReLU(), nn.MaxPool2d(2),   # 6 filters of 5 × 5
+#     nn.Conv2d(6, 16, kernel_size=5), nn.ReLU(), nn.MaxPool2d(2),             # 16 filters, each reads all 6 channels
+#     nn.Flatten(),                                                            # 16 × 5 × 5 = 400 numbers
+#     nn.Linear(400, 120), nn.ReLU(),
+#     nn.Linear(120, 84), nn.ReLU(),
+#     nn.Linear(84, 10),                                                       # one score per digit
 # )
 # ```
 #
-# `a` and `d` are the numbers of filters in the two convolutions, `b` and `e` their widths, and `c` the
-# number of positions per pooling block. The second convolution takes `a` input channels, one per filter
-# of the first. `f` is the number of values after flatten.
+# (The original used the sigmoid instead of ReLU and averaged instead of taking the maximum; the shapes
+# are the same.) The cell below defines `show_shapes`, which runs one input through a list of layers
+# and prints the shape after each one, and runs it on LeNet-5 with one blank 28 × 28 image.
 #
-# The cell below defines `show_shapes`, which runs one sequence through your layers and prints the
-# shape after each one. Use it to build your network layer by layer: the shape after flatten gives `f`.
+# **From LeNet-5 to a network for our sequences.** Change these, and keep the rest:
+#
+# 1. **The input** is one sequence as a one-hot matrix, `1 × 4 × 501`, instead of a `1 × 28 × 28` image.
+# 2. **The first convolution's filters** are 4 rows tall, `(4, width)`, so each filter reads whole
+#    letters at every position; drop the padding. After it, only one row is left.
+# 3. **Pooling and later convolutions** work along the sequence only: `nn.MaxPool2d((1, c))` and
+#    `nn.Conv2d(..., (1, width))` instead of 2 × 2 and 5 × 5.
+# 4. **The end** is one number per sequence, the logit: flatten, then a single `nn.Linear(f, 1)`.
+#    The two hidden linear layers (120 and 84) are left out here, so that the template above holds.
+# 5. **`f`**, the number of values after flatten, depends on your choices: read it off `show_shapes`.
+#
+# How many filters, how wide, and how many blocks is your choice.
 
 # %%
-#@title ▶ show_shapes: the shape after each layer { display-mode: "form" }
+#@title ▶ show_shapes, and LeNet-5 layer by layer { display-mode: "form" }
 def show_shapes(layers, x=None):
     """Run one input through `layers` one layer at a time and print the shape after each layer."""
     h = encode_batch(train_seqs[:1]) if x is None else x
@@ -201,6 +215,21 @@ def show_shapes(layers, x=None):
             print(f"layer {i}, {layer}: fails on an input of shape {tuple(h.shape[1:])}: {e}")
             return
         print(f"{str(layer)[:38]:38s} {tuple(h.shape[1:])}")
+
+
+lenet = nn.Sequential(
+    nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.ReLU(), nn.MaxPool2d(2),
+    nn.Conv2d(6, 16, kernel_size=5), nn.ReLU(), nn.MaxPool2d(2),
+    nn.Flatten(),
+    nn.Linear(400, 120), nn.ReLU(),
+    nn.Linear(120, 84), nn.ReLU(),
+    nn.Linear(84, 10),
+)
+print("LeNet-5 on one 28 x 28 image:")
+show_shapes(lenet, torch.zeros(1, 1, 28, 28))
+
+# %% [markdown]
+# Now your network. Use `show_shapes(GlobalCNN().net)` to build it layer by layer.
 
 # %%
 class GlobalCNN(nn.Module):
