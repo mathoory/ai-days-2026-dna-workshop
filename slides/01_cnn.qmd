@@ -207,6 +207,8 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ## 2.3 Statistics, machine learning and AI
 
+:::: {.columns .vcenter}
+::: {.column width="55%"}
 ::: {.incremental}
 - **Statistics**: use data to make inferences about a population or a process
 - **Machine learning**: use data to find a function $g$ that approximates an unknown target $f$
@@ -216,8 +218,16 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
     - there is no easy rule to program it
     - there are data about it
 :::
+:::
+::: {.column width="45%" .fragment}
+![](assets/venn_ai_ds.png){height="492px"}
+
+[Image: ResearchGate, publication 380790362]{.caption-small}
+:::
+::::
 
 ::: {.notes}
+- Click: the Venn diagram. Deep learning sits inside machine learning, inside AI; statistics overlaps with machine learning and with data science.
 - Statistics gives machine learning many of its tools; traditional statistics cares more about provable results under assumptions, less about computation.
 - Machine learning is one route to AI. Chess: traditional AI searches a game tree; machine learning learns from board positions.
 - When: all three hold for AGO2. Binding is not random (1), there is no simple rule for it (2), and CLIP-seq measured tens of thousands of sites (3). If (1) fails, there is nothing to learn; if (2) fails, write the rule; if (3) fails, there is nothing to learn from.
