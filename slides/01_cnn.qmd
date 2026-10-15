@@ -113,8 +113,8 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 <tbody>
 <tr><td>11:30</td><td>1. Machine learning and CNNs</td><td class="tut">50 min</td><td></td><td></td></tr>
 <tr><td>12:20</td><td>1. Machine learning and CNNs, continued (break included)</td><td></td><td class="hands">60 min</td><td><code>01_cnn</code></td></tr>
-<tr><td>13:20</td><td>2. DNA foundation models, end at 14:00</td><td class="tut">20 min</td><td class="hands">20 min</td><td><code>02_foundation_models</code></td></tr>
-<tr class="brk"><td>Optional</td><td colspan="4">3. Shortcuts, controls and fine-tuning: slides and notebook, at home</td></tr>
+<tr><td>13:20</td><td>2. DNA foundation models, end at 14:00</td><td class="tut">40 min</td><td class="hands">optional</td><td><code>02_foundation_models</code></td></tr>
+<tr class="brk"><td>Optional</td><td colspan="4">3. Shortcuts, controls and fine-tuning: slides and notebook</td></tr>
 </tbody>
 </table>
 ```

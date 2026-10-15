@@ -440,6 +440,6 @@ Open **`02_foundation_models.ipynb`**.
 :::
 
 ::: {.notes}
-- Feedback at 14:00, the end of the day's sessions. Part 3 (slides and notebook) is optional, at home. The link and the QR code open the same form.
+- Feedback at 14:00, the end of the day's sessions. Part 3 (slides and notebook) is optional. The link and the QR code open the same form.
 :::
 

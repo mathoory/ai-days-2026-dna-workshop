@@ -1,6 +1,6 @@
 ---
 pagetitle: "Part 3: Shortcuts, controls and fine-tuning"
-subtitle: "Part 3: Shortcuts, controls and fine-tuning<br>(optional, at home)<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
+subtitle: "Part 3: Shortcuts, controls and fine-tuning<br>(optional)<br><br>AI Days 2026<br><br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
 ---
 
 ::: {.center}

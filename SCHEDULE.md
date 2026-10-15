@@ -6,11 +6,11 @@
 | 11:20–11:30 | | Break | | |
 | 11:30–12:20 | Mattan | 1. Machine learning and CNNs (talk) | `01_cnn` | |
 | 12:20–13:20 | Mattan | 1. Machine learning and CNNs, continued (notebook, break included) | | `01_cnn.ipynb` |
-| 13:20–14:00 | Mattan | 2. DNA foundation models (20 min talk, 20 min notebook, feedback) | `02_foundation_models` | `02_foundation_models.ipynb` |
-| optional | | 3. Shortcuts, controls and fine-tuning (slides and notebook, at home) | `03_shortcuts_and_controls` | `03_shortcuts_and_controls.ipynb` |
+| 13:20–14:00 | Mattan | 2. DNA foundation models (talk and feedback; notebook optional) | `02_foundation_models` | `02_foundation_models.ipynb` |
+| optional | | 3. Shortcuts, controls and fine-tuning (slides and notebook) | `03_shortcuts_and_controls` | `03_shortcuts_and_controls.ipynb` |
 
 Updated on the day (15.10): the opening lecture ended at 11:20, then one 10-minute break; part 1's talk ran
-to 12:20 and its notebook to 13:20 (break included); part 2 is 20 + 20 min; part 3 is optional, at home.
+to 12:20 and its notebook to 13:20 (break included); part 2 was the talk only (its notebook is optional); part 3 is optional.
 80 + 10 + 50 + 60 + 40 = 240 min, 10:00 to 14:00.
 
 ## Projected minutes, before any cuts

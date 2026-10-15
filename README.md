@@ -1,13 +1,13 @@
 # Applications of AI in Biotechnology and Genomics: AI Days 2026 workshop
 
 Technion AI Days, Thu 15.10.2026. Prof. Roee Amit opens at 10:00 until 11:20; parts 1 and 2 run from 11:30 to
-14:00 (each a talk, then a notebook); part 3 is optional, at home. All parts use the AGO2 CLIP-seq data of the GraphProt benchmark (Maticzka et al. 2014).
+14:00 (each a talk, then a notebook); part 3 is optional. All parts use the AGO2 CLIP-seq data of the GraphProt benchmark (Maticzka et al. 2014).
 
 | part | notebook | deck | you write |
 |---|---|---|---|
 | 1 Machine learning and CNNs (11:30) | `notebooks/01_cnn.ipynb` | `slides/01_cnn.qmd` | one-hot encoding, the CNN layers, held-out AUROC, a logo for every filter, motif insertion against a shuffled copy |
 | 2 DNA foundation models (13:20) | `notebooks/02_foundation_models.ipynb` | `slides/02_foundation_models.qmd` | `embed()`, `probe_auc()` |
-| 3 Shortcuts, controls and fine-tuning (optional, at home) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks |
+| 3 Shortcuts, controls and fine-tuning (optional) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks |
 
 Open a notebook in Colab, choose *Runtime → Change runtime type → T4 GPU*, and run from the top. Every
 notebook runs on its own: the data and our reference files download from
