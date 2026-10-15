@@ -57,13 +57,13 @@ def timeline():
 def agenda():
     """10:00 to 14:00, block widths proportional to minutes; tutorial, hands-on and breaks in their own colours."""
     BREAK_C, BREAK_T = "#FEEFC3", "#B06000"
-    slots = [("10:00", "10:50", "roee"), ("10:50", "11:00", "break"),
-             ("11:00", "11:40", "tutorial"), ("11:40", "11:50", "break"), ("11:50", "12:15", "hands-on"),
-             ("12:15", "12:45", "tutorial"), ("12:45", "13:05", "hands-on"), ("13:05", "13:15", "break"),
-             ("13:15", "13:30", "tutorial"), ("13:30", "13:50", "hands-on"), ("13:50", "14:00", "break")]
-    parts = [("11:00", "12:15", "Part 1", "Machine learning and CNNs"),
-             ("12:15", "13:05", "Part 2", "DNA foundation\nmodels"),
-             ("13:15", "13:50", "Part 3", "Shortcuts\nand controls")]
+    slots = [("10:00", "11:30", "roee"), ("11:30", "11:35", "break"),
+             ("11:35", "12:05", "tutorial"), ("12:05", "12:10", "break"), ("12:10", "12:30", "hands-on"),
+             ("12:30", "12:55", "tutorial"), ("12:55", "13:15", "hands-on"), ("13:15", "13:20", "break"),
+             ("13:20", "13:35", "tutorial"), ("13:35", "13:55", "hands-on"), ("13:55", "14:00", "break")]
+    parts = [("11:35", "12:30", "Part 1", "Machine learning and CNNs"),
+             ("12:30", "13:15", "Part 2", "DNA foundation\nmodels"),
+             ("13:20", "13:55", "Part 3", "Shortcuts\nand controls")]
     m = lambda s: int(s[:2]) * 60 + int(s[3:])                          # noqa: E731
     x0, x1, t0, t1 = 4, 156, m("10:00"), m("14:00")
     X = lambda s: x0 + (m(s) - t0) / (t1 - t0) * (x1 - x0)              # noqa: E731
@@ -96,8 +96,8 @@ def agenda():
     for s in ticks:
         dy = 4.5 if s in low else 0
         ax.plot([X(s), X(s)], [y - 1.2, y - 2.6 - dy], color=MUTED, lw=1.2)
-        label(ax, X(s), y - 5.5 - dy, s, fs=18, color=INK if s in ("10:00", "11:00", "14:00") else MUTED,
-              bold=s in ("10:00", "11:00", "14:00"))
+        label(ax, X(s), y - 5.5 - dy, s, fs=18, color=INK if s in ("10:00", "11:35", "14:00") else MUTED,
+              bold=s in ("10:00", "11:35", "14:00"))
     save(fig, "agenda")
 
 
