@@ -134,7 +134,7 @@ def page():
     </ol>
   </section>
   <section class="lab">
-    <h2>The host lab</h2>
+    <h2>About the lab</h2>
     <div class="lab-in">
         <h3>Roee Amit Lab</h3>
         <p class="lab-sub">The Synthetic Biology Laboratory for the Decipherment of Genomic Codes,
