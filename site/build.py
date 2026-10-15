@@ -23,18 +23,15 @@ SCHEDULE = [
     ("10:00", "11:20", "talk", "Opening lecture", "Prof. Roee Amit", None),
     ("11:20", "11:30", "break", "Break", "", None),
     ("11:30", "12:20", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn", [("Tutorial", "11:30", "12:20")]),
-    ("12:20", "12:40", "talk", "Part 1, continued", "", None, [("Hands-on", "12:20", "12:40")]),
-    ("12:40", "13:25", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models",
-     [("Tutorial", "12:40", "13:05"), ("Hands-on", "13:05", "13:25")]),
-    ("13:25", "13:30", "break", "Break", "", None),
-    ("13:30", "13:45", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls",
-     [("Tutorial", "13:30", "13:45")]),
-    ("13:45", "14:00", "break", "Questions, end", "", None),
+    ("12:20", "13:20", "talk", "Part 1, continued (break included)", "", None, [("Hands-on", "12:20", "13:20")]),
+    ("13:20", "14:00", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models",
+     [("Tutorial", "13:20", "13:40"), ("Hands-on", "13:40", "14:00")]),
+    ("Optional", "at home", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
 ]
 SUMMARY = {
     "01_cnn": "Build a CNN that predicts AGO2 binding from RNA sequence, then read motifs off its filters and test them.",
     "02_foundation_models": "Turn sequences into vectors with a pretrained DNA language model and train a linear probe on them.",
-    "03_shortcuts_and_controls": "Take-home notebook: measure what composition alone explains, then test the models with a shuffle and a matched control.",
+    "03_shortcuts_and_controls": "Optional, at home: measure what composition alone explains, then test the models with a shuffle and a matched control.",
 }
 GITHUB_MARK = ('<svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 '
                '3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23'
