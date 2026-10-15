@@ -452,7 +452,7 @@ def train_loop():
     label(ax, 25.5, 26.6, "after every epoch, forward pass only, no learning", fs=21, color=HELD_C, ha="left")
     row(4, [("Held-out", "sequences"), ("Network", "weights fixed"), ("Sigmoid", "probabilities"),
             ("AUROC", "vs the true labels")], INK)
-    save(fig, "train_loop")
+    save_split(fig, ax, "train_loop", 30)               # training first, the evaluation row on the click
 
 
 # ------------------------------------------------------------------ 5.x your turn: what each TODO produces

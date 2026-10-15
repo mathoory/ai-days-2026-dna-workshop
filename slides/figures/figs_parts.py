@@ -583,7 +583,7 @@ def cnn_template():
                    (" × ", INK), ("0.6", X_C), ("  +  …  +  ", INK), ("0.1", W_C), (" × ", INK), ("0.2", X_C),
                    ("  +  ", INK), ("(−0.2)", W_C), ("  =  1.2", INK), ("          ", INK),
                    (r"$\hat p$", INK), (" = σ(z) = σ(1.2) = 0.77", INK)], fs=24)
-    save(fig, "cnn_template")
+    save_split(fig, ax, "cnn_template", 35)             # the parts first, the worked numbers on the click
 
 
 if __name__ == "__main__":

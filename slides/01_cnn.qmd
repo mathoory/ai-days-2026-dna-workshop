@@ -555,7 +555,11 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 
 ## 4.6 Build your network (TODO-2) {data-todo="TODO-2"}
 
-![](assets/custom/cnn_template.png){fig-align="center" height="749px"}
+::: {.r-stack}
+![](assets/custom/cnn_template_0.png){height="749px"}
+
+![](assets/custom/cnn_template_1.png){.fragment height="749px"}
+:::
 
 ::: {.notes}
 - The parts: a convolution slides its filters along the sequence (one output row, a channel, per filter); ReLU sets negative values to 0; max pooling keeps the largest value of each block of neighbouring positions, so the rows get shorter; flatten lays everything out in one row; a linear layer makes one number, the logit.
@@ -568,7 +572,11 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 
 ## 4.7 The training step and the evaluation (TODO-3) {data-todo="TODO-3"}
 
-![](assets/custom/train_loop.png){fig-align="center" height="766px"}
+::: {.r-stack}
+![](assets/custom/train_loop_0.png){height="742px"}
+
+![](assets/custom/train_loop_1.png){.fragment height="742px"}
+:::
 
 ::: {.notes}
 - Top, blue: one training step, repeated for every batch of every epoch. A batch goes through the network, the scores are compared with the labels (the loss), the gradients of the loss say how to change every weight, and the step changes them; then the next batch.

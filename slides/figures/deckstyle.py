@@ -141,6 +141,21 @@ def save(fig, name):
     print("wrote", name)
 
 
+def save_split(fig, ax, name, y_cut):
+    """Two click frames of one drawing: name_0 shows only what lies above y_cut (data units), name_1 everything."""
+    fig.savefig(OUT / f"{name}_1.png", dpi=120, facecolor="white")
+    rend = fig.canvas.get_renderer()
+    cut = ax.transData.transform((0, y_cut))[1]
+    for a in list(ax.patches) + list(ax.texts) + list(ax.lines) + list(ax.images) + list(ax.collections):
+        bb = a.get_window_extent(rend)
+        if (bb.y0 + bb.y1) / 2 < cut:
+            a.set_visible(False)
+    fig.savefig(OUT / f"{name}_0.png", dpi=120, facecolor="white")
+    plt.close(fig)
+    trim_group([f"{name}_0", f"{name}_1"])
+    print("wrote", name, "in two frames")
+
+
 def trim_group(names, pad=24):
     """Crop the frames of one click-through to the union of their ink, so they still stack exactly."""
     import numpy as np
