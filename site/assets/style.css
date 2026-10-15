@@ -122,3 +122,12 @@ main h2 {
 }
 .split { margin: 6px 0 0; color: var(--muted); font-size: 0.95em; }
 .split b { color: var(--ink); font-weight: 500; }
+
+/* the solution: apart from the working buttons, quieter, for after the attempt */
+.actions { align-items: center; }
+.after { display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; padding-left: 16px;
+         border-left: 1px solid var(--hair); color: var(--muted); font-size: 15px; }
+.after .solution { font-weight: 500; text-decoration: none; border-bottom: 1px solid currentColor; }
+.after .solution:hover { color: var(--ink); }
+.meta .contact { color: #fff; text-decoration: none; border-bottom: 1px solid var(--accent); }
+.meta .contact:hover { color: var(--accent); }

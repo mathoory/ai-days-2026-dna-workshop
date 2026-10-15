@@ -17,6 +17,7 @@ COLAB = "https://colab.research.google.com/github/mathoory/ai-days-2026-dna-work
 COLAB_SOLUTION = "https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/solutions/{}_solution.ipynb"
 FORM = "https://forms.gle/NfE6ZHj98ri3WYmG6"
 LAB = "https://roee-amit.technion.ac.il/"
+PEOPLE = "https://roee-amit.technion.ac.il/people/"
 TITLE = "Applications of AI in Biotechnology and Genomics"
 
 # (start, end, kind, title, who, stem[, split]); kind: talk, part, break; split: [(label, start, end), ...]
@@ -26,7 +27,7 @@ SCHEDULE = [
     ("11:30", "12:20", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn", [("Tutorial", "11:30", "12:20")]),
     ("12:20", "13:20", "talk", "Part 1, continued (break included)", "", None, [("Hands-on", "12:20", "13:20")]),
     ("13:20", "14:00", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models",
-     [("Tutorial", "13:20", "13:40"), ("Hands-on", "13:40", "14:00")]),
+     [("Tutorial", "13:20", "14:00"), ("Hands-on", None, None)]),
     ("Optional", "at home", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
 ]
 SUMMARY = {
@@ -57,21 +58,24 @@ def row(start, end, kind, title, who, stem, split=()):
     if stem:
         nb, deck = ROOT / "notebooks" / f"{stem}.ipynb", ROOT / "slides" / f"{stem}.html"
         part = title.split(".")[0]
-        a = []
+        a = []                                           # in the order they are used: talk, hands-on, afterwards
+        a.append(link(f"slides/{stem}.html", "Slides", label=f"{part}: slides") if deck.exists()
+                 else '<span class="btn off">Slides not yet available</span>')
         a.append(link(COLAB.format(stem), "Open in Colab", "btn primary", label=f"{part}: open in Colab") if nb.exists()
                  else '<span class="btn off">Notebook not yet available</span>')
         if nb.exists():
             a.append(link(f"notebooks/{stem}.ipynb", "Download notebook", download=True, label=f"{part}: download notebook"))
-        a.append(link(f"slides/{stem}.html", "Slides", label=f"{part}: slides") if deck.exists()
-                 else '<span class="btn off">Slides not yet available</span>')
-        if (ROOT / "solutions" / f"{stem}_solution.ipynb").exists():     # the solved notebook, a separate link
-            a.append(link(COLAB_SOLUTION.format(stem), "Solution", label=f"{part}: solution notebook in Colab"))
+        if (ROOT / "solutions" / f"{stem}_solution.ipynb").exists():     # set apart: for after the attempt
+            a.append('<span class="after">After you try: '
+                     + link(COLAB_SOLUTION.format(stem), "Solution \u2192", "solution", label=f"{part}: solution notebook in Colab")
+                     + "</span>")
         acts = f'<div class="actions">{"".join(a)}</div>'
     desc = f'<p class="desc">{html.escape(SUMMARY[stem])}</p>' if SUMMARY.get(stem) else ""
     who = f'<div class="who">{html.escape(who)}</div>' if who else ""
     if split:
         mins = lambda a, b: (int(b[:2]) * 60 + int(b[3:])) - (int(a[:2]) * 60 + int(a[3:]))  # noqa: E731
-        who += ('<p class="split">' + ", ".join(f"<b>{html.escape(l)}</b> {mins(a, b)} min" for l, a, b in split) + "</p>")
+        who += ('<p class="split">' + ", ".join(f"<b>{html.escape(l)}</b> " + (f"{mins(a, b)} min" if a else "optional, at home")
+                                                for l, a, b in split) + "</p>")
     return f'<li class="slot {kind}">{t}<div class="what"><h3>{html.escape(title)}</h3>{who}{desc}{acts}</div></li>'
 
 
@@ -118,7 +122,7 @@ def page():
     <p class="kicker">Technion AI Days 2026 / Workshop</p>
     <h1>{TITLE}</h1>
     <p class="meta">Thursday 15 October 2026, 10:00 to 14:00 / Ullmann 803, Technion</p>
-    <p class="meta">Prof. Roee Amit and Mattan Hoory</p>
+    <p class="meta">Prof. Roee Amit and Mattan Hoory / <a class="contact" href="{PEOPLE}" target="_blank" rel="noopener">Contact details</a></p>
     <p class="host">Hosted by the <a href="{LAB}" target="_blank" rel="noopener">Roee Amit Lab</a></p>
    </div>
     <a class="mark" href="./" aria-label="Workshop home"><img src="assets/favicon.svg" alt=""></a>
@@ -148,6 +152,8 @@ def page():
     <h2>Feedback</h2>
     <div class="feedback-in">
       {link(FORM, "Open the feedback form", "btn primary")}
+      <p class="note">Questions after the workshop? Contact details for both instructors are on the
+        <a href="{PEOPLE}" target="_blank" rel="noopener">Roee Amit Lab people page</a>.</p>
       {qr}
     </div>
   </section>
