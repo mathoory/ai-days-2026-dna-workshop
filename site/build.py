@@ -20,17 +20,17 @@ TITLE = "Applications of AI in Biotechnology and Genomics"
 
 # (start, end, kind, title, who, stem[, split]); kind: talk, part, break; split: [(label, start, end), ...]
 SCHEDULE = [
-    ("10:00", "10:50", "talk", "Opening lecture", "Prof. Roee Amit", None),
-    ("10:50", "11:00", "break", "Break", "", None),
-    ("11:00", "11:40", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn", [("Tutorial", "11:00", "11:40")]),
-    ("11:40", "11:50", "break", "Break", "", None),
-    ("11:50", "12:15", "talk", "Part 1, continued", "", None, [("Hands-on", "11:50", "12:15")]),
-    ("12:15", "13:05", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models",
-     [("Tutorial", "12:15", "12:45"), ("Hands-on", "12:45", "13:05")]),
-    ("13:05", "13:15", "break", "Break", "", None),
-    ("13:15", "13:50", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls",
-     [("Tutorial", "13:15", "13:30"), ("Hands-on", "13:30", "13:50")]),
-    ("13:50", "14:00", "break", "Break", "", None),
+    ("10:00", "11:30", "talk", "Opening lecture", "Prof. Roee Amit", None),
+    ("11:30", "11:35", "break", "Break", "", None),
+    ("11:35", "12:05", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn", [("Tutorial", "11:35", "12:05")]),
+    ("12:05", "12:10", "break", "Break", "", None),
+    ("12:10", "12:30", "talk", "Part 1, continued", "", None, [("Hands-on", "12:10", "12:30")]),
+    ("12:30", "13:15", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models",
+     [("Tutorial", "12:30", "12:55"), ("Hands-on", "12:55", "13:15")]),
+    ("13:15", "13:20", "break", "Break", "", None),
+    ("13:20", "13:55", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls",
+     [("Tutorial", "13:20", "13:35"), ("Hands-on", "13:35", "13:55")]),
+    ("13:55", "14:00", "break", "Break", "", None),
 ]
 SUMMARY = {
     "01_cnn": "Build a CNN that predicts AGO2 binding from RNA sequence, then read motifs off its filters and test them.",
