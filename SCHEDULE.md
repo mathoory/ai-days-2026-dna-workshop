@@ -2,18 +2,18 @@
 
 | Time | Who | Part | Deck | Notebook |
 |---|---|---|---|---|
-| 10:00–11:30 | Roee | Opening lecture (biology) | Roee's | none |
-| 11:30–11:35 | | Break | | |
-| 11:35–12:15 | Mattan | 1. Machine learning and CNNs (talk) | `01_cnn` | |
-| 12:15–12:20 | | Break | | |
+| 10:00–11:20 | Roee | Opening lecture (biology) | Roee's | none |
+| 11:20–11:30 | | Break | | |
+| 11:30–12:20 | Mattan | 1. Machine learning and CNNs (talk) | `01_cnn` | |
 | 12:20–12:40 | Mattan | 1. Machine learning and CNNs, continued (notebook) | | `01_cnn.ipynb` |
 | 12:40–13:25 | Mattan | 2. DNA foundation models (25 min talk, 20 min notebook) | `02_foundation_models` | `02_foundation_models.ipynb` |
 | 13:25–13:30 | | Break | | |
 | 13:30–13:45 | Mattan | 3. Shortcuts, controls and fine-tuning (15 min talk, feedback; notebook at home) | `03_shortcuts_and_controls` | `03_shortcuts_and_controls.ipynb` |
 | 13:45–14:00 | | Questions, end | | |
 
-Updated on the day (15.10): the opening lecture ran to 11:30 and part 1's talk to 12:15; part 3's hands-on
-is cut (the notebook stays online). 90 + 60 + 45 + 15 + 3 × 5 + 15 of questions = 240 min, 10:00 to 14:00.
+Updated on the day (15.10): the opening lecture ended at 11:20, then one 10-minute break; part 1's talk ran
+to 12:20; part 3's hands-on is cut (the notebook stays online). 80 + 10 + 70 + 45 + 5 + 15 + 15 of questions
+= 240 min, 10:00 to 14:00.
 
 ## Projected minutes, before any cuts
 

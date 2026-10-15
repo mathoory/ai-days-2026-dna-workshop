@@ -1,11 +1,11 @@
 # Applications of AI in Biotechnology and Genomics: AI Days 2026 workshop
 
-Technion AI Days, Thu 15.10.2026. Prof. Roee Amit opens at 10:00 until 11:30; the three parts run from 11:35 to
+Technion AI Days, Thu 15.10.2026. Prof. Roee Amit opens at 10:00 until 11:20; the three parts run from 11:30 to
 13:45 (parts 1 and 2 a talk, then a notebook; part 3 a talk, its notebook at home), then questions until 14:00. All parts use the AGO2 CLIP-seq data of the GraphProt benchmark (Maticzka et al. 2014).
 
 | part | notebook | deck | you write |
 |---|---|---|---|
-| 1 Machine learning and CNNs (11:35) | `notebooks/01_cnn.ipynb` | `slides/01_cnn.qmd` | one-hot encoding, the CNN layers, held-out AUROC, a logo for every filter, motif insertion against a shuffled copy |
+| 1 Machine learning and CNNs (11:30) | `notebooks/01_cnn.ipynb` | `slides/01_cnn.qmd` | one-hot encoding, the CNN layers, held-out AUROC, a logo for every filter, motif insertion against a shuffled copy |
 | 2 DNA foundation models (12:40) | `notebooks/02_foundation_models.ipynb` | `slides/02_foundation_models.qmd` | `embed()`, `probe_auc()` |
 | 3 Shortcuts, controls and fine-tuning (13:30) | `notebooks/03_shortcuts_and_controls.ipynb` | `slides/03_shortcuts_and_controls.qmd` | G+C/U baseline, 5-letter word baseline, shuffle test, `shortcut_scores()` on both benchmarks |
 
