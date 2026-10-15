@@ -4,16 +4,16 @@
 |---|---|---|---|---|
 | 10:00–11:30 | Roee | Opening lecture (biology) | Roee's | none |
 | 11:30–11:35 | | Break | | |
-| 11:35–12:05 | Mattan | 1. Machine learning and CNNs (talk) | `01_cnn` | |
-| 12:05–12:10 | | Break | | |
-| 12:10–12:30 | Mattan | 1. Machine learning and CNNs, continued (notebook) | | `01_cnn.ipynb` |
-| 12:30–13:15 | Mattan | 2. DNA foundation models (25 min talk, 20 min notebook) | `02_foundation_models` | `02_foundation_models.ipynb` |
-| 13:15–13:20 | | Break | | |
-| 13:20–13:55 | Mattan | 3. Shortcuts, controls and fine-tuning (15 min talk, 20 min notebook, feedback) | `03_shortcuts_and_controls` | `03_shortcuts_and_controls.ipynb` |
-| 13:55–14:00 | | Break (end) | | |
+| 11:35–12:15 | Mattan | 1. Machine learning and CNNs (talk) | `01_cnn` | |
+| 12:15–12:20 | | Break | | |
+| 12:20–12:40 | Mattan | 1. Machine learning and CNNs, continued (notebook) | | `01_cnn.ipynb` |
+| 12:40–13:25 | Mattan | 2. DNA foundation models (25 min talk, 20 min notebook) | `02_foundation_models` | `02_foundation_models.ipynb` |
+| 13:25–13:30 | | Break | | |
+| 13:30–13:45 | Mattan | 3. Shortcuts, controls and fine-tuning (15 min talk, feedback; notebook at home) | `03_shortcuts_and_controls` | `03_shortcuts_and_controls.ipynb` |
+| 13:45–14:00 | | Questions, end | | |
 
-Updated on the day (15.10): the opening lecture runs to 11:30, so part 1 is 30 + 20 min, part 2's talk 25 min,
-and every break 5 min. 90 + 50 + 45 + 35 + 4 × 5 = 240 min, 10:00 to 14:00.
+Updated on the day (15.10): the opening lecture ran to 11:30 and part 1's talk to 12:15; part 3's hands-on
+is cut (the notebook stays online). 90 + 60 + 45 + 15 + 3 × 5 + 15 of questions = 240 min, 10:00 to 14:00.
 
 ## Projected minutes, before any cuts
 

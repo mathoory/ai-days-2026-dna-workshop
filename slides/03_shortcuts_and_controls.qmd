@@ -190,7 +190,7 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 :::
 
 ::: {.notes}
-- Feedback at the end of the notebook, before the final break (13:55). The link and the QR code open the same form.
+- Feedback at the end of the notebook, at the end of the talk (13:45). The link and the QR code open the same form.
 :::
 
 ## 6.5 Credits and further reading
