@@ -818,13 +818,11 @@ print(f"score before {score_before:.3f} | after {score_after:.3f}")
 
 # %%
 # TODO-5b: your control, `control_motif`: the sequence you insert instead of MY_MOTIF (see "Design a
-#          control" above), with the same length. In MY_CONTROL_REASON, say in one sentence why
-#          comparing the two answers the question.
+#          control" above), with the same length.
 # === Your code here ===
 control_motif = "".join(np.random.default_rng(2).permutation(list(MY_MOTIF)))
 # === End of your code ===
-MY_CONTROL_REASON = ""
-print(f"motif   : {MY_MOTIF}\ncontrol : {control_motif}\nbecause : {MY_CONTROL_REASON or '(not written yet)'}")
+print(f"motif   : {MY_MOTIF}\ncontrol : {control_motif}")
 
 # %%
 # TODO-5c: for every number of copies in `copies`, the mean score over all sequences of `canvas` with
