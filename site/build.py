@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "_site"
 REPO = "https://github.com/mathoory/ai-days-2026-dna-workshop"
 COLAB = "https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/notebooks/{}.ipynb"
+COLAB_SOLUTION = "https://colab.research.google.com/github/mathoory/ai-days-2026-dna-workshop/blob/public/solutions/{}_solution.ipynb"
 FORM = "https://forms.gle/NfE6ZHj98ri3WYmG6"
 LAB = "https://roee-amit.technion.ac.il/"
 TITLE = "Applications of AI in Biotechnology and Genomics"
@@ -63,6 +64,8 @@ def row(start, end, kind, title, who, stem, split=()):
             a.append(link(f"notebooks/{stem}.ipynb", "Download notebook", download=True, label=f"{part}: download notebook"))
         a.append(link(f"slides/{stem}.html", "Slides", label=f"{part}: slides") if deck.exists()
                  else '<span class="btn off">Slides not yet available</span>')
+        if (ROOT / "solutions" / f"{stem}_solution.ipynb").exists():     # the solved notebook, a separate link
+            a.append(link(COLAB_SOLUTION.format(stem), "Solution", label=f"{part}: solution notebook in Colab"))
         acts = f'<div class="actions">{"".join(a)}</div>'
     desc = f'<p class="desc">{html.escape(SUMMARY[stem])}</p>' if SUMMARY.get(stem) else ""
     who = f'<div class="who">{html.escape(who)}</div>' if who else ""
@@ -168,7 +171,7 @@ def main():
         shutil.rmtree(OUT)
     OUT.mkdir()
     shutil.copytree(ROOT / "site" / "assets", OUT / "assets", ignore=shutil.ignore_patterns("*.py"))
-    for d in ("notebooks", "slides"):
+    for d in ("notebooks", "slides", "solutions"):
         if (ROOT / d).exists():
             shutil.copytree(ROOT / d, OUT / d)
     (OUT / "index.html").write_text(page(), encoding="utf-8")
