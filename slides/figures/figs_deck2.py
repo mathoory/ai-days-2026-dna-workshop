@@ -493,24 +493,34 @@ def probe(tok, fm, pos):
 # ------------------------------------------------------------------ 5.3 summary, 6.1 Hugging Face
 def summary():
     names = []
-    for k in (0, 1):
+    for k in (0, 1, 2):                                  # 2: the same adaptation, with the body trained too
         fig, ax, H = canvas3("d2_summary_0")
         label(ax, 2, H - 4, "1  Pretraining: billions of DNA letters, no labels", fs=24, ha="left", bold=True)
         yb1 = H - 22
         stage_row(ax, yb1, XS, BW, colors=[ACCENT, ACCENT, ACCENT, HELD_C],
                   texts=["Tokenization", "Embedding", "Body", "Next-token\nhead"])
-        if k == 1:
+        if k >= 1:
             for x in XS[:3]:
                 arrow(ax, x + BW / 2, yb1 - 1.5, x + BW / 2, yb1 - 9, color=MUTED, lw=2.5, ms=22)
             label(ax, XS[2] + BW / 2 + 3, yb1 - 5.5, "kept", fs=20, color=MUTED, ha="left")
             label(ax, 2, yb1 - 15, "2  Adapting: 12,000 labelled AGO2 sequences", fs=24, ha="left", bold=True)
             yb2 = yb1 - 33
-            stage_row(ax, yb2, XS, BW, colors=[FAINT, FAINT, FAINT, GOOD_C],
-                      texts=["Tokenization", "Embedding", "Body", "AGO2 head"], tcolors=[MUTED, MUTED, MUTED, "white"])
-            label(ax, XS[1] + BW / 2 + 20, yb2 - 5, "frozen", fs=22, color=MUTED, bold=True)
-            label(ax, XS[3] + BW / 2, yb2 - 5, "trained", fs=22, color=GOOD_C, bold=True)
-            label(ax, 2, yb2 - 15, "Train only the new head: a linear probe (today)", fs=22, ha="left")
-            label(ax, 2, yb2 - 22, "Also update the body: fine-tuning (part 3)", fs=22, ha="left")
+            if k == 1:                                   # linear probe: the pretrained parts stay frozen
+                stage_row(ax, yb2, XS, BW, colors=[FAINT, FAINT, FAINT, GOOD_C],
+                          texts=["Tokenization", "Embedding", "Body", "AGO2 head"], tcolors=[MUTED, MUTED, MUTED, "white"])
+                label(ax, XS[1] + BW / 2 + 20, yb2 - 5, "frozen", fs=22, color=MUTED, bold=True)
+                label(ax, XS[3] + BW / 2, yb2 - 5, "trained", fs=22, color=GOOD_C, bold=True)
+                label(ax, 2, yb2 - 15, "Linear probe (today): only the new head learns", fs=22, ha="left", bold=True)
+                label(ax, 2, yb2 - 22, "the pretrained model stays as it is", fs=22, ha="left", color=MUTED)
+            else:                                        # fine-tuning: the pretrained parts keep learning
+                stage_row(ax, yb2, XS, BW, colors=[FAINT, TUNED_C, TUNED_C, GOOD_C],
+                          texts=["Tokenization", "Embedding", "Body", "AGO2 head"], tcolors=[MUTED, "white", "white", "white"])
+                label(ax, XS[1] + BW / 2 + 20, yb2 - 5, "trained further", fs=22, color=TUNED_C, bold=True)
+                label(ax, XS[3] + BW / 2, yb2 - 5, "trained", fs=22, color=GOOD_C, bold=True)
+                label(ax, 2, yb2 - 15, "Fine-tuning (part 3): the body learns too", fs=22, ha="left", bold=True,
+                      color=TUNED_C)
+                label(ax, 2, yb2 - 22, "continue training the pretrained model on your own labelled data", fs=22,
+                      ha="left", color=MUTED)
         nm = f"d2_summary_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
 
