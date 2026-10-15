@@ -131,3 +131,4 @@ main h2 {
 .after .solution:hover { color: var(--ink); }
 .meta .contact { color: #fff; text-decoration: none; border-bottom: 1px solid var(--accent); }
 .meta .contact:hover { color: var(--accent); }
+.foot .ref { padding-left: 1.2em; text-indent: -1.2em; }

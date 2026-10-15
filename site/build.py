@@ -28,12 +28,12 @@ SCHEDULE = [
     ("12:20", "13:20", "talk", "Part 1, continued (break included)", "", None, [("Hands-on", "12:20", "13:20")]),
     ("13:20", "14:00", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models",
      [("Tutorial", "13:20", "14:00"), ("Hands-on", None, None)]),
-    ("Optional", "at home", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
+    ("Optional", "", "part", "Part 3. Shortcuts, controls and fine-tuning", "Mattan Hoory", "03_shortcuts_and_controls"),
 ]
 SUMMARY = {
     "01_cnn": "Build a CNN that predicts AGO2 binding from RNA sequence, then read motifs off its filters and test them.",
     "02_foundation_models": "Turn sequences into vectors with a pretrained DNA language model and train a linear probe on them.",
-    "03_shortcuts_and_controls": "Optional, at home: measure what composition alone explains, then test the models with a shuffle and a matched control.",
+    "03_shortcuts_and_controls": "Optional: measure what composition alone explains, then test the models with a shuffle and a matched control.",
 }
 GITHUB_MARK = ('<svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 '
                '3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23'
@@ -74,7 +74,7 @@ def row(start, end, kind, title, who, stem, split=()):
     who = f'<div class="who">{html.escape(who)}</div>' if who else ""
     if split:
         mins = lambda a, b: (int(b[:2]) * 60 + int(b[3:])) - (int(a[:2]) * 60 + int(a[3:]))  # noqa: E731
-        who += ('<p class="split">' + ", ".join(f"<b>{html.escape(l)}</b> " + (f"{mins(a, b)} min" if a else "optional, at home")
+        who += ('<p class="split">' + ", ".join(f"<b>{html.escape(l)}</b> " + (f"{mins(a, b)} min" if a else "optional")
                                                 for l, a, b in split) + "</p>")
     return f'<li class="slot {kind}">{t}<div class="what"><h3>{html.escape(title)}</h3>{who}{desc}{acts}</div></li>'
 
@@ -161,7 +161,13 @@ def page():
 <footer class="foot">
   <div class="wrap foot-in">
     <a class="gh" href="{REPO}" target="_blank" rel="noopener">{GITHUB_MARK}<span>mathoory/ai-days-2026-dna-workshop</span></a>
-    <p>Data: AGO2 CLIP-seq from the GraphProt benchmark (Maticzka et al. 2014), as used by Pan and Shen (2018).</p>
+    <p>Data: AGO2 CLIP-seq from the GraphProt benchmark, as used by Pan and Shen.</p>
+    <p class="ref">Maticzka D, Lange SJ, Costa F, Backofen R. GraphProt: modeling binding preferences of RNA-binding proteins.
+      <i>Genome Biology</i> 15, R17 (2014).
+      <a href="https://doi.org/10.1186/gb-2014-15-1-r17" target="_blank" rel="noopener">doi:10.1186/gb-2014-15-1-r17</a></p>
+    <p class="ref">Pan X, Shen H-B. Predicting RNA-protein binding sites and motifs through combining local and global deep
+      convolutional neural networks. <i>Bioinformatics</i> 34(20), 3427-3436 (2018).
+      <a href="https://doi.org/10.1093/bioinformatics/bty364" target="_blank" rel="noopener">doi:10.1093/bioinformatics/bty364</a></p>
     <p>Pipeline ideas from the KAUST Genomic Foundation Models workshop (I. Ullah, 2026):
       <a href="https://github.com/bioinfo-kaust/gfm-workshop" target="_blank" rel="noopener">github.com/bioinfo-kaust/gfm-workshop</a></p>
     <p class="built">Updated {built}</p>
