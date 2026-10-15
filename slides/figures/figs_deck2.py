@@ -454,33 +454,44 @@ def heads(tok, fm, pos):
     toks, _, Hc, _ = walk_tensors(tok, fm, pos)
     v = np.percentile(np.abs(Hc), 97)
     n = len(toks)
-    rows = [("Next token", n - 2, "256 → 4,096\nsoftmax", "4,096\nprobabilities", HELD_C),
-            ("Masked token", 6, "256 → 4,096\nsoftmax", "4,096\nprobabilities", HELD_C),
-            ("Our task", None, "256 → 1\nsigmoid", "P(bound)", GOOD_C)]
+    vocab = [r"$z_k = w_{k,1}\,e_1 + w_{k,2}\,e_2 + \dots + w_{k,256}\,e_{256} + b_k$",
+             "4,096 equations, one per token: k = 1, …, 4,096",
+             r"softmax:  $p_k = \exp(z_k)\ /\ \Sigma_j\, \exp(z_j)$"]
+    ours = [r"$z = w_1\,e_1 + w_2\,e_2 + \dots + w_{256}\,e_{256} + b$",
+            "one equation",
+            r"sigmoid:  $\hat p = \sigma(z)$ = P(bound)"]
+    rows = [("Next token: the last DNA token", n - 2, vocab, HELD_C),
+            ("Masked token: the hidden token", 6, vocab, HELD_C),
+            ("Our task: the average of all rows", None, ours, GOOD_C)]
     names = []
     for k in range(3):
         fig, ax, H = canvas3("d2_heads_0")
         top, bot = H - 9, 9
-        heat(ax, 2, bot, 30, top - bot, Hc, v)
+        x0, w = 12, 22                                  # room on the left to name the special rows
+        heat(ax, x0, bot, w, top - bot, Hc, v)
         rh = (top - bot) / n
-        label(ax, 17, H - 3.5, "Body output", fs=22, bold=True)
-        label(ax, 17, 3, f"{n} tokens", fs=20, color=MUTED)
+        label(ax, x0 + w / 2, H - 3.5, "Body output", fs=22, bold=True)
+        label(ax, x0 + w / 2, 3, f"{n} tokens", fs=20, color=MUTED)
+        for ri, nm_ in ((0, "[CLS]"), (n - 1, "[SEP]")):      # special tokens the tokenizer adds; not DNA
+            label(ax, x0 - 1, top - (ri + 0.5) * rh, nm_, fs=15, color=MUTED, ha="right", family=MONO)
         step = (H - 6) / 3
-        for j, (name, ri, head, out, c) in enumerate(rows[:k + 1]):
-            y = H - 10 - j * step
+        for j, (name, ri, eqs, c) in enumerate(rows[:k + 1]):
+            y = H - 4 - j * step                         # the row's title line
             if ri is not None:
-                ax.add_patch(Rectangle((2, top - (ri + 1) * rh), 30, rh, fill=False, ec=c, lw=3, zorder=4))
+                ax.add_patch(Rectangle((x0, top - (ri + 1) * rh), w, rh, fill=False, ec=c, lw=3, zorder=4))
                 src = top - (ri + 0.5) * rh
                 vec = Hc[ri]
-            else:
+            else:                                       # the average reads every row: a bracket over all of them
+                ax.plot([x0 + w + 1.2, x0 + w + 2.4, x0 + w + 2.4, x0 + w + 1.2], [top, top, bot, bot], color=c, lw=3)
                 src, vec = (top + bot) / 2, Hc.mean(0)
-            arrow(ax, 33, src, 40, y - 6, color=c, lw=2.5, ms=20)
-            label(ax, 41, y + 1, name, fs=21, color=c, ha="left", bold=True)
-            strip(ax, 41, y - 9, 34, 6, vec, v)
-            arrow(ax, 76, y - 6, 82, y - 6, color=MUTED, lw=2.5, ms=20)
-            blk(ax, 83, y - 12, 34, 12, head, fc=c, fs=20)
-            arrow(ax, 118, y - 6, 124, y - 6, color=MUTED, lw=2.5, ms=20)
-            label(ax, 125, y - 6, out, fs=22, ha="left")
+            arrow(ax, x0 + w + (2.6 if ri is None else 1), src, 40, y - 10, color=c, lw=2.5, ms=20)
+            label(ax, 41, y, name, fs=19, color=c, ha="left", bold=True)
+            strip(ax, 41, y - 12.5, 22, 5, vec, v)             # the 256 numbers going in
+            label(ax, 52, y - 15.5, r"$e_1 \ \dots \ e_{256}$", fs=15, color=MUTED)
+            arrow(ax, 64, y - 10, 68, y - 10, color=MUTED, lw=2.5, ms=18)
+            label(ax, 69, y - 5, eqs[0], fs=17, ha="left")
+            label(ax, 69, y - 10.5, eqs[1], fs=15, color=c, ha="left", bold=True)
+            label(ax, 69, y - 16, eqs[2], fs=17, ha="left")
         nm = f"d2_heads_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
 

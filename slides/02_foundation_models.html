@@ -599,9 +599,10 @@
 <aside class="notes">
 <ul>
 <li>Left: the body’s output for the sequence of slide 4.2, one row of 256 numbers per token: its contextual embeddings. One head per click.</li>
-<li>Next token: the last token’s row goes through a linear layer to 4,096 scores, one per vocabulary token; the softmax turns them into probabilities that sum to 1. Masked token: the same, from the hidden token’s row.</li>
+<li>The first and last rows are [CLS] and [SEP], two special tokens the tokenizer adds; they are not DNA. So the next-token head reads the row just above [SEP], the last DNA token.</li>
+<li>Next token: that row’s 256 numbers go through a linear layer with 4,096 outputs. Each output is one weighted sum, <span class="math inline">\(z_k = w_{k,1} e_1 + \dots + w_{k,256} e_{256} + b_k\)</span>: one equation per vocabulary token, 4,096 equations, about a million weights. The softmax turns the 4,096 scores into probabilities that sum to 1. Masked token: the same equations, from the hidden token’s row.</li>
 <li>These two are the pretraining heads (slide 1.5). After pretraining they are dropped; the embedding table and the body are kept.</li>
-<li>Our task: the average of all rows, the <strong>sequence embedding</strong> (the 256 numbers of slide 4.2), goes through one linear layer to one number, then the sigmoid: P(bound).</li>
+<li>Our task: the average of all rows, the <strong>sequence embedding</strong> (the 256 numbers of slide 4.2), goes into a single equation, <span class="math inline">\(z = w_1 e_1 + \dots + w_{256} e_{256} + b\)</span>, then the sigmoid: P(bound). 257 numbers to learn, the logistic regression of part 1.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
