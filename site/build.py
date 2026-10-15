@@ -20,10 +20,9 @@ TITLE = "Applications of AI in Biotechnology and Genomics"
 
 # (start, end, kind, title, who, stem[, split]); kind: talk, part, break; split: [(label, start, end), ...]
 SCHEDULE = [
-    ("10:00", "11:30", "talk", "Opening lecture", "Prof. Roee Amit", None),
-    ("11:30", "11:35", "break", "Break", "", None),
-    ("11:35", "12:15", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn", [("Tutorial", "11:35", "12:15")]),
-    ("12:15", "12:20", "break", "Break", "", None),
+    ("10:00", "11:20", "talk", "Opening lecture", "Prof. Roee Amit", None),
+    ("11:20", "11:30", "break", "Break", "", None),
+    ("11:30", "12:20", "part", "Part 1. Machine learning and CNNs", "Mattan Hoory", "01_cnn", [("Tutorial", "11:30", "12:20")]),
     ("12:20", "12:40", "talk", "Part 1, continued", "", None, [("Hands-on", "12:20", "12:40")]),
     ("12:40", "13:25", "part", "Part 2. DNA foundation models", "Mattan Hoory", "02_foundation_models",
      [("Tutorial", "12:40", "13:05"), ("Hands-on", "13:05", "13:25")]),
