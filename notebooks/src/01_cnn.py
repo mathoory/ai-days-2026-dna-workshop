@@ -12,8 +12,8 @@
 # **The data.** We use the AGO2 set of the GraphProt CLIP benchmark (Maticzka et al. 2014), as used by
 # Pan & Shen (2018). Each **bound** sequence contains a CLIP-seq binding site of about 40 letters, with
 # flanking context on both sides (in the files the site is in capital letters and the context in small
-# letters; we convert everything to capitals). Each **unbound** sequence was made by moving a binding
-# site to a random position in the same gene. The files call the two classes *positives* and
+# letters; we convert everything to capitals). Each **unbound** sequence is a stretch of the same
+# length taken from a random position in the same gene. The files call the two classes *positives* and
 # *negatives*.
 #
 # In this notebook you will:
@@ -193,7 +193,7 @@ test_encoding()
 #
 # 1. **The input** is one sequence as a one-hot matrix, `1 × 4 × 501`, instead of a `1 × 28 × 28` image.
 # 2. **The first convolution's filters** are 4 rows tall, `(4, width)`, so each filter reads whole
-#    letters at every position; drop the padding. After it, only one row is left.
+#    letters at every position; leave out LeNet's `padding=2`. After it, only one row is left.
 # 3. **Pooling and later convolutions** work along the sequence only: `nn.MaxPool2d((1, c))` and
 #    `nn.Conv2d(..., (1, width))` instead of 2 × 2 and 5 × 5.
 # 4. **The end** is one number per sequence, the logit: flatten, then a single `nn.Linear(f, 1)`.
@@ -268,6 +268,8 @@ def test_network():
         f"❌ the first convolution takes {first.in_channels} input channels, want 1: the one-hot matrix has one channel"
     assert first.kernel_size[0] == 4, \
         f"❌ the first convolution's filters are {first.kernel_size[0]} rows tall, want 4: one row per letter"
+    assert tuple(first.padding) == (0, 0) and tuple(first.stride) == (1, 1), \
+        "❌ the first convolution has padding or a stride: leave both out, so each output is one window of letters"
     for i, k in enumerate(kinds):
         if k == "Conv2d":
             assert kinds[i + 1:i + 2] == ["ReLU"], \
@@ -351,7 +353,7 @@ print(f"{len(train_loader):,} batches of 256 sequences per epoch")
 # %%
 # TODO-3a: write train_step(model, opt, criterion, X, y): one training step on one batch (the five
 #          steps of the pseudocode, from clearing the gradients to the optimizer step). It returns the
-#          loss of the batch, before the step, as a number.
+#          loss of the batch, before the step, as a number: `loss.item()`.
 def train_step(model, opt, criterion, X, y):
     # === Your code here ===
     opt.zero_grad()
@@ -375,7 +377,9 @@ for step in range(1, 6):
 # %%
 # TODO-3b: write evaluate(model, X_test, test_y): the held-out test AUROC, without learning. The model
 #          scores every test sequence, the scores become probabilities of "bound", and the AUROC compares
-#          them with the true labels test_y. It returns the AUROC as a number.
+#          them with the true labels test_y. It returns the AUROC as a number. X_test arrives on the
+#          CPU and the model may be on the GPU: score `model(X_test.to(DEVICE))`, and bring the
+#          probabilities back with `.cpu().numpy()` before `roc_auc_score`.
 def evaluate(model, X_test, test_y):
     # === Your code here ===
     model.eval()
@@ -443,7 +447,7 @@ def test_train():
     assert np.isfinite(l), f"❌ train_step returned the loss {l}, want a finite number"
     assert any(not torch.equal(b0, q.detach()) for b0, q in zip(before, m.parameters())), \
         "❌ the weights did not change in train_step: it must compute the gradients and take the optimizer step"
-    assert all(q.grad.abs().max().item() < 1e5 for q in m.parameters()), \
+    assert all(q.grad is None or q.grad.abs().max().item() < 1e5 for q in m.parameters()), \
         "❌ the gradients of an earlier step were still there: train_step must clear the gradients first"
     X_test = encode_batch(test_seqs)
     with torch.no_grad():
@@ -496,7 +500,7 @@ plt.tight_layout(); plt.show()
 # curve on training sequences pull away from the curve on held-out sequences, and if so, from which
 # epoch? A growing gap means the model starts to memorise its training data. Is your model good, and
 # compared with what? The held-out test set has only 1,000 sequences, so any AUROC on it has a sampling
-# uncertainty of about ±0.025 (95% range, part 1 talk): smaller differences, between epochs or between
+# uncertainty of about ±0.025 (95% range): smaller differences, between epochs or between
 # your network and your neighbour's, are noise.
 
 # %% [markdown]
@@ -617,6 +621,8 @@ def windows_above(acts_f, seqs, cutoff):
 
 def pwm_of(windows):
     """(KERNEL, 4) table: the frequency of each letter at each position."""
+    if not windows:                                    # a filter that never fires: no letter is preferred
+        return np.full((KERNEL, 4), 0.25)
     arr = np.frombuffer("".join(windows).encode(), dtype=np.uint8).reshape(-1, KERNEL)
     counts = np.stack([(arr == ord(b)).sum(0) for b in ALPHABET], 1).astype(float)
     return counts / counts.sum(1, keepdims=True)
@@ -737,7 +743,7 @@ def test_tables():
              f"threshold of filter {f} itself (its activations are acts[:, {f}, :])")
         P = np.asarray(pwms[f])
         assert P.shape == ref.shape, f"❌ filter {f}: pwms[{f}] has shape {P.shape}, want {ref.shape} (positions x letters)"
-        assert np.allclose(P, ref, atol=1e-6), \
+        assert np.allclose(P, ref, atol=1e-6, equal_nan=True), \
             f"❌ filter {f}: pwms[{f}] differs from pwm_of(its windows) by up to {np.abs(P - ref).max():.3g}"
         assert motifs[f] == consensus_of(ref), \
             f"❌ filter {f}: motifs[{f}] = {motifs[f]!r}, want {consensus_of(ref)!r}, the consensus of pwms[{f}]"
@@ -767,7 +773,7 @@ plt.tight_layout(); plt.show()
 # logo looks most like a specific pattern (tall, clean columns) and set `MY_FILTER` to its number.
 # `MY_MOTIF` is then its consensus, the tallest letter in each column from left to right. You can also
 # type the motif you read off the logo yourself. That string is your hypothesis for what the model
-# responds to. If you change nothing, you test filter 00.
+# responds to. Pick a motif with at least two different letters (TODO-5 reorders its letters). If you change nothing, you test filter 00.
 
 # %%
 MY_FILTER = 0                  # <- the number of the filter you chose
@@ -802,7 +808,8 @@ print(f"your motif: {MY_MOTIF}")
 
 # %%
 # TODO-5a: one copy of MY_MOTIF in one sequence. `one` is the first random sequence of `canvas`;
-#          `one_planted` is the same sequence with one copy of MY_MOTIF inserted (toolkit, section 5);
+#          `one_planted` is the same sequence with one copy of MY_MOTIF inserted (toolkit, section 5;
+#          `plant` takes a list of sequences and returns a list);
 #          `score_before` and `score_after` are the model's scores of the two.
 # === Your code here ===
 one = canvas[0]

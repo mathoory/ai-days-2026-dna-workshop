@@ -659,7 +659,7 @@ if __name__ == "__main__":
             your_turn(ls, ly)
 
     # crop every click-through group to the union of its ink, so frames fill the slide and still stack exactly
-    TRIM_GROUPS = [[f"slide_filter_{k}" for k in range(5)], ["toy_cutoff_0", "toy_cutoff_1"],
+    TRIM_GROUPS = [[f"slide_filter_{k}" for k in range(5)], [f"toy_cutoff_{k}" for k in range(6)],
                    [f"roc_frame_{k}" for k in range(4)], ["bio_flow_base"]]
     for g in TRIM_GROUPS:
         if all((OUT / f"{n}.png").exists() for n in g):

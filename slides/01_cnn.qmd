@@ -250,7 +250,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 
 ::: {.notes}
 - Four real training sequences, the first 32 of their 340 letters. $y$ is the CLIP-seq label; $\hat p$ is the prediction of the CNN trained in this part.
-- Supervised learning: every training example comes with its answer. Here $N$ = 92,346. The next slide gives these symbols their tutorial-1 names.
+- Supervised learning: every training example comes with its answer. Here $N$ = 92,346. The next slide names these symbols.
 - Training chooses $\theta$ so that $\hat p$ is close to $y$ on the training examples. The goal is good predictions on sequences the model has not seen (section 3).
 - The second bound example gets 0.35 and the second unbound one 0.52: the model is often uncertain, and sometimes wrong.
 - Click: the loss of each example, small when $\hat p$ is close to $y$ (0.10 for the first, bound at 0.90) and large when it is far (1.04 for the second bound one, at 0.35). Slide 2.8 gives the formula.
@@ -271,7 +271,7 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 :::
 
 ::: {.notes}
-- The notation of tutorial 1. $f$ is unknown: we only see it through the examples. The algorithm picks one $g_\theta$ from $\mathcal{H}$.
+- The notation we use from here on. $f$ is unknown: we only see it through the examples. The algorithm picks one $g_\theta$ from $\mathcal{H}$.
 - Today: $\mathcal{X}$ RNA sequences; $\mathcal{Y}$ 1 bound, 0 unbound; $D$ 92,346 labelled sequences; $f$ where AGO2 binds; $\mathcal{H}$ all CNNs of one shape; $\mathcal{A}$ gradient descent; $g_\theta$ the trained CNN.
 :::
 
@@ -311,7 +311,7 @@ $\mathcal{L} = -\frac{1}{N}\sum_{i} \big[\, \color{#BDC1C6}{y_i \log \hat p_i} +
 - A confident correct prediction costs almost nothing; a confident wrong one costs a lot ($-\log 0.01 = 4.6$).
 - On slide 2.5: predicting 0.90 for a bound sequence gives a loss of 0.10; predicting 0.35 gives 1.04.
 - Predicting 0.5 for everything gives $\ln 2 = 0.69$, the loss of a coin flip.
-- Tutorial 1 used the mean squared error, for predicting a number. Cross-entropy is the standard loss for a predicted probability.
+- For predicting a number one would use the mean squared error. Cross-entropy is the standard loss for a predicted probability.
 :::
 
 ## 2.9 Features: chosen or learned
@@ -519,7 +519,7 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 
 ::: {.notes}
 - One filter at epochs 0, 1, 3 and 10 of one training run (its number is in the figure), one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.
-- Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.
+- Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.84. By epoch 10 the filter has clear preferences (the darkest cells: a letter at a position) and the model reaches 0.86. The exact numbers vary from run to run.
 - Each step is the update of slide 2.12, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.
 :::
 
@@ -612,17 +612,17 @@ The scores of our convolutional neural network (CNN, section 4) on the 1,000 hel
 ## 5.1 Which windows does a filter like?
 
 ::: {.r-stack}
-![](assets/custom/toy_cutoff_0.png){height="697px"}
+![](assets/custom/toy_cutoff_0.png){height="742px"}
 
-![](assets/custom/toy_cutoff_1.png){.fragment height="697px"}
+![](assets/custom/toy_cutoff_1.png){.fragment height="742px"}
 
-![](assets/custom/toy_cutoff_2.png){.fragment height="697px"}
+![](assets/custom/toy_cutoff_2.png){.fragment height="742px"}
 
-![](assets/custom/toy_cutoff_3.png){.fragment height="697px"}
+![](assets/custom/toy_cutoff_3.png){.fragment height="742px"}
 
-![](assets/custom/toy_cutoff_4.png){.fragment height="697px"}
+![](assets/custom/toy_cutoff_4.png){.fragment height="742px"}
 
-![](assets/custom/toy_cutoff_5.png){.fragment height="697px"}
+![](assets/custom/toy_cutoff_5.png){.fragment height="742px"}
 :::
 
 ::: {.notes}
@@ -679,7 +679,7 @@ Open **`01_cnn.ipynb`** in Colab, select the T4 GPU, run from the top.
 
 ::: {.notes}
 - TODO-1: `one_hot` and `encode_batch`. TODO-2: build your own network from the parts. TODO-3: `train_step`, `evaluate`, then the ROC curve. TODO-4: filter 0 step by step, then a logo for every filter. TODO-5: one copy in one sequence, design a control, then both curves.
-- Helpers for TODO-4: `acts[:, f, :]`, `cutoff_for`, `windows_above`, `pwm_of`; then set `MY_FILTER` and `MY_MOTIF`. TODO-4 ends with choosing a motif. TODO-5 uses `plant`, first on one sequence (TODO-5a), then on all 1,000 (TODO-5b).
+- Helpers for TODO-4: `acts[:, f, :]`, `cutoff_for`, `windows_above`, `pwm_of`; then set `MY_FILTER` and `MY_MOTIF`. TODO-4 ends with choosing a motif. TODO-5 uses `plant`, first on one sequence (TODO-5a), then its control (TODO-5b), then many copies in all 1,000 (TODO-5c).
 - Each TODO has a test cell; the solutions are published on the workshop site during the workshop.
 
 Next, after the break: part 2, DNA foundation models, pretrained on the whole genome.

@@ -345,10 +345,11 @@
 <h2>2.1 Single letters</h2>
 <ul>
 <li>A vocabulary of 4: each letter is a token, as in the CNN</li>
+<li>DNA models read T where RNA has U</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/tokens_letters.png" class="quarto-figure quarto-figure-center" height="655"></p>
+<p><img data-src="assets/custom/tokens_letters.png" class="quarto-figure quarto-figure-center" height="590"></p>
 </figure>
 </div>
 <aside class="notes">
@@ -465,12 +466,12 @@
 <section id="token-embeddings" class="slide level2">
 <h2>3.1 Token embeddings</h2>
 <ul>
-<li>Token <span class="math inline">\(i\)</span> becomes row <span class="math inline">\(i\)</span> of a learned table <span class="math inline">\(E\)</span>: <span class="math inline">\(\;e_i = x_i^\top E\)</span></li>
+<li>A token with ID <span class="math inline">\(k\)</span> becomes row <span class="math inline">\(k\)</span> of a learned table <span class="math inline">\(E\)</span>: <span class="math inline">\(\;e_i = x_i^\top E\)</span> for the token at position <span class="math inline">\(i\)</span>, with <span class="math inline">\(x_i\)</span> the one-hot vector of its ID</li>
 </ul>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_emb_0.png" height="640"></p>
-<p><img data-src="assets/custom/d2_emb_1.png" class="fragment" height="640"></p>
-<p><img data-src="assets/custom/d2_emb_2.png" class="fragment" height="640"></p>
+<p><img data-src="assets/custom/d2_emb_0.png" height="591"></p>
+<p><img data-src="assets/custom/d2_emb_1.png" class="fragment" height="591"></p>
+<p><img data-src="assets/custom/d2_emb_2.png" class="fragment" height="591"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -626,7 +627,7 @@
 <aside class="notes">
 <ul>
 <li>The sequence embedding <span class="math inline">\(e = (e_1, \dots, e_{256})\)</span> of slide 4.2: the average of the body’s output rows.</li>
-<li>The head is logistic regression, the model of part 1 (slides 2.10 and 2.11) with 256 inputs instead of 2: each number gets a weight, the weighted sum plus a bias <span class="math inline">\(b\)</span> goes through the sigmoid <span class="math inline">\(\sigma\)</span>, and the result <span class="math inline">\(\hat p\)</span> is the probability that AGO2 binds, P(bound).</li>
+<li>The head is logistic regression, the model of part 1 (slides 2.10 and 2.12) with 256 inputs instead of 2: each number gets a weight, the weighted sum plus a bias <span class="math inline">\(b\)</span> goes through the sigmoid <span class="math inline">\(\sigma\)</span>, and the result <span class="math inline">\(\hat p\)</span> is the probability that AGO2 binds, P(bound).</li>
 <li>Click: it is trained on 12,000 labelled sequences; three real ones are shown, their sequence embeddings and their labels. Only the 256 weights and the bias are learned; the body stays frozen. This is a <strong>linear probe</strong>.</li>
 <li>Before fitting, each of the 256 numbers is standardised (mean 0, standard deviation 1 on the training sequences), and regularisation keeps the weights small (<code>C = 0.1</code> in scikit-learn).</li>
 <li>Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.</li>
@@ -742,7 +743,7 @@
 <aside class="notes">
 <ul>
 <li>Signatures: <code>embed(tok, model, seqs)</code> returns an <code>(N, 256)</code> array; <code>probe_auc(...)</code> returns <code>(auc, probe)</code>.</li>
-<li>TODO-1: before writing <code>embed</code>, the notebook prints one sequence’s tokens and a padded pair, and asks how many letters a token holds (about 5) and whether a ~330-letter sequence fits in 512 tokens. The test checks the same vector alone and in a padded batch. Its test checks the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
+<li>TODO-1: before writing <code>embed</code>, the notebook prints one sequence’s tokens and a padded pair, and asks how many letters a token holds (about 5) and whether a ~330-letter sequence fits in 512 tokens. Its test checks that a sequence gets the same vector whether it is embedded alone or in a padded batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.</li>
 <li>TODO-2: the probe trains on 12,000 sequences (the <code>C=0.1</code> setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set; the test cell says so.</li>
 <li>NT-500M (human reference) is a 2 GB download, so its vectors are provided. It scores about 0.79 from these precomputed vectors.</li>
 <li>The live row is section 3 of the notebook: start the cell and read the take-aways while it trains.</li>

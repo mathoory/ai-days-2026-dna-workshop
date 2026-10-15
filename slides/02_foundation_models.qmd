@@ -122,8 +122,9 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 ## 2.1 Single letters
 
 - A vocabulary of 4: each letter is a token, as in the CNN
+- DNA models read T where RNA has U
 
-![](assets/custom/tokens_letters.png){fig-align="center" height="655px"}
+![](assets/custom/tokens_letters.png){fig-align="center" height="590px"}
 
 ::: {.notes}
 - Projected: 1 min.
@@ -188,14 +189,14 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 ## 3.1 Token embeddings
 
-- Token $i$ becomes row $i$ of a learned table $E$: $\;e_i = x_i^\top E$
+- A token with ID $k$ becomes row $k$ of a learned table $E$: $\;e_i = x_i^\top E$ for the token at position $i$, with $x_i$ the one-hot vector of its ID
 
 ::: {.r-stack}
-![](assets/custom/d2_emb_0.png){height="640px"}
+![](assets/custom/d2_emb_0.png){height="591px"}
 
-![](assets/custom/d2_emb_1.png){.fragment height="640px"}
+![](assets/custom/d2_emb_1.png){.fragment height="591px"}
 
-![](assets/custom/d2_emb_2.png){.fragment height="640px"}
+![](assets/custom/d2_emb_2.png){.fragment height="591px"}
 :::
 
 ::: {.notes}
@@ -306,7 +307,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 
 ::: {.notes}
 - The sequence embedding $e = (e_1, \dots, e_{256})$ of slide 4.2: the average of the body's output rows.
-- The head is logistic regression, the model of part 1 (slides 2.10 and 2.11) with 256 inputs instead of 2: each number gets a weight, the weighted sum plus a bias $b$ goes through the sigmoid $\sigma$, and the result $\hat p$ is the probability that AGO2 binds, P(bound).
+- The head is logistic regression, the model of part 1 (slides 2.10 and 2.12) with 256 inputs instead of 2: each number gets a weight, the weighted sum plus a bias $b$ goes through the sigmoid $\sigma$, and the result $\hat p$ is the probability that AGO2 binds, P(bound).
 - Click: it is trained on 12,000 labelled sequences; three real ones are shown, their sequence embeddings and their labels. Only the 256 weights and the bias are learned; the body stays frozen. This is a **linear probe**.
 - Before fitting, each of the 256 numbers is standardised (mean 0, standard deviation 1 on the training sequences), and regularisation keeps the weights small (`C = 0.1` in scikit-learn).
 - Fit on the training vectors, score on the held-out vectors. Scored on its own training vectors, this probe gives about 0.82.
@@ -375,7 +376,7 @@ Open **`02_foundation_models.ipynb`**.
 
 ::: {.notes}
 - Signatures: `embed(tok, model, seqs)` returns an `(N, 256)` array; `probe_auc(...)` returns `(auc, probe)`.
-- TODO-1: before writing `embed`, the notebook prints one sequence's tokens and a padded pair, and asks how many letters a token holds (about 5) and whether a ~330-letter sequence fits in 512 tokens. The test checks the same vector alone and in a padded batch. Its test checks the same vector whether a sequence is embedded alone or in a batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.
+- TODO-1: before writing `embed`, the notebook prints one sequence's tokens and a padded pair, and asks how many letters a token holds (about 5) and whether a ~330-letter sequence fits in 512 tokens. Its test checks that a sequence gets the same vector whether it is embedded alone or in a padded batch. If the attention mask is ignored, padding changes the average and the vector of a sequence changes with its batch.
 - TODO-2: the probe trains on 12,000 sequences (the `C=0.1` setting means fairly strong regularisation). If the result is about 0.82, it was scored on the training set; the test cell says so.
 - NT-500M (human reference) is a 2 GB download, so its vectors are provided. It scores about 0.79 from these precomputed vectors.
 - The live row is section 3 of the notebook: start the cell and read the take-aways while it trains.

@@ -7,7 +7,7 @@
 #
 # | model | what it is | held-out test AUROC |
 # |---|---|---|
-# | your CNN (part 1) | 10 first-layer filters, trained on about 92,000 labelled sequences | ~0.86 |
+# | our CNN (part 1) | 10 first-layer filters, trained on about 92,000 labelled sequences | ~0.86 |
 # | Mistral-DNA (16M) + probe (part 2) | frozen genome-pretrained language model; probe trained on 12,000 labelled sequences | ~0.78 |
 #
 # In this notebook you will:
@@ -236,6 +236,10 @@ def test_words():
         total = len(seq) - 5 + 1
         assert sum(c.values()) == total, \
             f"❌ sequence {n} ({len(seq)} letters): {sum(c.values())} windows counted, want {total} (length - 5 + 1)"
+        pairs = count_words(seq, 2)
+        want2 = Counter(seq[i:i + 2] for i in range(len(seq) - 1))
+        assert {w: v for w, v in pairs.items() if v} == dict(want2), \
+            f"❌ sequence {n}: count_words(seq, 2) does not count the letter pairs; the word length must follow k"
         for j, w in enumerate(WORDS5):
             assert np.isclose(c.get(w, 0) / total, K[n, j], atol=1e-6), \
                 (f"❌ sequence {n}, word {w}: your count is {c.get(w, 0)}, kmer_counts gives "
@@ -335,9 +339,11 @@ print(f"Mistral-DNA : real {probe_real:.3f}  ->  shuffled {auc_shuf_fm:.3f}")
 # %%
 #@title ▶ Test TODO-3 { display-mode: "form" }
 def test_shuffle_test():
-    for name, got, want in (("same_letters", same_letters, count_words(s, 1) == count_words(s_shuf, 1)),
-                            ("same_pairs", same_pairs, count_words(s, 2) == count_words(s_shuf, 2)),
-                            ("same_words5", same_words5, count_words(s, 5) == count_words(s_shuf, 5)),
+    def ref_counts(x, k):                              # independent of the student's count_words
+        return Counter(x[i:i + k] for i in range(len(x) - k + 1))
+    for name, got, want in (("same_letters", same_letters, ref_counts(s, 1) == ref_counts(s_shuf, 1)),
+                            ("same_pairs", same_pairs, ref_counts(s, 2) == ref_counts(s_shuf, 2)),
+                            ("same_words5", same_words5, ref_counts(s, 5) == ref_counts(s_shuf, 5)),
                             ("same_sequence", same_sequence, s == s_shuf)):
         assert got == want, f"❌ {name} = {got}, but comparing the counts of s and s_shuf gives {want}"
     assert unbound == [q for q, label in zip(S_test, y_test) if label == 0], \
@@ -653,7 +659,7 @@ plt.legend(); plt.grid(axis="y"); plt.tight_layout(); plt.show()
 # ### What to take away
 #
 # * **Frozen probe.** It still scores about 0.77 after matching, and in section 3 it barely changed under
-#   the shuffle. So it relies mostly on short-word composition (letter pairs, 5-letter words), which
+#   the shuffle. So it relies mostly on letter-pair composition, which the shuffle keeps and
 #   the matching leaves in place, and little on single letters.
 # * **CNN.** It lost almost nothing to the matched control (0.84 → 0.84), so it uses more than
 #   single-letter composition.

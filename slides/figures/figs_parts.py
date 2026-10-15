@@ -575,7 +575,7 @@ def cnn_template():
     for k, s in vals.items():
         label(ax, cols[k], 22, s, fs=21, color=X_C)
     label(ax, cols[5], 22, "z = 1.2", fs=21, color=INK, bold=True)
-    shapes = ["4 × 501", "10 filters: 10 × 492", "negatives → 0", "10 × 164", "1,060 numbers", "one number"]
+    shapes = ["4 × 501", "10 filters: 10 × 492", "negatives → 0", "10 × 164, then\nblock 2: 20 × 53", "1,060 = 20 × 53", "one number"]
     for x, s in zip(cols, shapes):
         label(ax, x, 15.5, s, fs=18, color=MUTED)
     # the linear layer and the logistic function with these numbers

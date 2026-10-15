@@ -212,7 +212,8 @@ for j in (0, 1):
 #    in 12,000 sequences with 256 numbers each (a smaller `C` means stronger regularisation).
 #
 # Fit on the training set only. The AUROC compares the probe's probability of "bound" for every test
-# sequence with the true test labels.
+# sequence with the true test labels. Return the two steps as **one** object (`make_pipeline`), so that
+# `probe.predict_proba` on raw vectors standardises them itself: later cells, and part 3, call it that way.
 #
 # **Tools:** [`StandardScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html),
 # [`LogisticRegression`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html),

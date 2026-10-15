@@ -539,7 +539,7 @@
 <aside class="notes">
 <ul>
 <li>Four real training sequences, the first 32 of their 340 letters. <span class="math inline">\(y\)</span> is the CLIP-seq label; <span class="math inline">\(\hat p\)</span> is the prediction of the CNN trained in this part.</li>
-<li>Supervised learning: every training example comes with its answer. Here <span class="math inline">\(N\)</span> = 92,346. The next slide gives these symbols their tutorial-1 names.</li>
+<li>Supervised learning: every training example comes with its answer. Here <span class="math inline">\(N\)</span> = 92,346. The next slide names these symbols.</li>
 <li>Training chooses <span class="math inline">\(\theta\)</span> so that <span class="math inline">\(\hat p\)</span> is close to <span class="math inline">\(y\)</span> on the training examples. The goal is good predictions on sequences the model has not seen (section 3).</li>
 <li>The second bound example gets 0.35 and the second unbound one 0.52: the model is often uncertain, and sometimes wrong.</li>
 <li>Click: the loss of each example, small when <span class="math inline">\(\hat p\)</span> is close to <span class="math inline">\(y\)</span> (0.10 for the first, bound at 0.90) and large when it is far (1.04 for the second bound one, at 0.35). Slide 2.8 gives the formula.</li>
@@ -613,7 +613,7 @@
 </div>
 <aside class="notes">
 <ul>
-<li>The notation of tutorial 1. <span class="math inline">\(f\)</span> is unknown: we only see it through the examples. The algorithm picks one <span class="math inline">\(g_\theta\)</span> from <span class="math inline">\(\mathcal{H}\)</span>.</li>
+<li>The notation we use from here on. <span class="math inline">\(f\)</span> is unknown: we only see it through the examples. The algorithm picks one <span class="math inline">\(g_\theta\)</span> from <span class="math inline">\(\mathcal{H}\)</span>.</li>
 <li>Today: <span class="math inline">\(\mathcal{X}\)</span> RNA sequences; <span class="math inline">\(\mathcal{Y}\)</span> 1 bound, 0 unbound; <span class="math inline">\(D\)</span> 92,346 labelled sequences; <span class="math inline">\(f\)</span> where AGO2 binds; <span class="math inline">\(\mathcal{H}\)</span> all CNNs of one shape; <span class="math inline">\(\mathcal{A}\)</span> gradient descent; <span class="math inline">\(g_\theta\)</span> the trained CNN.</li>
 </ul>
 <style type="text/css">
@@ -675,7 +675,7 @@
 <li>A confident correct prediction costs almost nothing; a confident wrong one costs a lot (<span class="math inline">\(-\log 0.01 = 4.6\)</span>).</li>
 <li>On slide 2.5: predicting 0.90 for a bound sequence gives a loss of 0.10; predicting 0.35 gives 1.04.</li>
 <li>Predicting 0.5 for everything gives <span class="math inline">\(\ln 2 = 0.69\)</span>, the loss of a coin flip.</li>
-<li>Tutorial 1 used the mean squared error, for predicting a number. Cross-entropy is the standard loss for a predicted probability.</li>
+<li>For predicting a number one would use the mean squared error. Cross-entropy is the standard loss for a predicted probability.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1051,7 +1051,7 @@
 <aside class="notes">
 <ul>
 <li>One filter at epochs 0, 1, 3 and 10 of one training run (its number is in the figure), one epoch per click, with the held-out AUROC after each epoch. Rows A, C, G, U; columns the 10 positions; blue positive, orange negative weights.</li>
-<li>Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.85. By epoch 10 the filter has a clear preference, a G at position 7, and the model reaches 0.86.</li>
+<li>Epoch 0 is the random initialisation (AUROC 0.58). After epoch 1 the model reaches 0.79 and after epoch 3 0.84. By epoch 10 the filter has clear preferences (the darkest cells: a letter at a position) and the model reaches 0.86. The exact numbers vary from run to run.</li>
 <li>Each step is the update of slide 2.12, applied to all 2,491 weights. We use Adam, a variant of gradient descent that adapts the step size per weight.</li>
 </ul>
 <style type="text/css">
@@ -1218,12 +1218,12 @@
 <section id="which-windows-does-a-filter-like" class="slide level2">
 <h2>5.1 Which windows does a filter like?</h2>
 <div class="r-stack">
-<p><img data-src="assets/custom/toy_cutoff_0.png" height="697"></p>
-<p><img data-src="assets/custom/toy_cutoff_1.png" class="fragment" height="697"></p>
-<p><img data-src="assets/custom/toy_cutoff_2.png" class="fragment" height="697"></p>
-<p><img data-src="assets/custom/toy_cutoff_3.png" class="fragment" height="697"></p>
-<p><img data-src="assets/custom/toy_cutoff_4.png" class="fragment" height="697"></p>
-<p><img data-src="assets/custom/toy_cutoff_5.png" class="fragment" height="697"></p>
+<p><img data-src="assets/custom/toy_cutoff_0.png" height="742"></p>
+<p><img data-src="assets/custom/toy_cutoff_1.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/toy_cutoff_2.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/toy_cutoff_3.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/toy_cutoff_4.png" class="fragment" height="742"></p>
+<p><img data-src="assets/custom/toy_cutoff_5.png" class="fragment" height="742"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -1339,7 +1339,7 @@
 <aside class="notes">
 <ul>
 <li>TODO-1: <code>one_hot</code> and <code>encode_batch</code>. TODO-2: build your own network from the parts. TODO-3: <code>train_step</code>, <code>evaluate</code>, then the ROC curve. TODO-4: filter 0 step by step, then a logo for every filter. TODO-5: one copy in one sequence, design a control, then both curves.</li>
-<li>Helpers for TODO-4: <code>acts[:, f, :]</code>, <code>cutoff_for</code>, <code>windows_above</code>, <code>pwm_of</code>; then set <code>MY_FILTER</code> and <code>MY_MOTIF</code>. TODO-4 ends with choosing a motif. TODO-5 uses <code>plant</code>, first on one sequence (TODO-5a), then on all 1,000 (TODO-5b).</li>
+<li>Helpers for TODO-4: <code>acts[:, f, :]</code>, <code>cutoff_for</code>, <code>windows_above</code>, <code>pwm_of</code>; then set <code>MY_FILTER</code> and <code>MY_MOTIF</code>. TODO-4 ends with choosing a motif. TODO-5 uses <code>plant</code>, first on one sequence (TODO-5a), then its control (TODO-5b), then many copies in all 1,000 (TODO-5c).</li>
 <li>Each TODO has a test cell; the solutions are published on the workshop site during the workshop.</li>
 </ul>
 <p>Next, after the break: part 2, DNA foundation models, pretrained on the whole genome.</p>

@@ -137,7 +137,9 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 
 ## 6.1 The day in numbers
 
-![](assets/custom/day_numbers.png){fig-align="center" height="766px"}
+![](assets/custom/day_numbers.png){fig-align="center" height="693px"}
+
+[Held-out AUROC. The matched-data rows use their own 3,000-sequence test set, so their numbers differ slightly from the 1,000-sequence rows.]{.caption-small}
 
 ::: {.notes}
 - Each row is a measured held-out AUROC from today; open circle to filled circle is the same model before and after a control.
@@ -162,14 +164,14 @@ Open **`03_shortcuts_and_controls.ipynb`**; it starts from our CNN and our embed
 ::: {.incremental}
 - A CNN read AGO2 binding from the RNA letters alone: **AUROC 0.86**
 - Two composition numbers, GC and U, already reached **0.66**: check simple baselines first
-- Shuffles and matched data show what a model uses: the CNN fell from 0.86 to 0.66 when shuffled, GC and U fell to chance on matched data
+- Shuffles and matched data show what a model uses: the CNN fell from 0.86 to 0.66 when shuffled (the shuffle also moves the site), GC and U fell to chance on matched data
 - With **few labels** (below about 2,500) a frozen pretrained model with a probe beat the CNN; with **20,000 labels** fine-tuning reached 0.87 against the CNN's 0.84
 :::
 
 ::: {.notes}
 - Point 1: held-out AUROC of the part 1 CNN, trained on 92,346 labelled sequences.
 - Point 2: the negatives were random positions in the same genes; on the 1,000 held-out sequences GC and U alone reached 0.66, and 5-letter word counts 0.74.
-- Point 3: the dinucleotide shuffle keeps letters and letter pairs and breaks longer motifs; matched data keeps GC, U and length equal between the classes (GC and U: 0.64 to 0.51). Frozen Mistral-DNA barely changed under the shuffle (0.77 to 0.78), so it relied mostly on short-range composition.
+- Point 3: the dinucleotide shuffle keeps letters and letter pairs and breaks longer motifs; matched data keeps GC, U and length equal between the classes (GC and U: 0.64 to 0.51). Frozen Mistral-DNA barely changed under the shuffle (0.78 to 0.77), so it relied mostly on short-range composition.
 - Point 4: from the label curve (slide 5.1) and one offline benchmark with NT-500M and LoRA (3,000 matched test sequences, 3 runs each). The thresholds are for this task and will differ for others.
 - For a new problem, the same order: the question and its labels, how the negatives were chosen, simple baselines, the model, then controls.
 :::
