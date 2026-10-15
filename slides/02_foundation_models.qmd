@@ -7,7 +7,18 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 # 1 From sequence to prediction {data-name="Overview"}
 :::
 
-## 1.1 Pretraining, by analogy
+## 1.1 Part 1, in three parts
+
+![](assets/custom/d2_cnn_recap.png){fig-align="center" height="766px"}
+
+::: {.notes}
+- Our CNN from part 1, drawn the way the rest of this part draws every model.
+- Body: the convolution blocks turn a sequence into numbers that describe it. Embedding: the 1,060 numbers after flatten. Head: the linear layer and the sigmoid turn them into one answer, P(bound).
+- Here every part was trained from scratch on our 92,346 labelled sequences.
+- This part keeps the picture and changes one thing: the body is learned first, from unlabelled genome sequence, and only a small head is trained on our labels.
+:::
+
+## 1.2 Pretraining, by analogy
 
 ::: {.r-stack}
 ![](assets/custom/pretrain_analogy_0.png){height="742px"}
@@ -22,7 +33,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - To predict the next token well, it has to learn which stretches of DNA occur together, and that may include signals that matter for our task.
 :::
 
-## 1.2 Pretraining a model
+## 1.3 Pretraining a model
 
 ::: {.r-stack}
 ![](assets/custom/d2_adapt_0.png){height="742px"}
@@ -35,7 +46,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - The embedding here is drawn, not computed. On the DNA version (next slide, last clicks) it is real.
 :::
 
-## 1.3 One model, many tasks
+## 1.4 One model, many tasks
 
 ::: {.r-stack}
 ![](assets/custom/d2_adapt_1.png){height="742px"}
@@ -53,7 +64,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - The claim to test in parts 2 and 3: what a model learns in pretraining transfers, so each task needs fewer labels.
 :::
 
-## 1.4 Two pretraining objectives
+## 1.5 Two pretraining objectives
 
 ::: {.r-stack}
 ![](assets/custom/d2_obj_0.png){height="723px"}
@@ -68,18 +79,18 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - In both, the genome supplies its own targets, so no experimental labels are needed.
 :::
 
-## 1.5 What the model predicts
+## 1.6 What the model predicts
 
 ![](assets/custom/d2_next.png){fig-align="center" height="766px"}
 
 ::: {.notes}
-- Mistral-DNA, given the real context of the last slide, gives a probability to each of its 4,096 possible next tokens. Blue: its six most likely tokens, with their probabilities. Orange: the token that actually comes next, AAATA.
-- Its top choice gets 0.10. The true token gets less than 0.0001 and ranks 2,362 of 4,096: the model was wrong here.
-- Much of the genome is hard to predict from local context, so the loss stays high even in a trained model.
+- Mistral-DNA, given the real context of the last slides, gives a probability to each of its 4,096 possible next tokens. The bars are its eight most likely tokens.
+- Orange: the token that actually comes next, GGAGGCC. It is the model's top choice, at 0.33; the next guesses are longer or shorter versions of it.
+- A well-chosen example: on most positions of the genome the true token gets a much lower probability, because much of the genome is hard to predict from local context. The loss stays high even in a trained model.
 - The head turns one score per vocabulary token into these probabilities with the softmax (section 5).
 :::
 
-## 1.6 Four stages
+## 1.7 Four stages
 
 ::: {.r-stack}
 ![](assets/custom/d2_stages_0.png){height="742px"}
@@ -98,7 +109,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 - The example is real: Mistral-DNA on the first 40 letters of one bound sequence (its first 6 tokens shown). One click per stage.
 - Click, tokenization: the letters are cut into tokens (section 2).
 - Click, embedding: each token becomes a row of 256 numbers taken from a learned table, its **token embedding** (section 3; the first 40 numbers shown). The same token always gets the same row.
-- Click, body: the transformer turns them into **contextual embeddings**: still one row per token, but now each row depends on all the tokens (section 4). These are the embeddings of slide 1.2.
+- Click, body: the transformer turns them into **contextual embeddings**: still one row per token, but now each row depends on all the tokens (section 4). These are the embeddings of slide 1.3.
 - Click, head: in pretraining it predicts the next token; for our task, P(bound), the probability that AGO2 binds (section 5).
 :::
 
@@ -252,7 +263,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 :::
 
 ::: {.notes}
-- The same four stages as slide 1.6, at the same place on the slide.
+- The same four stages as slide 1.7, at the same place on the slide.
 - First the CNN of part 1: single letters, a fixed one-hot table, two convolution layers, one linear layer to a logit.
 - Click: Mistral-DNA, stage by stage: BPE tokens (slide 2.3), a learned table (slide 3.1), a transformer body (slide 4.1), and a head for the next token or for your task.
 - The CNN's stages were fixed by us (one-hot) or trained on 92,346 labels. A language model learns its embedding and body from unlabelled genome sequence first.
@@ -279,7 +290,7 @@ subtitle: "Part 2: DNA foundation models<br><br>AI Days 2026<br><br> Faculty of 
 ::: {.notes}
 - Left: the body's output for the sequence of slide 4.2, one row of 256 numbers per token: its contextual embeddings. One head per click.
 - Next token: the last token's row goes through a linear layer to 4,096 scores, one per vocabulary token; the softmax turns them into probabilities that sum to 1. Masked token: the same, from the hidden token's row.
-- These two are the pretraining heads (slide 1.4). After pretraining they are dropped; the embedding table and the body are kept.
+- These two are the pretraining heads (slide 1.5). After pretraining they are dropped; the embedding table and the body are kept.
 - Our task: the average of all rows, the **sequence embedding** (the 256 numbers of slide 4.2), goes through one linear layer to one number, then the sigmoid: P(bound).
 :::
 

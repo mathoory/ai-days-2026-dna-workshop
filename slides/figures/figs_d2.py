@@ -50,8 +50,11 @@ def token_row(ax, x, y, toks, fs=22, cw=None, colored=True, hide=None, hide_text
 
 
 # ------------------------------------------------------------------ the real example: a context and its next token
-def real_context(tok, pos, cut=14, n_show=6):
-    ids = tok(pos[7].replace("U", "T"), return_tensors="pt", add_special_tokens=False)["input_ids"][0]
+EXAMPLE_SEQ, EXAMPLE_CUT = 282, 23                     # a real bound sequence where the true next token is the top guess
+
+
+def real_context(tok, pos, cut=EXAMPLE_CUT, n_show=6):
+    ids = tok(pos[EXAMPLE_SEQ].replace("U", "T"), return_tensors="pt", add_special_tokens=False)["input_ids"][0]
     toks = [t.replace("▁", "") for t in tok.convert_ids_to_tokens(ids[:cut + 1])]
     return toks[cut - n_show:cut], toks[cut]
 

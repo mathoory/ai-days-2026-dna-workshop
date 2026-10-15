@@ -15,7 +15,7 @@ import torch
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
 from deckstyle import *  # noqa: F401,F403
-from figs_d2 import MISTRAL, STAGES, real_context, save_raw
+from figs_d2 import EXAMPLE_CUT, EXAMPLE_SEQ, MISTRAL, STAGES, real_context, save_raw
 from figs_parts import bound_window
 from intuition import split
 
@@ -148,6 +148,40 @@ def adapt(tok, fm, pos):
     trim_group(names)
 
 
+# ------------------------------------------------------------------ 1.1 part 1's CNN, in the body / embedding / head picture
+def cnn_recap(pos):
+    """The CNN of part 1 drawn exactly like the pretrained model of the next slides: body, embedding, head."""
+    from intuition import cnn_scores, load_cnn, onehot
+    model = load_cnn()
+    s = pos[0]
+    with torch.no_grad():
+        feats = model.net[:-1](onehot([s]).to(next(model.parameters()).device)).cpu().numpy()[0]
+    p = float(cnn_scores(model, [s])[0])
+    e = feats[np.argsort(-np.abs(feats))[:10]][np.random.default_rng(0).permutation(10)]   # 10 of the 1,060 numbers
+    fig, ax, H = canvas3("d2_adapt_0")
+    top = H - 6
+    tok_row(ax, 2, top, list(s[150:162]) + ["…"], fs=22)
+    arrow(ax, 22, top - 6, 22, top - 13, color=MUTED, lw=2.5, ms=24)
+    ax.add_patch(FancyBboxPatch((4, 12), 36, top - 26, boxstyle="round,pad=0,rounding_size=1.4", fc=CNN_C, ec="none"))
+    mid = (top - 14) / 2 + 12
+    label(ax, 22, mid + 9, "CNN", fs=30, color="white", bold=True)
+    label(ax, 22, mid - 7, "convolution,\nReLU, pooling\n(2 blocks)", fs=19, color="white")
+    label(ax, 22, 5, "Body", fs=24, color=CNN_C, bold=True)
+    arrow(ax, 41, mid, 47, mid, color=MUTED, lw=2.5, ms=24)
+    strip(ax, 48, mid - 16, 6, 32, e, np.abs(e).max(), vertical=True)
+    label(ax, 51, 5, "Embedding", fs=22, color=INK, bold=True)
+    label(ax, 57, mid - 18, "1,060 numbers\nafter flatten", fs=19, color=MUTED, ha="left")
+    arrow(ax, 55, mid, 63, mid, color=MUTED, lw=2.5, ms=22)
+    blk(ax, 64, mid - 7, 40, 14, "linear head", fc=CNN_C, fs=24)
+    arrow(ax, 105, mid, 111, mid, color=MUTED, lw=2.5, ms=22)
+    label(ax, 113, mid, f"sigmoid\nP(bound) = {p:.2f}", fs=24, ha="left")
+    label(ax, 84, 5, "Head", fs=22, color=CNN_C, bold=True)
+    label(ax, 64, mid + 20, "all of it trained from scratch\non our 92,346 labelled sequences", fs=22, color=CNN_C,
+          ha="left", bold=True)
+    save_raw(fig, "d2_cnn_recap")
+    trim_group(["d2_cnn_recap"])
+
+
 # ------------------------------------------------------------------ 1.4 two objectives
 def objectives(tok, pos):
     ctx, nxt = real_context(tok, pos, n_show=6)
@@ -178,32 +212,32 @@ def objectives(tok, pos):
 def next_probs(tok, pos):
     from transformers import AutoModelForCausalLM
     lm = AutoModelForCausalLM.from_pretrained(MISTRAL, trust_remote_code=True).eval()
-    ids = tok(pos[7].replace("U", "T"), return_tensors="pt", add_special_tokens=False)["input_ids"][0]
-    cut = 14
+    ids = tok(pos[EXAMPLE_SEQ].replace("U", "T"), return_tensors="pt", add_special_tokens=False)["input_ids"][0]
+    cut = EXAMPLE_CUT
     with torch.no_grad():
         p = torch.softmax(lm(input_ids=ids[None, :cut]).logits[0, -1], -1)
     true = int(ids[cut])
     rank = int((p > p[true]).sum()) + 1
-    top = torch.topk(p, 6)
-    items = [(tok.convert_ids_to_tokens(int(i)).replace("▁", ""), float(v), False) for v, i in zip(top.values, top.indices)]
-    items.append((tok.convert_ids_to_tokens(true).replace("▁", ""), float(p[true]), True))
+    top = torch.topk(p, 8)
+    items = [(tok.convert_ids_to_tokens(int(i)).replace("▁", ""), float(v), int(i) == true)
+             for v, i in zip(top.values, top.indices)]
+    assert any(t for *_, t in items), "the example's true token should be among the top guesses"
     fig = plt.figure(figsize=(10, 10 / (ASPECT.get("d2_next") or 1.88)), dpi=120)
     fig._canvas = True
-    ax = fig.add_axes([0.2, 0.14, 0.62, 0.8])
-    ys = list(range(len(items) - 1)) + [len(items)]
+    ax = fig.add_axes([0.2, 0.15, 0.62, 0.8])
+    ys = list(range(len(items)))
     ax.barh(ys, [v for _, v, _ in items], color=[HELD_C if t else TRAIN_L for *_, t in items], height=0.72)
     for y, (n, v, t) in zip(ys, items):
-        txt = f"{v:.3f}" if not t else (f"{v:.4f}" if v >= 1e-4 else "below 0.0001") + f", rank {rank:,} of 4,096"
-        ax.text(v + 0.0015, y, txt, va="center", fontsize=22, color=HELD_C if t else INK)
-    ax.set_yticks(ys); ax.set_yticklabels([n + ("  true" if t else "") for n, _, t in items], family=MONO, fontsize=22)
+        ax.text(v + 0.004, y, f"{v:.2f}" + ("   the true next token" if t else ""), va="center", fontsize=22,
+                color=HELD_C if t else INK, fontweight="bold" if t else "normal")
+    ax.set_yticks(ys); ax.set_yticklabels([n for n, _, _ in items], family=MONO, fontsize=22)
     for lab, (_, _, t) in zip(ax.get_yticklabels(), items):
-        lab.set_color(HELD_C if t else INK)
+        lab.set_color(HELD_C if t else INK); lab.set_fontweight("bold" if t else "normal")
     ax.invert_yaxis(); ax.tick_params(axis="y", length=0); ax.spines["left"].set_visible(False)
-    ax.set_xlim(0, top.values[0].item() * 1.35)
-    ax.set_xlabel("Predicted probability of the next token", fontsize=22); ax.tick_params(axis="x", labelsize=20)
-    ax.text(-0.02 * top.values[0].item(), len(items) - 1, "…", fontsize=26, color=MUTED, ha="right", va="center")
+    ax.set_xlim(0, top.values[0].item() * 1.6)
+    ax.set_xlabel("Predicted probability of the next token (top 8 of 4,096)", fontsize=22); ax.tick_params(axis="x", labelsize=20)
     fig.savefig(OUT / "d2_next.png", dpi=200, facecolor="white"); plt.close(fig); trim(OUT / "d2_next.png")
-    print("next_probs true", items[-1][0], round(items[-1][1], 5), "rank", rank, "top", items[0][0], round(items[0][1], 3))
+    print("next_probs rank of the true token", rank, "top", items[0][0], round(items[0][1], 3))
 
 
 # ------------------------------------------------------------------ 1.6 four stages with a worked example, and 4.3 the comparison
@@ -404,8 +438,8 @@ def body_context(tok, fm, pos):
             strip(ax, 101, y - 22, 56, 6, vo, vout)
         left = "the same row in both" if k == 1 else f"token embedding of {txt}"
         right = "different rows" if k == 1 else f"contextual embedding"
-        label(ax, 29, 4, left, fs=22, color=ACCENT, bold=True)
-        label(ax, 129, 4, right, fs=22, color=ACCENT, bold=True)
+        label(ax, 2, 4, left, fs=22, color=ACCENT, bold=True, ha="left")      # starts at the strip, never off the edge
+        label(ax, 157, 4, right, fs=22, color=ACCENT, bold=True, ha="right")
         nm = f"d2_body_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
     print("body token", txt, "cos", round(cos, 3), "inputs equal", bool(np.allclose(rows[0][2], rows[1][2])))
@@ -554,7 +588,7 @@ if __name__ == "__main__":
     tr, ty = split("train")
     pos = [s for s, l in zip(tr, ty) if l == 1]
     tok, fm = model_and_tokenizer()
-    for n, job in [("adapt", lambda: adapt(tok, fm, pos)), ("objectives", lambda: objectives(tok, pos)),
+    for n, job in [("cnn_recap", lambda: cnn_recap(pos)), ("adapt", lambda: adapt(tok, fm, pos)), ("objectives", lambda: objectives(tok, pos)),
                    ("next", lambda: next_probs(tok, pos)), ("stages", lambda: stage_frames(tok, fm, pos)),
                    ("bpe", lambda: bpe_steps(tok, pos)), ("emb", lambda: emb_matmul(tok, fm, pos)),
                    ("body", lambda: body_context(tok, fm, pos)), ("heads", lambda: heads(tok, fm, pos)),
