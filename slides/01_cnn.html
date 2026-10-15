@@ -532,10 +532,9 @@
 <li>Examples <span class="math inline">\((x_i, y_i)\)</span>, <span class="math inline">\(i = 1, \dots, N\)</span>: a sequence <span class="math inline">\(x_i\)</span> and its label <span class="math inline">\(y_i\)</span> (1 bound, 0 unbound)</li>
 <li>A model <span class="math inline">\(g_\theta\)</span> with parameters <span class="math inline">\(\theta\)</span> predicts <span class="math inline">\(\hat p = g_\theta(x)\)</span>, the probability of bound</li>
 </ul>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/setup_examples.png" class="quarto-figure quarto-figure-center" height="589"></p>
-</figure>
+<div class="r-stack">
+<p><img data-src="assets/custom/setup_examples_0.png" height="577"></p>
+<p><img data-src="assets/custom/setup_examples_1.png" class="fragment" height="577"></p>
 </div>
 <aside class="notes">
 <ul>
@@ -543,6 +542,7 @@
 <li>Supervised learning: every training example comes with its answer. Here <span class="math inline">\(N\)</span> = 92,346. The next slide gives these symbols their tutorial-1 names.</li>
 <li>Training chooses <span class="math inline">\(\theta\)</span> so that <span class="math inline">\(\hat p\)</span> is close to <span class="math inline">\(y\)</span> on the training examples. The goal is good predictions on sequences the model has not seen (section 3).</li>
 <li>The second bound example gets 0.35 and the second unbound one 0.52: the model is often uncertain, and sometimes wrong.</li>
+<li>Click: the loss of each example, small when <span class="math inline">\(\hat p\)</span> is close to <span class="math inline">\(y\)</span> (0.10 for the first, bound at 0.90) and large when it is far (1.04 for the second bound one, at 0.35). Slide 2.8 gives the formula.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {

@@ -242,13 +242,18 @@ subtitle: "Part 1: Machine learning and CNNs<br><br>AI Days 2026<br><br> Faculty
 - Examples $(x_i, y_i)$, $i = 1, \dots, N$: a sequence $x_i$ and its label $y_i$ (1 bound, 0 unbound)
 - A model $g_\theta$ with parameters $\theta$ predicts $\hat p = g_\theta(x)$, the probability of bound
 
-![](assets/custom/setup_examples.png){fig-align="center" height="589px"}
+::: {.r-stack}
+![](assets/custom/setup_examples_0.png){height="577px"}
+
+![](assets/custom/setup_examples_1.png){.fragment height="577px"}
+:::
 
 ::: {.notes}
 - Four real training sequences, the first 32 of their 340 letters. $y$ is the CLIP-seq label; $\hat p$ is the prediction of the CNN trained in this part.
 - Supervised learning: every training example comes with its answer. Here $N$ = 92,346. The next slide gives these symbols their tutorial-1 names.
 - Training chooses $\theta$ so that $\hat p$ is close to $y$ on the training examples. The goal is good predictions on sequences the model has not seen (section 3).
 - The second bound example gets 0.35 and the second unbound one 0.52: the model is often uncertain, and sometimes wrong.
+- Click: the loss of each example, small when $\hat p$ is close to $y$ (0.10 for the first, bound at 0.90) and large when it is far (1.04 for the second bound one, at 0.35). Slide 2.8 gives the formula.
 :::
 
 ## 2.6 Notation

@@ -228,22 +228,28 @@ def setup_examples(model, tr, ty):
     u = [i for i in range(len(ty)) if ty[i] == 0][:2]
     rows = [b[0], u[0], b[1], u[1]]
     p = cnn_scores(model, [tr[i] for i in rows])
-    fig, ax = canvas(16, 8, ylim=(0, 80))
-    label(ax, 1, 71, "$x$: sequence (first 32 letters)", fs=28, color=MUTED, ha="left")
-    label(ax, 104, 71, "Length", fs=28, color=MUTED)
-    label(ax, 118.5, 71, "$y$", fs=32, color=MUTED)
-    label(ax, 135, 71, r"$\hat p = g_\theta(x)$", fs=30, color=MUTED)
-    label(ax, 153, 71, "Loss", fs=28, color=MUTED)
-    for r, (i, pi) in enumerate(zip(rows, p)):
-        yy = 56 - r * 15
-        seq(ax, 2, yy, tr[i][:32], fs=28, dx=2.8)
-        label(ax, 2 + 32 * 2.8 - 0.4, yy, "…", fs=28, color=MUTED, ha="left")
-        label(ax, 104, yy, f"{len(tr[i])}", fs=30)
-        label(ax, 118.5, yy, f"{int(ty[i])}", fs=32, color=BOUND if ty[i] == 1 else MUTED, bold=True)
-        label(ax, 135, yy, f"{pi:.2f}", fs=32)
-        loss = -np.log(pi) if ty[i] == 1 else -np.log(1 - pi)
-        label(ax, 153, yy, f"{loss:.2f}", fs=32, color=HELD_C, bold=True)
-    save(fig, "setup_examples")
+    names = []
+    for frame in (0, 1):                                 # the loss column enters on the click
+        fig, ax = canvas(16, 8, ylim=(0, 80))
+        label(ax, 1, 71, "$x$: sequence (first 32 letters)", fs=28, color=MUTED, ha="left")
+        label(ax, 104, 71, "Length", fs=28, color=MUTED)
+        label(ax, 118.5, 71, "$y$", fs=32, color=MUTED)
+        label(ax, 135, 71, r"$\hat p = g_\theta(x)$", fs=30, color=MUTED)
+        if frame:
+            label(ax, 153, 71, "Loss", fs=28, color=MUTED)
+        for r, (i, pi) in enumerate(zip(rows, p)):
+            yy = 56 - r * 15
+            seq(ax, 2, yy, tr[i][:32], fs=28, dx=2.8)
+            label(ax, 2 + 32 * 2.8 - 0.4, yy, "…", fs=28, color=MUTED, ha="left")
+            label(ax, 104, yy, f"{len(tr[i])}", fs=30)
+            label(ax, 118.5, yy, f"{int(ty[i])}", fs=32, color=BOUND if ty[i] == 1 else MUTED, bold=True)
+            label(ax, 135, yy, f"{pi:.2f}", fs=32)
+            if frame:
+                loss = -np.log(pi) if ty[i] == 1 else -np.log(1 - pi)
+                label(ax, 153, yy, f"{loss:.2f}", fs=32, color=HELD_C, bold=True)
+        fig.savefig(OUT / f"setup_examples_{frame}.png", facecolor="white"); plt.close(fig)
+        names.append(f"setup_examples_{frame}")
+    trim_group(names)
     print("setup_examples", [int(ty[i]) for i in rows], [round(float(v), 3) for v in p])
 
 
