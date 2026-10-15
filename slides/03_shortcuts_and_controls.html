@@ -260,9 +260,10 @@
 <h2>6.1 The day in numbers</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/day_numbers.png" class="quarto-figure quarto-figure-center" height="766"></p>
+<p><img data-src="assets/custom/day_numbers.png" class="quarto-figure quarto-figure-center" height="693"></p>
 </figure>
 </div>
+<p><span class="caption-small">Held-out AUROC. The matched-data rows use their own 3,000-sequence test set, so their numbers differ slightly from the 1,000-sequence rows.</span></p>
 
 </section>
 <section id="ten-pretrained-models-on-matched-data" class="slide level2">
@@ -279,7 +280,7 @@
 <ul>
 <li class="fragment">A CNN read AGO2 binding from the RNA letters alone: <strong>AUROC 0.86</strong></li>
 <li class="fragment">Two composition numbers, GC and U, already reached <strong>0.66</strong>: check simple baselines first</li>
-<li class="fragment">Shuffles and matched data show what a model uses: the CNN fell from 0.86 to 0.66 when shuffled, GC and U fell to chance on matched data</li>
+<li class="fragment">Shuffles and matched data show what a model uses: the CNN fell from 0.86 to 0.66 when shuffled (the shuffle also moves the site), GC and U fell to chance on matched data</li>
 <li class="fragment">With <strong>few labels</strong> (below about 2,500) a frozen pretrained model with a probe beat the CNN; with <strong>20,000 labels</strong> fine-tuning reached 0.87 against the CNN’s 0.84</li>
 </ul>
 

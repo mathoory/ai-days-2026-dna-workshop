@@ -223,10 +223,11 @@
 <h2>2.1 Single letters</h2>
 <ul>
 <li>A vocabulary of 4: each letter is a token, as in the CNN</li>
+<li>DNA models read T where RNA has U</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/tokens_letters.png" class="quarto-figure quarto-figure-center" height="655"></p>
+<p><img data-src="assets/custom/tokens_letters.png" class="quarto-figure quarto-figure-center" height="590"></p>
 </figure>
 </div>
 
@@ -274,12 +275,12 @@
 <section id="token-embeddings" class="slide level2">
 <h2>3.1 Token embeddings</h2>
 <ul>
-<li>Token <span class="math inline">\(i\)</span> becomes row <span class="math inline">\(i\)</span> of a learned table <span class="math inline">\(E\)</span>: <span class="math inline">\(\;e_i = x_i^\top E\)</span></li>
+<li>A token with ID <span class="math inline">\(k\)</span> becomes row <span class="math inline">\(k\)</span> of a learned table <span class="math inline">\(E\)</span>: <span class="math inline">\(\;e_i = x_i^\top E\)</span> for the token at position <span class="math inline">\(i\)</span>, with <span class="math inline">\(x_i\)</span> the one-hot vector of its ID</li>
 </ul>
 <div class="r-stack">
-<p><img data-src="assets/custom/d2_emb_0.png" height="640"></p>
-<p><img data-src="assets/custom/d2_emb_1.png" class="fragment" height="640"></p>
-<p><img data-src="assets/custom/d2_emb_2.png" class="fragment" height="640"></p>
+<p><img data-src="assets/custom/d2_emb_0.png" height="591"></p>
+<p><img data-src="assets/custom/d2_emb_1.png" class="fragment" height="591"></p>
+<p><img data-src="assets/custom/d2_emb_2.png" class="fragment" height="591"></p>
 </div>
 
 </section>
