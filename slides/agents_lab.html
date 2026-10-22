@@ -256,7 +256,7 @@
 <h2>1.3 Set up</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_setup.png" class="quarto-figure quarto-figure-center" height="288"></p>
+<p><img data-src="assets/custom/ag_setup.png" class="quarto-figure quarto-figure-center" height="466"></p>
 </figure>
 </div>
 <ul>
@@ -266,7 +266,7 @@
 </section>
 <section id="first-task" class="slide level2" data-todo="Task 1">
 <h2>1.4 First task</h2>
-<div class="prompt dense">
+<div class="prompt roomy">
 <p><span class="prompt-label">PASTE INTO THE CODE TAB NOW</span></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a href=""></a>I am new to coding agents. Work step by step and tell me briefly what you do.</span>
 <span id="cb1-2"><a href=""></a>Make this folder a git repository and commit after each step that works.</span>
@@ -290,8 +290,8 @@
 <p><span class="head">git</span><span class="pron">/ɡɪt/</span><span class="pos">noun</span> <span class="domain">(computing)</span> A program that records every version of a project’s files, with what changed, when and why.</p>
 </div>
 <div class="r-stack">
-<p><img data-src="assets/custom/ag_githistory.png" class="fragment" height="429"></p>
-<p><img data-src="assets/custom/ag_git.png" class="fragment" height="429"></p>
+<p><img data-src="assets/custom/ag_githistory.png" class="fragment" height="511"></p>
+<p><img data-src="assets/custom/ag_git.png" class="fragment" height="511"></p>
 </div>
 
 </section>
@@ -337,7 +337,7 @@
 <h2>2.3 You stay in control</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_control.png" class="quarto-figure quarto-figure-center" height="565"></p>
+<p><img data-src="assets/custom/ag_control.png" class="quarto-figure quarto-figure-center" height="707"></p>
 </figure>
 </div>
 
@@ -354,8 +354,17 @@
 </div>
 
 </section>
+<section id="speak-the-prompt" class="slide level2">
+<h2>2.5 Speak the prompt</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_dictation.png" class="quarto-figure quarto-figure-center" height="627"></p>
+</figure>
+</div>
+
+</section>
 <section id="compare-yours" class="slide level2">
-<h2>2.5 Compare yours</h2>
+<h2>2.6 Compare yours</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/ag_plot_plain.png" class="quarto-figure quarto-figure-center" height="765"></p>
@@ -391,7 +400,7 @@
 </section>
 <section id="install-one-in-a-new-session" class="slide level2">
 <h2>3.3 Install one, in a new session</h2>
-<div class="prompt">
+<div class="prompt large">
 <p><span class="prompt-label">NEW SESSION, SAME FOLDER: ASK YOUR AGENT</span></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href=""></a>Install the Claude Code skill at https://github.com/TingxiYu/academic-figure-skill</span>
 <span id="cb2-2"><a href=""></a>into ~/.claude/skills/academic-figure-skill (clone the repository there).</span>
@@ -399,25 +408,47 @@
 </div>
 
 </section>
+<section id="read-the-skill-you-installed" class="slide level2">
+<h2>3.4 Read the skill you installed</h2>
+<div class="prompt">
+<p><span class="prompt-label">~/.claude/skills/academic-figure-skill/SKILL.md, THE FIRST LINES</span></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href=""></a>---</span>
+<span id="cb3-2"><a href=""></a>name: academic-figure-skill</span>
+<span id="cb3-3"><a href=""></a>description: Academic-grade scientific figure creation for Nature/Cell/Science journals. Use when the user</span>
+<span id="cb3-4"><a href=""></a>  asks to create, polish, review, or export scientific figures for manuscript submission. ...</span>
+<span id="cb3-5"><a href=""></a>---</span>
+<span id="cb3-6"><a href=""></a>## Design Principles</span>
+<span id="cb3-7"><a href=""></a>**1. One figure, one core message.**</span>
+<span id="cb3-8"><a href=""></a>**2. Restrained color &gt; abundant color.**</span>
+<span id="cb3-9"><a href=""></a>**3. Design for print, not screen.** Journal column widths are fixed (89 mm single, 183 mm double).</span>
+<span id="cb3-10"><a href=""></a>**4. Vector first, raster as fallback.**</span>
+<span id="cb3-11"><a href=""></a></span>
+<span id="cb3-12"><a href=""></a>## Complete Workflow</span>
+<span id="cb3-13"><a href=""></a>Follow this closed loop for every request. Never skip steps. Never assume the user's question.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><strong>Your turn</strong>: open the file, then ask your agent “which of these rules will change my gc_u.png?”</li>
+</ul>
+
+</section>
 <section id="second-task-a-cnn-reported-with-the-skill" class="slide level2" data-todo="Task 2">
-<h2>3.4 Second task: a CNN, reported with the skill</h2>
-<div class="prompt denser">
+<h2>3.5 Second task: a CNN, reported with the skill</h2>
+<div class="prompt large">
 <p><span class="prompt-label">PASTE INTO THE SAME NEW SESSION</span></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href=""></a>Second task: train a small neural network on the AGO2 data, on this computer's CPU.</span>
-<span id="cb3-2"><a href=""></a>First show me your plan and wait for my OK. If anything is unclear, ask me before writing code.</span>
-<span id="cb3-3"><a href=""></a>Data: https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/&lt;file&gt;, FASTA, lower case allowed, T means U.</span>
-<span id="cb3-4"><a href=""></a>  Training: CLIPSEQ_AGO2.train.positives.fa, CLIPSEQ_AGO2.train.negatives.fa (download any you do not have)</span>
-<span id="cb3-5"><a href=""></a>  Held-out test (1,000): CLIPSEQ_AGO2.ls.positives.fa, CLIPSEQ_AGO2.ls.negatives.fa</span>
-<span id="cb3-6"><a href=""></a>1. Install the CPU build of PyTorch into .venv: pip install torch --index-url https://download.pytorch.org/whl/cpu</span>
-<span id="cb3-7"><a href=""></a>2. One-hot encode each sequence: 4 rows (A, C, G, U) by 501 columns; other letters and columns after the end are 0.25.</span>
-<span id="cb3-8"><a href=""></a>3. Network: Conv2d(1, 10, (4, 10)), ReLU, MaxPool2d((1, 3)), Conv2d(10, 20, (1, 5)), ReLU, MaxPool2d((1, 3)),</span>
-<span id="cb3-9"><a href=""></a>   Flatten, Linear(1060, 1).</span>
-<span id="cb3-10"><a href=""></a>4. Train 10 epochs: Adam, learning rate 0.001, shuffled batches of 256, BCEWithLogitsLoss, seed 0.</span>
-<span id="cb3-11"><a href=""></a>   Print the seconds per epoch and the held-out AUROC after each epoch.</span>
-<span id="cb3-12"><a href=""></a>5. Control: train again with the training labels shuffled and report its AUROC.</span>
-<span id="cb3-13"><a href=""></a>6. Use the academic-figure-skill for the figures: AUROC against epoch, and gc_u.png redrawn.</span>
-<span id="cb3-14"><a href=""></a>7. Write report.md (what you did, every number with the command that produced it) and CLAUDE.md</span>
-<span id="cb3-15"><a href=""></a>   (how to set up, run and check this project). Commit after each step that works.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb4-1"><a href=""></a>Train a small neural network that predicts from the RNA sequence whether AGO2 binds it,</span>
+<span id="cb4-2"><a href=""></a>on this laptop's CPU. Train on the two training files and test on the held-out files</span>
+<span id="cb4-3"><a href=""></a>CLIPSEQ_AGO2.ls.positives.fa and CLIPSEQ_AGO2.ls.negatives.fa (same address as before).</span>
+<span id="cb4-4"><a href=""></a>Make the figures with the academic-figure-skill and write report.md with what you did</span>
+<span id="cb4-5"><a href=""></a>and the results. Show me your plan before you start.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="not-in-the-prompt-the-agent-chooses" class="slide level2">
+<h2>3.6 Not in the prompt, the agent chooses</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_vibe.png" class="quarto-figure quarto-figure-center" height="720"></p>
+</figure>
 </div>
 
 </section>
@@ -431,14 +462,16 @@
 <div class="dict mini">
 <p><span class="head">context window</span><span class="pos">noun</span> <span class="domain">(language models)</span> Everything the model reads before each reply: instructions, the conversation, files opened, command output. It has a fixed size.</p>
 </div>
+<div class="dict mini">
+<p><span class="head">token</span><span class="pron">/ˈtəʊ.kən/</span><span class="pos">noun</span> <span class="domain">(language models)</span> The unit a model reads and writes, a word or a piece of a word, about three quarters of an English word on average.</p>
+</div>
 <div class="r-stack">
-<p><img data-src="assets/custom/ag_context_0.png" class="fragment" height="518"></p>
-<p><img data-src="assets/custom/ag_context_1.png" class="fragment" height="518"></p>
+<p><img data-src="assets/custom/ag_context_0.png" class="fragment" height="452"></p>
+<p><img data-src="assets/custom/ag_context_1.png" class="fragment" height="452"></p>
 </div>
 <ul>
 <li><strong>New task, new session</strong></li>
 </ul>
-<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 
 </section>
 <section id="subagents-and-new-sessions" class="slide level2">
@@ -447,10 +480,9 @@
 <p><span class="head">subagent</span><span class="pron">/ˈsʌbˌeɪ.dʒənt/</span><span class="pos">noun</span> <span class="domain">(agents)</span> A helper the agent starts for one part of a task, with its own empty context, that returns only a short result.</p>
 </div>
 <div class="r-stack">
-<p><img data-src="assets/custom/ag_sessions_0.png" class="fragment" height="619"></p>
-<p><img data-src="assets/custom/ag_sessions_1.png" class="fragment" height="619"></p>
+<p><img data-src="assets/custom/ag_sessions_0.png" class="fragment" height="631"></p>
+<p><img data-src="assets/custom/ag_sessions_1.png" class="fragment" height="631"></p>
 </div>
-<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 
 </section>
 <section id="reasoning-effort" class="slide level2">
@@ -460,34 +492,22 @@
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_effort.png" class="fragment quarto-figure quarto-figure-center" height="476"></p>
+<p><img data-src="assets/custom/ag_effort.png" class="fragment quarto-figure quarto-figure-center" height="516"></p>
 </figure>
 </div>
 <ul>
 <li><strong>Medium most of the time</strong></li>
 <li><strong>Higher is not better</strong></li>
 </ul>
-<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
-
-</section>
-<section id="when-it-goes-in-circles" class="slide level2">
-<h2>4.4 When it goes in circles</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/ag_circles.png" class="quarto-figure quarto-figure-center" height="726"></p>
-</figure>
-</div>
-<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 
 </section>
 <section id="limits-and-when-not-to-use-an-agent" class="slide level2">
-<h2>4.5 Limits, and when not to use an agent</h2>
+<h2>4.4 Limits, and when not to use an agent</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/ag_whennot.png" class="quarto-figure quarto-figure-center" height="725"></p>
 </figure>
 </div>
-<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 
 </section>
 <section id="results-and-bookkeeping" class="title-slide slide level1 center" data-name="Results">
@@ -502,7 +522,6 @@
 <p><img data-src="assets/custom/ag_phases.png" class="quarto-figure quarto-figure-center" height="609"></p>
 </figure>
 </div>
-<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 
 </section>
 <section id="the-same-plot-with-the-skill" class="slide level2">
@@ -519,21 +538,21 @@
 </section>
 <section id="claude.md-the-lab-template" class="slide level2">
 <h2>5.3 CLAUDE.md: the lab template</h2>
-<div class="prompt">
+<div class="prompt roomy">
 <p><span class="prompt-label">CLAUDE.md, READ AT THE START OF EVERY SESSION</span></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb4-1"><a href=""></a># Project: &lt;one line: the question&gt;</span>
-<span id="cb4-2"><a href=""></a>## Layout</span>
-<span id="cb4-3"><a href=""></a>data/raw/       read-only: never modify or delete</span>
-<span id="cb4-4"><a href=""></a>data/derived/   produced by scripts in src/</span>
-<span id="cb4-5"><a href=""></a>wiki/           FINDINGS.md, DECISIONS.md, RISKS.md: update at the end of every phase</span>
-<span id="cb4-6"><a href=""></a>phases/NN_name/ plan.md and report.md per phase</span>
-<span id="cb4-7"><a href=""></a>## How to run</span>
-<span id="cb4-8"><a href=""></a>.venv/bin/python src/train.py --config configs/&lt;name&gt;.yaml</span>
-<span id="cb4-9"><a href=""></a>## Rules</span>
-<span id="cb4-10"><a href=""></a>- GPU server: only GPU 1 (CUDA_VISIBLE_DEVICES=1); check nvidia-smi before starting a job</span>
-<span id="cb4-11"><a href=""></a>- Every number in a report comes with the command that produced it</span>
-<span id="cb4-12"><a href=""></a>- Commit after each working step; never commit data or secrets</span>
-<span id="cb4-13"><a href=""></a>- Log runs to ClearML project &lt;lab&gt;/&lt;project&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a href=""></a># Project: &lt;one line: the question&gt;</span>
+<span id="cb5-2"><a href=""></a>## Layout</span>
+<span id="cb5-3"><a href=""></a>data/raw/       read-only: never modify or delete</span>
+<span id="cb5-4"><a href=""></a>data/derived/   produced by scripts in src/</span>
+<span id="cb5-5"><a href=""></a>wiki/           FINDINGS.md, DECISIONS.md, RISKS.md: update at the end of every phase</span>
+<span id="cb5-6"><a href=""></a>phases/NN_name/ plan.md and report.md per phase</span>
+<span id="cb5-7"><a href=""></a>## How to run</span>
+<span id="cb5-8"><a href=""></a>.venv/bin/python src/train.py --config configs/&lt;name&gt;.yaml</span>
+<span id="cb5-9"><a href=""></a>## Rules</span>
+<span id="cb5-10"><a href=""></a>- GPU server: only GPU 1 (CUDA_VISIBLE_DEVICES=1); check nvidia-smi before starting a job</span>
+<span id="cb5-11"><a href=""></a>- Every number in a report comes with the command that produced it</span>
+<span id="cb5-12"><a href=""></a>- Commit after each working step; never commit data or secrets</span>
+<span id="cb5-13"><a href=""></a>- Log runs to ClearML project &lt;lab&gt;/&lt;project&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 </section>
@@ -562,20 +581,20 @@
 </div>
 
 </section>
-<section id="our-labs-skills" class="slide level2">
-<h2>6.2 Our lab’s skills</h2>
+<section id="nightly-runs" class="slide level2">
+<h2>6.2 Nightly runs</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_labskills.png" class="quarto-figure quarto-figure-center" height="765"></p>
+<p><img data-src="assets/custom/ag_nightly.png" class="quarto-figure quarto-figure-center" height="657"></p>
 </figure>
 </div>
 
 </section>
-<section id="nightly-runs" class="slide level2">
-<h2>6.3 Nightly runs</h2>
+<section id="our-labs-skills" class="slide level2">
+<h2>6.3 Our lab’s skills</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_nightly.png" class="quarto-figure quarto-figure-center" height="536"></p>
+<p><img data-src="assets/custom/ag_labskills.png" class="quarto-figure quarto-figure-center" height="765"></p>
 </figure>
 </div>
 
@@ -584,7 +603,7 @@
 <h2>6.4 Tracking experiments: ClearML</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_clearml.png" class="quarto-figure quarto-figure-center" height="560"></p>
+<p><img data-src="assets/custom/ag_clearml.png" class="quarto-figure quarto-figure-center" height="673"></p>
 </figure>
 </div>
 
@@ -603,9 +622,12 @@
 </section>
 <section id="a-shared-wiki" class="slide level2">
 <h2>6.6 A shared wiki</h2>
+<div class="dict mini">
+<p><span class="head">wiki</span><span class="pron">/ˈwɪk.i/</span><span class="pos">noun</span> <span class="domain">(projects)</span> A set of linked pages that everyone on a project reads and edits; here, plain files in the repository.</p>
+</div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_wiki.png" class="quarto-figure quarto-figure-center" height="740"></p>
+<p><img data-src="assets/custom/ag_wiki.png" class="fragment quarto-figure quarto-figure-center" height="650"></p>
 </figure>
 </div>
 
@@ -639,13 +661,13 @@
 </section>
 <section id="demo-a-dna-language-model-on-the-gpu" class="slide level2">
 <h2>6.10 Demo: a DNA language model on the GPU</h2>
-<div class="prompt">
+<div class="prompt large">
 <p><span class="prompt-label">DEMO PROMPT</span></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a href=""></a>On the GPU server (use only GPU 1: CUDA_VISIBLE_DEVICES=1), embed the AGO2 sequences with the pretrained</span>
-<span id="cb5-2"><a href=""></a>DNA language model RaphaelMourad/Mistral-DNA-v1-17M-hg38. Convert U to T first. One vector per</span>
-<span id="cb5-3"><a href=""></a>sequence: the average of the last layer. Embed both the training and the held-out files.</span>
-<span id="cb5-4"><a href=""></a>Train a logistic regression on the training vectors and report the held-out AUROC, with the command</span>
-<span id="cb5-5"><a href=""></a>and output. Compare it with the CNN of Task 2 (0.87) and with GC and U alone (0.66).</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a href=""></a>On the GPU server (use only GPU 1: CUDA_VISIBLE_DEVICES=1), embed the AGO2 sequences with the pretrained</span>
+<span id="cb6-2"><a href=""></a>DNA language model RaphaelMourad/Mistral-DNA-v1-17M-hg38. Convert U to T first. One vector per</span>
+<span id="cb6-3"><a href=""></a>sequence: the average of the last layer. Embed both the training and the held-out files.</span>
+<span id="cb6-4"><a href=""></a>Train a logistic regression on the training vectors and report the held-out AUROC, with the command</span>
+<span id="cb6-5"><a href=""></a>and output. Compare it with the CNN of Task 2 (0.87) and with GC and U alone (0.66).</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 </section>
