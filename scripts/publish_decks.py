@@ -17,7 +17,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SLIDES = ROOT / "slides"
-DECKS = ["01_cnn", "02_foundation_models", "03_shortcuts_and_controls"]
+DECKS = ["01_cnn", "02_foundation_models", "03_shortcuts_and_controls",
+         "agents_lab"]   # the lab tutorial: hosted, but not linked from the site
 REF = re.compile(r'(?:src|href|data-src|data-background-image)="([^"#:?]+)"')
 NOTES = re.compile(r'<aside class="notes">.*?</aside>', re.S)
 
