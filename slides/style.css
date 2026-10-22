@@ -126,3 +126,9 @@
   font-size: 0.5em; line-height: 1.5; padding: 0.8em 1.1em; max-height: none; }
 .reveal .prompt pre code { white-space: pre-wrap; max-height: none; background: none; }
 .reveal .prompt-label { font-size: 0.6em; color: #1A73E8; font-weight: 700; letter-spacing: 0.04em; margin-bottom: -0.3em; }
+.reveal .prompt.dense pre { font-size: 0.45em; line-height: 1.42; }
+.reveal .prompt.denser pre { font-size: 0.39em; line-height: 1.38; padding: 0.6em 1em; }
+.reveal .prompt div.sourceCode pre code, .reveal .prompt pre code { font-size: 21px !important; line-height: 1.45; }
+.reveal .prompt.dense div.sourceCode pre code, .reveal .prompt.dense pre code { font-size: 19px !important; }
+.reveal .prompt.denser div.sourceCode pre code, .reveal .prompt.denser pre code { font-size: 16.5px !important; line-height: 1.38; }
+.reveal .prompt div.sourceCode { background: none; }

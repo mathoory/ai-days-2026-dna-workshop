@@ -217,15 +217,15 @@ def lit_review():
 # ------------------------------------------------------------------ 5.1 reasoning effort
 def effort():
     fig, ax = canvas(16, 6.4, ylim=(0, 64))
-    levels = [("Low", 1), ("Medium", 2), ("High", 4), ("Max", 7)]
+    levels = [("Low", 1), ("Medium", 2), ("High", 3.5), ("Extra high", 5.5), ("Max", 8)]
     for i, (n, v) in enumerate(levels):
-        x = 4 + i * 39
-        ax.add_patch(Rectangle((x, 26), 30, v * 3.6, fc=ACCENT if i == 0 else ACCENT_L, ec="none"))
-        label(ax, x + 15, 20, n, fs=24, bold=True, color=ACCENT if i == 0 else INK)
+        x = 3 + i * 31.4
+        ax.add_patch(Rectangle((x, 26), 25, v * 3.2, fc=ACCENT if i == 0 else ACCENT_L, ec="none"))
+        label(ax, x + 12.5, 20, n, fs=22, bold=True, color=ACCENT if i == 0 else INK)
     label(ax, 2, 56, "thinking before each step: time and tokens", fs=21, color=MUTED, ha="left")
-    ex = ["scripts, plots,\nfile edits", "a new analysis", "a bug you\ncannot find", "a hard design\nchoice"]
+    ex = ["scripts, plots,\nfile edits", "a new analysis", "a bug you\ncannot find", "a hard design\nchoice", "rarely needed"]
     for i, t in enumerate(ex):
-        label(ax, 4 + i * 39 + 15, 7, t, fs=19, color=MUTED)
+        label(ax, 3 + i * 31.4 + 12.5, 7, t, fs=18, color=MUTED)
     save(fig, "ag_effort")
 
 
@@ -245,7 +245,9 @@ def nightly():
         ax.add_patch(Rectangle((x0 + a * dx, 44 + j * 5), (b - a) * dx, 3.4, fc=HELD_C, ec="none"))
     label(ax, x0 + 13.4 * dx, 51, "jobs on the GPU", fs=18, color=HELD_C, ha="left")
     label(ax, x0, 6, "you: plan with the\nagent, launch", fs=19, ha="left", va="bottom")
-    label(ax, x0 + 7 * dx, 14, "heartbeat every hour: are the jobs alive? restart, log", fs=19, color=ACCENT)
+    label(ax, x0 + 7 * dx, 15.5, "job-heartbeat: a scheduled prompt wakes the agent; it reads the job's status,", fs=18,
+          color=ACCENT)
+    label(ax, x0 + 7 * dx, 10.5, "fixes or alerts. A watchdog alerts if no agent is awake.", fs=18, color=ACCENT)
     file_icon(ax, x0 + 12.4 * dx, 10, "report.md", fs=19)
     label(ax, x0 + 12.4 * dx, 3, "08:00 morning report", fs=18, color=GOOD_C, ha="left")
     save(fig, "ag_nightly")
@@ -264,8 +266,9 @@ def clearml():
     arrow(ax, 96, 28, 112, 16, color=MUTED, lw=2.5, ms=20)
     label(ax, 114, 52, "You: the web dashboard", fs=21, ha="left", bold=True)
     label(ax, 114, 46, "curves, compare runs", fs=19, color=MUTED, ha="left")
-    label(ax, 114, 18, "Agent: the ClearML skill", fs=21, ha="left", bold=True, color=ACCENT)
-    label(ax, 114, 12, "reads results, writes the report", fs=19, color=MUTED, ha="left")
+    label(ax, 114, 18, "Agent: clearml-scientific-", fs=21, ha="left", bold=True, color=ACCENT)
+    label(ax, 114, 12.5, "publishing skill", fs=21, ha="left", bold=True, color=ACCENT)
+    label(ax, 114, 6.5, "logs runs, publishes the report", fs=19, color=MUTED, ha="left")
     save(fig, "ag_clearml")
 
 
@@ -421,7 +424,94 @@ def model_prices():
     save(fig, "ag_models")
 
 
-JOBS = {"harness": harness, "model_prices": model_prices, "cnn_curve": cnn_curve, "chat_agent": chat_agent, "agent_loop": agent_loop, "setup_steps": setup_steps, "skill_anatomy": skill_anatomy,
+# ------------------------------------------------------------------ 1.7 git, the undo button
+def git_undo():
+    fig, ax = canvas(16, 5.2, ylim=(0, 52))
+    steps = [("set up .venv", ACCENT), ("download data", ACCENT), ("gc_u.png", ACCENT), ("train CNN", HELD_C)]
+    xs = [12, 52, 92, 132]
+    ax.plot([xs[0], xs[-1]], [34, 34], color=MID, lw=3)
+    for (t, c), x in zip(steps, xs):
+        ax.add_patch(plt.Circle((x, 34), 3.4, color=c, zorder=3))
+        label(ax, x, 44, t, fs=22, color=INK if c == ACCENT else HELD_C, bold=True)
+    for sgn in (1, -1):
+        ax.plot([132 - 2.4, 132 + 2.4], [34 - 2.4 * sgn, 34 + 2.4 * sgn], color="white", lw=3, zorder=4)
+    ax.annotate("", (94, 29), (130, 29), arrowprops=dict(arrowstyle="-|>", color=INK, lw=2.5, mutation_scale=24,
+                                                          connectionstyle="arc3,rad=-0.45"))
+    label(ax, 112, 6, "the script broke: back to the last commit that worked", fs=20, color=INK)
+    label(ax, 2, 22, "one commit after\nevery step that works", fs=19, color=MUTED, ha="left")
+    save(fig, "ag_git")
+
+
+# ------------------------------------------------------------------ 2.3 the anatomy of the first prompt
+def prompt_anatomy():
+    fig, ax = canvas(16, 8.4, ylim=(0, 84))
+    parts = [("Goal", "one scatter plot of the AGO2 RNA dataset", ACCENT),
+             ("Inputs", "the two FASTA files, their links, lower case, T for U", INK),
+             ("How", "a .venv with numpy and matplotlib; git, a commit per step", MUTED),
+             ("Definitions", "GC fraction = (G + C) / length;  U fraction = (U + T) / length", HELD_C),
+             ("Constraints", "5,000 per group, seed 0, blue and grey, random order, no windows", GOOD_C),
+             ("Done when", "gc_u.png exists", TUNED_PURPLE),
+             ("Report", "two sentences: do the groups differ?", INK)]
+    for i, (h, t, c) in enumerate(parts):
+        y = 78 - i * 11.6
+        ax.add_patch(Rectangle((2, y - 4.2), 1.4, 8.4, fc=c, ec="none"))
+        label(ax, 6, y, h, fs=23, color=c, bold=True, ha="left")
+        label(ax, 42, y, t, fs=21, color=INK, ha="left")
+    save(fig, "ag_anatomy")
+
+
+# ------------------------------------------------------------------ 3.2 what the prompt left open (from the two test runs)
+def coinflip():
+    fig, ax = canvas(16, 8.4, ylim=(0, 84))
+    rows = [("How many points", "5,000 per group", "all 92,346"),
+            ("Colours", "matplotlib blue, grey", "#2166AC, #999999"),
+            ("Font", "DejaVu Sans", "Arial, 7 to 8 pt"),
+            ("Figure size", "default, 7 x 6 in", "89 mm, one column"),
+            ("Legend", "inside the plot", "outside, with n"),
+            ("Statistics", "none", "Mann-Whitney, AUC, report")]
+    label(ax, 2, 80, "Not in the prompt", fs=22, color=MUTED, bold=True, ha="left")
+    label(ax, 56, 80, "Agent, no skill", fs=22, color=MID, bold=True, ha="left")
+    label(ax, 108, 80, "Agent with the figure skill", fs=22, color=ACCENT, bold=True, ha="left")
+    ax.plot([2, 158], [75.5, 75.5], color=HAIR, lw=1.2)
+    for i, (d, a, b) in enumerate(rows):
+        y = 68 - i * 11.4
+        label(ax, 2, y, d, fs=22, color=INK, ha="left")
+        label(ax, 56, y, a, fs=21, color=MID, ha="left")
+        label(ax, 108, y, b, fs=21, color=ACCENT, ha="left")
+    save(fig, "ag_coinflip")
+
+
+# ------------------------------------------------------------------ 3.3 the lab's skills (gold-srv2, research-skills/)
+def lab_skills():
+    fig, ax = canvas(16, 7.6, ylim=(0, 76))
+    sk = [("research-workflow", "phases, backlog, experiments, claim review, closing a phase"),
+          ("research-vault", "the project's notes: links, templates, phase history"),
+          ("scientific-reporting", "a report built from its evidence: figures, captions, checks"),
+          ("clearml-scientific-publishing", "logs runs and publishes the report to ClearML"),
+          ("job-heartbeat", "watches long jobs overnight, alerts, fills idle GPU time")]
+    for i, (n, d) in enumerate(sk):
+        y = 70 - i * 13.5
+        label(ax, 2, y, n, fs=23, color=ACCENT, ha="left", family=MONO, bold=True)
+        label(ax, 2, y - 6, d, fs=20, color=MUTED, ha="left")
+    save(fig, "ag_labskills")
+
+
+# ------------------------------------------------------------------ 3.8 check its work: the numbers to expect
+def checks():
+    rows = [("Shuffled labels (expected)", 0.50, MID), ("GC and U only", 0.66, MID), ("CNN, 10 epochs", 0.866, CNN_C)]
+    fig = newfig(); fig.set_size_inches(16, 6)
+    ax = fig.add_axes([0.27, 0.18, 0.66, 0.78])
+    for i, (n, v, c) in enumerate(rows):
+        ax.barh(i, v - 0.4, left=0.4, color=c, height=0.62, alpha=0.45 if "expected" in n else 1)
+        ax.text(v + 0.008, i, f"{v:.2f}", va="center", fontsize=24, color=c)
+    ax.axvline(0.5, color=MUTED, ls="--", lw=1.5)
+    ax.set_yticks(range(3)); ax.set_yticklabels([r[0] for r in rows], fontsize=23); ax.invert_yaxis()
+    ax.tick_params(axis="y", length=0); ax.spines["left"].set_visible(False)
+    ax.set_xlim(0.4, 0.95); ax.set_xlabel("Held-out AUROC (1,000 sequences)"); xgrid(ax)
+    save(fig, "ag_checks")
+
+JOBS = {"git_undo": git_undo, "prompt_anatomy": prompt_anatomy, "coinflip": coinflip, "lab_skills": lab_skills,
+        "checks": checks, "harness": harness, "model_prices": model_prices, "cnn_curve": cnn_curve, "chat_agent": chat_agent, "agent_loop": agent_loop, "setup_steps": setup_steps, "skill_anatomy": skill_anatomy,
         "context_window": context_window, "subagents_sessions": subagents_sessions, "lit_review": lit_review,
         "effort": effort, "nightly": nightly, "clearml": clearml, "where_runs": where_runs, "phases": phases,
         "wiki": wiki}

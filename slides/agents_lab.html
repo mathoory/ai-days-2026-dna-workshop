@@ -208,11 +208,9 @@
 <li><a href="#/first-task" id="/toc-first-task">2 First Task</a></li>
 <li><a href="#/skills" id="/toc-skills">3 Skills</a></li>
 <li><a href="#/context" id="/toc-context">4 Context</a></li>
-<li><a href="#/reasoning-effort" id="/toc-reasoning-effort">5 Reasoning Effort</a></li>
-<li><a href="#/long-runs" id="/toc-long-runs">6 Long Runs</a></li>
-<li><a href="#/where-claude-runs" id="/toc-where-claude-runs">7 Where Claude Runs</a></li>
-<li><a href="#/working-with-agents" id="/toc-working-with-agents">8 Working with Agents</a></li>
-<li><a href="#/your-turn" id="/toc-your-turn">9 Your Turn</a></li>
+<li><a href="#/effort-and-limits" id="/toc-effort-and-limits">5 Effort and Limits</a></li>
+<li><a href="#/working-with-agents" id="/toc-working-with-agents">6 Working with Agents</a></li>
+<li><a href="#/on-the-gpu-server" id="/toc-on-the-gpu-server">7 On the GPU Server</a></li>
 </ul>
 </nav>
 </section>
@@ -235,8 +233,9 @@
 </div>
 <aside class="notes">
 <ul>
+<li>Before we start: open Claude Desktop, sign in with your lab seat, and open the Code tab in an empty folder. The first task comes in a few minutes.</li>
 <li>Sense 2 is the one for today. Three parts: a goal, actions it chooses itself, and observation of what happened.</li>
-<li>Russell and Norvig’s definition is the textbook one: sensors and actuators. For a coding agent the sensors are files and command output; the actuators are writing files and running commands.</li>
+<li>Russell and Norvig’s definition is the textbook one. For a coding agent the sensors are files and command output; the actuators are writing files and running commands.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -260,8 +259,8 @@
 <ul>
 <li>A chatbot (ChatGPT in a browser) only returns text. You are the one who runs the code, sees the error and pastes it back.</li>
 <li>Click: an agent is an application around the same kind of language model, with permission to act on your computer: read and write files, run commands, run Python, search the web, connect to a server.</li>
-<li>It sees the result of each action itself, so the copy-run-paste loop disappears. Claude Code, Codex and Cursor are agents of this kind.</li>
-<li>It asks before actions you have not allowed, such as installing packages or deleting files.</li>
+<li>It sees the result of each action itself, so the copy-run-paste loop disappears.</li>
+<li>It asks before actions you have not allowed yet. It does not judge which actions are risky; you do, when you approve.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -312,7 +311,7 @@
 <ul>
 <li>Prices from the two companies’ API pricing pages, October 2026, per million output tokens; input costs one fifth of that. Haiku 5.5’s price is for prompts up to 100,000 tokens.</li>
 <li>The two families line up tier by tier: Fable and GPT-6 Astra at the top, Sonnet and Sol in the middle, Haiku and Luna for cheap, high-volume work. Opus sits between top and middle.</li>
-<li>On a subscription (Claude Desktop) you do not pay per token; larger models use up the plan’s limits faster.</li>
+<li>On the lab seats you do not pay per token; larger models use up the seat’s limits faster.</li>
 <li>A rough rule: the mid tier for most coding, the top tier for hard reasoning and long autonomous tasks, the small tier for simple, repeated jobs.</li>
 </ul>
 <style type="text/css">
@@ -356,15 +355,43 @@
 <h2>1.6 You stay in control</h2>
 <ul>
 <li><strong>Permissions</strong>: the agent asks before it runs a command or edits a file; allow once, always, or deny</li>
-<li><strong>Plan first</strong>: ask for a plan and approve it before any code is written</li>
+<li><strong>Plan mode</strong>: the mode menu under the prompt box; the agent only reads and proposes until you accept its plan</li>
 <li><strong>One folder per project</strong>: the agent works where you open it</li>
-<li><strong>Read what it did</strong>: every command and every changed file is shown</li>
+<li><strong>Read what it did</strong>: each command and each changed file is shown</li>
 </ul>
 <aside class="notes">
 <ul>
-<li>Defaults are cautious: in the beginning, approve each step and read it. Later you allow routine actions (editing files in the project folder) and keep asking for the rest.</li>
-<li>Plan mode: the agent only reads and proposes until you accept the plan. Good for anything longer than a few steps.</li>
+<li>In the beginning, approve each step and read it. Later, allow routine actions (editing files in the project folder) and keep asking for the rest.</li>
+<li>A permission covers a command, not what the command does: once you allow <code>python</code>, any script it writes can delete files. Read the script, or keep the folder under git (next slide).</li>
+<li>Plan mode is the safest way to start anything longer than a few steps. Or write in the prompt: “show me your plan and wait for my OK”.</li>
+<li>Subagents (section 4) work in the background; their individual steps are collapsed in the view.</li>
 <li>Never give an agent a folder that holds the only copy of your data.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="git-is-the-undo-button" class="slide level2">
+<h2>1.7 Git is the undo button</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_git.png" class="quarto-figure quarto-figure-center" height="429"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Ask the agent to make the folder a git repository and to commit after every step that works. Both prompts today start with that line.</li>
+<li>When a later step breaks something, “go back to the last commit that worked” is one command, and the agent can run it.</li>
+<li>The harness can also rewind its own file edits, but not files changed by a script it ran. Git covers both.</li>
+<li>Keep data out of git: add the data files and .venv to .gitignore.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -395,8 +422,8 @@
 </ul>
 <aside class="notes">
 <ul>
-<li>Claude Desktop runs on Windows and macOS. The Code tab is the coding agent (Claude Code); the Chat tab is the chatbot.</li>
-<li>Claude Code needs a paid plan (Pro or above) or a seat on the lab’s team plan.</li>
+<li>Claude Desktop runs on Windows and macOS. The Code tab is the coding agent (Claude Code); the Chat tab is the chatbot. Sign in with your lab seat.</li>
+<li>On Windows the Code tab needs Git for Windows and Python from python.org (with the py launcher). Install both before the session.</li>
 <li>Open an empty folder, for example ago2-agents on the desktop. The agent can read and write inside it.</li>
 <li>The data: 48,095 RNA sequences bound by AGO2 (CLIP-seq) and 44,251 unbound sequences from the same genes, plus 1,000 held-out sequences. The agent downloads them itself.</li>
 </ul>
@@ -414,25 +441,51 @@
 </section>
 <section id="the-prompt" class="slide level2" data-todo="Task 1">
 <h2>2.2 The prompt</h2>
-<div class="prompt">
-<p><span class="prompt-label">PASTE INTO THE CODE TAB</span></p>
+<div class="prompt dense">
+<p><span class="prompt-label">PASTE INTO THE CODE TAB NOW</span></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a href=""></a>I am new to coding agents. Work step by step and tell me briefly what you do.</span>
-<span id="cb1-2"><a href=""></a></span>
-<span id="cb1-3"><a href=""></a>Goal: one scatter plot of the AGO2 RNA dataset.</span>
-<span id="cb1-4"><a href=""></a>1. In this folder, set up a Python environment with numpy and matplotlib.</span>
-<span id="cb1-5"><a href=""></a>   On Windows use `py -m venv .venv` and install with `.venv\Scripts\python -m pip`.</span>
-<span id="cb1-6"><a href=""></a>2. Download the two training files (FASTA; letters can be lower case, some sequences use T for U):</span>
-<span id="cb1-7"><a href=""></a>   https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/CLIPSEQ_AGO2.train.positives.fa   (bound by AGO2)</span>
-<span id="cb1-8"><a href=""></a>   https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/CLIPSEQ_AGO2.train.negatives.fa   (unbound)</span>
-<span id="cb1-9"><a href=""></a>3. For each sequence: GC fraction = (G + C) / length, U fraction = (U + T) / length.</span>
-<span id="cb1-10"><a href=""></a>4. Plot GC fraction (x) against U fraction (y): 5,000 random sequences per group, bound in blue,</span>
-<span id="cb1-11"><a href=""></a>   unbound in grey, small transparent dots, drawn in random order.</span>
-<span id="cb1-12"><a href=""></a>5. Save the plot as gc_u.png, open the file, and tell me in two sentences whether the groups differ.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href=""></a>Make this folder a git repository and commit after each step that works.</span>
+<span id="cb1-3"><a href=""></a></span>
+<span id="cb1-4"><a href=""></a>Goal: one scatter plot of the AGO2 RNA dataset.</span>
+<span id="cb1-5"><a href=""></a>1. Set up a Python environment with numpy and matplotlib in .venv</span>
+<span id="cb1-6"><a href=""></a>   (Windows: py -m venv .venv, then .venv\Scripts\python -m pip install ...; macOS: python3 -m venv .venv).</span>
+<span id="cb1-7"><a href=""></a>2. Download the two training files (FASTA; letters can be lower case, some sequences use T for U):</span>
+<span id="cb1-8"><a href=""></a>   https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/CLIPSEQ_AGO2.train.positives.fa   (bound)</span>
+<span id="cb1-9"><a href=""></a>   https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/CLIPSEQ_AGO2.train.negatives.fa   (unbound)</span>
+<span id="cb1-10"><a href=""></a>3. For each sequence: GC fraction = (G + C) / length, U fraction = (U + T) / length.</span>
+<span id="cb1-11"><a href=""></a>4. Plot GC fraction (x) against U fraction (y): 5,000 random sequences per group (seed 0), bound in blue,</span>
+<span id="cb1-12"><a href=""></a>   unbound in grey, small transparent dots, drawn in random order. Do not open plot windows.</span>
+<span id="cb1-13"><a href=""></a>5. Save the plot as gc_u.png and tell me in two sentences whether the groups differ.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <aside class="notes">
 <ul>
-<li>Each line closes a gap we hit when we tested this prompt with an agent: Python on Windows, lower-case letters and T in some sequences, how many dots, which colour lands on top, “show” meaning a pop-up window that blocks the agent.</li>
-<li>Approve the steps as they come. Expect three or four approvals: creating the environment, installing, downloading, running.</li>
+<li>Paste it now; it runs while we look at what is in it. Approve the steps as they come: three or four approvals (environment, install, download, run).</li>
+<li>Each line closes a gap we hit when we tested this prompt with an agent: Python on Windows, lower-case letters and T in some sequences, how many dots, which colour lands on top, a plot window that blocks the agent.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="anatomy-of-a-prompt" class="slide level2">
+<h2>2.3 Anatomy of a prompt</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_anatomy.png" class="quarto-figure quarto-figure-center" height="760"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>The same prompt, by what each part does. A goal, the inputs with where they are and what is odd about them, how to work, the definitions you mean, the constraints, when it is done, and what to report.</li>
+<li>The parts you leave out, the agent decides for you (section 3).</li>
+<li>For anything bigger, add one line: “If anything is unclear, ask me before you start.” Then fix one thing at a time and run again.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -447,7 +500,7 @@
       }</style></aside>
 </section>
 <section id="why-this-task-first" class="slide level2">
-<h2>2.3 Why this task first</h2>
+<h2>2.4 Why this task first</h2>
 <ul>
 <li><strong>Small</strong>: one script, under a second of compute</li>
 <li><strong>Every agent ability</strong>: environment, download, parsing, code, running, a file you can see</li>
@@ -473,7 +526,7 @@
       }</style></aside>
 </section>
 <section id="what-you-should-get" class="slide level2">
-<h2>2.4 What you should get</h2>
+<h2>2.5 What you should get</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/ag_plot_plain.png" class="quarto-figure quarto-figure-center" height="765"></p>
@@ -483,7 +536,7 @@
 <ul>
 <li>An agent’s actual result on this prompt. Mean GC fraction 0.41 bound against 0.45 unbound, mean U fraction 0.31 against 0.29.</li>
 <li>The two groups overlap along one diagonal band: GC and U alone separate them only weakly.</li>
-<li>If yours looks different, ask the agent why: different sample, different colours on top, a wrong letter count.</li>
+<li>Compare with your neighbour: the same prompt, but the fonts, sizes and legend may differ. That is the next section.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -513,7 +566,57 @@
 <ul>
 <li>A skill is a folder: a SKILL.md with instructions, plus any reference documents and scripts it needs. A reusable prompt, written once, used in every session.</li>
 <li>The agent always sees the skill’s name and one-line description. When a task matches the description, it loads the instructions; references and scripts only when needed. So many skills cost almost nothing until used.</li>
-<li>Skills live in ~/.claude/skills on the machine where the agent runs.</li>
+<li>Personal skills live in ~/.claude/skills; a project’s skills in its .claude/skills folder, shared with everyone who uses the project.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="not-in-the-prompt-the-agent-decides" class="slide level2">
+<h2>3.2 Not in the prompt, the agent decides</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_coinflip.png" class="quarto-figure quarto-figure-center" height="675"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Two agents, the same request for a GC and U scatter plot. Everything the prompt did not say, each agent decided on its own: how many points, colours, font, size, legend, statistics.</li>
+<li>Without a skill, these are coin flips: another run, or another person’s agent, makes other choices.</li>
+<li>A skill writes the choices down once. With the figure skill every plot gets the same fonts, sizes and colours, and a statistics report, every time.</li>
+<li>The lab’s conventions (our colours, our report format) belong in a skill, not in each person’s prompt.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="our-labs-skills" class="slide level2">
+<h2>3.3 Our lab’s skills</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_labskills.png" class="quarto-figure quarto-figure-center" height="765"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>These run on gold-srv2 and live in research-skills/ of a shared git repository, so everyone uses the same version and improvements reach everyone.</li>
+<li>research-workflow and research-vault are how a project is run and recorded (section 6). scientific-reporting builds a report from its evidence; clearml-scientific-publishing puts runs and the report on ClearML; job-heartbeat watches long jobs (section 7).</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -528,7 +631,7 @@
       }</style></aside>
 </section>
 <section id="install-one" class="slide level2">
-<h2>3.2 Install one</h2>
+<h2>3.4 Install one</h2>
 <div class="prompt">
 <p><span class="prompt-label">ASK YOUR AGENT</span></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href=""></a>Install the Claude Code skill at https://github.com/TingxiYu/academic-figure-skill</span>
@@ -536,13 +639,52 @@
 <span id="cb2-3"><a href=""></a>Then tell me what the skill does and when it will be used.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
-<li>Then open a <strong>new session</strong> in the same folder: skills are found when a session starts</li>
+<li>Asking for a summary first is the habit: a skill is instructions the agent will follow, and some include scripts it runs</li>
 </ul>
 <aside class="notes">
 <ul>
 <li>The repository root is the skill folder (SKILL.md at the top), so cloning it into ~/.claude/skills is the whole installation. By hand: git clone https://github.com/TingxiYu/academic-figure-skill ~/.claude/skills/academic-figure-skill</li>
-<li>Asking the agent to read and summarise a skill before using it is a good habit: a skill is instructions the agent will follow, and some include scripts it will run.</li>
-<li>Then ask in the new session: “Redraw gc_u.png as a publication figure.”</li>
+<li>If the agent does not list it, start a new session in the same folder.</li>
+<li>This one is heavy: it asks to confirm a plan for the figure, runs several rounds of checks and writes a statistics report. Answer its questions briefly.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="second-task-a-cnn-reported-with-the-skill" class="slide level2" data-todo="Task 2">
+<h2>3.5 Second task: a CNN, reported with the skill</h2>
+<div class="prompt denser">
+<p><span class="prompt-label">PASTE INTO THE SAME FOLDER</span></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href=""></a>Second task: train a small neural network on the AGO2 data, on this computer's CPU.</span>
+<span id="cb3-2"><a href=""></a>First show me your plan and wait for my OK. If anything is unclear, ask me before writing code.</span>
+<span id="cb3-3"><a href=""></a>Data: https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/&lt;file&gt;, FASTA, lower case allowed, T means U.</span>
+<span id="cb3-4"><a href=""></a>  Training: CLIPSEQ_AGO2.train.positives.fa, CLIPSEQ_AGO2.train.negatives.fa (download any you do not have)</span>
+<span id="cb3-5"><a href=""></a>  Held-out test (1,000): CLIPSEQ_AGO2.ls.positives.fa, CLIPSEQ_AGO2.ls.negatives.fa</span>
+<span id="cb3-6"><a href=""></a>1. Install the CPU build of PyTorch into .venv: pip install torch --index-url https://download.pytorch.org/whl/cpu</span>
+<span id="cb3-7"><a href=""></a>2. One-hot encode each sequence: 4 rows (A, C, G, U) by 501 columns; other letters and columns after the end are 0.25.</span>
+<span id="cb3-8"><a href=""></a>3. Network: Conv2d(1, 10, (4, 10)), ReLU, MaxPool2d((1, 3)), Conv2d(10, 20, (1, 5)), ReLU, MaxPool2d((1, 3)),</span>
+<span id="cb3-9"><a href=""></a>   Flatten, Linear(1060, 1).</span>
+<span id="cb3-10"><a href=""></a>4. Train 10 epochs: Adam, learning rate 0.001, shuffled batches of 256, BCEWithLogitsLoss, seed 0.</span>
+<span id="cb3-11"><a href=""></a>   Print the seconds per epoch and the held-out AUROC after each epoch.</span>
+<span id="cb3-12"><a href=""></a>5. Control: train again with the training labels shuffled and report its AUROC.</span>
+<span id="cb3-13"><a href=""></a>6. Use the academic-figure-skill for the figures: AUROC against epoch, and gc_u.png redrawn.</span>
+<span id="cb3-14"><a href=""></a>7. Write report.md (what you did, every number with the command that produced it) and CLAUDE.md</span>
+<span id="cb3-15"><a href=""></a>   (how to set up, run and check this project). Commit after each step that works.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<aside class="notes">
+<ul>
+<li>Paste it now. The agent first answers with a plan: read it, correct it, then approve. Installing PyTorch takes a few minutes; training then takes under two minutes.</li>
+<li>The network is the one of the AI Days workshop, 2,491 weights. Spelling it out makes everyone’s numbers comparable with slide 3.7.</li>
+<li>Watching the AUROC on the test set after every epoch is fine for a demonstration; for real model selection use a separate validation split.</li>
+<li>While it trains, we continue.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -557,20 +699,72 @@
       }</style></aside>
 </section>
 <section id="the-same-plot-with-the-skill" class="slide level2">
-<h2>3.3 The same plot, with the skill</h2>
+<h2>3.6 The same plot, with the skill</h2>
 <div class="columns vcenter">
-<div class="column" style="width:45%;">
-<p><img data-src="assets/custom/ag_plot_plain.png" height="617"></p>
+<div class="column" style="width:48%;">
+<p><img data-src="assets/custom/ag_plot_plain.png" height="658"></p>
 <p><span class="caption-small">Without the skill</span></p>
-</div><div class="column" style="width:55%;">
-<p><img data-src="assets/custom/ag_plot_skill.png" height="491"></p>
+</div><div class="column" style="width:52%;">
+<p><img data-src="assets/custom/ag_plot_skill.png" height="465"></p>
 <p><span class="caption-small">With the academic figure skill</span></p>
 </div></div>
 <aside class="notes">
 <ul>
 <li>Both made by an agent from the same request. With the skill: Arial, journal column width (89 mm), no top and right axes, a restrained palette, PDF plus 300 dpi PNG, and a statistics report.</li>
-<li>It also overruled us: the skill forbids subsampling, so it drew all 92,346 points, and the dense centre hides the difference the left plot shows.</li>
-<li>It is heavy for one scatter plot: it asks to confirm a panel plan, runs four rounds of checks and writes reports. Skills encode someone’s taste and rules; read one before you rely on it, and write your own for the lab’s conventions.</li>
+<li>It also overruled the request: the skill forbids subsampling, so it drew all 92,346 points, and the dense centre hides the difference the left plot shows. It did not say so; we found it by reading its output.</li>
+<li>Skills encode someone’s taste and rules. Read one before you rely on it, and write your own for the lab’s conventions.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-to-expect" class="slide level2">
+<h2>3.7 What to expect</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_cnn_curve.png" class="quarto-figure quarto-figure-center" height="752"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Measured on a laptop CPU with this exact recipe: about 8 seconds per epoch, held-out AUROC 0.79 after one epoch and 0.87 after ten.</li>
+<li>Yours should be within a few hundredths. Much higher or much lower means something differs: ask the agent to show you the network and the data counts.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check-its-work" class="slide level2">
+<h2>3.8 Check its work</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_checks.png" class="quarto-figure quarto-figure-center" height="657"></p>
+</figure>
+</div>
+<ul>
+<li><strong>Show me the command and its output</strong> for every number in the report</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>A plot can be checked by eye; an AUROC cannot. Three checks put it in context. Shuffled labels must give about 0.5: anything clearly higher means the test data leaked into training. Composition alone (GC and U) gives 0.66 on these data: a model has to beat that. And no sequence may appear in both the training and the test files.</li>
+<li>Agents report numbers confidently, including ones they did not compute. Ask for the command and the printed output behind each number; a number without them is not a result.</li>
+<li>Slide 3.6 is the example: the skill changed our request without saying so.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -626,7 +820,7 @@
 <ul>
 <li>Subagents: the main session starts helpers, each with its own empty context. They read and search on their own and return a short result. The main context stays small. Ask for it: “use subagents to …”.</li>
 <li>Click: new sessions. A fresh session knows nothing of the old one. Hand over with files: ask the old session to write handoff.md (what was done, what is open, where the files are), and start the new one with “read handoff.md”.</li>
-<li>Shared files in the project (the wiki of section 8) are how sessions, and people, stay in sync.</li>
+<li>Shared files in the project (the wiki of section 6) are how sessions, and people, stay in sync.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -644,15 +838,18 @@
 <h2>4.3 Example: a literature review</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_litreview.png" class="quarto-figure quarto-figure-center" height="731"></p>
+<p><img data-src="assets/custom/ag_litreview.png" class="quarto-figure quarto-figure-center" height="657"></p>
 </figure>
 </div>
+<ul>
+<li>Check that every cited paper exists and says what the notes claim</li>
+</ul>
 <aside class="notes">
 <ul>
-<li>One session cannot read 30 papers: the PDFs alone would fill its context.</li>
-<li>The main session splits the topic, starts five subagents with six papers each, and each writes its notes to a file and returns a few lines.</li>
+<li>One session reading 30 full papers fills its context with PDFs. The main session splits the topic, starts five subagents with six papers each, and each writes its notes to a file and returns a few lines.</li>
 <li>The main session writes the review and a comparison table from the notes. Tomorrow, a new session starts from review.md and the lit/ notes, not from the papers.</li>
-<li>Check every citation it gives against the paper itself.</li>
+<li>Two failure modes: papers behind a paywall that the agent cannot read but summarises anyway, and papers that do not exist. Open the cited paper for every claim you will use.</li>
+<li>Five subagents use about five times the limits of one session.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -666,22 +863,52 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="reasoning-effort" class="title-slide slide level1 center" data-name="Effort">
-<h1>5 Reasoning Effort</h1>
+<section id="when-it-goes-in-circles" class="slide level2">
+<h2>4.4 When it goes in circles</h2>
+<ul>
+<li><strong>Esc</strong> stops it at once</li>
+<li><strong>Rewind, or start fresh</strong>: a new session with what was tried and what failed</li>
+<li><strong>Three hypotheses first</strong>: “list three possible causes and how to test each, before you edit anything”</li>
+<li><strong>Raise the effort</strong> for this one problem</li>
+<li><strong>After three failed fixes</strong>, stop and think yourself</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>The usual sign: the same error comes back after each “fix”, or the agent edits more and more files.</li>
+<li>The usual cause: a context full of failed attempts. A new session with a short summary of what was tried often solves it at once.</li>
+<li>Asking for hypotheses before edits turns guessing into testing. A minimal example that shows the bug helps the same way.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="effort-and-limits" class="title-slide slide level1 center" data-name="Effort">
+<h1>5 Effort and Limits</h1>
 
 </section>
 
-<section id="start-low" class="slide level2">
-<h2>5.1 Start low</h2>
+<section id="reasoning-effort" class="slide level2">
+<h2>5.1 Reasoning effort</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_effort.png" class="quarto-figure quarto-figure-center" height="525"></p>
+<p><img data-src="assets/custom/ag_effort.png" class="quarto-figure quarto-figure-center" height="514"></p>
 </figure>
 </div>
+<ul>
+<li>Lower is faster, and enough for most lab work; raise it when it is stuck</li>
+</ul>
 <aside class="notes">
 <ul>
-<li>Effort sets how much the model thinks before each step. Higher effort takes longer and uses more of your plan’s limits.</li>
-<li>Most lab work (scripts, plots, edits) is done well at low effort, and fast. Raise it when the agent is going in circles on a bug, or for a design decision you will build on.</li>
+<li>Effort sets how much the model thinks before each step: low, medium, high, extra high, max. Higher effort takes longer and uses more of the seat’s limits.</li>
+<li>Most lab work (scripts, plots, edits) is done well at low or medium effort, and fast. Raise it for a bug the agent keeps failing on, or a design decision you will build on.</li>
 <li>The bars show the direction, not measured values.</li>
 </ul>
 <style type="text/css">
@@ -696,105 +923,20 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="long-runs" class="title-slide slide level1 center" data-name="Long runs">
-<h1>6 Long Runs</h1>
-
-</section>
-
-<section id="nightly-runs" class="slide level2">
-<h2>6.1 Nightly runs</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/ag_nightly.png" class="quarto-figure quarto-figure-center" height="536"></p>
-</figure>
-</div>
-<aside class="notes">
+<section id="limits-and-when-not-to-use-an-agent" class="slide level2">
+<h2>5.2 Limits, and when not to use an agent</h2>
 <ul>
-<li>In the evening, plan the runs with the agent and launch them on the GPU server.</li>
-<li>The lab’s heartbeat skill checks the jobs at a fixed interval: are they running, did one crash, is the GPU idle. It restarts what failed and writes a log.</li>
-<li>In the morning the agent reads the logs and writes report.md: what finished, the results, what failed and why.</li>
-<li>Training runs should save checkpoints, so a restart continues instead of starting over.</li>
+<li><strong>Usage limits</strong>: a seat has a budget per few hours and per week; large models and subagents use it faster</li>
+<li><strong>Not when you cannot check the result</strong></li>
+<li><strong>Not for sensitive data</strong> without a decision (section 7)</li>
+<li><strong>Not for a one-line change</strong> you already know</li>
+<li><strong>Not when the point is to learn it yourself</strong></li>
 </ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="tracking-experiments-clearml" class="slide level2">
-<h2>6.2 Tracking experiments: ClearML</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/ag_clearml.png" class="quarto-figure quarto-figure-center" height="506"></p>
-</figure>
-</div>
 <aside class="notes">
 <ul>
-<li>ClearML records every run: its settings, its metric curves and its output files, on a server the whole lab can open.</li>
-<li>You compare runs in the web dashboard.</li>
-<li>The lab’s ClearML skill lets the agent do the same: log new runs, read the results of old ones, and compare them in a report.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="where-claude-runs" class="title-slide slide level1 center" data-name="Setups">
-<h1>7 Where Claude Runs</h1>
-
-</section>
-
-<section id="two-setups" class="slide level2">
-<h2>7.1 Two setups</h2>
-<div class="r-stack">
-<p><img data-src="assets/custom/ag_where_0.png" height="740"></p>
-<p><img data-src="assets/custom/ag_where_1.png" class="fragment" height="740"></p>
-</div>
-<aside class="notes">
-<ul>
-<li>A: Claude runs on your PC and executes commands on the server over ssh. Nothing to install on the server; your files and skills stay local. Each command opens a connection, and nothing keeps running when your PC sleeps.</li>
-<li>Click, B: Claude runs on the server. From your PC, a WSL terminal connects with ssh and attaches to a tmux session where Claude runs. tmux keeps the session alive when you disconnect, so overnight work continues.</li>
-<li>Remote Control lets you follow and steer that session from the Claude app or your phone.</li>
-<li>Skills are reusable prompts. They live in ~/.claude/skills on the machine where Claude runs: in setup B, install them on the server.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="demo-a-dna-language-model-on-the-gpu" class="slide level2">
-<h2>7.2 Demo: a DNA language model on the GPU</h2>
-<div class="prompt">
-<p><span class="prompt-label">DEMO PROMPT</span></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href=""></a>On the GPU server (ssh hoory@gold-srv2, use only GPU 1), embed the AGO2 training sequences</span>
-<span id="cb3-2"><a href=""></a>with the pretrained DNA language model RaphaelMourad/Mistral-DNA-v1-17M-hg38: one vector</span>
-<span id="cb3-3"><a href=""></a>per sequence, the average of the last layer. Train a logistic regression on the vectors and</span>
-<span id="cb3-4"><a href=""></a>report the held-out AUROC. Then compare it with the CNN from the first task.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<aside class="notes">
-<ul>
-<li>Setup A, live. Watch for: the agent checks which GPU is free, installs what is missing in its own environment, and copies results back.</li>
-<li>Expected: the frozen language model with a linear probe reaches about 0.78 held-out AUROC; the CNN trained on all labels about 0.86.</li>
+<li>/usage in the Code tab shows how much of the current budget is used.</li>
+<li>A long autonomous run with five subagents on the top model can use a day’s budget in an hour.</li>
+<li>“Cannot check” is the important one: if you cannot tell a right answer from a wrong one, the agent’s speed does not help.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -809,12 +951,12 @@
       }</style></aside>
 </section>
 <section id="working-with-agents" class="title-slide slide level1 center" data-name="Workflow">
-<h1>8 Working with Agents</h1>
+<h1>6 Working with Agents</h1>
 
 </section>
 
 <section id="work-in-phases" class="slide level2">
-<h2>8.1 Work in phases</h2>
+<h2>6.1 Work in phases</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/ag_phases.png" class="quarto-figure quarto-figure-center" height="609"></p>
@@ -824,7 +966,8 @@
 <ul>
 <li>Split a project into phases, each small enough to review: data, baseline, model, analysis.</li>
 <li>Each phase: the agent proposes a plan, you approve it, it runs, it writes report.md, you read the report before the next phase starts.</li>
-<li>The report is the record: what was done, the numbers, the figures, what did not work. A new session starts the next phase from it.</li>
+<li>The report is the record: what was done, the numbers with their commands, the figures, what did not work. A new session starts the next phase from it.</li>
+<li>The lab’s research-workflow skill runs projects this way.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -839,7 +982,7 @@
       }</style></aside>
 </section>
 <section id="a-shared-wiki" class="slide level2">
-<h2>8.2 A shared wiki</h2>
+<h2>6.2 A shared wiki</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/ag_wiki.png" class="quarto-figure quarto-figure-center" height="740"></p>
@@ -847,9 +990,8 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Three files that every session reads at the start and updates at the end of a phase.</li>
-<li>FINDINGS: dated results with the evidence and where it is. DECISIONS: what was chosen, why, and what else was considered. RISKS: what could make the results wrong, how to check, and the status.</li>
-<li>CLAUDE.md is read by the agent at the start of every session: the project goal, the folder layout, how to run things, and the rules (for example: never delete data, GPU 1 only, update the wiki after every phase).</li>
+<li>Three files that every session reads at the start and updates at the end of a phase. FINDINGS: dated results with the evidence and where it is. DECISIONS: what was chosen, why, and what else was considered. RISKS: what could make the results wrong, how to check, and the status.</li>
+<li>You do not write them by hand: the agent fills them in at the end of each phase, and you correct them. The lab’s research-vault skill keeps this structure.</li>
 <li>Bookkeeping is what makes agent work reusable: without it each session starts from zero and results cannot be traced.</li>
 </ul>
 <style type="text/css">
@@ -864,32 +1006,29 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="your-turn" class="title-slide slide level1 center" data-name="Task 2">
-<h1>9 Your Turn</h1>
-
-</section>
-
-<section id="train-a-cnn-from-scratch" class="slide level2" data-todo="Task 2">
-<h2>9.1 Train a CNN from scratch</h2>
+<section id="claude.md-the-lab-template" class="slide level2">
+<h2>6.3 CLAUDE.md: the lab template</h2>
 <div class="prompt">
-<p><span class="prompt-label">PASTE INTO THE SAME FOLDER</span></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb4-1"><a href=""></a>Now train a small neural network on the same data, on this computer's CPU.</span>
-<span id="cb4-2"><a href=""></a>1. Download the held-out files CLIPSEQ_AGO2.ls.positives.fa and CLIPSEQ_AGO2.ls.negatives.fa</span>
-<span id="cb4-3"><a href=""></a>   from the same address (1,000 test sequences).</span>
-<span id="cb4-4"><a href=""></a>2. Encode every sequence as a one-hot matrix of 4 rows (A, C, G, U or T) by 501 columns;</span>
-<span id="cb4-5"><a href=""></a>   pad short sequences with 0.25.</span>
-<span id="cb4-6"><a href=""></a>3. In PyTorch, build a CNN: two blocks of convolution, ReLU and max pooling, then one</span>
-<span id="cb4-7"><a href=""></a>   linear layer to one output.</span>
-<span id="cb4-8"><a href=""></a>4. Train with Adam (learning rate 0.001, batches of 256) for 10 epochs. After every epoch</span>
-<span id="cb4-9"><a href=""></a>   print the time and the AUROC on the held-out files.</span>
-<span id="cb4-10"><a href=""></a>5. Plot AUROC against epoch, save it as auroc.png, and write report.md: what you did,</span>
-<span id="cb4-11"><a href=""></a>   the numbers, and what you would try next.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span class="prompt-label">CLAUDE.md, READ AT THE START OF EVERY SESSION</span></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb4-1"><a href=""></a># Project: &lt;one line: the question&gt;</span>
+<span id="cb4-2"><a href=""></a>## Layout</span>
+<span id="cb4-3"><a href=""></a>data/raw/       read-only: never modify or delete</span>
+<span id="cb4-4"><a href=""></a>data/derived/   produced by scripts in src/</span>
+<span id="cb4-5"><a href=""></a>wiki/           FINDINGS.md, DECISIONS.md, RISKS.md: update at the end of every phase</span>
+<span id="cb4-6"><a href=""></a>phases/NN_name/ plan.md and report.md per phase</span>
+<span id="cb4-7"><a href=""></a>## How to run</span>
+<span id="cb4-8"><a href=""></a>.venv/bin/python src/train.py --config configs/&lt;name&gt;.yaml</span>
+<span id="cb4-9"><a href=""></a>## Rules</span>
+<span id="cb4-10"><a href=""></a>- GPU server: only GPU 1 (CUDA_VISIBLE_DEVICES=1); check nvidia-smi before starting a job</span>
+<span id="cb4-11"><a href=""></a>- Every number in a report comes with the command that produced it</span>
+<span id="cb4-12"><a href=""></a>- Commit after each working step; never commit data or secrets</span>
+<span id="cb4-13"><a href=""></a>- Log runs to ClearML project &lt;lab&gt;/&lt;project&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <aside class="notes">
 <ul>
-<li>Start with a plan: ask the agent to propose the network and the training script before running anything, and approve it.</li>
-<li>PyTorch is about 200 MB to install; the rest of the task runs in about two minutes.</li>
-<li>Step 5 is the phase report of section 8.</li>
+<li>Task 2 ended with the agent writing a CLAUDE.md; this is the structure to grow it into.</li>
+<li>/init asks the agent to draft one from an existing project.</li>
+<li>Keep it to one screen: it is read every session and uses context.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -903,18 +1042,153 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="what-to-expect" class="slide level2">
-<h2>9.2 What to expect</h2>
+<section id="sharing-in-the-lab" class="slide level2">
+<h2>6.4 Sharing in the lab</h2>
+<ul>
+<li><strong>Skills in a shared repository</strong>: a project’s .claude/skills, or the lab’s research-skills; one version for everyone</li>
+<li><strong>Review in pairs</strong>: read each other’s report.md before trusting it</li>
+<li><strong>Prompts that worked</strong>: one shared file</li>
+<li><strong>Connectors (MCP)</strong>: Box, Drive, ClearML; third-party code with access to your data, like a skill</li>
+<li><strong>Hooks</strong>: rules the harness enforces, for example blocking any rm in data/raw</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Skills copied by hand into each person’s ~/.claude drift apart. Committed to a repository, they improve for everyone.</li>
+<li>A hook is a script the harness runs before or after an action; unlike a line in CLAUDE.md, the agent cannot ignore it.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="on-the-gpu-server" class="title-slide slide level1 center" data-name="Server">
+<h1>7 On the GPU Server</h1>
+
+</section>
+
+<section id="two-setups" class="slide level2">
+<h2>7.1 Two setups</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/ag_where_0.png" height="740"></p>
+<p><img data-src="assets/custom/ag_where_1.png" class="fragment" height="740"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>A: Claude runs on your PC and executes commands on the server over ssh. Nothing to install on the server; your files and skills stay local. Jobs started with nohup or tmux keep running when your PC sleeps, but nothing watches them.</li>
+<li>Click, B: Claude runs on the server. From your PC, a WSL terminal connects with ssh and attaches to a tmux session where Claude runs. tmux keeps the session alive when you disconnect, so overnight work continues and the agent keeps watching.</li>
+<li>Remote Control lets you follow and steer that session from the Claude app or your phone. Read each permission request before approving it on the phone.</li>
+<li>Skills are reusable prompts. They live on the machine where Claude runs: in setup B, the lab’s skills on gold-srv2.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="nightly-runs" class="slide level2">
+<h2>7.2 Nightly runs</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_cnn_curve.png" class="quarto-figure quarto-figure-center" height="680"></p>
+<p><img data-src="assets/custom/ag_nightly.png" class="quarto-figure quarto-figure-center" height="536"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>Measured on a laptop CPU with this exact recipe (the network of the AI Days workshop, 2,491 weights): about 8 seconds per epoch, held-out AUROC 0.79 after one epoch and 0.87 after ten.</li>
-<li>Compare with the GC and U plot: composition alone reaches about 0.66.</li>
-<li>Next steps to ask for: more filters, a matched control, saving the model, a ClearML log.</li>
+<li>In the evening, plan the runs with the agent and launch them on the GPU server (setup B).</li>
+<li>job-heartbeat: a scheduled prompt wakes the agent at a fixed interval. It runs a status script that prints facts about the job, decides whether anything is wrong, fixes or restarts what it can, and alerts a person when needed. A separate watchdog alerts if no agent has woken up for too long.</li>
+<li>Give it a limit on restarts: a job that crashes and restarts all night blocks the GPU for everyone.</li>
+<li>In the morning the agent reads the logs and writes report.md. Training runs should save checkpoints, so a restart continues instead of starting over.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="tracking-experiments-clearml" class="slide level2">
+<h2>7.3 Tracking experiments: ClearML</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_clearml.png" class="quarto-figure quarto-figure-center" height="560"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>ClearML records every run: its settings, its metric curves and its output files, on a server the whole lab can open. You compare runs in the web dashboard.</li>
+<li>The lab’s clearml-scientific-publishing skill lets the agent log runs and publish the phase report to ClearML with its figures and evidence.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="data-secrets-and-the-shared-server" class="slide level2">
+<h2>7.4 Data, secrets and the shared server</h2>
+<ul>
+<li><strong>What the agent reads goes to the model provider</strong>: unpublished lab data needs a decision first</li>
+<li><strong>Secrets</strong> (tokens, clearml.conf, .env) stay out of the repository and out of the prompt</li>
+<li><strong>One account and one login per person</strong>; no shared logins</li>
+<li><strong>Raw data read-only</strong>: chmod -R a-w data/raw</li>
+<li><strong>Never skip permissions</strong> on a shared machine</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Files the agent opens, command output and your prompts are sent to Anthropic to be processed. The lab seats are covered by the organisation’s data terms; check before using personal accounts for lab data.</li>
+<li>Data that may become a patent or an unpublished result: ask Roee before giving an agent access.</li>
+<li>A permission-skipping mode exists for sandboxes. On the lab server it means any command runs without a question.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="demo-a-dna-language-model-on-the-gpu" class="slide level2">
+<h2>7.5 Demo: a DNA language model on the GPU</h2>
+<div class="prompt">
+<p><span class="prompt-label">DEMO PROMPT</span></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a href=""></a>On the GPU server (use only GPU 1: CUDA_VISIBLE_DEVICES=1), embed the AGO2 sequences with the pretrained</span>
+<span id="cb5-2"><a href=""></a>DNA language model RaphaelMourad/Mistral-DNA-v1-17M-hg38. Convert U to T first. One vector per</span>
+<span id="cb5-3"><a href=""></a>sequence: the average of the last layer. Embed both the training and the held-out files.</span>
+<span id="cb5-4"><a href=""></a>Train a logistic regression on the training vectors and report the held-out AUROC, with the command</span>
+<span id="cb5-5"><a href=""></a>and output. Compare it with the CNN of Task 2 (0.87) and with GC and U alone (0.66).</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<aside class="notes">
+<ul>
+<li>Setup A, live. Watch for: the agent checks which GPU is free, installs what is missing in its own environment, and copies results back.</li>
+<li>Expected: the frozen language model with a linear probe reaches about 0.78 held-out AUROC, below the CNN trained on all labels (0.87) and above composition alone (0.66).</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -929,7 +1203,7 @@
       }</style></aside>
 </section>
 <section id="links" class="slide level2">
-<h2>9.3 Links</h2>
+<h2>7.6 Links</h2>
 <ul>
 <li>Claude Desktop: <a href="https://claude.ai/download">claude.ai/download</a></li>
 <li>Data: <a href="https://huggingface.co/datasets/yup8/ai-days-2026-ago2">huggingface.co/datasets/yup8/ai-days-2026-ago2</a></li>
