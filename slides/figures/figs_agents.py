@@ -69,7 +69,7 @@ def chat_agent():
             label(ax, 97, 29.5, "acts", fs=19, color=ACCENT, bold=True)
             arrow(ax, 114, 18, 80, 18, color=MUTED, lw=2.5, ms=22)
             label(ax, 97, 14.5, "sees the result", fs=19, color=MUTED)
-            label(ax, 58, 3, "asks you before every risky action", fs=19, color=INK)
+            label(ax, 58, 3, "asks before actions you have not allowed", fs=19, color=INK)
         nm = f"ag_chat_agent_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
 
@@ -366,7 +366,62 @@ def cnn_curve():
     save(fig, "ag_cnn_curve")
 
 
-JOBS = {"cnn_curve": cnn_curve, "chat_agent": chat_agent, "agent_loop": agent_loop, "setup_steps": setup_steps, "skill_anatomy": skill_anatomy,
+# ------------------------------------------------------------------ 1.3 model and harness
+def harness():
+    fig, ax = canvas(16, 8.6, ylim=(0, 86))
+    blk(ax, 2, 50, 156, 32, "", fc=FAINT)
+    label(ax, 6, 76, "Agent", fs=26, bold=True, ha="left")
+    blk(ax, 6, 54, 50, 17, "", fc=ACCENT)
+    label(ax, 31, 66, "Language model", fs=24, color="white", bold=True)
+    label(ax, 31, 58.5, "chooses the next step", fs=19, color="white")
+    label(ax, 62, 62.5, "+", fs=40, color=INK, bold=True)
+    blk(ax, 70, 54, 84, 17, "", fc=INK)
+    label(ax, 112, 66, "Harness", fs=24, color="white", bold=True)
+    label(ax, 112, 58.5, "tools, permissions, context, skills, memory files", fs=19, color="white")
+    rows = [("Claude Code", "Fable, Opus, Sonnet, Haiku", "Anthropic"), ("Codex", "GPT-6 Astra, Sol, Luna", "OpenAI")]
+    label(ax, 70, 42, "Harness", fs=21, color=MUTED, bold=True, ha="left")
+    label(ax, 6, 42, "Models", fs=21, color=MUTED, bold=True, ha="left")
+    for i, (h, m, co) in enumerate(rows):
+        y = 31 - i * 15
+        label(ax, 6, y, m, fs=22, color=ACCENT, ha="left", bold=True)
+        label(ax, 6, y - 6, co, fs=18, color=MUTED, ha="left")
+        arrow(ax, 56, y - 2, 68, y - 2, color=MUTED, lw=2, ms=18)
+        label(ax, 70, y - 2, h, fs=24, color=INK, ha="left", bold=True)
+    label(ax, 112, 23, "same harness, a different model:\nchoose it per task", fs=19, color=MUTED, ha="left")
+    save(fig, "ag_harness")
+
+
+# ------------------------------------------------------------------ 1.4 the models, by price
+def model_prices():
+    rows = [("Top", [("Claude Fable 5.1", 50, "Anthropic"), ("GPT-6 Astra", 50, "OpenAI")]),
+            ("Large", [("Claude Opus 5.5", 20, "Anthropic")]),
+            ("Mid", [("Claude Sonnet 5.5", 10, "Anthropic"), ("GPT-6 Sol", 10, "OpenAI")]),
+            ("Small", [("Claude Haiku 5.5", 0.5, "Anthropic"), ("GPT-6 Luna", 0.5, "OpenAI")])]
+    fig = newfig(); fig.set_size_inches(16, 8.2)
+    ax = fig.add_axes([0.2, 0.13, 0.62, 0.8])
+    y, ticks, labels, tiers = 0, [], [], []
+    for tier, ms in rows:
+        y0 = y
+        for name, out, co in ms:
+            c = ACCENT if co == "Anthropic" else MID
+            ax.barh(y, out, color=c, height=0.7)
+            ax.text(out * 1.12, y, f"${out:g}", va="center", fontsize=22, color=c)
+            ticks.append(y); labels.append(name); y += 1
+        tiers.append(((y0 + y - 1) / 2, tier)); y += 0.6
+    ax.set_xscale("log"); ax.set_xlim(0.2, 200)
+    ax.set_yticks(ticks); ax.set_yticklabels(labels, fontsize=22); ax.invert_yaxis()
+    for lab, (n) in zip(ax.get_yticklabels(), labels):
+        lab.set_color(ACCENT if n.startswith("Claude") else MUTED)
+    ax.tick_params(axis="y", length=0); ax.spines["left"].set_visible(False)
+    ax.set_xticks([0.5, 1, 10, 50]); ax.set_xticklabels(["$0.5", "$1", "$10", "$50"], fontsize=20)
+    ax.set_xlabel("Price per million output tokens (log scale)")
+    for yy, tier in tiers:
+        ax.text(260, yy, tier, va="center", fontsize=22, color=INK, fontweight="bold")
+    xgrid(ax)
+    save(fig, "ag_models")
+
+
+JOBS = {"harness": harness, "model_prices": model_prices, "cnn_curve": cnn_curve, "chat_agent": chat_agent, "agent_loop": agent_loop, "setup_steps": setup_steps, "skill_anatomy": skill_anatomy,
         "context_window": context_window, "subagents_sessions": subagents_sessions, "lit_review": lit_review,
         "effort": effort, "nightly": nightly, "clearml": clearml, "where_runs": where_runs, "phases": phases,
         "wiki": wiki}

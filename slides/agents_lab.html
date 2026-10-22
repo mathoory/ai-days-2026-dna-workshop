@@ -275,8 +275,60 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="model-and-harness" class="slide level2">
+<h2>1.3 Model and harness</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_harness.png" class="quarto-figure quarto-figure-center" height="687"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>An agent has two parts. The language model reads everything in its context and chooses the next step. The harness is the program around it: it runs the tools, asks your permission, decides what goes into the context, loads skills and memory files, and shows you what happens.</li>
+<li>Claude Code (the Code tab of Claude Desktop) is Anthropic’s harness; Codex is OpenAI’s. Each runs its company’s models.</li>
+<li>The two are chosen separately: in the same harness you can switch to a smaller model for routine work and a larger one for hard problems.</li>
+<li>Most of today is about the harness: skills, context, sessions, permissions. Those carry over when the models change.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-models" class="slide level2">
+<h2>1.4 The models</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_models.png" class="quarto-figure quarto-figure-center" height="765"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Prices from the two companies’ API pricing pages, October 2026, per million output tokens; input costs one fifth of that. Haiku 5.5’s price is for prompts up to 100,000 tokens.</li>
+<li>The two families line up tier by tier: Fable and GPT-6 Astra at the top, Sonnet and Sol in the middle, Haiku and Luna for cheap, high-volume work. Opus sits between top and middle.</li>
+<li>On a subscription (Claude Desktop) you do not pay per token; larger models use up the plan’s limits faster.</li>
+<li>A rough rule: the mid tier for most coding, the top tier for hard reasoning and long autonomous tasks, the small tier for simple, repeated jobs.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="the-agent-loop" class="slide level2">
-<h2>1.3 The agent loop</h2>
+<h2>1.5 The agent loop</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/ag_loop.png" class="quarto-figure quarto-figure-center" height="765"></p>
@@ -301,7 +353,7 @@
       }</style></aside>
 </section>
 <section id="you-stay-in-control" class="slide level2">
-<h2>1.4 You stay in control</h2>
+<h2>1.6 You stay in control</h2>
 <ul>
 <li><strong>Permissions</strong>: the agent asks before it runs a command or edits a file; allow once, always, or deny</li>
 <li><strong>Plan first</strong>: ask for a plan and approve it before any code is written</li>
