@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="agents_lab_files/libs/clipboard/clipboard.min.js"></script>
+<script src="agents_lab_files/libs/quarto-html/tabby.min.js"></script>
+<script src="agents_lab_files/libs/quarto-html/popper.min.js"></script>
+<script src="agents_lab_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="agents_lab_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="agents_lab_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="agents_lab_files/libs/quarto-html/quarto-syntax-highlighting-226bd0f977fa82dfae4534cac220d79a.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.23">
+
+  <title>Agentic Accelerated Discovery</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="agents_lab_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="agents_lab_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="agents_lab_files/libs/revealjs/dist/theme/quarto-00ac2f6af1389919a18f42df5b7c0002.css">
+  <link rel="stylesheet" href="style.css">
+  <link href="agents_lab_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="agents_lab_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="agents_lab_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="agents_lab_files/libs/revealjs/plugin/simplemenu/simplemenu.css" rel="stylesheet">
+  <link href="agents_lab_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-state="hide-menubar" class="quarto-title-block center">
+  <h1 class="title">Agentic Accelerated Discovery</h1>
+  <p class="subtitle">Using Coding Agents in the Lab<br><br>Roee Amit Lab<br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory</p>
+
+<div class="quarto-title-authors">
+</div>
+
+</section><section id="TOC">
+<nav role="doc-toc"> 
+<h2 id="toc-title">Table of contents</h2>
+<ul>
+<li><a href="#/getting-started" id="/toc-getting-started">1 Getting Started</a></li>
+<li><a href="#/inside-an-agent" id="/toc-inside-an-agent">2 Inside an Agent</a></li>
+<li><a href="#/skills" id="/toc-skills">3 Skills</a></li>
+<li><a href="#/context-and-effort" id="/toc-context-and-effort">4 Context and Effort</a></li>
+<li><a href="#/results-and-bookkeeping" id="/toc-results-and-bookkeeping">5 Results and Bookkeeping</a></li>
+<li><a href="#/on-the-gpu-server" id="/toc-on-the-gpu-server">6 On the GPU Server</a></li>
+</ul>
+</nav>
+</section>
+<section id="before-we-start" class="slide level2">
+<h2>Before we start</h2>
+<div class="warning">
+<p><span class="alarm">Not approved by the Technion. Data you give an agent leaves your computer and may be exposed.</span></p>
+<p>Anthropic, for the lab’s commercial seats:</p>
+<blockquote>
+<p>Anthropic does not train generative models using code or prompts sent to Claude Code under commercial terms. <span class="cite">Anthropic, Claude Code documentation, Data usage. Standard retention for commercial users is 30 days.</span></p>
+</blockquote>
+<p>These terms, and the tools in this tutorial, have <strong>not been reviewed or approved by the Technion</strong>. Their use is at the <strong>sole responsibility of the user</strong>.</p>
+</div>
+
+</section>
+<section id="getting-started" class="title-slide slide level1 center" data-name="Start">
+<h1>1 Getting Started</h1>
+
+</section>
+
+<section id="definition" class="slide level2">
+<h2>1.1 Definition</h2>
+<div class="dict">
+<p><span class="head">agent</span><span class="pron">/ˈeɪ.dʒənt/</span><span class="pos">noun</span></p>
+<ol type="1">
+<li>A person who acts on behalf of another.</li>
+<li><span class="domain">(computing)</span> A program that pursues a goal by choosing actions, carrying them out and observing their results, until the goal is reached.</li>
+</ol>
+<blockquote>
+<p>An agent is anything that can be viewed as perceiving its environment through sensors and acting upon that environment through actuators. <span class="cite">Russell and Norvig, <em>Artificial Intelligence: A Modern Approach</em></span></p>
+</blockquote>
+</div>
+
+</section>
+<section id="a-chatbot-answers-an-agent-acts" class="slide level2">
+<h2>1.2 A chatbot answers, an agent acts</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/ag_chat_agent_0.png" height="741"></p>
+<p><img data-src="assets/custom/ag_chat_agent_1.png" class="fragment" height="741"></p>
+</div>
+
+</section>
+<section id="set-up" class="slide level2">
+<h2>1.3 Set up</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_setup.png" class="quarto-figure quarto-figure-center" height="288"></p>
+</figure>
+</div>
+<ul>
+<li>Data: <a href="https://huggingface.co/datasets/yup8/ai-days-2026-ago2">huggingface.co/datasets/yup8/ai-days-2026-ago2</a>, AGO2 binding sites and unbound RNA</li>
+</ul>
+
+</section>
+<section id="first-task" class="slide level2" data-todo="Task 1">
+<h2>1.4 First task</h2>
+<div class="prompt dense">
+<p><span class="prompt-label">PASTE INTO THE CODE TAB NOW</span></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a href=""></a>I am new to coding agents. Work step by step and tell me briefly what you do.</span>
+<span id="cb1-2"><a href=""></a>Make this folder a git repository and commit after each step that works.</span>
+<span id="cb1-3"><a href=""></a></span>
+<span id="cb1-4"><a href=""></a>Goal: one scatter plot of the AGO2 RNA dataset.</span>
+<span id="cb1-5"><a href=""></a>1. Set up a Python environment with numpy and matplotlib in .venv</span>
+<span id="cb1-6"><a href=""></a>   (Windows: py -m venv .venv, then .venv\Scripts\python -m pip install ...; macOS: python3 -m venv .venv).</span>
+<span id="cb1-7"><a href=""></a>2. Download the two training files (FASTA; letters can be lower case, some sequences use T for U):</span>
+<span id="cb1-8"><a href=""></a>   https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/CLIPSEQ_AGO2.train.positives.fa   (bound)</span>
+<span id="cb1-9"><a href=""></a>   https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/CLIPSEQ_AGO2.train.negatives.fa   (unbound)</span>
+<span id="cb1-10"><a href=""></a>3. For each sequence: GC fraction = (G + C) / length, U fraction = (U + T) / length.</span>
+<span id="cb1-11"><a href=""></a>4. Plot GC fraction (x) against U fraction (y): 5,000 random sequences per group (seed 0), bound in blue,</span>
+<span id="cb1-12"><a href=""></a>   unbound in grey, small transparent dots, drawn in random order. Do not open plot windows.</span>
+<span id="cb1-13"><a href=""></a>5. Save the plot as gc_u.png and tell me in two sentences whether the groups differ.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="git-the-projects-history" class="slide level2">
+<h2>1.5 Git: the project’s history</h2>
+<div class="dict mini">
+<p><span class="head">git</span><span class="pron">/ɡɪt/</span><span class="pos">noun</span> <span class="domain">(computing)</span> A program that records every version of a project’s files, with what changed, when and why.</p>
+</div>
+<div class="r-stack">
+<p><img data-src="assets/custom/ag_githistory.png" class="fragment" height="429"></p>
+<p><img data-src="assets/custom/ag_git.png" class="fragment" height="429"></p>
+</div>
+
+</section>
+<section id="virtual-environments" class="slide level2">
+<h2>1.6 Virtual environments</h2>
+<div class="dict mini">
+<p><span class="head">virtual environment</span><span class="pos">noun</span> <span class="domain">(Python)</span> A folder with its own Python and its own packages, used by one project only.</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_venv.png" class="fragment quarto-figure quarto-figure-center" height="623"></p>
+</figure>
+</div>
+
+</section>
+<section id="inside-an-agent" class="title-slide slide level1 center" data-name="Agents">
+<h1>2 Inside an Agent</h1>
+
+</section>
+
+<section id="model-and-harness" class="slide level2">
+<h2>2.1 Model and harness</h2>
+<div class="dict mini">
+<p><span class="head">harness</span><span class="pron">/ˈhɑːr.nɪs/</span><span class="pos">noun</span> <span class="domain">(computing)</span> The program around a language model that runs its tools and asks your permission. It also manages the context and loads skills.</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_harness.png" class="fragment quarto-figure quarto-figure-center" height="650"></p>
+</figure>
+</div>
+
+</section>
+<section id="the-agent-loop" class="slide level2">
+<h2>2.2 The agent loop</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_loop.png" class="quarto-figure quarto-figure-center" height="765"></p>
+</figure>
+</div>
+
+</section>
+<section id="you-stay-in-control" class="slide level2">
+<h2>2.3 You stay in control</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_control.png" class="quarto-figure quarto-figure-center" height="565"></p>
+</figure>
+</div>
+
+</section>
+<section id="anatomy-of-a-prompt" class="slide level2">
+<h2>2.4 Anatomy of a prompt</h2>
+<div class="dict mini">
+<p><span class="head">prompt</span><span class="pron">/prɒmpt/</span><span class="pos">noun</span> <span class="domain">(computing)</span> The instruction you give the agent: what to do, with what, how, and when it is done.</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_anatomy.png" class="fragment quarto-figure quarto-figure-center" height="650"></p>
+</figure>
+</div>
+
+</section>
+<section id="compare-yours" class="slide level2">
+<h2>2.5 Compare yours</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_plot_plain.png" class="quarto-figure quarto-figure-center" height="765"></p>
+</figure>
+</div>
+
+</section>
+<section id="skills" class="title-slide slide level1 center" data-name="Skills">
+<h1>3 Skills</h1>
+
+</section>
+
+<section id="anatomy-of-a-skill" class="slide level2">
+<h2>3.1 Anatomy of a skill</h2>
+<div class="dict mini">
+<p><span class="head">skill</span><span class="pron">/skɪl/</span><span class="pos">noun</span> <span class="domain">(agents)</span> A folder of instructions, and the files they need, that the agent loads when a task matches it: a reusable prompt.</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_skill.png" class="fragment quarto-figure quarto-figure-center" height="650"></p>
+</figure>
+</div>
+
+</section>
+<section id="not-in-the-prompt-the-agent-decides" class="slide level2">
+<h2>3.2 Not in the prompt, the agent decides</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_coinflip.png" class="quarto-figure quarto-figure-center" height="675"></p>
+</figure>
+</div>
+
+</section>
+<section id="install-one-in-a-new-session" class="slide level2">
+<h2>3.3 Install one, in a new session</h2>
+<div class="prompt">
+<p><span class="prompt-label">NEW SESSION, SAME FOLDER: ASK YOUR AGENT</span></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href=""></a>Install the Claude Code skill at https://github.com/TingxiYu/academic-figure-skill</span>
+<span id="cb2-2"><a href=""></a>into ~/.claude/skills/academic-figure-skill (clone the repository there).</span>
+<span id="cb2-3"><a href=""></a>Then tell me what the skill does and when it will be used.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="second-task-a-cnn-reported-with-the-skill" class="slide level2" data-todo="Task 2">
+<h2>3.4 Second task: a CNN, reported with the skill</h2>
+<div class="prompt denser">
+<p><span class="prompt-label">PASTE INTO THE SAME NEW SESSION</span></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href=""></a>Second task: train a small neural network on the AGO2 data, on this computer's CPU.</span>
+<span id="cb3-2"><a href=""></a>First show me your plan and wait for my OK. If anything is unclear, ask me before writing code.</span>
+<span id="cb3-3"><a href=""></a>Data: https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/&lt;file&gt;, FASTA, lower case allowed, T means U.</span>
+<span id="cb3-4"><a href=""></a>  Training: CLIPSEQ_AGO2.train.positives.fa, CLIPSEQ_AGO2.train.negatives.fa (download any you do not have)</span>
+<span id="cb3-5"><a href=""></a>  Held-out test (1,000): CLIPSEQ_AGO2.ls.positives.fa, CLIPSEQ_AGO2.ls.negatives.fa</span>
+<span id="cb3-6"><a href=""></a>1. Install the CPU build of PyTorch into .venv: pip install torch --index-url https://download.pytorch.org/whl/cpu</span>
+<span id="cb3-7"><a href=""></a>2. One-hot encode each sequence: 4 rows (A, C, G, U) by 501 columns; other letters and columns after the end are 0.25.</span>
+<span id="cb3-8"><a href=""></a>3. Network: Conv2d(1, 10, (4, 10)), ReLU, MaxPool2d((1, 3)), Conv2d(10, 20, (1, 5)), ReLU, MaxPool2d((1, 3)),</span>
+<span id="cb3-9"><a href=""></a>   Flatten, Linear(1060, 1).</span>
+<span id="cb3-10"><a href=""></a>4. Train 10 epochs: Adam, learning rate 0.001, shuffled batches of 256, BCEWithLogitsLoss, seed 0.</span>
+<span id="cb3-11"><a href=""></a>   Print the seconds per epoch and the held-out AUROC after each epoch.</span>
+<span id="cb3-12"><a href=""></a>5. Control: train again with the training labels shuffled and report its AUROC.</span>
+<span id="cb3-13"><a href=""></a>6. Use the academic-figure-skill for the figures: AUROC against epoch, and gc_u.png redrawn.</span>
+<span id="cb3-14"><a href=""></a>7. Write report.md (what you did, every number with the command that produced it) and CLAUDE.md</span>
+<span id="cb3-15"><a href=""></a>   (how to set up, run and check this project). Commit after each step that works.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="context-and-effort" class="title-slide slide level1 center" data-name="Context">
+<h1>4 Context and Effort</h1>
+
+</section>
+
+<section id="the-context-window" class="slide level2">
+<h2>4.1 The context window</h2>
+<div class="dict mini">
+<p><span class="head">context window</span><span class="pos">noun</span> <span class="domain">(language models)</span> Everything the model reads before each reply: instructions, the conversation, files opened, command output. It has a fixed size.</p>
+</div>
+<div class="r-stack">
+<p><img data-src="assets/custom/ag_context_0.png" class="fragment" height="518"></p>
+<p><img data-src="assets/custom/ag_context_1.png" class="fragment" height="518"></p>
+</div>
+<ul>
+<li><strong>New task, new session</strong></li>
+</ul>
+<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
+
+</section>
+<section id="subagents-and-new-sessions" class="slide level2">
+<h2>4.2 Subagents and new sessions</h2>
+<div class="dict mini">
+<p><span class="head">subagent</span><span class="pron">/ˈsʌbˌeɪ.dʒənt/</span><span class="pos">noun</span> <span class="domain">(agents)</span> A helper the agent starts for one part of a task, with its own empty context, that returns only a short result.</p>
+</div>
+<div class="r-stack">
+<p><img data-src="assets/custom/ag_sessions_0.png" class="fragment" height="619"></p>
+<p><img data-src="assets/custom/ag_sessions_1.png" class="fragment" height="619"></p>
+</div>
+<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
+
+</section>
+<section id="reasoning-effort" class="slide level2">
+<h2>4.3 Reasoning effort</h2>
+<div class="dict mini">
+<p><span class="head">effort</span><span class="pron">/ˈef.ət/</span><span class="pos">noun</span> <span class="domain">(agents)</span> How much the model thinks before each step. It is set from low to max.</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_effort.png" class="fragment quarto-figure quarto-figure-center" height="476"></p>
+</figure>
+</div>
+<ul>
+<li><strong>Medium most of the time</strong></li>
+<li><strong>Higher is not better</strong></li>
+</ul>
+<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
+
+</section>
+<section id="when-it-goes-in-circles" class="slide level2">
+<h2>4.4 When it goes in circles</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_circles.png" class="quarto-figure quarto-figure-center" height="726"></p>
+</figure>
+</div>
+<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
+
+</section>
+<section id="limits-and-when-not-to-use-an-agent" class="slide level2">
+<h2>4.5 Limits, and when not to use an agent</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_whennot.png" class="quarto-figure quarto-figure-center" height="725"></p>
+</figure>
+</div>
+<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
+
+</section>
+<section id="results-and-bookkeeping" class="title-slide slide level1 center" data-name="Results">
+<h1>5 Results and Bookkeeping</h1>
+
+</section>
+
+<section id="work-in-phases" class="slide level2">
+<h2>5.1 Work in phases</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_phases.png" class="quarto-figure quarto-figure-center" height="609"></p>
+</figure>
+</div>
+<p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
+
+</section>
+<section id="the-same-plot-with-the-skill" class="slide level2">
+<h2>5.2 The same plot, with the skill</h2>
+<div class="columns vcenter">
+<div class="column" style="width:48%;">
+<p><img data-src="assets/custom/ag_plot_plain.png" height="658"></p>
+<p><span class="caption-small">Without the skill</span></p>
+</div><div class="column" style="width:52%;">
+<p><img data-src="assets/custom/ag_plot_skill.png" height="465"></p>
+<p><span class="caption-small">With the academic figure skill</span></p>
+</div></div>
+
+</section>
+<section id="claude.md-the-lab-template" class="slide level2">
+<h2>5.3 CLAUDE.md: the lab template</h2>
+<div class="prompt">
+<p><span class="prompt-label">CLAUDE.md, READ AT THE START OF EVERY SESSION</span></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb4-1"><a href=""></a># Project: &lt;one line: the question&gt;</span>
+<span id="cb4-2"><a href=""></a>## Layout</span>
+<span id="cb4-3"><a href=""></a>data/raw/       read-only: never modify or delete</span>
+<span id="cb4-4"><a href=""></a>data/derived/   produced by scripts in src/</span>
+<span id="cb4-5"><a href=""></a>wiki/           FINDINGS.md, DECISIONS.md, RISKS.md: update at the end of every phase</span>
+<span id="cb4-6"><a href=""></a>phases/NN_name/ plan.md and report.md per phase</span>
+<span id="cb4-7"><a href=""></a>## How to run</span>
+<span id="cb4-8"><a href=""></a>.venv/bin/python src/train.py --config configs/&lt;name&gt;.yaml</span>
+<span id="cb4-9"><a href=""></a>## Rules</span>
+<span id="cb4-10"><a href=""></a>- GPU server: only GPU 1 (CUDA_VISIBLE_DEVICES=1); check nvidia-smi before starting a job</span>
+<span id="cb4-11"><a href=""></a>- Every number in a report comes with the command that produced it</span>
+<span id="cb4-12"><a href=""></a>- Commit after each working step; never commit data or secrets</span>
+<span id="cb4-13"><a href=""></a>- Log runs to ClearML project &lt;lab&gt;/&lt;project&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="your-results" class="slide level2">
+<h2>5.4 Your results</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/ag_cnn_curve.png" height="673"></p>
+<p><img data-src="assets/custom/ag_checks.png" class="fragment" height="673"></p>
+</div>
+<ul>
+<li><strong>Every number with its command</strong></li>
+</ul>
+
+</section>
+<section id="on-the-gpu-server" class="title-slide slide level1 center" data-name="Server">
+<h1>6 On the GPU Server</h1>
+<p>Part 2: watch, and let your agent finish</p>
+<p><a href="https://claude.ai/download">claude.ai/download</a> / <a href="https://huggingface.co/datasets/yup8/ai-days-2026-ago2">the data</a> / <a href="https://github.com/TingxiYu/academic-figure-skill">the figure skill</a></p>
+</section>
+
+<section id="two-setups" class="slide level2">
+<h2>6.1 Two setups</h2>
+<div class="r-stack">
+<p><img data-src="assets/custom/ag_where_0.png" height="740"></p>
+<p><img data-src="assets/custom/ag_where_1.png" class="fragment" height="740"></p>
+</div>
+
+</section>
+<section id="our-labs-skills" class="slide level2">
+<h2>6.2 Our lab’s skills</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_labskills.png" class="quarto-figure quarto-figure-center" height="765"></p>
+</figure>
+</div>
+
+</section>
+<section id="nightly-runs" class="slide level2">
+<h2>6.3 Nightly runs</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_nightly.png" class="quarto-figure quarto-figure-center" height="536"></p>
+</figure>
+</div>
+
+</section>
+<section id="tracking-experiments-clearml" class="slide level2">
+<h2>6.4 Tracking experiments: ClearML</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_clearml.png" class="quarto-figure quarto-figure-center" height="560"></p>
+</figure>
+</div>
+
+</section>
+<section id="example-a-literature-review" class="slide level2">
+<h2>6.5 Example: a literature review</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_litreview.png" class="quarto-figure quarto-figure-center" height="657"></p>
+</figure>
+</div>
+<ul>
+<li><strong>Open every cited paper</strong></li>
+</ul>
+
+</section>
+<section id="a-shared-wiki" class="slide level2">
+<h2>6.6 A shared wiki</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_wiki.png" class="quarto-figure quarto-figure-center" height="740"></p>
+</figure>
+</div>
+
+</section>
+<section id="sharing-in-the-lab" class="slide level2">
+<h2>6.7 Sharing in the lab</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_sharing.png" class="quarto-figure quarto-figure-center" height="643"></p>
+</figure>
+</div>
+
+</section>
+<section id="the-models" class="slide level2">
+<h2>6.8 The models</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_models.png" class="quarto-figure quarto-figure-center" height="765"></p>
+</figure>
+</div>
+
+</section>
+<section id="data-secrets-and-the-shared-server" class="slide level2">
+<h2>6.9 Data, secrets and the shared server</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_dataflow.png" class="quarto-figure quarto-figure-center" height="613"></p>
+</figure>
+</div>
+
+</section>
+<section id="demo-a-dna-language-model-on-the-gpu" class="slide level2">
+<h2>6.10 Demo: a DNA language model on the GPU</h2>
+<div class="prompt">
+<p><span class="prompt-label">DEMO PROMPT</span></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a href=""></a>On the GPU server (use only GPU 1: CUDA_VISIBLE_DEVICES=1), embed the AGO2 sequences with the pretrained</span>
+<span id="cb5-2"><a href=""></a>DNA language model RaphaelMourad/Mistral-DNA-v1-17M-hg38. Convert U to T first. One vector per</span>
+<span id="cb5-3"><a href=""></a>sequence: the average of the last layer. Embed both the training and the held-out files.</span>
+<span id="cb5-4"><a href=""></a>Train a logistic regression on the training vectors and report the held-out AUROC, with the command</span>
+<span id="cb5-5"><a href=""></a>and output. Compare it with the CNN of Task 2 (0.87) and with GC and U alone (0.66).</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="links" class="slide level2">
+<h2>6.11 Links</h2>
+<ul>
+<li>Claude Desktop: <a href="https://claude.ai/download">claude.ai/download</a></li>
+<li>Data: <a href="https://huggingface.co/datasets/yup8/ai-days-2026-ago2">huggingface.co/datasets/yup8/ai-days-2026-ago2</a></li>
+<li>Figure skill: <a href="https://github.com/TingxiYu/academic-figure-skill">github.com/TingxiYu/academic-figure-skill</a></li>
+<li>Data terms: <a href="https://code.claude.com/docs/en/data-usage">code.claude.com/docs/en/data-usage</a></li>
+<li>The data’s source: Maticzka et al., <em>Genome Biology</em> 15, R17 (2014), <a href="https://doi.org/10.1186/gb-2014-15-1-r17">doi:10.1186/gb-2014-15-1-r17</a></li>
+</ul>
+
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<p><img src="assets/logo.png" class="slide-logo"></p>
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="agents_lab_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="agents_lab_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="agents_lab_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="agents_lab_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="agents_lab_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="agents_lab_files/libs/revealjs/plugin/simplemenu/simplemenu.js"></script>
+  <script src="agents_lab_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="agents_lab_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="agents_lab_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="agents_lab_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="agents_lab_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'simplemenu': {"menubarclass":"menubar","menuclass":"menu","activeclass":"active","activeelement":"li","flat":true,"barhtml":{"header":"<div class='menubar'><ul class='menu'></ul></div>","footer":""},"scale":0.42},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: false,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1600,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, Simplemenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <!-- A second menu row under the section menu: one link per TODO slide (slides tagged data-todo). -->
+    <style>
+      .todo-bar { position: fixed; left: 0; right: 0; z-index: 40; display: flex; justify-content: center; gap: 10px;
+                  pointer-events: none; font-family: Roboto, sans-serif; }
+      .todo-bar a { pointer-events: auto; font-size: 12px; line-height: 1; padding: 3px 9px; border-radius: 10px;
+                    color: #1A73E8; background: #E8F0FE; text-decoration: none; }
+      .todo-bar a.active { color: #fff; background: #1A73E8; }
+      .todo-bar a:hover { background: #D2E3FC; }
+      .todo-bar a.active:hover { background: #1A73E8; }
+      .reveal[data-state~="hide-menubar"] ~ .todo-bar, body.hide-todo .todo-bar { display: none; }
+    </style>
+    <script>
+    (function () {
+      function build() {
+        var slides = Reveal.getSlides(), todos = [];
+        slides.forEach(function (s, i) {
+          var t = s.getAttribute("data-todo");
+          if (t) todos.push({ name: t, index: i });
+        });
+        if (!todos.length) return;
+        var bar = document.createElement("div");
+        bar.className = "todo-bar";
+        todos.forEach(function (t) {
+          var a = document.createElement("a");
+          a.href = "#"; a.textContent = t.name;
+          a.addEventListener("click", function (e) { e.preventDefault(); Reveal.slide(t.index); });
+          t.el = a; bar.appendChild(a);
+        });
+        document.body.appendChild(bar);
+        function place() {
+          var mb = document.querySelector(".menubar");
+          var r = mb ? mb.getBoundingClientRect() : null;
+          bar.style.top = ((r && r.height) ? r.bottom + 4 : 30) + "px";
+        }
+        function update() {
+          var cur = Reveal.getIndices().h;
+          var title = Reveal.getCurrentSlide().id === "title-slide";
+          document.body.classList.toggle("hide-todo", title);
+          todos.forEach(function (t) { t.el.classList.toggle("active", t.index === cur); });
+          place();
+        }
+        Reveal.on("slidechanged", update);
+        Reveal.on("resize", place);
+        update();
+      }
+      if (window.Reveal && Reveal.isReady && Reveal.isReady()) build();
+      else window.addEventListener("load", function () {
+        if (Reveal.isReady()) build(); else Reveal.on("ready", build);
+      });
+    })();
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

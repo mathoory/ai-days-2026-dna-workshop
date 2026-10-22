@@ -110,3 +110,37 @@
 .reveal .fill-table td, .reveal .fill-table th { padding: 0.42em 0.6em; }
 .reveal .columns.vcenter > .column { align-self: center; }
 .reveal .columns.vcenter > .column > p { margin-top: 0; margin-bottom: 0; }
+
+/* lab tutorial deck (agents_lab.qmd): a dictionary entry, and prompt cards */
+.reveal .dict { font-family: Georgia, "Times New Roman", serif; max-width: 1180px; margin: 0 auto; text-align: left; }
+.reveal .dict .head { font-size: 2.2em; font-weight: 700; color: var(--ink, #202124); }
+.reveal .dict .pron { font-size: 1.2em; color: #5F6368; margin-left: 0.4em; }
+.reveal .dict .pos { font-size: 1.1em; font-style: italic; color: #1A73E8; margin-left: 0.5em; }
+.reveal .dict ol { margin-top: 0.3em; font-size: 1.0em; line-height: 1.4; }
+.reveal .dict ol li { margin-bottom: 0.35em; }
+.reveal .dict .domain { font-style: italic; color: #5F6368; }
+.reveal .dict blockquote { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: 1.05em; width: auto;
+  margin: 1.1em 0 0; padding: 0.2em 0 0.2em 1em; border-left: 4px solid #1A73E8; box-shadow: none; background: none; color: #202124; }
+.reveal .dict .cite { display: block; font-style: normal; font-size: 0.8em; color: #5F6368; margin-top: 0.4em; }
+.reveal .prompt pre { background: #F8F9FA; border-left: 5px solid #1A73E8; border-radius: 0; box-shadow: none;
+  font-size: 0.5em; line-height: 1.5; padding: 0.8em 1.1em; max-height: none; }
+.reveal .prompt pre code { white-space: pre-wrap; max-height: none; background: none; }
+.reveal .prompt-label { font-size: 0.6em; color: #1A73E8; font-weight: 700; letter-spacing: 0.04em; margin-bottom: -0.3em; }
+.reveal .prompt.dense pre { font-size: 0.45em; line-height: 1.42; }
+.reveal .prompt.denser pre { font-size: 0.39em; line-height: 1.38; padding: 0.6em 1em; }
+.reveal .prompt div.sourceCode pre code, .reveal .prompt pre code { font-size: 21px !important; line-height: 1.45; }
+.reveal .prompt.dense div.sourceCode pre code, .reveal .prompt.dense pre code { font-size: 19px !important; }
+.reveal .prompt.denser div.sourceCode pre code, .reveal .prompt.denser pre code { font-size: 16.5px !important; line-height: 1.38; }
+.reveal .prompt div.sourceCode { background: none; }
+/* lab tutorial deck: one-line dictionary entries above a figure, the warning screen, the "agent waiting" reminder */
+.reveal .dict.mini { font-size: 0.78em; max-width: none; margin: 0 0 0.25em 0; }
+.reveal .dict.mini p { margin: 0; line-height: 1.35; }
+.reveal .dict.mini .head { font-size: 1.45em; }
+.reveal .dict.mini .pron, .reveal .dict.mini .pos { font-size: 0.95em; }
+.reveal .warning { font-family: Roboto, sans-serif; text-align: left; border-left: 8px solid #E8710A; padding: 0.3em 0 0.3em 1em;
+  margin: 0.4em auto 0; max-width: 1300px; font-size: 0.95em; }
+.reveal .warning .alarm { color: #E8710A; font-weight: 700; font-size: 1.5em; display: block; margin-bottom: 0.3em; }
+.reveal .warning blockquote { font-family: Georgia, "Times New Roman", serif; font-style: italic; width: auto; margin: 0.6em 0;
+  padding: 0 0 0 0.8em; border-left: 3px solid #DADCE0; box-shadow: none; background: none; font-size: 0.95em; }
+.reveal .warning .cite { display: block; font-style: normal; font-size: 0.75em; color: #5F6368; margin-top: 0.2em; }
+.reveal .waiting { position: absolute; left: 0; right: 0; bottom: -2px; text-align: center; font-size: 0.5em; color: #E8710A; font-weight: 500; }
