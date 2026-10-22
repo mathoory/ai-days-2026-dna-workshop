@@ -131,7 +131,7 @@
 .reveal .prompt div.sourceCode pre code, .reveal .prompt pre code { font-size: 21px !important; line-height: 1.45; }
 .reveal .prompt.dense div.sourceCode pre code, .reveal .prompt.dense pre code { font-size: 19px !important; }
 .reveal .prompt.denser div.sourceCode pre code, .reveal .prompt.denser pre code { font-size: 16.5px !important; line-height: 1.38; }
-.reveal .prompt div.sourceCode { background: none; }
+.reveal .prompt div.sourceCode { background: none; overflow: hidden; }
 /* lab tutorial deck: one-line dictionary entries above a figure, the warning screen, the "agent waiting" reminder */
 .reveal .dict.mini { font-size: 0.78em; max-width: none; margin: 0 0 0.25em 0; }
 .reveal .dict.mini p { margin: 0; line-height: 1.35; }
@@ -145,6 +145,7 @@
 .reveal .warning .cite { display: block; font-style: normal; font-size: 0.75em; color: #5F6368; margin-top: 0.2em; }
 .reveal .waiting { position: absolute; left: 0; right: 0; bottom: -2px; text-align: center; font-size: 0.5em; color: #E8710A; font-weight: 500; }
 .reveal .prompt.roomy div.sourceCode pre code, .reveal .prompt.roomy pre code { font-size: 25px !important; line-height: 1.45; }
+.reveal .prompt.mid div.sourceCode pre code, .reveal .prompt.mid pre code { font-size: 23px !important; line-height: 1.5; }
 .reveal .prompt.large div.sourceCode pre code, .reveal .prompt.large pre code { font-size: 30px !important; line-height: 1.45; }
 .reveal .prompt-label { font-size: 0.72em; }
 .reveal .warning { font-size: 1.0em; }
