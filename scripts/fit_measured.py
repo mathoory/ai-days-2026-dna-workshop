@@ -41,7 +41,7 @@ MEASURE_JS = r"""
       await new Promise(function (res) { setTimeout(res, 150); });
       var sl = Reveal.getCurrentSlide(), r = sl.getBoundingClientRect(), s = Reveal.getScale(), bottom = 0;
       sl.querySelectorAll('img,p,li,table,h2,pre,.MathJax,.katex-display,mjx-container,span').forEach(function (e) {
-        if (e.closest('aside')) return;
+        if (e.closest('aside') || e.closest('.waiting')) return;
         var b = e.getBoundingClientRect(); if (!b.width) return;
         bottom = Math.max(bottom, (b.bottom - r.top) / s);
       });
