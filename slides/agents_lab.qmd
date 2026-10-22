@@ -559,18 +559,7 @@ Part 2: watch, and let your agent finish
 - Without this bookkeeping each session starts from zero and results cannot be traced.
 :::
 
-## 6.7 Sharing in the lab
-
-![](assets/custom/ag_sharing.png){fig-align="center" height="643px"}
-
-::: {.notes}
-- Keep the lab's skills, a file of prompts that worked and the hooks in one repository. Review each other's report.md before trusting it.
-- Connectors (MCP) give the agent access to Box, Drive or ClearML. They are third-party code with access to your data, so treat them like a skill.
-- Skills copied by hand into each person's ~/.claude drift apart. Committed to a repository, they improve for everyone.
-- A hook is a script the harness runs before or after an action. Unlike a line in CLAUDE.md, the agent cannot ignore it.
-:::
-
-## 6.8 The models
+## 6.7 The models
 
 ![](assets/custom/ag_models.png){fig-align="center" height="765px"}
 
@@ -581,7 +570,7 @@ Part 2: watch, and let your agent finish
 - On the lab seats you do not pay per token, but larger models use up the seat's limits faster. One overall score hides large differences between tasks, so try two models on your own problem.
 :::
 
-## 6.9 Data, secrets and the shared server
+## 6.8 Data, secrets and the shared server
 
 ![](assets/custom/ag_dataflow.png){fig-align="center" height="613px"}
 
@@ -592,7 +581,7 @@ Part 2: watch, and let your agent finish
 - A permission-skipping mode exists for sandboxes. On the lab server it means any command runs without a question.
 :::
 
-## 6.10 Demo: a DNA language model on the GPU
+## 6.9 Demo: a DNA language model on the GPU
 
 ::: {.prompt .large}
 [DEMO PROMPT]{.prompt-label}
@@ -611,7 +600,7 @@ and output. Compare it with the CNN of Task 2 (0.87) and with GC and U alone (0.
 - The frozen language model with a linear probe should reach about 0.78 held-out AUROC, below the CNN trained on all labels (0.87) and above composition alone (0.66).
 :::
 
-## 6.11 Links
+## 6.10 Links
 
 - Claude Desktop: [claude.ai/download](https://claude.ai/download)
 - Data: [huggingface.co/datasets/yup8/ai-days-2026-ago2](https://huggingface.co/datasets/yup8/ai-days-2026-ago2)
