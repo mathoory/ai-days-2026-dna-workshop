@@ -100,18 +100,16 @@ def agent_loop():
 
 # ------------------------------------------------------------------ 2.1 setting up, four steps
 def setup_steps():
-    fig, ax = canvas(16, 5.2, ylim=(0, 52))
-    steps = [("Install", "Claude Desktop\nclaude.ai/download"),
-             ("Sign in", "a paid Claude plan\n(Pro or a lab seat)"),
-             ("Open a folder", "Code tab:\nchoose an empty folder"),
-             ("Prompt", "paste the task,\napprove each step")]
-    r = 6
+    fig, ax = canvas(16, 6.6, ylim=(0, 66))
+    steps = [("Install", "Claude Desktop, claude.ai/download"), ("Sign in", "with your lab seat"),
+             ("Open a folder", "Code tab: an empty folder"), ("Prompt", "paste the task, approve each step")]
+    r = 7
     for k, (h, d) in enumerate(steps):
-        x = 2 + k * 40
-        ax.add_patch(plt.Circle((x + r, 40), r, color=ACCENT))
-        ax.text(x + r, 40, str(k + 1), ha="center", va="center_baseline", fontsize=30, color="white", fontweight="bold")
-        label(ax, x + 2 * r + 2, 40, h, fs=26, bold=True, ha="left")
-        label(ax, x, 22, d, fs=21, color=MUTED, ha="left", va="center")
+        x, y = 2 + (k % 2) * 80, 50 - (k // 2) * 31
+        ax.add_patch(plt.Circle((x + r, y), r, color=ACCENT))
+        ax.text(x + r, y, str(k + 1), ha="center", va="center_baseline", fontsize=34, color="white", fontweight="bold")
+        label(ax, x + 2 * r + 3, y + 3.5, h, fs=30, bold=True, ha="left")
+        label(ax, x + 2 * r + 3, y - 4.5, d, fs=23, color=MUTED, ha="left")
     save(fig, "ag_setup")
 
 
@@ -180,9 +178,12 @@ def subagents_sessions():
         label(ax, 2, 9, "each reads on its own; only the result\nenters the main context", fs=19, color=MUTED, ha="left")
         if k == 1:
             ax.plot([84, 84], [4, 84], color=HAIR, lw=1.2)
-            label(ax, 88, 82, "New sessions: you hand over", fs=24, bold=True, ha="left")
+            label(ax, 88, 82, "Sessions: files and messages", fs=24, bold=True, ha="left")
             blk(ax, 88, 58, 30, 12, "Session 1", fc=ACCENT, fs=21)
             blk(ax, 126, 58, 30, 12, "Session 2", fc=ACCENT, fs=21)
+            ax.annotate("", (125.5, 64), (118.5, 64), arrowprops=dict(arrowstyle="<|-|>", color=INK, lw=2.5,
+                                                                    mutation_scale=20))
+            label(ax, 122, 74, "messages", fs=18, color=INK, bold=True)
             file_icon(ax, 106, 36, "handoff.md", fs=19)
             arrow(ax, 103, 57.5, 108, 40, color=GOOD_C, lw=2, ms=18)
             arrow(ax, 124, 40, 141, 57.5, color=GOOD_C, lw=2, ms=18)
@@ -233,44 +234,45 @@ def effort():
 
 # ------------------------------------------------------------------ 6.1 nightly runs
 def nightly():
-    fig, ax = canvas(16, 6.4, ylim=(0, 64))
+    fig, ax = canvas(16, 7.6, ylim=(0, 76))
     hours = list(range(18, 24)) + list(range(0, 9))
     x0, dx = 8, 10
-    ax.plot([x0, x0 + dx * (len(hours) - 1)], [30, 30], color=INK, lw=2)
+    ax.plot([x0, x0 + dx * (len(hours) - 1)], [34, 34], color=INK, lw=2.5)
     for i, h in enumerate(hours):
         x = x0 + i * dx
-        ax.plot([x, x], [29, 31], color=INK, lw=2)
-        label(ax, x, 25, f"{h:02d}:00", fs=15, color=MUTED)
+        ax.plot([x, x], [32.5, 35.5], color=INK, lw=2.5)
+        label(ax, x, 28, f"{h:02d}", fs=19, color=MUTED)
         if 0 < i < len(hours) - 1:
-            ax.add_patch(plt.Circle((x, 36), 1.3, color=ACCENT))
+            ax.add_patch(plt.Circle((x, 41), 1.8, color=ACCENT))
     for j, (a, b) in enumerate([(0.3, 5.5), (1, 9.2), (5.7, 12.6)]):
-        ax.add_patch(Rectangle((x0 + a * dx, 44 + j * 5), (b - a) * dx, 3.4, fc=HELD_C, ec="none"))
-    label(ax, x0 + 13.4 * dx, 51, "jobs on the GPU", fs=18, color=HELD_C, ha="left")
-    label(ax, x0, 6, "you: plan with the\nagent, launch", fs=19, ha="left", va="bottom")
-    label(ax, x0 + 7 * dx, 15.5, "job-heartbeat: a scheduled prompt wakes the agent; it reads the job's status,", fs=18,
-          color=ACCENT)
-    label(ax, x0 + 7 * dx, 10.5, "fixes or alerts. A watchdog alerts if no agent is awake.", fs=18, color=ACCENT)
-    file_icon(ax, x0 + 12.4 * dx, 10, "report.md", fs=19)
-    label(ax, x0 + 12.4 * dx, 3, "08:00 morning report", fs=18, color=GOOD_C, ha="left")
+        ax.add_patch(Rectangle((x0 + a * dx, 50 + j * 7), (b - a) * dx, 5, fc=HELD_C, ec="none"))
+    label(ax, x0 + 13.4 * dx, 64, "jobs on\nthe GPU", fs=22, color=HELD_C, ha="left")
+    label(ax, x0, 9, "you: plan with the\nagent, launch", fs=22, ha="left")
+    label(ax, x0 + 6.6 * dx, 17, "job-heartbeat: a scheduled prompt wakes the agent;", fs=21, color=ACCENT)
+    label(ax, x0 + 6.6 * dx, 11, "it reads the job's status, fixes or alerts.", fs=21, color=ACCENT)
+    label(ax, x0 + 6.6 * dx, 5, "A watchdog alerts if no agent is awake.", fs=21, color=ACCENT)
+    file_icon(ax, x0 + 12.2 * dx, 14, "report.md", fs=22)
+    label(ax, x0 + 12.2 * dx, 6, "08:00 report", fs=21, color=GOOD_C, ha="left")
     save(fig, "ag_nightly")
 
 
 # ------------------------------------------------------------------ 6.2 experiment tracking
 def clearml():
-    fig, ax = canvas(16, 6.6, ylim=(0, 66))
+    fig, ax = canvas(16, 7.6, ylim=(0, 76))
     for i in range(4):
-        blk(ax, 2, 52 - i * 13, 34, 9, f"run {i + 1}: lr {['1e-3', '3e-4', '1e-4', '3e-5'][i]}", fc=HELD_C, fs=18)
-        arrow(ax, 37, 56.5 - i * 13, 54, 33 + (1.5 - i) * 4, color=MUTED, lw=2, ms=18)
-    blk(ax, 55, 22, 40, 22, "", fc=INK)
-    label(ax, 75, 37, "ClearML server", fs=22, color="white", bold=True)
-    label(ax, 75, 28, "metrics, settings,\nmodel files", fs=18, color="white")
-    arrow(ax, 96, 38, 112, 50, color=MUTED, lw=2.5, ms=20)
-    arrow(ax, 96, 28, 112, 16, color=MUTED, lw=2.5, ms=20)
-    label(ax, 114, 52, "You: the web dashboard", fs=21, ha="left", bold=True)
-    label(ax, 114, 46, "curves, compare runs", fs=19, color=MUTED, ha="left")
-    label(ax, 114, 18, "Agent: clearml-scientific-", fs=21, ha="left", bold=True, color=ACCENT)
-    label(ax, 114, 12.5, "publishing skill", fs=21, ha="left", bold=True, color=ACCENT)
-    label(ax, 114, 6.5, "logs runs, publishes the report", fs=19, color=MUTED, ha="left")
+        blk(ax, 2, 62 - i * 16, 34, 12, f"run {i + 1}: lr {['1e-3', '3e-4', '1e-4', '3e-5'][i]}", fc=HELD_C, fs=21)
+        arrow(ax, 37, 68 - i * 16, 54, 38 + (1.5 - i) * 5, color=MUTED, lw=2, ms=18)
+    blk(ax, 55, 24, 40, 28, "", fc=INK)
+    label(ax, 75, 43, "ClearML server", fs=25, color="white", bold=True)
+    label(ax, 75, 32, "metrics, settings,\nmodel files", fs=21, color="white")
+    arrow(ax, 96, 44, 110, 58, color=MUTED, lw=2.5, ms=20)
+    arrow(ax, 96, 32, 110, 18, color=MUTED, lw=2.5, ms=20)
+    label(ax, 112, 63, "You: the web", fs=24, ha="left", bold=True)
+    label(ax, 112, 56, "dashboard", fs=24, ha="left", bold=True)
+    label(ax, 112, 49, "curves, compare runs", fs=21, color=MUTED, ha="left")
+    label(ax, 112, 21, "Agent: clearml-", fs=24, ha="left", bold=True, color=ACCENT)
+    label(ax, 112, 14, "scientific-publishing", fs=24, ha="left", bold=True, color=ACCENT)
+    label(ax, 112, 7, "logs runs, publishes the report", fs=21, color=MUTED, ha="left")
     save(fig, "ag_clearml")
 
 
@@ -293,17 +295,17 @@ def where_runs():
             label(ax, 2, 40, "B. Claude on the server, you connect to it", fs=23, bold=True, ha="left")
             region(ax, 2, 2, 54, 32, "Your PC")
             blk(ax, 7, 17, 44, 10, "WSL terminal", fc=INK, fs=20)
-            blk(ax, 7, 5, 44, 9, "Claude app or phone", fc=TOOL, tc=INK, fs=18, bold=False)
+            blk(ax, 7, 6.5, 44, 9, "Claude app or phone", fc=TOOL, tc=INK, fs=18, bold=False)
             region(ax, 100, 2, 58, 34, "GPU server", color=HELD_C)
             ax.add_patch(FancyBboxPatch((104, 5), 50, 22, boxstyle="round,pad=0,rounding_size=1.2", fc="none",
                                         ec=INK, lw=2))
             label(ax, 106, 24, "tmux session", fs=17, color=MUTED, ha="left")
-            blk(ax, 108, 8, 22, 11, "Claude", fc=ACCENT, fs=20)
-            blk(ax, 132, 8, 20, 11, "GPU", fc=TOOL, tc=INK, fs=19)
-            arrow(ax, 130.5, 13.5, 131.5, 13.5, color=MUTED, lw=2, ms=14)
+            blk(ax, 108, 5.5, 22, 11, "Claude", fc=ACCENT, fs=20)
+            blk(ax, 132, 5.5, 20, 11, "GPU", fc=TOOL, tc=INK, fs=19)
+            arrow(ax, 130.5, 11, 131.5, 11, color=MUTED, lw=2, ms=14)
             arrow(ax, 52, 22, 104, 22, color=INK, lw=2.5, ms=22)
             label(ax, 78, 25.5, "ssh, then tmux attach", fs=18, color=INK)
-            arrow(ax, 52, 9.5, 107, 11, color=ACCENT, lw=2.5, ms=22, ls=(0, (4, 3)))
+            arrow(ax, 51.5, 11, 107.5, 11, color=ACCENT, lw=2.5, ms=22, ls=(0, (4, 3)))
             label(ax, 78, 6, "Remote Control", fs=18, color=ACCENT)
         nm = f"ag_where_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
@@ -441,51 +443,50 @@ def venv():
     save(fig, "ag_venv")
 
 
-# ------------------------------------------------------------------ 1.4 the models, by price
+# ------------------------------------------------------------------ 6.8 the models: score against price
 def model_prices():
-    rows = [("Top", [("Claude Fable 5.1", 50, "Anthropic"), ("GPT-6 Astra", 50, "OpenAI")]),
-            ("Large", [("Claude Opus 5.5", 20, "Anthropic")]),
-            ("Mid", [("Claude Sonnet 5.5", 10, "Anthropic"), ("GPT-6 Sol", 10, "OpenAI")]),
-            ("Small", [("Claude Haiku 5.5", 0.5, "Anthropic"), ("GPT-6 Luna", 0.5, "OpenAI")])]
-    fig = newfig(); fig.set_size_inches(16, 8.2)
-    ax = fig.add_axes([0.2, 0.13, 0.62, 0.8])
-    y, ticks, labels, tiers = 0, [], [], []
-    for tier, ms in rows:
-        y0 = y
-        for name, out, co in ms:
-            c = ACCENT if co == "Anthropic" else MID
-            ax.barh(y, out, color=c, height=0.7)
-            ax.text(out * 1.12, y, f"${out:g}", va="center", fontsize=22, color=c)
-            ticks.append(y); labels.append(name); y += 1
-        tiers.append(((y0 + y - 1) / 2, tier)); y += 0.6
-    ax.set_xscale("log"); ax.set_xlim(0.2, 200)
-    ax.set_yticks(ticks); ax.set_yticklabels(labels, fontsize=22); ax.invert_yaxis()
-    for lab, (n) in zip(ax.get_yticklabels(), labels):
-        lab.set_color(ACCENT if n.startswith("Claude") else MUTED)
-    ax.tick_params(axis="y", length=0); ax.spines["left"].set_visible(False)
-    ax.set_xticks([0.5, 1, 10, 50]); ax.set_xticklabels(["$0.5", "$1", "$10", "$50"], fontsize=20)
+    """benchlm.ai overall score (8 weighted categories, verified 20.10.2026) against API output price."""
+    ms = [("Fable 5.1", 50, 83.25, "A"), ("Opus 5.5", 20, 86.69, "A"), ("Sonnet 5.5", 10, 82.25, "A"),
+          ("Haiku 5.5", 0.5, 67.23, "A"), ("GPT-6 Astra", 50, 84.03, "O"), ("GPT-6 Sol", 10, 78.58, "O"),
+          ("GPT-6 Luna", 0.5, 66.55, "O")]
+    fig = newfig(); fig.set_size_inches(16, 8.4)
+    ax = fig.add_axes([0.09, 0.13, 0.86, 0.84])
+    for fam, c in (("A", ACCENT), ("O", MID)):
+        pts = sorted([(p, s) for _, p, s, f in ms if f == fam])
+        ax.plot([p for p, _ in pts], [s for _, s in pts], color=c, lw=2, alpha=0.5, zorder=1)
+    off = {"Fable 5.1": (12, -26), "Opus 5.5": (12, 6), "Sonnet 5.5": (12, 8), "Haiku 5.5": (12, 6),
+           "GPT-6 Astra": (12, 6), "GPT-6 Sol": (12, -24), "GPT-6 Luna": (12, -22)}
+    for n, p, s, f in ms:
+        c = ACCENT if f == "A" else MID
+        ax.scatter(p, s, s=260, color=c, zorder=3)
+        ax.annotate(f"{n}  {s:.1f}", (p, s), xytext=off[n], textcoords="offset points", fontsize=22, color=c,
+                    fontweight="bold" if f == "A" else "normal")
+    ax.set_xscale("log"); ax.set_xlim(0.3, 160)
+    ax.set_xticks([0.5, 1, 10, 20, 50]); ax.set_xticklabels(["$0.50", "$1", "$10", "$20", "$50"], fontsize=20)
+    ax.set_ylim(62, 90)
     ax.set_xlabel("Price per million output tokens (log scale)")
-    for yy, tier in tiers:
-        ax.text(260, yy, tier, va="center", fontsize=22, color=INK, fontweight="bold")
-    xgrid(ax)
+    ax.set_ylabel("benchlm.ai overall score")
+    ygrid(ax)
+    ax.text(0.33, 88.5, "Claude", fontsize=24, color=ACCENT, fontweight="bold", va="top")
+    ax.text(0.33, 86.3, "GPT-6", fontsize=24, color=MID, fontweight="bold", va="top")
     save(fig, "ag_models")
 
 
 # ------------------------------------------------------------------ 1.7 git, the undo button
 def git_undo():
-    fig, ax = canvas(16, 5.2, ylim=(0, 52))
+    fig, ax = canvas(16, 7.2, ylim=(0, 72))
     steps = [("set up .venv", ACCENT), ("download data", ACCENT), ("gc_u.png", ACCENT), ("train CNN", HELD_C)]
     xs = [12, 52, 92, 132]
-    ax.plot([xs[0], xs[-1]], [34, 34], color=MID, lw=3)
-    for (t, c), x in zip(steps, xs):
-        ax.add_patch(plt.Circle((x, 34), 3.4, color=c, zorder=3))
-        label(ax, x, 44, t, fs=22, color=INK if c == ACCENT else HELD_C, bold=True)
+    ax.plot([xs[0], xs[-1]], [44, 44], color=MID, lw=4)
+    for (tx, c), x in zip(steps, xs):
+        ax.add_patch(plt.Circle((x, 44), 5, color=c, zorder=3))
+        label(ax, x, 58, tx, fs=27, color=INK if c == ACCENT else HELD_C, bold=True)
     for sgn in (1, -1):
-        ax.plot([132 - 2.4, 132 + 2.4], [34 - 2.4 * sgn, 34 + 2.4 * sgn], color="white", lw=3, zorder=4)
-    ax.annotate("", (94, 29), (130, 29), arrowprops=dict(arrowstyle="-|>", color=INK, lw=2.5, mutation_scale=24,
+        ax.plot([132 - 3.4, 132 + 3.4], [44 - 3.4 * sgn, 44 + 3.4 * sgn], color="white", lw=4, zorder=4)
+    ax.annotate("", (94, 37), (130, 37), arrowprops=dict(arrowstyle="-|>", color=INK, lw=3, mutation_scale=30,
                                                           connectionstyle="arc3,rad=-0.45"))
-    label(ax, 112, 6, "the script broke: back to the last commit that worked", fs=20, color=INK)
-    label(ax, 2, 22, "one commit after\nevery step that works", fs=19, color=MUTED, ha="left")
+    label(ax, 112, 10, "the script broke: back to the last commit that worked", fs=24, color=INK)
+    label(ax, 2, 26, "one commit after\nevery step that works", fs=23, color=MUTED, ha="left")
     save(fig, "ag_git")
 
 
@@ -560,21 +561,22 @@ def checks():
 
 # ------------------------------------------------------------------ 2.3 permissions and plan mode
 def control():
-    fig, ax = canvas(16, 7.4, ylim=(0, 74))
-    ax.add_patch(FancyBboxPatch((2, 18), 74, 50, boxstyle="round,pad=0,rounding_size=1.6", fc="white", ec=MID, lw=2))
-    label(ax, 6, 61, "The agent asks", fs=22, color=MUTED, ha="left", bold=True)
-    label(ax, 6, 50, "Run:  python gc_u.py", fs=24, color=INK, ha="left", family=MONO)
-    for i, (t, c, tc) in enumerate([("Allow once", ACCENT, "white"), ("Always", TOOL, INK), ("Deny", TOOL, INK)]):
-        blk(ax, 6 + i * 23, 26, 20, 11, t, fc=c, tc=tc, fs=20)
-    label(ax, 39, 11, "a permission covers the command,\nnot what the script does", fs=19, color=MUTED)
-    ax.add_patch(FancyBboxPatch((84, 18), 74, 50, boxstyle="round,pad=0,rounding_size=1.6", fc="white", ec=MID, lw=2))
-    label(ax, 88, 61, "Plan mode", fs=22, color=MUTED, ha="left", bold=True)
+    fig, ax = canvas(16, 8.2, ylim=(0, 82))
+    for x0 in (2, 84):
+        ax.add_patch(FancyBboxPatch((x0, 18), 74, 62, boxstyle="round,pad=0,rounding_size=1.6", fc="white", ec=MID,
+                                    lw=2))
+    label(ax, 6, 72, "The agent asks", fs=26, color=MUTED, ha="left", bold=True)
+    label(ax, 6, 58, "Run:  python gc_u.py", fs=28, color=INK, ha="left", family=MONO)
+    for i, (tx, c, tc) in enumerate([("Allow once", ACCENT, "white"), ("Always", TOOL, INK), ("Deny", TOOL, INK)]):
+        blk(ax, 6 + i * 23, 28, 21, 14, tx, fc=c, tc=tc, fs=23)
+    label(ax, 39, 8, "a permission covers the command,\nnot what the script does", fs=23, color=MUTED)
+    label(ax, 88, 72, "Plan mode", fs=26, color=MUTED, ha="left", bold=True)
     steps = [("reads", ACCENT), ("proposes a plan", ACCENT), ("you accept", INK), ("then edits", GOOD_C)]
-    for i, (t, c) in enumerate(steps):
-        y = 50 - i * 9
-        ax.add_patch(plt.Circle((91, y), 1.6, color=c))
-        label(ax, 95, y, t, fs=21, color=c, ha="left", bold=c == INK)
-    label(ax, 121, 11, "for anything longer than a few steps", fs=19, color=MUTED)
+    for i, (tx, c) in enumerate(steps):
+        y = 60 - i * 11
+        ax.add_patch(plt.Circle((92, y), 2, color=c))
+        label(ax, 97, y, tx, fs=26, color=c, ha="left", bold=c == INK)
+    label(ax, 121, 8, "for anything longer\nthan a few steps", fs=23, color=MUTED)
     save(fig, "ag_control")
 
 
@@ -658,7 +660,47 @@ def data_flow():
     save(fig, "ag_dataflow")
 
 
-JOBS = {"git_history": git_history, "venv": venv, "control": control, "circles": circles, "when_not": when_not, "sharing": sharing, "data_flow": data_flow,
+# ------------------------------------------------------------------ 2.5 speak the prompt
+def dictation():
+    fig, ax = canvas(16, 7.6, ylim=(0, 76))
+    for i, (n, v, c) in enumerate([("Typing", 40, MID), ("Speaking", 150, ACCENT)]):
+        y = 64 - i * 18
+        label(ax, 2, y, n, fs=30, color=c, ha="left", bold=True)
+        ax.add_patch(Rectangle((32, y - 6), v * 0.55, 12, fc=c, ec="none"))
+        label(ax, 32 + v * 0.55 + 2, y, f"about {v} words\nper minute", fs=24, color=c, ha="left")
+    ax.plot([2, 158], [30, 30], color=HAIR, lw=1.2)
+    for i, (os_, key) in enumerate([("Windows", "Win + H"), ("macOS", "press Fn twice")]):
+        x = 2 + i * 80
+        label(ax, x, 18, os_, fs=26, color=MUTED, ha="left")
+        label(ax, x + 30, 18, key, fs=30, color=INK, ha="left", family=MONO, bold=True)
+    label(ax, 2, 5, "then read the text before you send it", fs=24, color=HELD_C, ha="left")
+    save(fig, "ag_dictation")
+
+
+# ------------------------------------------------------------------ 3.6 the vague CNN prompt: what two agents chose (tests 22.10)
+def vibe_choices():
+    fig, ax = canvas(16, 8.6, ylim=(0, 86))
+    cols = [(2, "Not in the prompt", MUTED), (48, "Agent A", ACCENT), (86, "Agent B", ACCENT), (124, "Our recipe", CNN_C)]
+    for x, h, c in cols:
+        label(ax, x, 81, h, fs=22, color=c, bold=True, ha="left")
+    ax.plot([2, 158], [76.5, 76.5], color=HAIR, lw=1.2)
+    rows = [("Sequence length", "340, crop and pad", "375, pad", "501, pad"),
+            ("Network", "2 conv + 2 linear", "2 conv + 1 linear", "2 conv + 1 linear"),
+            ("Trainable weights", "33,729", "36,033", "2,491"),
+            ("Epochs", "8, kept epoch 6", "8", "10"),
+            ("Validation split", "10%", "10%", "none"),
+            ("Shuffled-label control", "none", "none", "asked for"),
+            ("Held-out AUROC", "0.785", "0.798", "0.866"),
+            ("Training time (CPU)", "5.5 min", "4.2 min", "1.3 min")]
+    for i, r in enumerate(rows):
+        y = 70 - i * 9
+        for (x, _, c), v in zip(cols, r):
+            bold = i == 6 and x > 2
+            label(ax, x, y, v, fs=21, color=INK if x == 2 else c, ha="left", bold=bold)
+    save(fig, "ag_vibe")
+
+
+JOBS = {"vibe_choices": vibe_choices, "dictation": dictation, "git_history": git_history, "venv": venv, "control": control, "circles": circles, "when_not": when_not, "sharing": sharing, "data_flow": data_flow,
         "git_undo": git_undo, "prompt_anatomy": prompt_anatomy, "coinflip": coinflip, "lab_skills": lab_skills,
         "checks": checks, "harness": harness, "model_prices": model_prices, "cnn_curve": cnn_curve, "chat_agent": chat_agent, "agent_loop": agent_loop, "setup_steps": setup_steps, "skill_anatomy": skill_anatomy,
         "context_window": context_window, "subagents_sessions": subagents_sessions, "lit_review": lit_review,

@@ -144,3 +144,7 @@
   padding: 0 0 0 0.8em; border-left: 3px solid #DADCE0; box-shadow: none; background: none; font-size: 0.95em; }
 .reveal .warning .cite { display: block; font-style: normal; font-size: 0.75em; color: #5F6368; margin-top: 0.2em; }
 .reveal .waiting { position: absolute; left: 0; right: 0; bottom: -2px; text-align: center; font-size: 0.5em; color: #E8710A; font-weight: 500; }
+.reveal .prompt.roomy div.sourceCode pre code, .reveal .prompt.roomy pre code { font-size: 25px !important; line-height: 1.45; }
+.reveal .prompt.large div.sourceCode pre code, .reveal .prompt.large pre code { font-size: 30px !important; line-height: 1.45; }
+.reveal .prompt-label { font-size: 0.72em; }
+.reveal .warning { font-size: 1.0em; }
