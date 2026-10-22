@@ -141,22 +141,25 @@ def context_window():
     parts = [("Instructions", 10, MID), ("Your messages", 12, INK), ("Files read", 26, ACCENT),
              ("Command output", 34, ACCENT_L)]
     for k in (0, 1):
-        fig, ax = canvas(16, 6.2, ylim=(0, 62))
-        label(ax, 2, 57, "Context window: everything the model sees right now", fs=23, bold=True, ha="left")
+        fig, ax = canvas(16, 7.6, ylim=(0, 76))
+        label(ax, 2, 72, "Before each reply the model reads all of this", fs=23, bold=True, ha="left")
         x = 2
         for n, w, c in parts:
-            ax.add_patch(Rectangle((x, 30), w * 1.56, 14, fc=c, ec="white", lw=2))
-            label(ax, x + w * 0.78, 37, n, fs=17, color="white" if c in (MID, INK, ACCENT) else INK, bold=True)
+            ax.add_patch(Rectangle((x, 46), w * 1.56, 16, fc=c, ec="white", lw=2))
+            label(ax, x + w * 0.78, 54, n, fs=18, color="white" if c in (MID, INK, ACCENT) else INK, bold=True)
             x += w * 1.56
-        ax.add_patch(Rectangle((x, 30), 158 - x, 14, fc="white", ec=HAIR, lw=2))
-        label(ax, (x + 158) / 2, 37, "free", fs=18, color=MUTED)
-        label(ax, 2, 24, "fills as the agent works; every reply reads all of it", fs=20, color=MUTED, ha="left")
+        ax.add_patch(Rectangle((x, 46), 158 - x, 16, fc="white", ec=HAIR, lw=2))
+        label(ax, (x + 158) / 2, 54, "free", fs=19, color=MUTED)
+        label(ax, 2, 40, "it fills as the agent works", fs=20, color=MUTED, ha="left")
         if k == 1:
-            ax.add_patch(Rectangle((2, 4), 24, 12, fc=MID, ec="white", lw=2))
-            label(ax, 14, 10, "summary", fs=18, color="white", bold=True)
-            ax.add_patch(Rectangle((26, 4), 132, 12, fc="white", ec=HAIR, lw=2))
-            label(ax, 92, 10, "when full: compaction, the history becomes a summary and details are lost", fs=19,
-                  color=INK)
+            label(ax, 2, 28, "Compaction", fs=27, color=HELD_C, bold=True, ha="left")
+            label(ax, 32, 28, "when it is full, the history so far is replaced by a short summary", fs=21, color=INK,
+                  ha="left")
+            arrow(ax, 152, 45, 152, 20, color=HELD_C, lw=3, ms=24)
+            ax.add_patch(Rectangle((2, 4), 30, 14, fc=HELD_C, ec="white", lw=2))
+            label(ax, 17, 11, "summary", fs=20, color="white", bold=True)
+            ax.add_patch(Rectangle((32, 4), 126, 14, fc="white", ec=HAIR, lw=2))
+            label(ax, 95, 11, "free again; exact numbers and early files may be gone", fs=19, color=MUTED)
         nm = f"ag_context_{k}"; save_raw(fig, nm); names.append(nm)
     trim_group(names)
 
@@ -492,19 +495,31 @@ def git_undo():
 
 # ------------------------------------------------------------------ 2.3 the anatomy of the first prompt
 def prompt_anatomy():
-    fig, ax = canvas(16, 8.4, ylim=(0, 84))
-    parts = [("Goal", "one scatter plot of the AGO2 RNA dataset", ACCENT),
-             ("Inputs", "the two FASTA files, their links, lower case, T for U", INK),
-             ("How", "a .venv with numpy and matplotlib; git, a commit per step", MUTED),
-             ("Definitions", "GC fraction = (G + C) / length;  U fraction = (U + T) / length", HELD_C),
-             ("Constraints", "5,000 per group, seed 0, blue and grey, random order, no windows", GOOD_C),
-             ("Done when", "gc_u.png exists", TUNED_PURPLE),
-             ("Report", "two sentences: do the groups differ?", INK)]
-    for i, (h, t, c) in enumerate(parts):
-        y = 78 - i * 11.6
-        ax.add_patch(Rectangle((2, y - 4.2), 1.4, 8.4, fc=c, ec="none"))
-        label(ax, 6, y, h, fs=23, color=c, bold=True, ha="left")
-        label(ax, 42, y, t, fs=21, color=INK, ha="left")
+    """The Task 1 prompt, each line coloured by the part it plays; the parts listed on the left."""
+    C = {"How": MUTED, "Goal": ACCENT, "Inputs": BASE["U"], "Definitions": HELD_C, "Constraints": GOOD_C,
+         "Done when": TUNED_PURPLE, "Report": INK}
+    lines = [("How", "I am new to coding agents. Work step by step ..."),
+             ("How", "Make this folder a git repository and commit after each step that works."),
+             ("Goal", "Goal: one scatter plot of the AGO2 RNA dataset."),
+             ("How", "1. Set up a Python environment with numpy and matplotlib in .venv ..."),
+             ("Inputs", "2. Download the two training files (FASTA; lower case, some use T for U):"),
+             ("Inputs", "   https://huggingface.co/.../CLIPSEQ_AGO2.train.positives.fa   (bound)"),
+             ("Inputs", "   https://huggingface.co/.../CLIPSEQ_AGO2.train.negatives.fa   (unbound)"),
+             ("Definitions", "3. GC fraction = (G + C) / length, U fraction = (U + T) / length."),
+             ("Constraints", "4. GC (x) against U (y): 5,000 per group (seed 0), bound in blue,"),
+             ("Constraints", "   unbound in grey, small transparent dots, random order. No windows."),
+             ("Done when", "5. Save the plot as gc_u.png"),
+             ("Report", "   and tell me in two sentences whether the groups differ.")]
+    fig, ax = canvas(16, 6.8, ylim=(0, 68))
+    for i, (h, c) in enumerate(C.items()):                 # the parts, on the left
+        y = 62 - i * 9.4
+        ax.add_patch(Rectangle((1, y - 3.2), 1.4, 6.4, fc=c, ec="none"))
+        label(ax, 4.5, y, h, fs=22, color=c, bold=True, ha="left")
+    ax.add_patch(Rectangle((28, 1), 132, 66, fc="#F8F9FA", ec="none"))
+    for i, (h, s) in enumerate(lines):                     # the prompt itself, on the right
+        y = 63.5 - i * 5.5
+        ax.add_patch(Rectangle((28, y - 2.75), 1.1, 5.5, fc=C[h], ec="none"))
+        label(ax, 31, y, s, fs=18, color=C[h], ha="left", family=MONO, bold=h in ("Goal", "Done when"))
     save(fig, "ag_anatomy")
 
 

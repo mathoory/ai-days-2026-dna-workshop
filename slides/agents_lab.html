@@ -207,7 +207,7 @@
 <li><a href="#/getting-started" id="/toc-getting-started">1 Getting Started</a></li>
 <li><a href="#/inside-an-agent" id="/toc-inside-an-agent">2 Inside an Agent</a></li>
 <li><a href="#/skills" id="/toc-skills">3 Skills</a></li>
-<li><a href="#/context-and-effort" id="/toc-context-and-effort">4 Context and Effort</a></li>
+<li><a href="#/limits-context-and-effort" id="/toc-limits-context-and-effort">4 Limits, Context and Effort</a></li>
 <li><a href="#/results-and-bookkeeping" id="/toc-results-and-bookkeeping">5 Results and Bookkeeping</a></li>
 <li><a href="#/on-the-gpu-server" id="/toc-on-the-gpu-server">6 On the GPU Server</a></li>
 </ul>
@@ -332,7 +332,7 @@
 </section>
 <section id="first-task" class="slide level2" data-todo="Task 1">
 <h2>1.4 First task</h2>
-<div class="prompt roomy">
+<div class="prompt mid">
 <p><span class="prompt-label">PASTE INTO THE CODE TAB NOW</span></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a href=""></a>I am new to coding agents. Work step by step and tell me briefly what you do.</span>
 <span id="cb1-2"><a href=""></a>Make this folder a git repository and commit after each step that works.</span>
@@ -521,7 +521,7 @@
 </div>
 <aside class="notes">
 <ul>
-<li>The prompt you pasted, by what each part does. Goal and inputs come first, including where the files are and what is odd about them. Then come how to work, the definitions you mean, the constraints, the end condition and what to report.</li>
+<li>This is the prompt you pasted in 1.4, each line coloured by the part it plays, with the long lines cut. Goal and inputs, including where the files are and what is odd about them. Then how to work, the definitions you mean, the constraints, the end condition and what to report.</li>
 <li>This task came first because it is small (one script, under a second of compute) and still uses every agent ability, from setting up an environment to saving a file you can see. You can check it by eye, and the answer is known: bound sequences have less GC and more U.</li>
 <li>Whatever you leave out, the agent decides for you (section 3).</li>
 <li>For anything bigger, add one line: “If anything is unclear, ask me before you start.” Then fix one thing at a time and run again.</li>
@@ -623,19 +623,29 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="not-in-the-prompt-the-agent-decides" class="slide level2">
-<h2>3.2 Not in the prompt, the agent decides</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/ag_coinflip.png" class="quarto-figure quarto-figure-center" height="675"></p>
-</figure>
+<section id="a-skill-from-the-inside" class="slide level2">
+<h2>3.2 A skill from the inside</h2>
+<div class="prompt">
+<p><span class="prompt-label">~/.claude/skills/academic-figure-skill/SKILL.md, THE FIRST LINES</span></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href=""></a>---</span>
+<span id="cb2-2"><a href=""></a>name: academic-figure-skill</span>
+<span id="cb2-3"><a href=""></a>description: Academic-grade scientific figure creation for Nature/Cell/Science journals. Use when the user</span>
+<span id="cb2-4"><a href=""></a>  asks to create, polish, review, or export scientific figures for manuscript submission. ...</span>
+<span id="cb2-5"><a href=""></a>---</span>
+<span id="cb2-6"><a href=""></a>## Design Principles</span>
+<span id="cb2-7"><a href=""></a>**1. One figure, one core message.**</span>
+<span id="cb2-8"><a href=""></a>**2. Restrained color &gt; abundant color.**</span>
+<span id="cb2-9"><a href=""></a>**3. Design for print, not screen.** Journal column widths are fixed (89 mm single, 183 mm double).</span>
+<span id="cb2-10"><a href=""></a>**4. Vector first, raster as fallback.**</span>
+<span id="cb2-11"><a href=""></a></span>
+<span id="cb2-12"><a href=""></a>## Complete Workflow</span>
+<span id="cb2-13"><a href=""></a>Follow this closed loop for every request. Never skip steps. Never assume the user's question.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <aside class="notes">
 <ul>
-<li>We gave two agents the same request for a GC and U scatter plot. Everything the prompt did not specify was set by the agent, from the number of points to the statistics.</li>
-<li>Without a skill these choices vary. Another run, or a colleague’s agent, makes different ones, as you saw when you compared plots.</li>
-<li>A skill writes the choices down once. With the figure skill every plot gets the same fonts, sizes and colours, and a statistics report.</li>
-<li>The lab’s conventions, such as our colours and our report format, belong in a skill, not in each person’s prompt.</li>
+<li>This is the top of the skill. The agent always sees the name and description, and it loads the instructions below them when a figure is requested. Excerpt from github.com/TingxiYu/academic-figure-skill (Apache-2.0).</li>
+<li>Everything below the description is a prompt someone else wrote for you. It sets fonts, sizes, colours and a fixed workflow with a confirmation step.</li>
+<li>Next you install it and use it on your own plot. Then open this file in any text editor and see which rules your figure followed.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -649,20 +659,22 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="install-one-in-a-new-session" class="slide level2">
-<h2>3.3 Install one, in a new session</h2>
+<section id="install-it-and-use-it" class="slide level2" data-todo="Skill">
+<h2>3.3 Install it and use it</h2>
 <div class="prompt large">
 <p><span class="prompt-label">NEW SESSION, SAME FOLDER: ASK YOUR AGENT</span></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href=""></a>Install the Claude Code skill at https://github.com/TingxiYu/academic-figure-skill</span>
-<span id="cb2-2"><a href=""></a>into ~/.claude/skills/academic-figure-skill (clone the repository there).</span>
-<span id="cb2-3"><a href=""></a>Then tell me what the skill does and when it will be used.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href=""></a>Install the Claude Code skill at https://github.com/TingxiYu/academic-figure-skill</span>
+<span id="cb3-2"><a href=""></a>into ~/.claude/skills/academic-figure-skill (clone the repository there).</span>
+<span id="cb3-3"><a href=""></a>Tell me what the skill does and when it will be used.</span>
+<span id="cb3-4"><a href=""></a>Then redraw gc_u.png with the skill and tell me what it changed.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <aside class="notes">
 <ul>
 <li>Open a new session in the same folder, since the first one may still be finishing Task 1. Paste this there, and use the same new session for Task 2. Section 4 explains why a new task gets a new session.</li>
 <li>The repository root is the skill folder (SKILL.md at the top), so cloning it into ~/.claude/skills installs it. By hand: git clone https://github.com/TingxiYu/academic-figure-skill ~/.claude/skills/academic-figure-skill</li>
 <li>If the agent does not list the skill afterwards, start one more new session.</li>
-<li>This skill asks you to confirm a plan for each figure, runs several rounds of checks and writes a statistics report. Answer its questions briefly.</li>
+<li>Do it yourself: the last line puts the skill to work on your Task 1 plot, so you see what it does instead of reading about it.</li>
+<li>This skill asks you to confirm a plan for each figure, runs several rounds of checks and writes a statistics report. Answer its questions briefly. If it plans to draw all points, tell it to subsample to 5,000 per group, as in gc_u.png.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -676,32 +688,51 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="read-the-skill-you-installed" class="slide level2">
-<h2>3.4 Read the skill you installed</h2>
-<div class="prompt">
-<p><span class="prompt-label">~/.claude/skills/academic-figure-skill/SKILL.md, THE FIRST LINES</span></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href=""></a>---</span>
-<span id="cb3-2"><a href=""></a>name: academic-figure-skill</span>
-<span id="cb3-3"><a href=""></a>description: Academic-grade scientific figure creation for Nature/Cell/Science journals. Use when the user</span>
-<span id="cb3-4"><a href=""></a>  asks to create, polish, review, or export scientific figures for manuscript submission. ...</span>
-<span id="cb3-5"><a href=""></a>---</span>
-<span id="cb3-6"><a href=""></a>## Design Principles</span>
-<span id="cb3-7"><a href=""></a>**1. One figure, one core message.**</span>
-<span id="cb3-8"><a href=""></a>**2. Restrained color &gt; abundant color.**</span>
-<span id="cb3-9"><a href=""></a>**3. Design for print, not screen.** Journal column widths are fixed (89 mm single, 183 mm double).</span>
-<span id="cb3-10"><a href=""></a>**4. Vector first, raster as fallback.**</span>
-<span id="cb3-11"><a href=""></a></span>
-<span id="cb3-12"><a href=""></a>## Complete Workflow</span>
-<span id="cb3-13"><a href=""></a>Follow this closed loop for every request. Never skip steps. Never assume the user's question.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="the-same-plot-with-the-skill" class="slide level2">
+<h2>3.4 The same plot, with the skill</h2>
+<div class="columns vcenter">
+<div class="column" style="width:48%;">
+<p><img data-src="assets/custom/ag_plot_plain.png" height="658"></p>
+<p><span class="caption-small">Without the skill</span></p>
+</div><div class="column" style="width:52%;">
+<p><img data-src="assets/custom/ag_plot_skill.png" height="465"></p>
+<p><span class="caption-small">With the academic figure skill</span></p>
+</div></div>
+<aside class="notes">
+<ul>
+<li>Compare these with your own two plots. If your agent is still asking to confirm the skill’s figure plan, read it before approving.</li>
+<li>An agent made both plots from the same request. With the skill the plot uses Arial at journal column width (89 mm) and has no top or right axis. The skill also wrote a PDF, a 300 dpi PNG and a statistics report.</li>
+<li>It also changed the request. The skill’s rules do not allow subsampling, so it drew all 92,346 points, and the dense middle hides the difference the left plot shows. It did not say so. If yours plans the same, tell it: “subsample to 5,000 per group, as in gc_u.png”.</li>
+<li>A skill contains someone’s taste and rules. Read one before you rely on it, and write your own for the lab’s conventions.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-skills-choices" class="slide level2">
+<h2>3.5 The skill’s choices</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_coinflip.png" class="quarto-figure quarto-figure-center" height="657"></p>
+</figure>
 </div>
 <ul>
-<li><strong>Your turn</strong>: open the file, then ask your agent “which of these rules will change my gc_u.png?”</li>
+<li><strong>A skill is a prompt you write once</strong></li>
 </ul>
 <aside class="notes">
 <ul>
-<li>This is the top of the skill. The agent always sees the name and description, and it loads the instructions below them when a figure is requested. Excerpt from github.com/TingxiYu/academic-figure-skill (Apache-2.0).</li>
-<li>Everything below the description is a prompt someone else wrote for you. It sets fonts, sizes, colours and a fixed workflow with a confirmation step.</li>
-<li>Open it in any text editor, or ask the agent to show it. Then ask the agent which rules apply to your plot. Its answer is what you will see in Task 2.</li>
+<li>We gave two agents the same request for a GC and U scatter plot. Everything the prompt did not specify was set by the agent, from the number of points to the statistics.</li>
+<li>Without a skill these choices vary. Another run, or a colleague’s agent, makes different ones, as you saw when you compared plots.</li>
+<li>A skill writes the choices down once. With the figure skill every plot gets the same fonts, sizes and colours, and a statistics report.</li>
+<li>A skill is a prompt written once and reused, so this applies to your own prompts too. Anything you type into every prompt, such as the lab’s colours or report format, belongs in a skill.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -716,7 +747,7 @@
       }</style></aside>
 </section>
 <section id="second-task-a-cnn-reported-with-the-skill" class="slide level2" data-todo="Task 2">
-<h2>3.5 Second task: a CNN, reported with the skill</h2>
+<h2>3.6 Second task: a CNN, reported with the skill</h2>
 <div class="prompt large">
 <p><span class="prompt-label">PASTE INTO THE SAME NEW SESSION</span></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb4-1"><a href=""></a>Train a small neural network that predicts from the RNA sequence whether AGO2 binds it,</span>
@@ -745,7 +776,7 @@
       }</style></aside>
 </section>
 <section id="not-in-the-prompt-the-agent-chooses" class="slide level2">
-<h2>3.6 Not in the prompt, the agent chooses</h2>
+<h2>3.7 Not in the prompt, the agent chooses</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/ag_vibe.png" class="quarto-figure quarto-figure-center" height="720"></p>
@@ -770,13 +801,39 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="context-and-effort" class="title-slide slide level1 center" data-name="Context">
-<h1>4 Context and Effort</h1>
+<section id="limits-context-and-effort" class="title-slide slide level1 center" data-name="Limits">
+<h1>4 Limits, Context and Effort</h1>
 
 </section>
 
+<section id="limits-and-when-not-to-use-an-agent" class="slide level2">
+<h2>4.1 Limits, and when not to use an agent</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_whennot.png" class="quarto-figure quarto-figure-center" height="725"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Ask the four questions in order. If none stops you, use the agent.</li>
+<li>/usage in the Code tab shows how much of the current budget is used.</li>
+<li>A long autonomous run with five subagents on the top model can use a day’s budget in an hour.</li>
+<li>If you cannot tell a right answer from a wrong one, the agent’s speed does not help.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="the-context-window" class="slide level2">
-<h2>4.1 The context window</h2>
+<h2>4.2 The context window</h2>
 <div class="dict mini">
 <p><span class="head">context window</span><span class="pos">noun</span> <span class="domain">(language models)</span> Everything the model reads before each reply: instructions, the conversation, files opened, command output. It has a fixed size.</p>
 </div>
@@ -809,7 +866,7 @@
       }</style></aside>
 </section>
 <section id="subagents-and-new-sessions" class="slide level2">
-<h2>4.2 Subagents and new sessions</h2>
+<h2>4.3 Subagents and new sessions</h2>
 <div class="dict mini">
 <p><span class="head">subagent</span><span class="pron">/ˈsʌbˌeɪ.dʒənt/</span><span class="pos">noun</span> <span class="domain">(agents)</span> A helper the agent starts for one part of a task, with its own empty context, that returns only a short result.</p>
 </div>
@@ -836,7 +893,7 @@
       }</style></aside>
 </section>
 <section id="reasoning-effort" class="slide level2">
-<h2>4.3 Reasoning effort</h2>
+<h2>4.4 Reasoning effort</h2>
 <div class="dict mini">
 <p><span class="head">effort</span><span class="pron">/ˈef.ət/</span><span class="pos">noun</span> <span class="domain">(agents)</span> How much the model thinks before each step. It is set from low to max.</p>
 </div>
@@ -855,32 +912,6 @@
 <li>Medium is where to be most of the time: it handles scripts, plots, edits and new analyses well and fast. Low is enough for small, mechanical edits.</li>
 <li>Higher effort is not better by default. It is slower, uses more of the seat’s limits and can overthink simple tasks. Raise it for a bug the agent keeps failing on, or for a design decision you will build on.</li>
 <li>The bars show the direction, not measured values.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="limits-and-when-not-to-use-an-agent" class="slide level2">
-<h2>4.4 Limits, and when not to use an agent</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/custom/ag_whennot.png" class="quarto-figure quarto-figure-center" height="725"></p>
-</figure>
-</div>
-<aside class="notes">
-<ul>
-<li>Ask the four questions in order. If none stops you, use the agent.</li>
-<li>/usage in the Code tab shows how much of the current budget is used.</li>
-<li>A long autonomous run with five subagents on the top model can use a day’s budget in an hour.</li>
-<li>If you cannot tell a right answer from a wrong one, the agent’s speed does not help.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -925,37 +956,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-same-plot-with-the-skill" class="slide level2">
-<h2>5.2 The same plot, with the skill</h2>
-<div class="columns vcenter">
-<div class="column" style="width:48%;">
-<p><img data-src="assets/custom/ag_plot_plain.png" height="658"></p>
-<p><span class="caption-small">Without the skill</span></p>
-</div><div class="column" style="width:52%;">
-<p><img data-src="assets/custom/ag_plot_skill.png" height="465"></p>
-<p><span class="caption-small">With the academic figure skill</span></p>
-</div></div>
-<aside class="notes">
-<ul>
-<li>Your agent is probably asking now to confirm the skill’s figure plan. Read it before approving.</li>
-<li>An agent made both plots from the same request. With the skill the plot uses Arial at journal column width (89 mm) and has no top or right axis. The skill also wrote a PDF, a 300 dpi PNG and a statistics report.</li>
-<li>It also changed the request. The skill’s rules do not allow subsampling, so it drew all 92,346 points, and the dense middle hides the difference the left plot shows. It did not say so. If yours plans the same, tell it: “subsample to 5,000 per group, as in gc_u.png”.</li>
-<li>A skill contains someone’s taste and rules. Read one before you rely on it, and write your own for the lab’s conventions.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
 <section id="claude.md-the-lab-template" class="slide level2">
-<h2>5.3 CLAUDE.md: the lab template</h2>
+<h2>5.2 CLAUDE.md: the lab template</h2>
 <div class="prompt roomy">
 <p><span class="prompt-label">CLAUDE.md, READ AT THE START OF EVERY SESSION</span></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a href=""></a># Project: &lt;one line: the question&gt;</span>
@@ -991,7 +993,7 @@
       }</style></aside>
 </section>
 <section id="your-results" class="slide level2">
-<h2>5.4 Your results</h2>
+<h2>5.3 Your results</h2>
 <div class="r-stack">
 <p><img data-src="assets/custom/ag_cnn_curve.png" height="673"></p>
 <p><img data-src="assets/custom/ag_checks.png" class="fragment" height="673"></p>

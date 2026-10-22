@@ -75,7 +75,7 @@ These terms, and the tools in this tutorial, have **not been reviewed or approve
 
 ## 1.4 First task {data-todo="Task 1"}
 
-::: {.prompt .roomy}
+::: {.prompt .mid}
 [PASTE INTO THE CODE TAB NOW]{.prompt-label}
 
 ```text
@@ -185,7 +185,7 @@ Goal: one scatter plot of the AGO2 RNA dataset.
 ![](assets/custom/ag_anatomy.png){.fragment fig-align="center" height="650px"}
 
 ::: {.notes}
-- The prompt you pasted, by what each part does. Goal and inputs come first, including where the files are and what is odd about them. Then come how to work, the definitions you mean, the constraints, the end condition and what to report.
+- This is the prompt you pasted in 1.4, each line coloured by the part it plays, with the long lines cut. Goal and inputs, including where the files are and what is odd about them. Then how to work, the definitions you mean, the constraints, the end condition and what to report.
 - This task came first because it is small (one script, under a second of compute) and still uses every agent ability, from setting up an environment to saving a file you can see. You can check it by eye, and the answer is known: bound sequences have less GC and more U.
 - Whatever you leave out, the agent decides for you (section 3).
 - For anything bigger, add one line: "If anything is unclear, ask me before you start." Then fix one thing at a time and run again.
@@ -231,37 +231,7 @@ Goal: one scatter plot of the AGO2 RNA dataset.
 - Personal skills live in ~/.claude/skills. A project's skills live in its .claude/skills folder, shared with everyone who uses the project.
 :::
 
-## 3.2 Not in the prompt, the agent decides
-
-![](assets/custom/ag_coinflip.png){fig-align="center" height="675px"}
-
-::: {.notes}
-- We gave two agents the same request for a GC and U scatter plot. Everything the prompt did not specify was set by the agent, from the number of points to the statistics.
-- Without a skill these choices vary. Another run, or a colleague's agent, makes different ones, as you saw when you compared plots.
-- A skill writes the choices down once. With the figure skill every plot gets the same fonts, sizes and colours, and a statistics report.
-- The lab's conventions, such as our colours and our report format, belong in a skill, not in each person's prompt.
-:::
-
-## 3.3 Install one, in a new session
-
-::: {.prompt .large}
-[NEW SESSION, SAME FOLDER: ASK YOUR AGENT]{.prompt-label}
-
-```text
-Install the Claude Code skill at https://github.com/TingxiYu/academic-figure-skill
-into ~/.claude/skills/academic-figure-skill (clone the repository there).
-Then tell me what the skill does and when it will be used.
-```
-:::
-
-::: {.notes}
-- Open a new session in the same folder, since the first one may still be finishing Task 1. Paste this there, and use the same new session for Task 2. Section 4 explains why a new task gets a new session.
-- The repository root is the skill folder (SKILL.md at the top), so cloning it into ~/.claude/skills installs it. By hand: git clone https://github.com/TingxiYu/academic-figure-skill ~/.claude/skills/academic-figure-skill
-- If the agent does not list the skill afterwards, start one more new session.
-- This skill asks you to confirm a plan for each figure, runs several rounds of checks and writes a statistics report. Answer its questions briefly.
-:::
-
-## 3.4 Read the skill you installed
+## 3.2 A skill from the inside
 
 ::: {.prompt}
 [~/.claude/skills/academic-figure-skill/SKILL.md, THE FIRST LINES]{.prompt-label}
@@ -283,15 +253,69 @@ Follow this closed loop for every request. Never skip steps. Never assume the us
 ```
 :::
 
-- **Your turn**: open the file, then ask your agent "which of these rules will change my gc_u.png?"
-
 ::: {.notes}
 - This is the top of the skill. The agent always sees the name and description, and it loads the instructions below them when a figure is requested. Excerpt from github.com/TingxiYu/academic-figure-skill (Apache-2.0).
 - Everything below the description is a prompt someone else wrote for you. It sets fonts, sizes, colours and a fixed workflow with a confirmation step.
-- Open it in any text editor, or ask the agent to show it. Then ask the agent which rules apply to your plot. Its answer is what you will see in Task 2.
+- Next you install it and use it on your own plot. Then open this file in any text editor and see which rules your figure followed.
 :::
 
-## 3.5 Second task: a CNN, reported with the skill {data-todo="Task 2"}
+## 3.3 Install it and use it {data-todo="Skill"}
+
+::: {.prompt .large}
+[NEW SESSION, SAME FOLDER: ASK YOUR AGENT]{.prompt-label}
+
+```text
+Install the Claude Code skill at https://github.com/TingxiYu/academic-figure-skill
+into ~/.claude/skills/academic-figure-skill (clone the repository there).
+Tell me what the skill does and when it will be used.
+Then redraw gc_u.png with the skill and tell me what it changed.
+```
+:::
+
+::: {.notes}
+- Open a new session in the same folder, since the first one may still be finishing Task 1. Paste this there, and use the same new session for Task 2. Section 4 explains why a new task gets a new session.
+- The repository root is the skill folder (SKILL.md at the top), so cloning it into ~/.claude/skills installs it. By hand: git clone https://github.com/TingxiYu/academic-figure-skill ~/.claude/skills/academic-figure-skill
+- If the agent does not list the skill afterwards, start one more new session.
+- Do it yourself: the last line puts the skill to work on your Task 1 plot, so you see what it does instead of reading about it.
+- This skill asks you to confirm a plan for each figure, runs several rounds of checks and writes a statistics report. Answer its questions briefly. If it plans to draw all points, tell it to subsample to 5,000 per group, as in gc_u.png.
+:::
+
+## 3.4 The same plot, with the skill
+
+:::: {.columns .vcenter}
+::: {.column width="48%"}
+![](assets/custom/ag_plot_plain.png){height="658px"}
+
+[Without the skill]{.caption-small}
+:::
+::: {.column width="52%"}
+![](assets/custom/ag_plot_skill.png){height="465px"}
+
+[With the academic figure skill]{.caption-small}
+:::
+::::
+
+::: {.notes}
+- Compare these with your own two plots. If your agent is still asking to confirm the skill's figure plan, read it before approving.
+- An agent made both plots from the same request. With the skill the plot uses Arial at journal column width (89 mm) and has no top or right axis. The skill also wrote a PDF, a 300 dpi PNG and a statistics report.
+- It also changed the request. The skill's rules do not allow subsampling, so it drew all 92,346 points, and the dense middle hides the difference the left plot shows. It did not say so. If yours plans the same, tell it: "subsample to 5,000 per group, as in gc_u.png".
+- A skill contains someone's taste and rules. Read one before you rely on it, and write your own for the lab's conventions.
+:::
+
+## 3.5 The skill's choices
+
+![](assets/custom/ag_coinflip.png){fig-align="center" height="657px"}
+
+- **A skill is a prompt you write once**
+
+::: {.notes}
+- We gave two agents the same request for a GC and U scatter plot. Everything the prompt did not specify was set by the agent, from the number of points to the statistics.
+- Without a skill these choices vary. Another run, or a colleague's agent, makes different ones, as you saw when you compared plots.
+- A skill writes the choices down once. With the figure skill every plot gets the same fonts, sizes and colours, and a statistics report.
+- A skill is a prompt written once and reused, so this applies to your own prompts too. Anything you type into every prompt, such as the lab's colours or report format, belongs in a skill.
+:::
+
+## 3.6 Second task: a CNN, reported with the skill {data-todo="Task 2"}
 
 ::: {.prompt .large}
 [PASTE INTO THE SAME NEW SESSION]{.prompt-label}
@@ -312,7 +336,7 @@ and the results. Show me your plan before you start.
 - PyTorch takes a few minutes to install, and training then a few minutes more. We go on while it runs.
 :::
 
-## 3.6 Not in the prompt, the agent chooses
+## 3.7 Not in the prompt, the agent chooses
 
 ![](assets/custom/ag_vibe.png){fig-align="center" height="720px"}
 
@@ -324,10 +348,21 @@ and the results. Show me your plan before you start.
 :::
 
 ::: {.center}
-# 4 Context and Effort {data-name="Context"}
+# 4 Limits, Context and Effort {data-name="Limits"}
 :::
 
-## 4.1 The context window
+## 4.1 Limits, and when not to use an agent
+
+![](assets/custom/ag_whennot.png){fig-align="center" height="725px"}
+
+::: {.notes}
+- Ask the four questions in order. If none stops you, use the agent.
+- /usage in the Code tab shows how much of the current budget is used.
+- A long autonomous run with five subagents on the top model can use a day's budget in an hour.
+- If you cannot tell a right answer from a wrong one, the agent's speed does not help.
+:::
+
+## 4.2 The context window
 
 ::: {.dict .mini}
 [context window]{.head}[noun]{.pos} [(language models)]{.domain} Everything the model reads before each reply: instructions, the conversation, files opened, command output. It has a fixed size.
@@ -351,7 +386,7 @@ and the results. Show me your plan before you start.
 - Click: when the window is full, the history is compacted into a summary. Details that were in it, such as exact numbers or a file you showed early, may be gone after that. So Task 2 runs in a new session.
 :::
 
-## 4.2 Subagents and new sessions
+## 4.3 Subagents and new sessions
 
 ::: {.dict .mini}
 [subagent]{.head}[/ˈsʌbˌeɪ.dʒənt/]{.pron}[noun]{.pos} [(agents)]{.domain} A helper the agent starts for one part of a task, with its own empty context, that returns only a short result.
@@ -369,7 +404,7 @@ and the results. Show me your plan before you start.
 - Shared files in the project (the wiki, part 2) keep sessions and people in sync.
 :::
 
-## 4.3 Reasoning effort
+## 4.4 Reasoning effort
 
 ::: {.dict .mini}
 [effort]{.head}[/ˈef.ət/]{.pron}[noun]{.pos} [(agents)]{.domain} How much the model thinks before each step. It is set from low to max.
@@ -387,17 +422,6 @@ and the results. Show me your plan before you start.
 - The bars show the direction, not measured values.
 :::
 
-## 4.4 Limits, and when not to use an agent
-
-![](assets/custom/ag_whennot.png){fig-align="center" height="725px"}
-
-::: {.notes}
-- Ask the four questions in order. If none stops you, use the agent.
-- /usage in the Code tab shows how much of the current budget is used.
-- A long autonomous run with five subagents on the top model can use a day's budget in an hour.
-- If you cannot tell a right answer from a wrong one, the agent's speed does not help.
-:::
-
 ::: {.center}
 # 5 Results and Bookkeeping {data-name="Results"}
 :::
@@ -413,29 +437,7 @@ and the results. Show me your plan before you start.
 - The lab's research-workflow skill runs projects this way (part 2).
 :::
 
-## 5.2 The same plot, with the skill
-
-:::: {.columns .vcenter}
-::: {.column width="48%"}
-![](assets/custom/ag_plot_plain.png){height="658px"}
-
-[Without the skill]{.caption-small}
-:::
-::: {.column width="52%"}
-![](assets/custom/ag_plot_skill.png){height="465px"}
-
-[With the academic figure skill]{.caption-small}
-:::
-::::
-
-::: {.notes}
-- Your agent is probably asking now to confirm the skill's figure plan. Read it before approving.
-- An agent made both plots from the same request. With the skill the plot uses Arial at journal column width (89 mm) and has no top or right axis. The skill also wrote a PDF, a 300 dpi PNG and a statistics report.
-- It also changed the request. The skill's rules do not allow subsampling, so it drew all 92,346 points, and the dense middle hides the difference the left plot shows. It did not say so. If yours plans the same, tell it: "subsample to 5,000 per group, as in gc_u.png".
-- A skill contains someone's taste and rules. Read one before you rely on it, and write your own for the lab's conventions.
-:::
-
-## 5.3 CLAUDE.md: the lab template
+## 5.2 CLAUDE.md: the lab template
 
 ::: {.prompt .roomy}
 [CLAUDE.md, READ AT THE START OF EVERY SESSION]{.prompt-label}
@@ -463,7 +465,7 @@ phases/NN_name/ plan.md and report.md per phase
 - Keep it to one screen. It is read in every session and uses context.
 :::
 
-## 5.4 Your results
+## 5.3 Your results
 
 ::: {.r-stack}
 ![](assets/custom/ag_cnn_curve.png){height="673px"}
