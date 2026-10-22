@@ -205,7 +205,7 @@
 <h2 id="toc-title">Table of contents</h2>
 <ul>
 <li><a href="#/getting-started" id="/toc-getting-started">1 Getting Started</a></li>
-<li><a href="#/how-an-agent-works" id="/toc-how-an-agent-works">2 How an Agent Works</a></li>
+<li><a href="#/inside-an-agent" id="/toc-inside-an-agent">2 Inside an Agent</a></li>
 <li><a href="#/skills" id="/toc-skills">3 Skills</a></li>
 <li><a href="#/context-and-effort" id="/toc-context-and-effort">4 Context and Effort</a></li>
 <li><a href="#/results-and-bookkeeping" id="/toc-results-and-bookkeeping">5 Results and Bookkeeping</a></li>
@@ -217,17 +217,17 @@
 <h2>Before we start</h2>
 <div class="warning">
 <p><span class="alarm">Not approved by the Technion. Data you give an agent leaves your computer and may be exposed.</span></p>
-<p>The lab’s Claude seats run under Anthropic’s commercial terms. Anthropic’s documentation for these plans states:</p>
+<p>Anthropic, for the lab’s commercial seats:</p>
 <blockquote>
-<p>Anthropic does not train generative models using code or prompts sent to Claude Code under commercial terms. <span class="cite">Anthropic, Claude Code documentation, Data usage; standard retention for commercial users: 30 days</span></p>
+<p>Anthropic does not train generative models using code or prompts sent to Claude Code under commercial terms. <span class="cite">Anthropic, Claude Code documentation, Data usage. Standard retention for commercial users is 30 days.</span></p>
 </blockquote>
 <p>These terms, and the tools in this tutorial, have <strong>not been reviewed or approved by the Technion</strong>. Their use is at the <strong>sole responsibility of the user</strong>.</p>
 </div>
 <aside class="notes">
 <ul>
-<li>Everything the agent reads (files, command output, your prompts) is sent to Anthropic to be processed and kept for 30 days under the commercial terms; transcripts are also stored in plain text on your own computer.</li>
-<li>No training on our data is Anthropic’s statement about its own plan. Nobody at the Technion has checked it against Technion policy.</li>
-<li>So: public data only today. Before using an agent on unpublished or patentable lab data, ask Roee.</li>
+<li>Everything the agent reads (files, command output, your prompts) is sent to Anthropic and kept for 30 days under the commercial terms. Transcripts are also stored in plain text on your own computer.</li>
+<li>The statement about training is Anthropic’s, about its own plan. Nobody at the Technion has checked it against Technion policy.</li>
+<li>Today we use public data only. Before using an agent on unpublished or patentable lab data, ask Roee.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -261,8 +261,8 @@
 <aside class="notes">
 <ul>
 <li>Open Claude Desktop now, sign in with your lab seat, and open the Code tab in an empty folder. The first task comes in two slides.</li>
-<li>Sense 2 is the one for today. Three parts: a goal, actions it chooses itself, and observation of what happened.</li>
-<li>Russell and Norvig’s definition is the textbook one. For a coding agent the sensors are files and command output; the actuators are writing files and running commands.</li>
+<li>Sense 2 is the one for today. The agent chooses its own actions toward a goal and observes what each one did.</li>
+<li>Russell and Norvig’s definition is the textbook one. For a coding agent the sensors are files and command output. The actuators are writing files and running commands.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -284,10 +284,10 @@
 </div>
 <aside class="notes">
 <ul>
-<li>A chatbot (ChatGPT in a browser) only returns text. You are the one who runs the code, sees the error and pastes it back.</li>
-<li>Click: an agent is an application around the same kind of language model, with permission to act on your computer: read and write files, run commands, run Python, search the web, connect to a server.</li>
-<li>It sees the result of each action itself, so the copy-run-paste loop disappears.</li>
-<li>It asks before actions you have not allowed yet. It does not judge which actions are risky; you do, when you approve.</li>
+<li>A chatbot (ChatGPT in a browser) only returns text. You run the code yourself, see the error and paste it back.</li>
+<li>Click: an agent puts the same kind of language model inside an application that may act on your computer. It can read and write files and run commands, Python included. It can also search the web or connect to a server.</li>
+<li>It sees the result of each action itself. You no longer carry errors back and forth.</li>
+<li>It asks before actions you have not allowed yet. It does not judge which actions are risky. You do, when you approve.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -313,10 +313,10 @@
 </ul>
 <aside class="notes">
 <ul>
-<li>Claude Desktop runs on Windows and macOS. The Code tab is the coding agent (Claude Code); the Chat tab is the chatbot. Sign in with your lab seat.</li>
+<li>Claude Desktop runs on Windows and macOS. The Code tab is the coding agent (Claude Code), and the Chat tab is the chatbot. Sign in with your lab seat.</li>
 <li>On Windows the Code tab needs Git for Windows and Python from python.org (with the py launcher). Install both before the session.</li>
-<li>Open an empty folder, for example ago2-agents on the desktop. The agent can read and write inside it.</li>
-<li>The data: 48,095 RNA sequences bound by AGO2 (CLIP-seq) and 44,251 unbound sequences from the same genes, plus 1,000 held-out sequences. The agent downloads them itself.</li>
+<li>Open an empty folder, such as ago2-agents on the desktop. The agent can read and write inside it.</li>
+<li>The data are 48,095 RNA sequences bound by AGO2 (CLIP-seq) and 44,251 unbound sequences from the same genes, plus 1,000 held-out sequences. The agent downloads them itself.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -350,8 +350,8 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Paste it now; it runs while we go on. Approve the steps as they come: three or four approvals (environment, install, download, run).</li>
-<li>Each line closes a gap we hit when we tested this prompt with an agent: Python on Windows, lower-case letters and T in some sequences, how many dots, which colour lands on top, a plot window that blocks the agent.</li>
+<li>Paste it now. It runs while we go on. Expect three or four approvals (environment, install, download, run), and approve them as they come.</li>
+<li>Each line fixes a problem an agent had when we tested this prompt: Python on Windows, lower-case letters, T in some sequences, how many dots, which colour is drawn on top, and a plot window that blocks the agent.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -365,27 +365,86 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="how-an-agent-works" class="title-slide slide level1 center" data-name="Agents">
-<h1>2 How an Agent Works</h1>
+<section id="git-the-projects-history" class="slide level2">
+<h2>1.5 Git: the project’s history</h2>
+<div class="dict mini">
+<p><span class="head">git</span><span class="pron">/ɡɪt/</span><span class="pos">noun</span> <span class="domain">(computing)</span> A program that records every version of a project’s files, with what changed, when and why.</p>
+</div>
+<div class="r-stack">
+<p><img data-src="assets/custom/ag_githistory.png" class="fragment" height="429"></p>
+<p><img data-src="assets/custom/ag_git.png" class="fragment" height="429"></p>
+</div>
+<aside class="notes">
+<ul>
+<li>Your prompt asked the agent to commit after every step that works. Each commit is a snapshot of all files with a message saying what was done.</li>
+<li>git log lists the commits, newest first. git diff shows what changed between two of them, line by line: here the fix that turned a count of the pair “GC” into a count of G plus C.</li>
+<li>With an agent this record matters more than without one. The agent changes many files quickly, and the log is how you see what it did and in which order.</li>
+<li>Click: the undo button. When a later step breaks something, going back to the last commit that worked is one command, and the agent can run it. The harness can also rewind its own file edits, but not files changed by a script it ran. Git covers both.</li>
+<li>Keep data out of git by adding the data files and .venv to .gitignore.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="virtual-environments" class="slide level2">
+<h2>1.6 Virtual environments</h2>
+<div class="dict mini">
+<p><span class="head">virtual environment</span><span class="pos">noun</span> <span class="domain">(Python)</span> A folder with its own Python and its own packages, used by one project only.</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_venv.png" class="fragment quarto-figure quarto-figure-center" height="623"></p>
+</figure>
+</div>
+<aside class="notes">
+<ul>
+<li>Your prompt asked for a .venv folder. Everything the agent installs for this project goes there, not into the Python of your computer.</li>
+<li>Different projects can then use different versions of the same package, such as numpy 1.26 for an old analysis and numpy 2.1 for a new one, without breaking each other.</li>
+<li>The agent installs freely inside .venv, and deleting the folder removes all of it. Write the versions to requirements.txt and the environment can be rebuilt on another computer.</li>
+<li>conda does the same, and can also install Python itself and tools that are not Python packages, such as CUDA libraries or samtools. On the GPU server the lab uses conda environments.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="inside-an-agent" class="title-slide slide level1 center" data-name="Agents">
+<h1>2 Inside an Agent</h1>
 
 </section>
 
 <section id="model-and-harness" class="slide level2">
 <h2>2.1 Model and harness</h2>
 <div class="dict mini">
-<p><span class="head">harness</span><span class="pron">/ˈhɑːr.nɪs/</span><span class="pos">noun</span> <span class="domain">(computing)</span> The program around a language model that runs its tools, asks your permission, manages its context and loads its skills.</p>
+<p><span class="head">harness</span><span class="pron">/ˈhɑːr.nɪs/</span><span class="pos">noun</span> <span class="domain">(computing)</span> The program around a language model that runs its tools and asks your permission. It also manages the context and loads skills.</p>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_harness.png" class="quarto-figure quarto-figure-center" height="650"></p>
+<p><img data-src="assets/custom/ag_harness.png" class="fragment quarto-figure quarto-figure-center" height="650"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>An agent has two parts. The language model reads everything in its context and chooses the next step. The harness is everything around it, and it is what you see on your screen right now.</li>
-<li>Claude Code (the Code tab of Claude Desktop) is Anthropic’s harness; Codex is OpenAI’s. Each runs its company’s models: Fable, Opus, Sonnet and Haiku in Claude Code; GPT-6 Astra, Sol and Luna in Codex. Part 2 compares them.</li>
-<li>The two are chosen separately: in the same harness you can switch to a smaller model for routine work and a larger one for hard problems.</li>
-<li>Most of today is about the harness: skills, context, sessions, permissions. Those carry over when the models change.</li>
+<li>One real step of your first task, as messages. The harness (black) sends the model (blue) your prompt, CLAUDE.md and the list of tools it may use. The model’s reply is a tool call, here Bash(“python gc_u.py”). The harness asks you, runs it and sends back the output, a FileNotFoundError. The model’s next answer is an edit that fixes the path.</li>
+<li>The model only ever writes text. Every action on your computer is carried out by the harness, and the harness is what you see on your screen right now.</li>
+<li>Claude Code (the Code tab of Claude Desktop) is Anthropic’s harness, and Codex is OpenAI’s. Each runs its company’s models. Claude Code runs Fable, Opus, Sonnet and Haiku, Codex runs GPT-6 Astra, Sol and Luna. Part 2 compares them.</li>
+<li>Model and harness are chosen separately. In the same harness you can switch to a smaller model for routine work and a larger one for hard problems.</li>
+<li>Most of today is about the harness, and that knowledge carries over when the models change.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -408,9 +467,9 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Yours is doing this now. Every agent works in this loop: plan the next step, act (write a file, run a command), observe the output, plan again.</li>
-<li>The example is from a real run of today’s first task: the script failed on a wrong path, the agent read the error, fixed the path and ran again, without us.</li>
-<li>It stops when the goal is reached, or when it needs a decision from you.</li>
+<li>Yours is doing this now. Every agent repeats one cycle. It plans a step and acts on it, then reads the output before planning the next.</li>
+<li>The example is from a real run of today’s first task. The script failed on a wrong path. After reading the error the agent fixed the path and reran the script, without us.</li>
+<li>It stops when the goal is reached or when it needs a decision from you.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -426,47 +485,17 @@
 </section>
 <section id="you-stay-in-control" class="slide level2">
 <h2>2.3 You stay in control</h2>
-<ul>
-<li><strong>Permissions</strong>: the agent asks before it runs a command or edits a file; allow once, always, or deny</li>
-<li><strong>Plan mode</strong>: the mode menu under the prompt box; the agent only reads and proposes until you accept its plan</li>
-<li><strong>One folder per project</strong>: the agent works where you open it</li>
-<li><strong>Read what it did</strong>: each command and each changed file is shown</li>
-</ul>
-<aside class="notes">
-<ul>
-<li>These are the requests popping up on your screens now. In the beginning, approve each step and read it. Later, allow routine actions (editing files in the project folder) and keep asking for the rest.</li>
-<li>A permission covers a command, not what the command does: once you allow <code>python</code>, any script it writes can delete files. Read the script, or keep the folder under git (next slide).</li>
-<li>Plan mode is the safest way to start anything longer than a few steps. Or write in the prompt: “show me your plan and wait for my OK”.</li>
-<li>Never give an agent a folder that holds the only copy of your data.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="git-is-the-undo-button" class="slide level2">
-<h2>2.4 Git is the undo button</h2>
-<div class="dict mini">
-<p><span class="head">commit</span><span class="pron">/kəˈmɪt/</span><span class="pos">noun</span> <span class="domain">(git)</span> A saved snapshot of every file in the project, which you can return to later.</p>
-</div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_git.png" class="quarto-figure quarto-figure-center" height="429"></p>
+<p><img data-src="assets/custom/ag_control.png" class="quarto-figure quarto-figure-center" height="565"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>Your first prompt asked the agent to make the folder a git repository and to commit after every step that works: look for “git commit” among its steps.</li>
-<li>When a later step breaks something, “go back to the last commit that worked” is one command, and the agent can run it.</li>
-<li>The harness can also rewind its own file edits, but not files changed by a script it ran. Git covers both.</li>
-<li>Keep data out of git: add the data files and .venv to .gitignore.</li>
+<li>These are the requests on your screens now. Each one shows the command. Allow it once, always, or deny it. At first, approve each step and read it. Later, allow routine actions such as editing files in the project folder, and keep asking for the rest.</li>
+<li>A permission covers a command, not what the command does. Once you allow <code>python</code>, any script it writes can delete files. Read the script, or keep the folder under git (slide 1.5).</li>
+<li>Plan mode is the safest way to start anything longer than a few steps. You can also write in the prompt: “show me your plan and wait for my OK”.</li>
+<li>Never give an agent a folder with the only copy of your data.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -481,20 +510,20 @@
       }</style></aside>
 </section>
 <section id="anatomy-of-a-prompt" class="slide level2">
-<h2>2.5 Anatomy of a prompt</h2>
+<h2>2.4 Anatomy of a prompt</h2>
 <div class="dict mini">
 <p><span class="head">prompt</span><span class="pron">/prɒmpt/</span><span class="pos">noun</span> <span class="domain">(computing)</span> The instruction you give the agent: what to do, with what, how, and when it is done.</p>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_anatomy.png" class="quarto-figure quarto-figure-center" height="650"></p>
+<p><img data-src="assets/custom/ag_anatomy.png" class="fragment quarto-figure quarto-figure-center" height="650"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>The prompt you pasted, by what each part does. A goal, the inputs with where they are and what is odd about them, how to work, the definitions you mean, the constraints, when it is done, and what to report.</li>
-<li>Why this task first: it is small (one script, under a second of compute), it uses every agent ability (environment, download, parsing, code, running, a file you can see), you can check it by eye, and the answer is known: bound sequences have less GC and more U.</li>
-<li>The parts you leave out, the agent decides for you (section 3).</li>
+<li>The prompt you pasted, by what each part does. Goal and inputs come first, including where the files are and what is odd about them. Then come how to work, the definitions you mean, the constraints, the end condition and what to report.</li>
+<li>This task came first because it is small (one script, under a second of compute) and still uses every agent ability, from setting up an environment to saving a file you can see. You can check it by eye, and the answer is known: bound sequences have less GC and more U.</li>
+<li>Whatever you leave out, the agent decides for you (section 3).</li>
 <li>For anything bigger, add one line: “If anything is unclear, ask me before you start.” Then fix one thing at a time and run again.</li>
 </ul>
 <style type="text/css">
@@ -510,7 +539,7 @@
       }</style></aside>
 </section>
 <section id="compare-yours" class="slide level2">
-<h2>2.6 Compare yours</h2>
+<h2>2.5 Compare yours</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="assets/custom/ag_plot_plain.png" class="quarto-figure quarto-figure-center" height="765"></p>
@@ -518,10 +547,10 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Open your gc_u.png and show it to your neighbour. This one is an agent’s result from our test run: mean GC fraction 0.41 bound against 0.45 unbound, mean U fraction 0.31 against 0.29.</li>
-<li>The two groups overlap along one diagonal band: GC and U alone separate them only weakly.</li>
-<li>Same prompt, but look at the differences between your plots: fonts, sizes, legend, title. That is the next section.</li>
-<li>Not done yet? Answer its open question; it will finish while we go on.</li>
+<li>Open your gc_u.png and show it to your neighbour. This one is an agent’s result from our test run, with mean GC fraction 0.41 bound against 0.45 unbound and mean U fraction 0.31 against 0.29.</li>
+<li>Bound and unbound overlap along one diagonal band, so GC and U alone separate them only weakly.</li>
+<li>Look at the differences between your plots from the same prompt, in fonts, sizes, legend and title. Section 3 is about those.</li>
+<li>If yours is not done, answer its open question. It will finish while we go on.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -540,21 +569,21 @@
 
 </section>
 
-<section id="what-a-skill-is" class="slide level2">
-<h2>3.1 What a skill is</h2>
+<section id="anatomy-of-a-skill" class="slide level2">
+<h2>3.1 Anatomy of a skill</h2>
 <div class="dict mini">
 <p><span class="head">skill</span><span class="pron">/skɪl/</span><span class="pos">noun</span> <span class="domain">(agents)</span> A folder of instructions, and the files they need, that the agent loads when a task matches it: a reusable prompt.</p>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_skill.png" class="quarto-figure quarto-figure-center" height="650"></p>
+<p><img data-src="assets/custom/ag_skill.png" class="fragment quarto-figure quarto-figure-center" height="650"></p>
 </figure>
 </div>
 <aside class="notes">
 <ul>
-<li>A skill is a folder: a SKILL.md with instructions, plus any reference documents and scripts it needs. Written once, used in every session.</li>
-<li>The agent always sees the skill’s name and one-line description. When a task matches the description, it loads the instructions; references and scripts only when needed. So many skills cost almost nothing until used.</li>
-<li>Personal skills live in ~/.claude/skills; a project’s skills in its .claude/skills folder, shared with everyone who uses the project.</li>
+<li>A skill is a folder with a SKILL.md of instructions, plus any reference documents and scripts it needs. It is written once and used in every session.</li>
+<li>The agent always sees the skill’s name and one-line description. When a task matches the description, it loads the instructions. It reads references and runs scripts only when needed, so many installed skills cost almost nothing until used.</li>
+<li>Personal skills live in ~/.claude/skills. A project’s skills live in its .claude/skills folder, shared with everyone who uses the project.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -577,10 +606,10 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Two agents, the same request for a GC and U scatter plot. Everything the prompt did not say, each agent decided on its own: how many points, colours, font, size, legend, statistics.</li>
-<li>Without a skill, these are coin flips: another run, or another person’s agent, makes other choices. You saw it when you compared plots.</li>
-<li>A skill writes the choices down once. With the figure skill every plot gets the same fonts, sizes and colours, and a statistics report, every time.</li>
-<li>The lab’s conventions (our colours, our report format) belong in a skill, not in each person’s prompt.</li>
+<li>We gave two agents the same request for a GC and U scatter plot. Everything the prompt did not specify was set by the agent, from the number of points to the statistics.</li>
+<li>Without a skill these choices vary. Another run, or a colleague’s agent, makes different ones, as you saw when you compared plots.</li>
+<li>A skill writes the choices down once. With the figure skill every plot gets the same fonts, sizes and colours, and a statistics report.</li>
+<li>The lab’s conventions, such as our colours and our report format, belong in a skill, not in each person’s prompt.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -602,15 +631,12 @@
 <span id="cb2-2"><a href=""></a>into ~/.claude/skills/academic-figure-skill (clone the repository there).</span>
 <span id="cb2-3"><a href=""></a>Then tell me what the skill does and when it will be used.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<ul>
-<li>Asking for a summary first is the habit: a skill is instructions the agent will follow, and some include scripts it runs</li>
-</ul>
 <aside class="notes">
 <ul>
-<li>Open a new session in the same folder (the first one may still be finishing Task 1), paste this there, and keep this session for Task 2. A new task gets a new session: section 4 explains why.</li>
-<li>The repository root is the skill folder (SKILL.md at the top), so cloning it into ~/.claude/skills is the whole installation. By hand: git clone https://github.com/TingxiYu/academic-figure-skill ~/.claude/skills/academic-figure-skill</li>
+<li>Open a new session in the same folder, since the first one may still be finishing Task 1. Paste this there, and use the same new session for Task 2. Section 4 explains why a new task gets a new session.</li>
+<li>The repository root is the skill folder (SKILL.md at the top), so cloning it into ~/.claude/skills installs it. By hand: git clone https://github.com/TingxiYu/academic-figure-skill ~/.claude/skills/academic-figure-skill</li>
 <li>If the agent does not list the skill afterwards, start one more new session.</li>
-<li>This skill is heavy: it asks to confirm a plan for each figure, runs several rounds of checks and writes a statistics report. Answer its questions briefly.</li>
+<li>This skill asks you to confirm a plan for each figure, runs several rounds of checks and writes a statistics report. Answer its questions briefly.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -646,12 +672,12 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Paste it now. Stay on this slide until everyone has read and approved the agent’s plan. Read it, correct it, then approve.</li>
-<li>For this folder it is reasonable to allow the .venv Python for the session: the folder is under git and holds only public data, so the caveat of slide 2.3 is covered.</li>
-<li>CLAUDE.md is a file every new session in this folder reads first: how to set up, run and check the project. The lab template comes at slide 5.3.</li>
-<li>The network is the one of the AI Days workshop, 2,491 weights; spelling it out makes everyone’s numbers comparable at slide 5.4.</li>
-<li>Watching the AUROC on the test set after every epoch is fine for a demonstration; for real model selection use a separate validation split.</li>
-<li>Installing PyTorch takes a few minutes; training then under two. We go on while it runs.</li>
+<li>Paste it now, and stay on this slide until everyone has read the agent’s plan, corrected it and approved it.</li>
+<li>Allowing the .venv Python for the session is reasonable in this folder. It is under git and contains only public data, which covers the caveat of slide 2.3.</li>
+<li>Every new session in this folder reads CLAUDE.md first. It says how to set up, run and check the project. Slide 5.3 has the lab template.</li>
+<li>The network is the one from the AI Days workshop, with 2,491 weights. Spelling it out makes everyone’s numbers comparable at slide 5.4.</li>
+<li>Watching the test AUROC after every epoch is fine for a demonstration. For real model selection, use a separate validation split.</li>
+<li>PyTorch takes a few minutes to install and training then takes under two. We go on while it runs.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -676,18 +702,18 @@
 <p><span class="head">context window</span><span class="pos">noun</span> <span class="domain">(language models)</span> Everything the model reads before each reply: instructions, the conversation, files opened, command output. It has a fixed size.</p>
 </div>
 <div class="r-stack">
-<p><img data-src="assets/custom/ag_context_0.png" height="518"></p>
+<p><img data-src="assets/custom/ag_context_0.png" class="fragment" height="518"></p>
 <p><img data-src="assets/custom/ag_context_1.png" class="fragment" height="518"></p>
 </div>
 <ul>
-<li>Long sessions get slower and less accurate; <strong>start a new session for a new task</strong></li>
+<li><strong>New task, new session</strong></li>
 </ul>
 <p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 <aside class="notes">
 <ul>
 <li>The model has no memory between replies. Every reply re-reads the whole context.</li>
 <li>Command output and large files fill it fastest. A training log printed to the screen can take a large share.</li>
-<li>Click: when it is full, the history is compacted into a summary. Details that were in it (exact numbers, a file you showed early) may be gone after that. This is why Task 2 runs in a new session.</li>
+<li>Click: when the window is full, the history is compacted into a summary. Details that were in it, such as exact numbers or a file you showed early, may be gone after that. So Task 2 runs in a new session.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -707,15 +733,15 @@
 <p><span class="head">subagent</span><span class="pron">/ˈsʌbˌeɪ.dʒənt/</span><span class="pos">noun</span> <span class="domain">(agents)</span> A helper the agent starts for one part of a task, with its own empty context, that returns only a short result.</p>
 </div>
 <div class="r-stack">
-<p><img data-src="assets/custom/ag_sessions_0.png" height="619"></p>
+<p><img data-src="assets/custom/ag_sessions_0.png" class="fragment" height="619"></p>
 <p><img data-src="assets/custom/ag_sessions_1.png" class="fragment" height="619"></p>
 </div>
 <p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 <aside class="notes">
 <ul>
-<li>Subagents: they read and search on their own and return a short result, so the main context stays small. Ask for it: “use subagents to …”. Their individual steps are collapsed in the view.</li>
-<li>Click: new sessions. A fresh session knows nothing of the old one. Hand over with files: ask the old session to write handoff.md (what was done, what is open, where the files are), and start the new one with “read handoff.md”.</li>
-<li>Shared files in the project (the wiki, part 2) are how sessions, and people, stay in sync.</li>
+<li>Subagents read and search on their own and return a short result. The main context grows only by that result. Ask for them in the prompt, as in “use subagents to read these papers”. Their individual steps are collapsed in the view.</li>
+<li>Click: new sessions. A fresh session starts with none of the old session’s context. Hand over with a file. Ask the old session to write handoff.md with what was done, what is open and where the files are, then start the new one with “read handoff.md”.</li>
+<li>Shared files in the project (the wiki, part 2) keep sessions and people in sync.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -732,21 +758,23 @@
 <section id="reasoning-effort" class="slide level2">
 <h2>4.3 Reasoning effort</h2>
 <div class="dict mini">
-<p><span class="head">effort</span><span class="pron">/ˈef.ət/</span><span class="pos">noun</span> <span class="domain">(agents)</span> How much the model thinks before each step; set from low to max.</p>
+<p><span class="head">effort</span><span class="pron">/ˈef.ət/</span><span class="pos">noun</span> <span class="domain">(agents)</span> How much the model thinks before each step. It is set from low to max.</p>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="assets/custom/ag_effort.png" class="quarto-figure quarto-figure-center" height="514"></p>
+<p><img data-src="assets/custom/ag_effort.png" class="fragment quarto-figure quarto-figure-center" height="476"></p>
 </figure>
 </div>
 <ul>
-<li>Lower is faster, and enough for most lab work; raise it when it is stuck</li>
+<li><strong>Medium most of the time</strong></li>
+<li><strong>Higher is not better</strong></li>
 </ul>
 <p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 <aside class="notes">
 <ul>
-<li>Five levels: low, medium, high, extra high, max. Higher effort takes longer and uses more of the seat’s limits.</li>
-<li>Most lab work (scripts, plots, edits) is done well at low or medium effort, and fast. Raise it for a bug the agent keeps failing on, or a design decision you will build on.</li>
+<li>The levels are low, medium, high, extra high and max. Higher effort takes longer and uses more of the seat’s limits.</li>
+<li>Medium is where to be most of the time: it handles scripts, plots, edits and new analyses well and fast. Low is enough for small, mechanical edits.</li>
+<li>Higher effort is not better by default. It is slower, uses more of the seat’s limits and can overthink simple tasks. Raise it for a bug the agent keeps failing on, or for a design decision you will build on.</li>
 <li>The bars show the direction, not measured values.</li>
 </ul>
 <style type="text/css">
@@ -763,19 +791,17 @@
 </section>
 <section id="when-it-goes-in-circles" class="slide level2">
 <h2>4.4 When it goes in circles</h2>
-<ul>
-<li><strong>Esc</strong> stops it at once</li>
-<li><strong>Rewind, or start fresh</strong>: a new session with what was tried and what failed</li>
-<li><strong>Three hypotheses first</strong>: “list three possible causes and how to test each, before you edit anything”</li>
-<li><strong>Raise the effort</strong> for this one problem</li>
-<li><strong>After three failed fixes</strong>, stop and think yourself</li>
-</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_circles.png" class="quarto-figure quarto-figure-center" height="726"></p>
+</figure>
+</div>
 <p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 <aside class="notes">
 <ul>
-<li>The usual sign: the same error comes back after each “fix”, or the agent edits more and more files.</li>
-<li>The usual cause: a context full of failed attempts. A new session with a short summary of what was tried often solves it at once.</li>
-<li>Asking for hypotheses before edits turns guessing into testing. A minimal example that shows the bug helps the same way.</li>
+<li>You can tell when the same error comes back after each fix, or when the agent edits more and more files. Esc stops it at once.</li>
+<li>Usually the context is full of failed attempts. A new session with a short summary of what was tried often solves it at once.</li>
+<li>Asking for hypotheses before edits turns guessing into testing. A minimal example that shows the bug helps in the same way.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -791,19 +817,18 @@
 </section>
 <section id="limits-and-when-not-to-use-an-agent" class="slide level2">
 <h2>4.5 Limits, and when not to use an agent</h2>
-<ul>
-<li><strong>Usage limits</strong>: a seat has a budget per few hours and per week; large models and subagents use it faster</li>
-<li><strong>Not when you cannot check the result</strong></li>
-<li><strong>Not for sensitive data</strong> without a decision (first slide)</li>
-<li><strong>Not for a one-line change</strong> you already know</li>
-<li><strong>Not when the point is to learn it yourself</strong></li>
-</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_whennot.png" class="quarto-figure quarto-figure-center" height="725"></p>
+</figure>
+</div>
 <p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 <aside class="notes">
 <ul>
+<li>Ask the four questions in order. If none stops you, use the agent.</li>
 <li>/usage in the Code tab shows how much of the current budget is used.</li>
 <li>A long autonomous run with five subagents on the top model can use a day’s budget in an hour.</li>
-<li>“Cannot check” is the important one: if you cannot tell a right answer from a wrong one, the agent’s speed does not help.</li>
+<li>If you cannot tell a right answer from a wrong one, the agent’s speed does not help.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -832,9 +857,9 @@
 <p><span class="waiting">Agent waiting? Answer it, then look up.</span></p>
 <aside class="notes">
 <ul>
-<li>Split a project into phases, each small enough to review: data, baseline, model, analysis. Task 2 is one phase.</li>
-<li>Each phase: the agent proposes a plan, you approve it, it runs, it writes report.md, you read the report before the next phase starts.</li>
-<li>The report is the record: what was done, the numbers with their commands, the figures, what did not work. A new session starts the next phase from it.</li>
+<li>Split a project into phases small enough to review, such as data, baseline, model and analysis. Task 2 is one phase.</li>
+<li>In each phase you approve the agent’s plan before it runs, and you read its report.md before the next phase starts.</li>
+<li>The report records what was done and what did not work, with every number, its command and the figures. A new session starts the next phase from it.</li>
 <li>The lab’s research-workflow skill runs projects this way (part 2).</li>
 </ul>
 <style type="text/css">
@@ -862,9 +887,9 @@
 <aside class="notes">
 <ul>
 <li>Your agent is probably asking now to confirm the skill’s figure plan. Read it before approving.</li>
-<li>Both plots made by an agent from the same request. With the skill: Arial, journal column width (89 mm), no top and right axes, a restrained palette, PDF plus 300 dpi PNG, and a statistics report.</li>
-<li>It also overruled the request: the skill forbids subsampling, so it drew all 92,346 points, and the dense centre hides the difference the left plot shows. It did not say so. If yours plans the same, tell it: “subsample to 5,000 per group, as in gc_u.png”.</li>
-<li>Skills encode someone’s taste and rules. Read one before you rely on it, and write your own for the lab’s conventions.</li>
+<li>An agent made both plots from the same request. With the skill the plot uses Arial at journal column width (89 mm) and has no top or right axis. The skill also wrote a PDF, a 300 dpi PNG and a statistics report.</li>
+<li>It also changed the request. The skill’s rules do not allow subsampling, so it drew all 92,346 points, and the dense middle hides the difference the left plot shows. It did not say so. If yours plans the same, tell it: “subsample to 5,000 per group, as in gc_u.png”.</li>
+<li>A skill contains someone’s taste and rules. Read one before you rely on it, and write your own for the lab’s conventions.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -898,9 +923,9 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Open the CLAUDE.md your agent wrote at the end of Task 2: this is the structure to grow it into.</li>
+<li>Open the CLAUDE.md your agent wrote at the end of Task 2 and grow it into this structure.</li>
 <li>/init asks the agent to draft one from an existing project.</li>
-<li>Keep it to one screen: it is read every session and uses context.</li>
+<li>Keep it to one screen. It is read in every session and uses context.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -921,14 +946,14 @@
 <p><img data-src="assets/custom/ag_checks.png" class="fragment" height="673"></p>
 </div>
 <ul>
-<li><strong>Show me the command and its output</strong> for every number in the report</li>
+<li><strong>Every number with its command</strong></li>
 </ul>
 <aside class="notes">
 <ul>
-<li>Your AUROC against ours: measured on a laptop CPU with this exact recipe, about 8 seconds per epoch, 0.79 after one epoch and 0.87 after ten. Yours should be within a few hundredths; much higher or lower means something differs, so ask the agent to show the network and the data counts.</li>
-<li>Click: check its work. A plot can be checked by eye; an AUROC cannot. Your shuffled-label control must give about 0.5: clearly higher means test data leaked into training. Composition alone (GC and U) gives 0.66: a model has to beat that. And no sequence may appear in both training and test files.</li>
-<li>Agents report numbers confidently, including ones they did not compute. Open report.md: every number should come with the command and the printed output behind it.</li>
-<li>Report not finished yet? Let the agent run; open it during part 2.</li>
+<li>Compare your AUROC with ours. On a laptop CPU this recipe took about 8 seconds per epoch and reached 0.79 after one epoch and 0.87 after ten. Yours should be within a few hundredths. If it is much higher or lower, ask the agent to show the network and the data counts.</li>
+<li>Click: check its work. A plot can be checked by eye, an AUROC cannot. Your shuffled-label control must give about 0.5, and a clearly higher value means test data leaked into training. Composition alone (GC and U) gives 0.66, and a useful model must score higher. Each sequence must be in only one of the training and test files.</li>
+<li>Agents report numbers confidently, including ones they did not compute. Open report.md and look for the command and printed output behind each number.</li>
+<li>If your report is not finished, let the agent run and open it during part 2.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -956,10 +981,10 @@
 </div>
 <aside class="notes">
 <ul>
-<li>A: Claude runs on your PC and executes commands on the server over ssh. Nothing to install on the server; your files and skills stay local. Jobs started with nohup or tmux keep running when your PC sleeps, but nothing watches them.</li>
-<li>Click, B: Claude runs on the server. From your PC, a WSL terminal connects with ssh and attaches to a tmux session where Claude runs. tmux keeps the session alive when you disconnect, so overnight work continues and the agent keeps watching.</li>
+<li>In setup A, Claude runs on your PC and executes commands on the server over ssh. You install nothing on the server, and your files and skills remain on your PC. Jobs started with nohup or tmux keep running when your PC sleeps, but nothing watches them.</li>
+<li>Click, setup B, where Claude runs on the server. From your PC, a WSL terminal connects with ssh and attaches to a tmux session with Claude in it. tmux keeps the session alive when you disconnect. The agent keeps working and watching overnight.</li>
 <li>Remote Control lets you follow and steer that session from the Claude app or your phone. Read each permission request before approving it on the phone.</li>
-<li>Skills are reusable prompts. They live on the machine where Claude runs: in setup B, the lab’s skills on gold-srv2.</li>
+<li>Skills are reusable prompts, kept on the machine that runs Claude. In setup B those are the lab’s skills on gold-srv2.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -982,8 +1007,8 @@
 </div>
 <aside class="notes">
 <ul>
-<li>These run on gold-srv2 and live in research-skills/ of a shared git repository, so everyone uses the same version and improvements reach everyone.</li>
-<li>research-workflow and research-vault are how a project is run and recorded. scientific-reporting builds a report from its evidence; clearml-scientific-publishing puts runs and the report on ClearML; job-heartbeat watches long jobs.</li>
+<li>These run on gold-srv2 and are kept in research-skills/ of a shared git repository, so everyone uses the same version, including every fix.</li>
+<li>research-workflow and research-vault run and record a project. scientific-reporting builds a report from its evidence. clearml-scientific-publishing puts runs and the report on ClearML. job-heartbeat watches long jobs.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1007,9 +1032,9 @@
 <aside class="notes">
 <ul>
 <li>In the evening, plan the runs with the agent and launch them on the GPU server (setup B).</li>
-<li>job-heartbeat: a scheduled prompt wakes the agent at a fixed interval. It runs a status script that prints facts about the job, decides whether anything is wrong, fixes or restarts what it can, and alerts a person when needed. A separate watchdog alerts if no agent has woken up for too long.</li>
-<li>Give it a limit on restarts: a job that crashes and restarts all night blocks the GPU for everyone.</li>
-<li>In the morning the agent reads the logs and writes report.md. Training runs should save checkpoints, so a restart continues instead of starting over.</li>
+<li>With job-heartbeat, a scheduled prompt wakes the agent at a fixed interval. It runs a status script that prints facts about the job, and checks the output for problems. It fixes or restarts what it can and alerts a person when needed. A separate watchdog alerts if no agent has woken up for too long.</li>
+<li>Set a limit on restarts. A job that crashes and restarts all night blocks the GPU for everyone.</li>
+<li>In the morning the agent reads the logs and writes report.md. Training runs should save checkpoints, and a restart then continues from the last one.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1032,8 +1057,8 @@
 </div>
 <aside class="notes">
 <ul>
-<li>ClearML records every run: its settings, its metric curves and its output files, on a server the whole lab can open. You compare runs in the web dashboard.</li>
-<li>The lab’s clearml-scientific-publishing skill lets the agent log runs and publish the phase report to ClearML with its figures and evidence.</li>
+<li>ClearML records the settings, metric curves and output files of every run on a server the whole lab can open. You compare runs in the web dashboard.</li>
+<li>With the lab’s clearml-scientific-publishing skill, the agent logs runs and publishes the phase report to ClearML with its figures and evidence.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1055,14 +1080,14 @@
 </figure>
 </div>
 <ul>
-<li>Check that every cited paper exists and says what the notes claim</li>
+<li><strong>Open every cited paper</strong></li>
 </ul>
 <aside class="notes">
 <ul>
-<li>One session reading 30 full papers fills its context with PDFs. The main session splits the topic, starts five subagents with six papers each, and each writes its notes to a file and returns a few lines.</li>
+<li>One session reading 30 full papers fills its context with PDFs. Instead the main session splits the topic and starts five subagents with six papers each. Each writes its notes to a file and returns a few lines.</li>
 <li>The main session writes the review and a comparison table from the notes. Tomorrow, a new session starts from review.md and the lit/ notes, not from the papers.</li>
-<li>Two failure modes: papers behind a paywall that the agent cannot read but summarises anyway, and papers that do not exist. Open the cited paper for every claim you will use.</li>
-<li>Five subagents use about five times the limits of one session.</li>
+<li>Watch for papers behind a paywall that the agent cannot read but summarises anyway, and for papers that do not exist. Open the cited paper for every claim you will use.</li>
+<li>The subagents together use about five times the limits of one session.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1085,9 +1110,9 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Three files that every session reads at the start and updates at the end of a phase. FINDINGS: dated results with the evidence and where it is. DECISIONS: what was chosen, why, and what else was considered. RISKS: what could make the results wrong, how to check, and the status.</li>
-<li>You do not write them by hand: the agent fills them in at the end of each phase, and you correct them. The lab’s research-vault skill keeps this structure.</li>
-<li>Bookkeeping is what makes agent work reusable: without it each session starts from zero and results cannot be traced.</li>
+<li>Every session reads these files at the start and updates them at the end of a phase. FINDINGS holds dated results with the evidence and where it is. DECISIONS records what was chosen and why, and the alternatives. RISKS lists what could make the results wrong, each with a check and its status.</li>
+<li>You do not write them by hand. The agent fills them in at the end of each phase and you correct them. The lab’s research-vault skill keeps this structure.</li>
+<li>Without this bookkeeping each session starts from zero and results cannot be traced.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1103,17 +1128,17 @@
 </section>
 <section id="sharing-in-the-lab" class="slide level2">
 <h2>6.7 Sharing in the lab</h2>
-<ul>
-<li><strong>Skills in a shared repository</strong>: a project’s .claude/skills, or the lab’s research-skills; one version for everyone</li>
-<li><strong>Review in pairs</strong>: read each other’s report.md before trusting it</li>
-<li><strong>Prompts that worked</strong>: one shared file</li>
-<li><strong>Connectors (MCP)</strong>: Box, Drive, ClearML; third-party code with access to your data, like a skill</li>
-<li><strong>Hooks</strong>: rules the harness enforces, for example blocking any rm in data/raw</li>
-</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_sharing.png" class="quarto-figure quarto-figure-center" height="643"></p>
+</figure>
+</div>
 <aside class="notes">
 <ul>
+<li>Keep the lab’s skills, a file of prompts that worked and the hooks in one repository. Review each other’s report.md before trusting it.</li>
+<li>Connectors (MCP) give the agent access to Box, Drive or ClearML. They are third-party code with access to your data, so treat them like a skill.</li>
 <li>Skills copied by hand into each person’s ~/.claude drift apart. Committed to a repository, they improve for everyone.</li>
-<li>A hook is a script the harness runs before or after an action; unlike a line in CLAUDE.md, the agent cannot ignore it.</li>
+<li>A hook is a script the harness runs before or after an action. Unlike a line in CLAUDE.md, the agent cannot ignore it.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1136,10 +1161,10 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Prices from the two companies’ API pricing pages, October 2026, per million output tokens; input costs one fifth of that. Haiku 5.5’s price is for prompts up to 100,000 tokens.</li>
-<li>The two families line up tier by tier: Fable and GPT-6 Astra at the top, Sonnet and Sol in the middle, Haiku and Luna for cheap, high-volume work. Opus sits between top and middle.</li>
-<li>On the lab seats you do not pay per token; larger models use up the seat’s limits faster.</li>
-<li>A rough rule: the mid tier for most coding, the top tier for hard reasoning and long autonomous tasks, the small tier for simple, repeated jobs.</li>
+<li>Prices from the two companies’ API pricing pages, October 2026, per million output tokens. Input costs one fifth of that. Haiku 5.5’s price is for prompts up to 100,000 tokens.</li>
+<li>Tier by tier the two families match. Fable and GPT-6 Astra are at the top and Sonnet and Sol in the middle, with Haiku and Luna for cheap, high-volume work. Opus sits between top and middle.</li>
+<li>On the lab seats you do not pay per token, but larger models use up the seat’s limits faster.</li>
+<li>Use the mid tier for most coding. The top tier is for hard reasoning and long autonomous tasks, and the small tier for simple, repeated jobs.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1155,17 +1180,16 @@
 </section>
 <section id="data-secrets-and-the-shared-server" class="slide level2">
 <h2>6.9 Data, secrets and the shared server</h2>
-<ul>
-<li><strong>What the agent reads goes to the model provider</strong>: unpublished lab data needs a decision first</li>
-<li><strong>Secrets</strong> (tokens, clearml.conf, .env) stay out of the repository and out of the prompt</li>
-<li><strong>One account and one login per person</strong>; no shared logins</li>
-<li><strong>Raw data read-only</strong>: chmod -R a-w data/raw</li>
-<li><strong>Never skip permissions</strong> on a shared machine</li>
-</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/custom/ag_dataflow.png" class="quarto-figure quarto-figure-center" height="613"></p>
+</figure>
+</div>
 <aside class="notes">
 <ul>
-<li>Back to the first slide: under the commercial terms, data is sent to Anthropic and kept for 30 days; the Technion has not reviewed this.</li>
-<li>Data that may become a patent or an unpublished result: ask Roee before giving an agent access.</li>
+<li>As on the first slide, files the agent opens, command output and prompts are sent to Anthropic and kept for 30 days. The Technion has not reviewed this. Transcripts also stay on your PC in plain text.</li>
+<li>Make raw data read-only (chmod -R a-w data/raw). Keep tokens, clearml.conf and .env out of the repository and out of prompts. Use one account and one login per person.</li>
+<li>For data that may become a patent or an unpublished result, ask Roee before giving an agent access.</li>
 <li>A permission-skipping mode exists for sandboxes. On the lab server it means any command runs without a question.</li>
 </ul>
 <style type="text/css">
@@ -1192,8 +1216,8 @@
 </div>
 <aside class="notes">
 <ul>
-<li>Setup A, live. Watch for: the agent checks which GPU is free, installs what is missing in its own environment, and copies results back.</li>
-<li>Expected: the frozen language model with a linear probe reaches about 0.78 held-out AUROC, below the CNN trained on all labels (0.87) and above composition alone (0.66).</li>
+<li>Setup A, live. Watch the agent check which GPU is free and install what is missing in its own environment. It copies the results back at the end.</li>
+<li>The frozen language model with a linear probe should reach about 0.78 held-out AUROC, below the CNN trained on all labels (0.87) and above composition alone (0.66).</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1218,7 +1242,7 @@
 </ul>
 <aside class="notes">
 <ul>
-<li>The AI Days workshop decks and notebooks: mathoory.github.io/ai-days-2026-dna-workshop</li>
+<li>The AI Days workshop decks and notebooks are at mathoory.github.io/ai-days-2026-dna-workshop.</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {

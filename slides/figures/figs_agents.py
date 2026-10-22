@@ -220,8 +220,10 @@ def effort():
     levels = [("Low", 1), ("Medium", 2), ("High", 3.5), ("Extra high", 5.5), ("Max", 8)]
     for i, (n, v) in enumerate(levels):
         x = 3 + i * 31.4
-        ax.add_patch(Rectangle((x, 26), 25, v * 3.2, fc=ACCENT if i == 0 else ACCENT_L, ec="none"))
-        label(ax, x + 12.5, 20, n, fs=22, bold=True, color=ACCENT if i == 0 else INK)
+        ax.add_patch(Rectangle((x, 26), 25, v * 3.2, fc=ACCENT if i == 1 else ACCENT_L, ec="none"))
+        label(ax, x + 12.5, 20, n, fs=22, bold=True, color=ACCENT if i == 1 else INK)
+        if i == 1:                                       # where to be most of the time
+            ax.add_patch(Rectangle((x - 3, 1.5), 31, 48, fill=False, ec=BASE["U"], lw=3.5))
     label(ax, 2, 56, "thinking before each step: time and tokens", fs=21, color=MUTED, ha="left")
     ex = ["scripts, plots,\nfile edits", "a new analysis", "a bug you\ncannot find", "a hard design\nchoice", "rarely needed"]
     for i, t in enumerate(ex):
@@ -371,27 +373,72 @@ def cnn_curve():
 
 # ------------------------------------------------------------------ 1.3 model and harness
 def harness():
-    fig, ax = canvas(16, 8.6, ylim=(0, 86))
-    blk(ax, 2, 50, 156, 32, "", fc=FAINT)
-    label(ax, 6, 76, "Agent", fs=26, bold=True, ha="left")
-    blk(ax, 6, 54, 50, 17, "", fc=ACCENT)
-    label(ax, 31, 66, "Language model", fs=24, color="white", bold=True)
-    label(ax, 31, 58.5, "chooses the next step", fs=19, color="white")
-    label(ax, 62, 62.5, "+", fs=40, color=INK, bold=True)
-    blk(ax, 70, 54, 84, 17, "", fc=INK)
-    label(ax, 112, 66, "Harness", fs=24, color="white", bold=True)
-    label(ax, 112, 58.5, "tools, permissions, context, skills, memory files", fs=19, color="white")
-    rows = [("Claude Code", "Fable, Opus, Sonnet, Haiku", "Anthropic"), ("Codex", "GPT-6 Astra, Sol, Luna", "OpenAI")]
-    label(ax, 70, 42, "Harness", fs=21, color=MUTED, bold=True, ha="left")
-    label(ax, 6, 42, "Models", fs=21, color=MUTED, bold=True, ha="left")
-    for i, (h, m, co) in enumerate(rows):
-        y = 31 - i * 15
-        label(ax, 6, y, m, fs=22, color=ACCENT, ha="left", bold=True)
-        label(ax, 6, y - 6, co, fs=18, color=MUTED, ha="left")
-        arrow(ax, 56, y - 2, 68, y - 2, color=MUTED, lw=2, ms=18)
-        label(ax, 70, y - 2, h, fs=24, color=INK, ha="left", bold=True)
-    label(ax, 112, 23, "same harness, a different model:\nchoose it per task", fs=19, color=MUTED, ha="left")
+    """One real step of Task 1, as messages between the model (blue) and the harness (black)."""
+    fig, ax = canvas(16, 8.8, ylim=(0, 88))
+    xm, xh = 30, 130                                    # the two lanes
+    blk(ax, xm - 24, 74, 48, 11, "Language model", fc=ACCENT, fs=23)
+    blk(ax, xh - 26, 74, 52, 11, "Harness (Claude Code)", fc=INK, fs=23)
+    for x in (xm, xh):
+        ax.plot([x, x], [6, 73], color=HAIR, lw=2, zorder=0)
+    msgs = [(xh, xm, "your prompt, CLAUDE.md, the tool list", INK),
+            (xm, xh, "Bash(\"python gc_u.py\")", ACCENT),
+            (None, xh, "asks you: allow?  then runs it", INK),
+            (xh, xm, "FileNotFoundError: ...positives.fa", INK),
+            (xm, xh, "Edit(gc_u.py, fix the path)", ACCENT)]
+    for i, (a, b, t, c) in enumerate(msgs):
+        y = 64 - i * 13
+        if a is None:
+            ax.add_patch(FancyBboxPatch((xh - 40, y - 4.5), 66, 9, boxstyle="round,pad=0,rounding_size=1.2", fc=FAINT,
+                                        ec=INK, lw=1.5))
+            label(ax, xh - 7, y, t, fs=19, color=INK)
+            continue
+        arrow(ax, a + (-2 if a > b else 2), y - 2.5, b + (2 if a > b else -2), y - 2.5, color=c, lw=2.5, ms=22)
+        label(ax, (a + b) / 2, y + 1.5, t, fs=19, color=c, family=MONO if "(" in t or "Error" in t else None)
+    label(ax, xm, 3, "chooses the next step", fs=19, color=ACCENT)
+    label(ax, xh, 3, "runs tools, asks, keeps the context", fs=19, color=INK)
     save(fig, "ag_harness")
+
+
+# ------------------------------------------------------------------ 1.5 git as the project's history
+def git_history():
+    fig, ax = canvas(16, 6.4, ylim=(0, 64))
+    log = [("c4d81aa", "gc_u.py: GC and U fractions, scatter plot", "10:06"),
+           ("7be19d0", "download the AGO2 training files", "10:04"),
+           ("a1f3c2e", "set up .venv with numpy and matplotlib", "10:02")]
+    label(ax, 2, 59, "git log", fs=21, color=MUTED, ha="left", family=MONO)
+    for i, (h, m, tm) in enumerate(log):
+        y = 49 - i * 9
+        label(ax, 2, y, h, fs=20, color=HELD_C, ha="left", family=MONO)
+        label(ax, 20, y, m, fs=21, color=INK, ha="left")
+        label(ax, 92, y, tm, fs=19, color=MUTED, ha="left")
+    label(ax, 2, 18, "git diff 7be19d0 c4d81aa", fs=21, color=MUTED, ha="left", family=MONO)
+    label(ax, 2, 10, "+ gc = (s.count(\"G\") + s.count(\"C\")) / len(s)", fs=20, color=GOOD_C, ha="left", family=MONO)
+    label(ax, 2, 3, "- gc = s.count(\"GC\") / len(s)", fs=20, color=HELD_C, ha="left", family=MONO)
+    for i, (h, d) in enumerate([("what changed", "line by line"), ("when, and why", "time and message"),
+                                ("any version back", "one command")]):
+        y = 50 - i * 17
+        label(ax, 112, y + 2.5, h, fs=22, color=INK, ha="left", bold=True)
+        label(ax, 112, y - 3.5, d, fs=19, color=MUTED, ha="left")
+    save(fig, "ag_githistory")
+
+
+# ------------------------------------------------------------------ 1.6 virtual environments
+def venv():
+    fig, ax = canvas(16, 7.4, ylim=(0, 74))
+    region(ax, 2, 4, 156, 66, "Your computer")
+    blk(ax, 8, 8, 40, 12, "system Python", fc=TOOL, tc=MUTED, fs=20, bold=False)
+    label(ax, 28, 25, "left untouched", fs=18, color=MUTED)
+    projs = [("ago2-agents/", ".venv", "numpy 2.1, torch 2.6", 56), ("thesis-2024/", ".venv", "numpy 1.26, torch 2.1", 56)]
+    for i, (p, e, pk, y) in enumerate(projs):
+        x = 56 + i * 50
+        file_icon(ax, x, 60, p, color=INK, fs=20)
+        blk(ax, x, 30, 44, 22, "", fc=ACCENT_L)
+        label(ax, x + 2, 46, e, fs=21, color=ACCENT, ha="left", family=MONO, bold=True)
+        label(ax, x + 2, 39, "its own Python", fs=18, color=INK, ha="left")
+        label(ax, x + 2, 33.5, pk, fs=18, color=INK, ha="left")
+    label(ax, 105, 16, "each project its own versions; delete the folder and it is gone", fs=19, color=MUTED)
+    label(ax, 105, 9, "conda: the same idea, also installs Python itself and non-Python tools", fs=19, color=GOOD_C)
+    save(fig, "ag_venv")
 
 
 # ------------------------------------------------------------------ 1.4 the models, by price
@@ -510,7 +557,109 @@ def checks():
     ax.set_xlim(0.4, 0.95); ax.set_xlabel("Held-out AUROC (1,000 sequences)"); xgrid(ax)
     save(fig, "ag_checks")
 
-JOBS = {"git_undo": git_undo, "prompt_anatomy": prompt_anatomy, "coinflip": coinflip, "lab_skills": lab_skills,
+
+# ------------------------------------------------------------------ 2.3 permissions and plan mode
+def control():
+    fig, ax = canvas(16, 7.4, ylim=(0, 74))
+    ax.add_patch(FancyBboxPatch((2, 18), 74, 50, boxstyle="round,pad=0,rounding_size=1.6", fc="white", ec=MID, lw=2))
+    label(ax, 6, 61, "The agent asks", fs=22, color=MUTED, ha="left", bold=True)
+    label(ax, 6, 50, "Run:  python gc_u.py", fs=24, color=INK, ha="left", family=MONO)
+    for i, (t, c, tc) in enumerate([("Allow once", ACCENT, "white"), ("Always", TOOL, INK), ("Deny", TOOL, INK)]):
+        blk(ax, 6 + i * 23, 26, 20, 11, t, fc=c, tc=tc, fs=20)
+    label(ax, 39, 11, "a permission covers the command,\nnot what the script does", fs=19, color=MUTED)
+    ax.add_patch(FancyBboxPatch((84, 18), 74, 50, boxstyle="round,pad=0,rounding_size=1.6", fc="white", ec=MID, lw=2))
+    label(ax, 88, 61, "Plan mode", fs=22, color=MUTED, ha="left", bold=True)
+    steps = [("reads", ACCENT), ("proposes a plan", ACCENT), ("you accept", INK), ("then edits", GOOD_C)]
+    for i, (t, c) in enumerate(steps):
+        y = 50 - i * 9
+        ax.add_patch(plt.Circle((91, y), 1.6, color=c))
+        label(ax, 95, y, t, fs=21, color=c, ha="left", bold=c == INK)
+    label(ax, 121, 11, "for anything longer than a few steps", fs=19, color=MUTED)
+    save(fig, "ag_control")
+
+
+# ------------------------------------------------------------------ 4.4 when it goes in circles
+def circles():
+    import numpy as np
+    fig, ax = canvas(16, 7.4, ylim=(0, 74))
+    cx, cy, r = 26, 37, 18
+    th = np.linspace(0.25, 2 * np.pi - 0.25, 200)
+    ax.plot(cx + r * np.cos(th), cy + r * np.sin(th), color=HELD_C, lw=4)
+    arrow(ax, cx + r * np.cos(th[-3]), cy + r * np.sin(th[-3]), cx + r * np.cos(th[-1]), cy + r * np.sin(th[-1]),
+          color=HELD_C, lw=4, ms=28)
+    label(ax, cx, cy + 4, "fix", fs=24, color=HELD_C, bold=True)
+    label(ax, cx, cy - 4, "same error", fs=22, color=HELD_C)
+    outs = [("Esc", "stops it at once"), ("A new session", "with what was tried and what failed"),
+            ("Causes before edits", "list them and how to test each"), ("Higher effort", "for this one problem"),
+            ("You", "after a few failed fixes")]
+    for i, (h, d) in enumerate(outs):
+        y = 66 - i * 14
+        arrow(ax, 47, cy + (y - cy) * 0.35, 62, y, color=MUTED, lw=2, ms=18)
+        label(ax, 64, y + 2.6, h, fs=23, color=INK, ha="left", bold=True)
+        label(ax, 64, y - 3.4, d, fs=19, color=MUTED, ha="left")
+    save(fig, "ag_circles")
+
+
+# ------------------------------------------------------------------ 4.5 when not to use an agent
+def when_not():
+    fig, ax = canvas(16, 7.6, ylim=(0, 76))
+    qs = [("Can you check the result?", "no", "do not use an agent"),
+          ("Unpublished or sensitive data?", "yes", "decide first (first slide)"),
+          ("A change you already know?", "yes", "type it yourself"),
+          ("Do you want to learn the method?", "yes", "do it yourself")]
+    for i, (q, a, out) in enumerate(qs):
+        y = 68 - i * 14
+        blk(ax, 2, y - 5, 62, 10, q, fc=TOOL, tc=INK, fs=20, bold=False)
+        arrow(ax, 65, y, 82, y, color=HELD_C, lw=2.5, ms=20)
+        label(ax, 73.5, y + 3, a, fs=18, color=HELD_C, bold=True)
+        label(ax, 84, y, out, fs=21, color=HELD_C, ha="left")
+        if i < 3:
+            arrow(ax, 33, y - 5.5, 33, y - 8.5, color=MUTED, lw=2, ms=16)
+    blk(ax, 2, 4, 62, 9, "Use the agent", fc=ACCENT, fs=22)
+    arrow(ax, 33, 68 - 3 * 14 - 5.5, 33, 13.5, color=MUTED, lw=2, ms=16)
+    label(ax, 84, 11, "each seat has a budget per few hours and per week,", fs=18, color=MUTED, ha="left")
+    label(ax, 84, 6, "and top models and subagents use it faster", fs=18, color=MUTED, ha="left")
+    save(fig, "ag_whennot")
+
+
+# ------------------------------------------------------------------ 6.7 sharing in the lab
+def sharing():
+    fig, ax = canvas(16, 7.6, ylim=(0, 76))
+    region(ax, 52, 20, 56, 46, "Lab repository", color=INK)
+    for i, t in enumerate([".claude/skills/", "research-skills/", "prompts.md", "hooks"]):
+        file_icon(ax, 58, 52 - i * 8.5, t, color=ACCENT if i < 2 else GOOD_C, fs=20)
+    for i, (x, y) in enumerate([(14, 58), (14, 28), (146, 43)]):
+        ax.add_patch(plt.Circle((x, y), 5, color=INK))
+        label(ax, x, y, "you" if i == 0 else "lab", fs=17, color="white", bold=True)
+        arrow(ax, x + (6 if x < 80 else -6), y, 51 if x < 80 else 109, 43 + (y - 43) * 0.4, color=MUTED, lw=2, ms=18)
+    ax.annotate("", (14, 34), (14, 52), arrowprops=dict(arrowstyle="<|-|>", color=GOOD_C, lw=2.5, mutation_scale=20))
+    label(ax, 20, 43, "review each\nother's report.md", fs=18, color=GOOD_C, ha="left")
+    label(ax, 80, 12, "Connectors (MCP): Box, Drive, ClearML. Third-party code with access to your data", fs=19,
+          color=HELD_C)
+    label(ax, 80, 5, "Hooks: rules the harness enforces, such as no rm in data/raw", fs=19, color=MUTED)
+    save(fig, "ag_sharing")
+
+
+# ------------------------------------------------------------------ 6.9 where the data goes
+def data_flow():
+    fig, ax = canvas(16, 7.6, ylim=(0, 76))
+    region(ax, 2, 6, 70, 64, "Your PC")
+    for i, t in enumerate(["files it opens", "command output", "your prompts"]):
+        blk(ax, 7, 50 - i * 10, 34, 8, t, fc=TOOL, tc=INK, fs=19, bold=False)
+    arrow(ax, 42, 44, 98, 44, color=ACCENT, lw=3, ms=24)
+    label(ax, 86, 48, "sent", fs=19, color=ACCENT, bold=True)
+    blk(ax, 100, 34, 56, 20, "", fc=INK)
+    label(ax, 128, 47.5, "Anthropic", fs=22, color="white", bold=True)
+    label(ax, 128, 39.5, "kept 30 days (commercial terms)", fs=17, color="white")
+    file_icon(ax, 7, 16, "~/.claude/projects: transcripts, plain text", color=MUTED, fs=17)
+    label(ax, 100, 24, "data/raw read-only", fs=19, color=GOOD_C, ha="left", bold=True)
+    label(ax, 100, 17, "secrets never in the repo or a prompt", fs=19, color=HELD_C, ha="left", bold=True)
+    label(ax, 100, 10, "one login per person", fs=19, color=INK, ha="left", bold=True)
+    save(fig, "ag_dataflow")
+
+
+JOBS = {"git_history": git_history, "venv": venv, "control": control, "circles": circles, "when_not": when_not, "sharing": sharing, "data_flow": data_flow,
+        "git_undo": git_undo, "prompt_anatomy": prompt_anatomy, "coinflip": coinflip, "lab_skills": lab_skills,
         "checks": checks, "harness": harness, "model_prices": model_prices, "cnn_curve": cnn_curve, "chat_agent": chat_agent, "agent_loop": agent_loop, "setup_steps": setup_steps, "skill_anatomy": skill_anatomy,
         "context_window": context_window, "subagents_sessions": subagents_sessions, "lit_review": lit_review,
         "effort": effort, "nightly": nightly, "clearml": clearml, "where_runs": where_runs, "phases": phases,
