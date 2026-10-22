@@ -1,0 +1,382 @@
+---
+title: "Agentic Accelerated Discovery"
+pagetitle: "Agentic Accelerated Discovery"
+subtitle: "Using Coding Agents in the Lab<br><br>Roee Amit Lab<br> Faculty of Biotechnology and Food Engineering<br> Technion Israel Institute of Technology <br><br> Mattan Hoory"
+---
+
+::: {.center}
+# 1 Agents {data-name="Agents"}
+:::
+
+## 1.1 Definition
+
+::: {.dict}
+[agent]{.head}[/ˈeɪ.dʒənt/]{.pron}[noun]{.pos}
+
+1. A person who acts on behalf of another.
+2. [(computing)]{.domain} A program that pursues a goal by choosing actions, carrying them out and observing their results, until the goal is reached.
+
+> An agent is anything that can be viewed as perceiving its environment through sensors and acting upon that environment through actuators.
+> [Russell and Norvig, *Artificial Intelligence: A Modern Approach*]{.cite}
+:::
+
+::: {.notes}
+- Sense 2 is the one for today. Three parts: a goal, actions it chooses itself, and observation of what happened.
+- Russell and Norvig's definition is the textbook one: sensors and actuators. For a coding agent the sensors are files and command output; the actuators are writing files and running commands.
+:::
+
+## 1.2 A chatbot answers, an agent acts
+
+::: {.r-stack}
+![](assets/custom/ag_chat_agent_0.png){height="741px"}
+
+![](assets/custom/ag_chat_agent_1.png){.fragment height="741px"}
+:::
+
+::: {.notes}
+- A chatbot (ChatGPT in a browser) only returns text. You are the one who runs the code, sees the error and pastes it back.
+- Click: an agent is an application around the same kind of language model, with permission to act on your computer: read and write files, run commands, run Python, search the web, connect to a server.
+- It sees the result of each action itself, so the copy-run-paste loop disappears. Claude Code, Codex and Cursor are agents of this kind.
+- It asks before actions you have not allowed, such as installing packages or deleting files.
+:::
+
+## 1.3 The agent loop
+
+![](assets/custom/ag_loop.png){fig-align="center" height="765px"}
+
+::: {.notes}
+- Every agent works in this loop: plan the next step, act (write a file, run a command), observe the output, plan again.
+- The example is from a real run of today's first task: the script failed on a wrong path, the agent read the error, fixed the path and ran again, without us.
+- It stops when the goal is reached, or when it needs a decision from you.
+:::
+
+## 1.4 You stay in control
+
+- **Permissions**: the agent asks before it runs a command or edits a file; allow once, always, or deny
+- **Plan first**: ask for a plan and approve it before any code is written
+- **One folder per project**: the agent works where you open it
+- **Read what it did**: every command and every changed file is shown
+
+::: {.notes}
+- Defaults are cautious: in the beginning, approve each step and read it. Later you allow routine actions (editing files in the project folder) and keep asking for the rest.
+- Plan mode: the agent only reads and proposes until you accept the plan. Good for anything longer than a few steps.
+- Never give an agent a folder that holds the only copy of your data.
+:::
+
+::: {.center}
+# 2 First Task {data-name="Task 1"}
+:::
+
+## 2.1 Set up
+
+![](assets/custom/ag_setup.png){fig-align="center" height="288px"}
+
+- Data: [huggingface.co/datasets/yup8/ai-days-2026-ago2](https://huggingface.co/datasets/yup8/ai-days-2026-ago2), AGO2 binding sites and unbound RNA
+
+::: {.notes}
+- Claude Desktop runs on Windows and macOS. The Code tab is the coding agent (Claude Code); the Chat tab is the chatbot.
+- Claude Code needs a paid plan (Pro or above) or a seat on the lab's team plan.
+- Open an empty folder, for example ago2-agents on the desktop. The agent can read and write inside it.
+- The data: 48,095 RNA sequences bound by AGO2 (CLIP-seq) and 44,251 unbound sequences from the same genes, plus 1,000 held-out sequences. The agent downloads them itself.
+:::
+
+## 2.2 The prompt {data-todo="Task 1"}
+
+::: {.prompt}
+[PASTE INTO THE CODE TAB]{.prompt-label}
+
+```text
+I am new to coding agents. Work step by step and tell me briefly what you do.
+
+Goal: one scatter plot of the AGO2 RNA dataset.
+1. In this folder, set up a Python environment with numpy and matplotlib.
+   On Windows use `py -m venv .venv` and install with `.venv\Scripts\python -m pip`.
+2. Download the two training files (FASTA; letters can be lower case, some sequences use T for U):
+   https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/CLIPSEQ_AGO2.train.positives.fa   (bound by AGO2)
+   https://huggingface.co/datasets/yup8/ai-days-2026-ago2/resolve/main/CLIPSEQ_AGO2.train.negatives.fa   (unbound)
+3. For each sequence: GC fraction = (G + C) / length, U fraction = (U + T) / length.
+4. Plot GC fraction (x) against U fraction (y): 5,000 random sequences per group, bound in blue,
+   unbound in grey, small transparent dots, drawn in random order.
+5. Save the plot as gc_u.png, open the file, and tell me in two sentences whether the groups differ.
+```
+:::
+
+::: {.notes}
+- Each line closes a gap we hit when we tested this prompt with an agent: Python on Windows, lower-case letters and T in some sequences, how many dots, which colour lands on top, "show" meaning a pop-up window that blocks the agent.
+- Approve the steps as they come. Expect three or four approvals: creating the environment, installing, downloading, running.
+:::
+
+## 2.3 Why this task first
+
+- **Small**: one script, under a second of compute
+- **Every agent ability**: environment, download, parsing, code, running, a file you can see
+- **Checkable by eye**: a wrong plot looks wrong
+- **A known answer**: bound sequences have less GC and more U
+
+::: {.notes}
+- A first task should be one the agent can finish in a few minutes and you can check without reading code. A plot is the fastest check there is.
+- It touches all of the loop: set up, act, observe errors, fix.
+- The answer matters for the lab's work: composition alone separates the classes a little, which is the shortcut every model of this data has to be tested against.
+:::
+
+## 2.4 What you should get
+
+![](assets/custom/ag_plot_plain.png){fig-align="center" height="765px"}
+
+::: {.notes}
+- An agent's actual result on this prompt. Mean GC fraction 0.41 bound against 0.45 unbound, mean U fraction 0.31 against 0.29.
+- The two groups overlap along one diagonal band: GC and U alone separate them only weakly.
+- If yours looks different, ask the agent why: different sample, different colours on top, a wrong letter count.
+:::
+
+::: {.center}
+# 3 Skills {data-name="Skills"}
+:::
+
+## 3.1 What a skill is
+
+![](assets/custom/ag_skill.png){fig-align="center" height="689px"}
+
+::: {.notes}
+- A skill is a folder: a SKILL.md with instructions, plus any reference documents and scripts it needs. A reusable prompt, written once, used in every session.
+- The agent always sees the skill's name and one-line description. When a task matches the description, it loads the instructions; references and scripts only when needed. So many skills cost almost nothing until used.
+- Skills live in ~/.claude/skills on the machine where the agent runs.
+:::
+
+## 3.2 Install one
+
+::: {.prompt}
+[ASK YOUR AGENT]{.prompt-label}
+
+```text
+Install the Claude Code skill at https://github.com/TingxiYu/academic-figure-skill
+into ~/.claude/skills/academic-figure-skill (clone the repository there).
+Then tell me what the skill does and when it will be used.
+```
+:::
+
+- Then open a **new session** in the same folder: skills are found when a session starts
+
+::: {.notes}
+- The repository root is the skill folder (SKILL.md at the top), so cloning it into ~/.claude/skills is the whole installation. By hand: git clone https://github.com/TingxiYu/academic-figure-skill ~/.claude/skills/academic-figure-skill
+- Asking the agent to read and summarise a skill before using it is a good habit: a skill is instructions the agent will follow, and some include scripts it will run.
+- Then ask in the new session: "Redraw gc_u.png as a publication figure."
+:::
+
+## 3.3 The same plot, with the skill
+
+:::: {.columns .vcenter}
+::: {.column width="45%"}
+![](assets/custom/ag_plot_plain.png){height="617px"}
+
+[Without the skill]{.caption-small}
+:::
+::: {.column width="55%"}
+![](assets/custom/ag_plot_skill.png){height="491px"}
+
+[With the academic figure skill]{.caption-small}
+:::
+::::
+
+::: {.notes}
+- Both made by an agent from the same request. With the skill: Arial, journal column width (89 mm), no top and right axes, a restrained palette, PDF plus 300 dpi PNG, and a statistics report.
+- It also overruled us: the skill forbids subsampling, so it drew all 92,346 points, and the dense centre hides the difference the left plot shows.
+- It is heavy for one scatter plot: it asks to confirm a panel plan, runs four rounds of checks and writes reports. Skills encode someone's taste and rules; read one before you rely on it, and write your own for the lab's conventions.
+:::
+
+::: {.center}
+# 4 Context {data-name="Context"}
+:::
+
+## 4.1 The context window
+
+::: {.r-stack}
+![](assets/custom/ag_context_0.png){height="518px"}
+
+![](assets/custom/ag_context_1.png){.fragment height="518px"}
+:::
+
+- Long sessions get slower and less accurate; **start a new session for a new task**
+
+::: {.notes}
+- The model has no memory between replies. Every reply re-reads the whole context: instructions, the conversation, every file it opened, every command output.
+- Command output and large files fill it fastest. A training log printed to the screen can take a large share.
+- Click: when it is full, the history is compacted into a summary. Details that were in it (exact numbers, a file you showed early) may be gone after that.
+:::
+
+## 4.2 Subagents and new sessions
+
+::: {.r-stack}
+![](assets/custom/ag_sessions_0.png){height="741px"}
+
+![](assets/custom/ag_sessions_1.png){.fragment height="741px"}
+:::
+
+::: {.notes}
+- Subagents: the main session starts helpers, each with its own empty context. They read and search on their own and return a short result. The main context stays small. Ask for it: "use subagents to ...".
+- Click: new sessions. A fresh session knows nothing of the old one. Hand over with files: ask the old session to write handoff.md (what was done, what is open, where the files are), and start the new one with "read handoff.md".
+- Shared files in the project (the wiki of section 8) are how sessions, and people, stay in sync.
+:::
+
+## 4.3 Example: a literature review
+
+![](assets/custom/ag_litreview.png){fig-align="center" height="731px"}
+
+::: {.notes}
+- One session cannot read 30 papers: the PDFs alone would fill its context.
+- The main session splits the topic, starts five subagents with six papers each, and each writes its notes to a file and returns a few lines.
+- The main session writes the review and a comparison table from the notes. Tomorrow, a new session starts from review.md and the lit/ notes, not from the papers.
+- Check every citation it gives against the paper itself.
+:::
+
+::: {.center}
+# 5 Reasoning Effort {data-name="Effort"}
+:::
+
+## 5.1 Start low
+
+![](assets/custom/ag_effort.png){fig-align="center" height="525px"}
+
+::: {.notes}
+- Effort sets how much the model thinks before each step. Higher effort takes longer and uses more of your plan's limits.
+- Most lab work (scripts, plots, edits) is done well at low effort, and fast. Raise it when the agent is going in circles on a bug, or for a design decision you will build on.
+- The bars show the direction, not measured values.
+:::
+
+::: {.center}
+# 6 Long Runs {data-name="Long runs"}
+:::
+
+## 6.1 Nightly runs
+
+![](assets/custom/ag_nightly.png){fig-align="center" height="536px"}
+
+::: {.notes}
+- In the evening, plan the runs with the agent and launch them on the GPU server.
+- The lab's heartbeat skill checks the jobs at a fixed interval: are they running, did one crash, is the GPU idle. It restarts what failed and writes a log.
+- In the morning the agent reads the logs and writes report.md: what finished, the results, what failed and why.
+- Training runs should save checkpoints, so a restart continues instead of starting over.
+:::
+
+## 6.2 Tracking experiments: ClearML
+
+![](assets/custom/ag_clearml.png){fig-align="center" height="506px"}
+
+::: {.notes}
+- ClearML records every run: its settings, its metric curves and its output files, on a server the whole lab can open.
+- You compare runs in the web dashboard.
+- The lab's ClearML skill lets the agent do the same: log new runs, read the results of old ones, and compare them in a report.
+:::
+
+::: {.center}
+# 7 Where Claude Runs {data-name="Setups"}
+:::
+
+## 7.1 Two setups
+
+::: {.r-stack}
+![](assets/custom/ag_where_0.png){height="740px"}
+
+![](assets/custom/ag_where_1.png){.fragment height="740px"}
+:::
+
+::: {.notes}
+- A: Claude runs on your PC and executes commands on the server over ssh. Nothing to install on the server; your files and skills stay local. Each command opens a connection, and nothing keeps running when your PC sleeps.
+- Click, B: Claude runs on the server. From your PC, a WSL terminal connects with ssh and attaches to a tmux session where Claude runs. tmux keeps the session alive when you disconnect, so overnight work continues.
+- Remote Control lets you follow and steer that session from the Claude app or your phone.
+- Skills are reusable prompts. They live in ~/.claude/skills on the machine where Claude runs: in setup B, install them on the server.
+:::
+
+## 7.2 Demo: a DNA language model on the GPU
+
+::: {.prompt}
+[DEMO PROMPT]{.prompt-label}
+
+```text
+On the GPU server (ssh hoory@gold-srv2, use only GPU 1), embed the AGO2 training sequences
+with the pretrained DNA language model RaphaelMourad/Mistral-DNA-v1-17M-hg38: one vector
+per sequence, the average of the last layer. Train a logistic regression on the vectors and
+report the held-out AUROC. Then compare it with the CNN from the first task.
+```
+:::
+
+::: {.notes}
+- Setup A, live. Watch for: the agent checks which GPU is free, installs what is missing in its own environment, and copies results back.
+- Expected: the frozen language model with a linear probe reaches about 0.78 held-out AUROC; the CNN trained on all labels about 0.86.
+:::
+
+::: {.center}
+# 8 Working with Agents {data-name="Workflow"}
+:::
+
+## 8.1 Work in phases
+
+![](assets/custom/ag_phases.png){fig-align="center" height="609px"}
+
+::: {.notes}
+- Split a project into phases, each small enough to review: data, baseline, model, analysis.
+- Each phase: the agent proposes a plan, you approve it, it runs, it writes report.md, you read the report before the next phase starts.
+- The report is the record: what was done, the numbers, the figures, what did not work. A new session starts the next phase from it.
+:::
+
+## 8.2 A shared wiki
+
+![](assets/custom/ag_wiki.png){fig-align="center" height="740px"}
+
+::: {.notes}
+- Three files that every session reads at the start and updates at the end of a phase.
+- FINDINGS: dated results with the evidence and where it is. DECISIONS: what was chosen, why, and what else was considered. RISKS: what could make the results wrong, how to check, and the status.
+- CLAUDE.md is read by the agent at the start of every session: the project goal, the folder layout, how to run things, and the rules (for example: never delete data, GPU 1 only, update the wiki after every phase).
+- Bookkeeping is what makes agent work reusable: without it each session starts from zero and results cannot be traced.
+:::
+
+::: {.center}
+# 9 Your Turn {data-name="Task 2"}
+:::
+
+## 9.1 Train a CNN from scratch {data-todo="Task 2"}
+
+::: {.prompt}
+[PASTE INTO THE SAME FOLDER]{.prompt-label}
+
+```text
+Now train a small neural network on the same data, on this computer's CPU.
+1. Download the held-out files CLIPSEQ_AGO2.ls.positives.fa and CLIPSEQ_AGO2.ls.negatives.fa
+   from the same address (1,000 test sequences).
+2. Encode every sequence as a one-hot matrix of 4 rows (A, C, G, U or T) by 501 columns;
+   pad short sequences with 0.25.
+3. In PyTorch, build a CNN: two blocks of convolution, ReLU and max pooling, then one
+   linear layer to one output.
+4. Train with Adam (learning rate 0.001, batches of 256) for 10 epochs. After every epoch
+   print the time and the AUROC on the held-out files.
+5. Plot AUROC against epoch, save it as auroc.png, and write report.md: what you did,
+   the numbers, and what you would try next.
+```
+:::
+
+::: {.notes}
+- Start with a plan: ask the agent to propose the network and the training script before running anything, and approve it.
+- PyTorch is about 200 MB to install; the rest of the task runs in about two minutes.
+- Step 5 is the phase report of section 8.
+:::
+
+## 9.2 What to expect
+
+![](assets/custom/ag_cnn_curve.png){fig-align="center" height="680px"}
+
+::: {.notes}
+- Measured on a laptop CPU with this exact recipe (the network of the AI Days workshop, 2,491 weights): about 8 seconds per epoch, held-out AUROC 0.79 after one epoch and 0.87 after ten.
+- Compare with the GC and U plot: composition alone reaches about 0.66.
+- Next steps to ask for: more filters, a matched control, saving the model, a ClearML log.
+:::
+
+## 9.3 Links
+
+- Claude Desktop: [claude.ai/download](https://claude.ai/download)
+- Data: [huggingface.co/datasets/yup8/ai-days-2026-ago2](https://huggingface.co/datasets/yup8/ai-days-2026-ago2)
+- Figure skill: [github.com/TingxiYu/academic-figure-skill](https://github.com/TingxiYu/academic-figure-skill)
+- The data's source: Maticzka et al., *Genome Biology* 15, R17 (2014), [doi:10.1186/gb-2014-15-1-r17](https://doi.org/10.1186/gb-2014-15-1-r17)
+
+::: {.notes}
+- The AI Days workshop decks and notebooks: mathoory.github.io/ai-days-2026-dna-workshop
+:::
