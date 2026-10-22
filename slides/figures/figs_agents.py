@@ -225,7 +225,7 @@ def effort():
         if i == 1:                                       # where to be most of the time
             ax.add_patch(Rectangle((x - 3, 1.5), 31, 48, fill=False, ec=BASE["U"], lw=3.5))
     label(ax, 2, 56, "thinking before each step: time and tokens", fs=21, color=MUTED, ha="left")
-    ex = ["scripts, plots,\nfile edits", "a new analysis", "a bug you\ncannot find", "a hard design\nchoice", "rarely needed"]
+    ex = ["small, mechanical\nedits", "most lab work:\nscripts, plots, analyses", "a bug you\ncannot find", "a hard design\nchoice", "rarely needed"]
     for i, t in enumerate(ex):
         label(ax, 3 + i * 31.4 + 12.5, 7, t, fs=18, color=MUTED)
     save(fig, "ag_effort")
