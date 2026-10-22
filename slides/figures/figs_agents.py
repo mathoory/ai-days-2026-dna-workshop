@@ -500,7 +500,7 @@ def lab_skills():
 def checks():
     rows = [("Shuffled labels (expected)", 0.50, MID), ("GC and U only", 0.66, MID), ("CNN, 10 epochs", 0.866, CNN_C)]
     fig = newfig(); fig.set_size_inches(16, 6)
-    ax = fig.add_axes([0.27, 0.18, 0.66, 0.78])
+    ax = fig.add_axes([0.33, 0.18, 0.6, 0.78])
     for i, (n, v, c) in enumerate(rows):
         ax.barh(i, v - 0.4, left=0.4, color=c, height=0.62, alpha=0.45 if "expected" in n else 1)
         ax.text(v + 0.008, i, f"{v:.2f}", va="center", fontsize=24, color=c)
